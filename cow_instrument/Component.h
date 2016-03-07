@@ -1,3 +1,6 @@
+#ifndef COMPONENT_H
+#define COMPONENT_H
+
 #include <array>
 
 using V3D = std::array<double, 3>;
@@ -8,3 +11,5 @@ public:
   virtual void setPos(V3D& pos) = 0;
   virtual ~Component(){}
 };
+
+#endif

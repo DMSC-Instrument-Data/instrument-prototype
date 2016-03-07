@@ -1,3 +1,5 @@
+add_subdirectory(testing)
+
 
 set ( SOURCE_FILES Instrument.cpp 
                    Detector.cpp

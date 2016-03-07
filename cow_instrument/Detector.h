@@ -1,3 +1,6 @@
+#ifndef DETECTOR_H
+#define DETECTOR_H
+
 #include "Component.h"
 
 class Detector : public Component {
@@ -10,3 +13,5 @@ public:
 private:
   V3D m_pos;
 };
+
+#endif
