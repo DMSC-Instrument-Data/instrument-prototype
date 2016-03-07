@@ -4,16 +4,16 @@
 namespace {
 
 // The fixture for testing class Foo.
-class FooTest : public ::testing::Test {
+class InstrumentTest : public ::testing::Test {
  protected:
   // You can remove any or all of the following functions if its body
   // is empty.
 
-  FooTest() {
+  InstrumentTest() {
     // You can do set-up work for each test here.
   }
 
-  virtual ~FooTest() {
+  virtual ~InstrumentTest() {
     // You can do clean-up work that doesn't throw exceptions here.
   }
 
@@ -34,8 +34,7 @@ class FooTest : public ::testing::Test {
 };
 
 
-// Tests that the Foo::Bar() method does Abc.
-TEST_F(FooTest, MethodBarDoesAbc) {
+TEST_F(InstrumentTest, dummy_test) {
   EXPECT_EQ(1, 1);
 }
 
