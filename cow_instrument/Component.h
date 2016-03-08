@@ -8,8 +8,11 @@ using V3D = std::array<double, 3>;
 class Component {
 public:
   virtual V3D getPos() const = 0;
-  virtual void setPos(V3D& pos) = 0;
+  virtual void setPos(const V3D& pos) = 0;
+  virtual void replace(Component* original, Component* replacement) = 0;
   virtual ~Component(){}
+  virtual Component* clone() const = 0;
+  virtual const Component& parent() const = 0;
 };
 
 #endif
