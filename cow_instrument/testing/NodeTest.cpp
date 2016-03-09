@@ -42,7 +42,7 @@ TEST_F(NodeTest, test_construction_isolated) {
   Node node(contents);
 
   EXPECT_FALSE(node.hasParent());
-  EXPECT_FALSE(node.hasChild());
+  EXPECT_FALSE(node.hasChildren());
 }
 
 TEST_F(NodeTest, test_indirection) {
@@ -66,7 +66,7 @@ TEST_F(NodeTest, test_construction_with_parent) {
   Node node(parent, contents);
 
   EXPECT_TRUE(node.hasParent());
-  EXPECT_FALSE(node.hasChild());
+  EXPECT_FALSE(node.hasChildren());
 }
 
 TEST_F(NodeTest, test_construction_with_parent_and_child) {
@@ -80,10 +80,10 @@ TEST_F(NodeTest, test_construction_with_parent_and_child) {
   Node node(parent, child, contents);
 
   EXPECT_TRUE(node.hasParent());
-  EXPECT_TRUE(node.hasChild());
+  EXPECT_TRUE(node.hasChildren());
 }
 
-TEST_F(NodeTest, test_modify) {
+TEST_F(NodeTest, test_modify_linear) {
 
   /*
     we start like this
@@ -125,13 +125,79 @@ TEST_F(NodeTest, test_modify) {
 
   // Sanity check newTree. We expect all nodes to be different.
   EXPECT_NE(newTree.get(), a.get());                   // compare a to a`
-  EXPECT_NE(newTree->child().get(), a->child().get()); // compare b to b`
-  EXPECT_NE(newTree->child()->child().get(),
-            a->child()->child().get()); // compare c to c`
+  EXPECT_NE(newTree->children()[0].get(), a->children()[0].get()); // compare b to b`
+  EXPECT_NE(newTree->children()[0]->children()[0].get(),
+            a->children()[0]->children()[0].get()); // compare c to c`
 
   // However, only the contents of one component should be different.
   EXPECT_EQ(&newTree->const_ref(), &a->const_ref());
-  EXPECT_EQ(&newTree->child()->const_ref(), &b->const_ref());
-  EXPECT_NE(&newTree->child()->child()->const_ref(), &c->const_ref());
+  EXPECT_EQ(&newTree->children()[0]->const_ref(), &b->const_ref());
+  EXPECT_NE(&newTree->children()[0]->children()[0]->const_ref(), &c->const_ref());
 }
+
+TEST_F(NodeTest, test_modify_tree) {
+
+  /*
+    we start like this
+
+        A
+        |
+ ------------------
+ |                |
+ B                C
+
+  */
+
+  MockComponent *a_contents = new MockComponent;
+  EXPECT_CALL(*a_contents, equals(_)).WillOnce(Return(false));
+  MockComponent *b_contents = new MockComponent;
+  EXPECT_CALL(*b_contents, equals(_)).WillOnce(Return(false));
+  MockComponent *c_contents = new MockComponent;
+  EXPECT_CALL(*c_contents, equals(_)).WillOnce(Return(true));
+
+  auto a = std::make_shared<Node>(CowPtr<Component>(a_contents));
+  auto b = std::make_shared<Node>(a, CowPtr<Component>(b_contents));
+  auto c = std::make_shared<Node>(a, CowPtr<Component>(c_contents));
+  a->addChild(b);
+  a->addChild(c);
+
+  /*
+    we then modify c.
+    so we should now have a shallow copied node tree,
+
+        A`
+        |
+ ------------------
+ |                |
+ B`                |C`|
+  */
+
+  // We would therefore expect the command to be executed on c_contents
+  MockCommmand command;
+  EXPECT_CALL(command, execute(_)).Times(1);
+
+  // We would also expect that the contents of c are deep copied.
+  EXPECT_CALL(*c_contents, clone()).WillOnce(Return(new MockComponent));
+
+  auto newTree = c->modify(command);
+
+  EXPECT_TRUE(Mock::VerifyAndClear(a_contents));
+  EXPECT_TRUE(Mock::VerifyAndClear(b_contents));
+  EXPECT_TRUE(Mock::VerifyAndClear(c_contents));
+
+  // Sanity check newTree. We expect all nodes to be different.
+  EXPECT_NE(newTree.get(), a.get());                   // compare a to a`
+  EXPECT_NE(newTree->children()[0].get(), a->children()[0].get()); // compare b to b`
+  EXPECT_NE(newTree->children()[1].get(),
+            a->children()[1].get()); // compare c to c`
+
+  // However, only the contents of one component should be different.
+  EXPECT_EQ(&newTree->const_ref(), &a->const_ref());
+  EXPECT_EQ(&newTree->children()[0]->const_ref(), &b->const_ref());
+  EXPECT_NE(&newTree->children()[1]->const_ref(), &c->const_ref());
+}
+
+
+
+
 }

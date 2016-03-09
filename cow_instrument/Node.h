@@ -4,6 +4,7 @@
 #include "cow_ptr.h"
 #include <memory>
 #include <tuple>
+#include <vector>
 
 class Component;
 class Command;
@@ -32,11 +33,11 @@ public:
 
   bool hasParent() const;
 
-  bool hasChild() const;
+  bool hasChildren() const;
 
   void addChild(std::shared_ptr<Node> child);
 
-  std::shared_ptr< Node>  child(); // TODO Make const T
+  std::vector<std::shared_ptr<Node> >  children(); // TODO Make const T
   std::shared_ptr< Node>  parent(); // TODO Make const T
 
   // Provide read-only access outside of modify.
@@ -51,9 +52,8 @@ private:
   std::shared_ptr<Node> smartCopy(const Command &command,
                                                                           const Component &component,
                                                                           std::shared_ptr<Node> &newPrevious) const;
-
   std::shared_ptr<Node> m_previous; // parent
-  std::shared_ptr<Node> m_next;     // Child
+  std::vector<std::shared_ptr<Node> > m_next;     // Children
   CowPtr<Component> m_contents;
 };
 
