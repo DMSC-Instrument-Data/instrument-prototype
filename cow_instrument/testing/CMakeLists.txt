@@ -13,9 +13,10 @@ include_directories(${GTEST_INCLUDE_DIRS} ${GMOCK_INCLUDE_DIRS})
 
 set ( TEST_FILES InstrumentTest.cpp
                  DetectorTest.cpp
+                 NodeTest.cpp
 )
 
-add_executable(cow_instrument_test runner.cpp ${TEST_FILES})
+add_executable(cow_instrument_test runner.cpp MockTypes.h ${TEST_FILES})
 target_link_libraries(cow_instrument_test LINK_PUBLIC cow_instrument ${GTEST_BOTH_LIBRARIES} ${GMOCK_LIBRARIES} ${GMOCK_MAIN_LIBRARIES})
 add_test(cow_instrument_test cow_instrument_test)
 

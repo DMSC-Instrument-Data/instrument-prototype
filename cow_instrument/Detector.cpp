@@ -1,30 +1,24 @@
 #include "Detector.h"
 
-Detector::Detector(CowPtr<Component> parent, const V3D &pos)
-    : m_parent(parent), m_pos(pos) {}
+Detector::Detector(size_t id, const V3D &pos)
+    : m_id(id), m_pos(pos) {}
 
 V3D Detector::getPos() const { return m_pos; }
 
-void Detector::setPos(const V3D &pos) {
+void Detector::setPos(const V3D &pos) { m_pos = pos; }
 
-  m_pos = pos;
+
+Detector *Detector::clone() const {
+
+
+  return new Detector(this->m_id, this->m_pos);
 }
 
-void Detector::replace(Component*, Component*){
-    throw std::invalid_argument("Replace not supported on Detector");
+bool Detector::equals(const Component &other) const{
+  if (auto *otherDetector = dynamic_cast<const Detector *>(&other)) {
+    return otherDetector->id() == this->id();
+  }
+  return false;
 }
-
-Detector* Detector::clone() const {
-
-    auto parentCopy = m_parent; // Shallow copy
-    parentCopy.copy(); // Deep copy
-
-    return new Detector(parentCopy, this->m_pos);
-}
-
-const Component& Detector::parent() const{
-    return m_parent.const_ref();
-}
-
 
 Detector::~Detector() {}

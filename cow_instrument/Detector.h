@@ -2,26 +2,25 @@
 #define DETECTOR_H
 
 #include "Component.h"
-#include "cow_ptr.h"
 
 class Detector : public Component {
 
 public:
 
-  Detector(CowPtr<Component> parent, const V3D &pos);
+  Detector(size_t id, const V3D &pos);
   Detector(const Detector&) = default;
   Detector& operator=(const Detector&) = default;
 
   V3D getPos() const override;
   void setPos(const V3D &pos) override;
-  void replace(Component* original, Component* replacement) override;
   virtual ~Detector();
   Detector* clone() const override;
-  const Component& parent() const override;
+  bool equals(const Component& other) const override;
+  size_t id() const{return m_id;}
 
 private:
+  size_t m_id;
   V3D m_pos;
-  mutable CowPtr<Component> m_parent;
 
 
 };

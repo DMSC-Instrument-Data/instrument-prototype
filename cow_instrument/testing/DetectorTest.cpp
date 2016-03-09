@@ -3,20 +3,11 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include <array>
+#include "MockTypes.h"
 
 using namespace testing;
 
 namespace {
-
-class MockComponent : public Component {
-public:
-  MOCK_CONST_METHOD0(getPos, V3D());
-  MOCK_METHOD1(setPos, void(const V3D &));
-  MOCK_METHOD2(replace, void(Component *, Component *));
-  MOCK_CONST_METHOD0(clone, Component*());
-  MOCK_CONST_METHOD0(parent, const Component&());
-  ~MockComponent() {}
-};
 
 // The fixture for testing class Foo.
 class DetectorTest : public ::testing::Test {
@@ -49,59 +40,40 @@ protected:
 };
 
 TEST_F(DetectorTest, test_construction) {
+
   V3D input{1, 2, 3};
-  Detector det(CowPtr<Component>(new MockComponent), input);
+  size_t id = 1;
+  Detector det(id, input);
   EXPECT_EQ(det.getPos(), input);
+  EXPECT_EQ(det.id(), id);
 }
 
-TEST_F(DetectorTest, test_clone_invokes_upward_cow){
-
-    MockComponent* parent = new MockComponent;
-    EXPECT_CALL(*parent, clone()).Times(1);
+TEST_F(DetectorTest, test_equals){
 
     V3D input{1, 2, 3};
-    Detector det(CowPtr<Component>(parent), input);
+    Detector a(1, input);
+    Detector b(2, input); // Different id.
+
+    EXPECT_FALSE(a.equals(b));
+
+    MockComponent c;
+    EXPECT_FALSE(a.equals(c));
+
+    Detector d(1, input);
+    EXPECT_TRUE(a.equals(d));
+}
+
+TEST_F(DetectorTest, test_clone){
+    V3D input{1, 2, 3};
+    Detector det(1, input);
     Detector* clone = det.clone();
 
-
-    // We expect the clone to be a different object from the original.
-    EXPECT_NE(clone, &det);
-
-    // We expect the cloned parent to also be a different object from the original parent
-    EXPECT_NE(&clone->parent(), &det.parent());
-
-    EXPECT_TRUE(Mock::VerifyAndClear(parent));
+    EXPECT_TRUE(det.equals(*clone));
+    EXPECT_NE(&det, clone); // different objects
     delete clone;
-}
-
-TEST_F(DetectorTest, partial_tree_update){
-
-/*
-         A
-         |
-  ---------------
-  |             |
-  B (detector)  C (detector)
-
-  Updating C, should result in a clone of A, but also B needs
-  it's parent reference updated, but B does not need to be cloned itself.
-
-
-
-*/
-
-    MockComponent* A = new MockComponent;
-    EXPECT_CALL(*A, clone()).Times(1);
-    auto parent = CowPtr<Component>(A);
-    V3D input{1, 2, 3};
-    Detector B(parent, input);
-    Detector C(parent, input);
-
-    Detector* clone = C.clone();
-
-    //TODO INCOMPLETE
 
 }
+
 
 
 
