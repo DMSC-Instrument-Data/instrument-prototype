@@ -1,19 +1,24 @@
-#include "Instrument.h"
+#include "Detector.h"
+#include "cow_ptr.h"
 #include "gtest/gtest.h"
+#include "MoveCommand.h"
+#include "Node.h"
+
+using namespace testing;
 
 namespace {
 
 // The fixture for testing class Foo.
-class InstrumentTest : public ::testing::Test {
- protected:
+class Example : public ::testing::Test {
+protected:
   // You can remove any or all of the following functions if its body
   // is empty.
 
-  InstrumentTest() {
+  Example() {
     // You can do set-up work for each test here.
   }
 
-  virtual ~InstrumentTest() {
+  virtual ~Example() {
     // You can do clean-up work that doesn't throw exceptions here.
   }
 
@@ -34,8 +39,26 @@ class InstrumentTest : public ::testing::Test {
 };
 
 
-TEST_F(InstrumentTest, dummy_test) {
-  EXPECT_EQ(1, 1);
+TEST_F(Example, run_example){
+    
+    
+/*
+
+        A
+        |
+ ------------------
+ |                |
+ B                C
+
+*/
+    
+    
+    
 }
 
-}  // namespace
+
+
+
+
+
+} // namespace

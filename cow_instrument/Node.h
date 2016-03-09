@@ -36,12 +36,15 @@ public:
 
   void addChild(std::shared_ptr<Node> child);
 
-  std::shared_ptr< Node>  child();
-  std::shared_ptr< Node>  parent();
-  CowPtr<Component> contents();
+  std::shared_ptr< Node>  child(); // TODO Make const T
+  std::shared_ptr< Node>  parent(); // TODO Make const T
+
+  // Provide read-only access outside of modify.
+  const Component& const_ref();
 
 private:
-  Node *  parentPtr();
+  Node const * const  parentPtr() const;
+  Node const * const obtainRoot() const;
 
   void doModify(const Command &command);
 
