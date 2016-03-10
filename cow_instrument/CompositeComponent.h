@@ -21,4 +21,6 @@ private:
   V3D m_pos;
 };
 
+using CompositeComponent_sptr = std::shared_ptr<CompositeComponent>;
+
 #endif

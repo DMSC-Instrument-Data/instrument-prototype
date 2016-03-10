@@ -1,4 +1,5 @@
 #include "Detector.h"
+#include "CompositeComponent.h"
 #include "cow_ptr.h"
 #include "gtest/gtest.h"
 #include "MoveCommand.h"
@@ -8,50 +9,38 @@ using namespace testing;
 
 namespace {
 
-// The fixture for testing class Foo.
-class Example : public ::testing::Test {
-protected:
-  // You can remove any or all of the following functions if its body
-  // is empty.
 
-  Example() {
-    // You can do set-up work for each test here.
-  }
-
-  virtual ~Example() {
-    // You can do clean-up work that doesn't throw exceptions here.
-  }
-
-  // If the constructor and destructor are not enough for setting up
-  // and cleaning up each test, you can define the following methods:
-
-  virtual void SetUp() {
-    // Code here will be called immediately after the constructor (right
-    // before each test).
-  }
-
-  virtual void TearDown() {
-    // Code here will be called immediately after each test (right
-    // before the destructor).
-  }
-
-  // Objects declared here can be used by all tests in the test case for Foo.
-};
+CompositeComponent_sptr make_square_bank(){
+    CompositeComponent_sptr bank = std::make_shared<CompositeComponent>();
+    for(size_t i = 0; i < 100; ++i){
+        for(size_t j = 0; j < 100; ++j){
+            bank->addComponent(std::make_shared<Detector>(i * 100 + j, V3D{double(i), double(j), double(0)} ));
+        }
+    }
+    return bank;
+}
 
 
-TEST_F(Example, run_example){
+TEST(example, simple_sans_example){
     
     
 /*
 
-        A
+        instrument
         |
- ------------------
- |                |
- B                C
-
+ --------------------------------------------
+                    |                      |
+              front_trolley           rear_trolley
+                        |                       |
+             ________________________       ________________________
+            |       |       |       |       |                     |
+            N       S       E       W       l_curtain            r_curtain
 */
-    
+
+    CompositeComponent_sptr N = make_square_bank();
+    CompositeComponent_sptr E = make_square_bank();
+    CompositeComponent_sptr S = make_square_bank();
+    CompositeComponent_sptr W = make_square_bank();
     
     
 }

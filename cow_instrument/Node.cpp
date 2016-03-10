@@ -18,7 +18,7 @@ Node_sptr Node::modify(const Command &command) {
   auto *root = obtainRoot();
   Node_sptr emptyPrevious(nullptr);
   Node_sptr newRoot = root->smartCopy(command, m_contents.const_ref(),
-                                      emptyPrevious); // New Instrument
+                                      emptyPrevious, false /*start cascading modifications*/); // New Instrument
   return newRoot;
 }
 
@@ -31,16 +31,18 @@ void Node::doModify(const Command &command) {
 void Node::addChild(Node_sptr child) { m_next.push_back(child); }
 
 Node_sptr Node::smartCopy(const Command &command, const Component &component,
-                          Node_sptr &newPrevious) const {
+                          Node_sptr &newPrevious, bool cascade) const {
+
+  bool doCascade = m_contents->equals(component) || cascade ;
 
   Node_sptr copy = std::make_shared<Node>(newPrevious, m_contents);
   if (this->hasChildren()) {
     for (size_t i = 0; i < this->m_next.size(); ++i) {
-      copy->addChild(this->m_next[i]->smartCopy(command, component, copy));
+      copy->addChild(this->m_next[i]->smartCopy(command, component, copy, doCascade));
     }
   }
 
-  if (m_contents->equals(component)) {
+  if (doCascade) {
     copy->doModify(command);
   }
 
