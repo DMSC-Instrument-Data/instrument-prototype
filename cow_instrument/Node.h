@@ -30,7 +30,7 @@ public:
 
   // What this will return is the new root node (instrument) with the command
   // applied.
-  std::shared_ptr<Node> modify(const Command &command);
+  std::shared_ptr<Node> modify(const Command &command) const;
 
   bool hasParent() const;
 
@@ -42,7 +42,7 @@ public:
   std::shared_ptr<Node> parent();                // TODO Make const T
 
   // Provide read-only access outside of modify.
-  const Component &const_ref();
+  const Component &const_ref() const;
 
 private:
   Node const *const parentPtr() const;

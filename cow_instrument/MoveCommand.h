@@ -14,7 +14,8 @@ public:
 
 private:
 
-  V3D m_pos;
+  /// Relative offset
+  V3D m_offset;
 };
 
 #endif

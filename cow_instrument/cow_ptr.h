@@ -31,7 +31,7 @@ public:
     copy();
     return m_sp.operator->();
   }
-  const T& const_ref(){
+  const T& const_ref() const {
       return *m_sp;
   }
 

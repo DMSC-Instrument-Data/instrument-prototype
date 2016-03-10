@@ -13,7 +13,7 @@ Node::Node(CowPtr<Component> contents)
 
 Node::~Node() {}
 
-Node_sptr Node::modify(const Command &command) {
+Node_sptr Node::modify(const Command &command) const {
 
   auto *root = obtainRoot();
   Node_sptr emptyPrevious(nullptr);
@@ -67,4 +67,4 @@ Node const *const Node::obtainRoot() const {
   return root;
 }
 
-const Component &Node::const_ref() { return m_contents.const_ref(); }
+const Component &Node::const_ref() const { return m_contents.const_ref(); }
