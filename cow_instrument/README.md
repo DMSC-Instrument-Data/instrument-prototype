@@ -20,3 +20,39 @@ After each modification a pointer to the root `Node` of the new tree is returned
 ###Shallow Copy###
 
 When `Nodes` are copied, the COW pointer to the `Component` is copied, but a new `Component` is not generated. Only when mutable access to a `Component` is made is the `Component` copied too. 
+
+###The Node Type###
+
+For the actual class declaration see [here](Node.h) 
+
+```cpp
+class Node {
+public:
+  /* Method for making instrument modifications. 
+  Note that it is const and return a new root node.
+  */
+  Node_sptr modify(Command& command) const;
+  /* Only const access to the Component is allowed externally.
+     Ensures immutability of any components.
+  */
+  const Component & const_ref() const;
+private:
+  Node_sptr m_parent;
+  std::vector<Node_sptr> m_children;
+  COWPtr<Component> m_component;
+};
+```
+
+###The Command Type###
+
+For the actual class declaration see [here](Command.h) 
+```cpp
+class Command {
+public:
+  /* 
+    Do something to a component
+  */
+  void execute(Component& command) const;
+};
+```
+
