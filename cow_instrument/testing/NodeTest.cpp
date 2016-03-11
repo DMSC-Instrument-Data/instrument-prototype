@@ -1,4 +1,5 @@
 #include "Node.h"
+#include "InstrumentTree.h"
 #include "cow_ptr.h"
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
@@ -92,16 +93,16 @@ TEST(node_test, test_modify_linear) {
   auto newTree = c->modify(command);
 
   // Sanity check newTree. We expect all nodes to be different.
-  EXPECT_NE(newTree.get(), a.get()); // compare a to a`
-  EXPECT_NE(newTree->child(0).get(),
+  EXPECT_NE(newTree->root().get(), a.get()); // compare a to a`
+  EXPECT_NE(newTree->root()->child(0).get(),
             a->child(0).get()); // compare b to b`
-  EXPECT_NE(newTree->child(0)->child(0).get(),
+  EXPECT_NE(newTree->root()->child(0)->child(0).get(),
             a->child(0)->child(0).get()); // compare c to c`
 
   // However, only the contents of one component should be different.
-  EXPECT_EQ(&newTree->const_ref(), &a->const_ref());
-  EXPECT_EQ(&newTree->child(0)->const_ref(), &b->const_ref());
-  EXPECT_NE(&newTree->child(0)->child(0)->const_ref(),
+  EXPECT_EQ(&newTree->root()->const_ref(), &a->const_ref());
+  EXPECT_EQ(&newTree->root()->child(0)->const_ref(), &b->const_ref());
+  EXPECT_NE(&newTree->root()->child(0)->child(0)->const_ref(),
             &c->const_ref());
 
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(a_contents));
@@ -164,16 +165,16 @@ TEST(node_test, test_modify_tree) {
   EXPECT_TRUE(Mock::VerifyAndClear(c_contents));
 
   // Sanity check newTree. We expect all nodes to be different.
-  EXPECT_NE(newTree.get(), a.get()); // compare a to a`
-  EXPECT_NE(newTree->child(0).get(),
+  EXPECT_NE(newTree->root().get(), a.get()); // compare a to a`
+  EXPECT_NE(newTree->root()->child(0).get(),
             a->child(0).get()); // compare b to b`
-  EXPECT_NE(newTree->child(1).get(),
+  EXPECT_NE(newTree->root()->child(1).get(),
             a->child(1).get()); // compare c to c`
 
   // However, only the contents of one component should be different.
-  EXPECT_EQ(&newTree->const_ref(), &a->const_ref());
-  EXPECT_EQ(&newTree->child(0)->const_ref(), &b->const_ref());
-  EXPECT_NE(&newTree->child(1)->const_ref(), &c->const_ref());
+  EXPECT_EQ(&newTree->root()->const_ref(), &a->const_ref());
+  EXPECT_EQ(&newTree->root()->child(0)->const_ref(), &b->const_ref());
+  EXPECT_NE(&newTree->root()->child(1)->const_ref(), &c->const_ref());
 
   delete a_contents;
   delete b_contents;
@@ -246,20 +247,20 @@ TEST(node_test, test_tree_cascade) {
   EXPECT_TRUE(Mock::VerifyAndClear(c_contents));
 
   // Sanity check newTree. We expect all nodes to be different.
-  EXPECT_NE(newTree.get(), a.get()); // compare a to a`
-  EXPECT_NE(newTree->child(0).get(),
+  EXPECT_NE(newTree->root().get(), a.get()); // compare a to a`
+  EXPECT_NE(newTree->root()->child(0).get(),
             a->child(0).get()); // compare b to b`
-  EXPECT_NE(newTree->child(1).get(),
+  EXPECT_NE(newTree->root()->child(1).get(),
             a->child(1).get()); // compare c to c`
-  EXPECT_NE(newTree->child(1)->child(0).get(),
+  EXPECT_NE(newTree->root()->child(1)->child(0).get(),
             a->child(1)->child(0).get()); // compare d to d`
 
   // These contents should be the same
-  EXPECT_EQ(&newTree->const_ref(), &a->const_ref());
-  EXPECT_EQ(&newTree->child(0)->const_ref(), &b->const_ref());
+  EXPECT_EQ(&newTree->root()->const_ref(), &a->const_ref());
+  EXPECT_EQ(&newTree->root()->child(0)->const_ref(), &b->const_ref());
   // These should not
-  EXPECT_NE(&newTree->child(1)->const_ref(), &c->const_ref());
-  EXPECT_NE(&newTree->child(1)->child(0)->const_ref(), &d->const_ref());
+  EXPECT_NE(&newTree->root()->child(1)->const_ref(), &c->const_ref());
+  EXPECT_NE(&newTree->root()->child(1)->child(0)->const_ref(), &d->const_ref());
 
   delete a_contents;
   delete b_contents;

@@ -8,6 +8,7 @@
 
 class Component;
 class Command;
+class InstrumentTree;
 
 /**
  * To give us a way of reusing components, and simply updating the association
@@ -30,7 +31,7 @@ public:
 
   // What this will return is the new root node (instrument) with the command
   // applied.
-  std::shared_ptr<Node> modify(const Command &command) const;
+  std::unique_ptr<InstrumentTree> modify(const Command &command) const;
 
   bool hasParent() const;
 
@@ -38,8 +39,8 @@ public:
 
   void addChild(std::shared_ptr<Node> child);
 
-  std::vector<std::shared_ptr<const Node>> children(); // TODO Make const T
-  std::shared_ptr<const Node> parent();                // TODO Make const T
+  std::vector<std::shared_ptr<const Node>> children() const;
+  std::shared_ptr<const Node> parent() const;
 
   // Provide read-only access outside of modify.
   const Component &const_ref() const;

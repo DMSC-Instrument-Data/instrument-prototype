@@ -4,9 +4,10 @@ add_subdirectory(testing)
 set ( SOURCE_FILES
                    CompositeComponent.cpp
                    Detector.cpp
-                   Instrument.cpp
+                   InstrumentTree.cpp
                    MoveCommand.cpp
                    Node.cpp
+                   NodeIterator.cpp
                    NullComponent.cpp                   
 )
 
@@ -16,9 +17,10 @@ set ( INCLUDE_FILES
                    CompositeComponent.h
                    cow_ptr.h
                    Detector.h
-                   Instrument.h
+                   InstrumentTree.h
                    MoveCommand.h
                    Node.h
+                   NodeIterator.h
                    NullComponent.h
 )
 
