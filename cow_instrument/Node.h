@@ -38,11 +38,13 @@ public:
 
   void addChild(std::shared_ptr<Node> child);
 
-  std::vector<std::shared_ptr<Node>> children(); // TODO Make const T
-  std::shared_ptr<Node> parent();                // TODO Make const T
+  std::vector<std::shared_ptr<const Node>> children(); // TODO Make const T
+  std::shared_ptr<const Node> parent();                // TODO Make const T
 
   // Provide read-only access outside of modify.
   const Component &const_ref() const;
+
+  std::shared_ptr<const Node> child(size_t index) const;
 
 private:
   Node const *const parentPtr() const;
@@ -55,7 +57,7 @@ private:
                                   std::shared_ptr<Node> &newPrevious,
                                   bool cascade) const;
   std::shared_ptr<Node> m_previous;          // parent
-  std::vector<std::shared_ptr<Node>> m_next; // Children
+  std::vector<std::shared_ptr<const Node>> m_next; // Children
   CowPtr<Component> m_contents;
 };
 

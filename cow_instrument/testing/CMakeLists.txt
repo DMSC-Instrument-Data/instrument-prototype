@@ -11,11 +11,13 @@ set( GMOCK_MAIN_LIBRARIES ${GTEST_LIBRARY_DIR}/../libgmock-main.a CACHE FILEPATH
 include_directories(${GTEST_INCLUDE_DIRS} ${GMOCK_INCLUDE_DIRS})
 
 
-set ( TEST_FILES MoveCommandTest.cpp
-                 DetectorTest.cpp
-                 NodeTest.cpp
-                 Example.cpp
+set ( TEST_FILES
                  CompositeComponentTest.cpp
+                 DetectorTest.cpp
+                 Example.cpp
+                 InstrumentTest.cpp
+                 MoveCommandTest.cpp
+                 NodeTest.cpp
 )
 
 add_executable(cow_instrument_test runner.cpp MockTypes.h ${TEST_FILES})

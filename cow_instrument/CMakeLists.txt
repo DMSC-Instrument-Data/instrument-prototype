@@ -1,21 +1,25 @@
 add_subdirectory(testing)
 
 
-set ( SOURCE_FILES MoveCommand.cpp
-                   Detector.cpp
-                   NullComponent.cpp
-                   Node.cpp
+set ( SOURCE_FILES
                    CompositeComponent.cpp
+                   Detector.cpp
+                   Instrument.cpp
+                   MoveCommand.cpp
+                   Node.cpp
+                   NullComponent.cpp                   
 )
 
-set ( INCLUDE_FILES MoveCommand.h
-                   Detector.h
+set ( INCLUDE_FILES
                    Command.h
                    Component.h
-                   NullComponent.h
-                   cow_ptr.h
-                   Node.h
                    CompositeComponent.h
+                   cow_ptr.h
+                   Detector.h
+                   Instrument.h
+                   MoveCommand.h
+                   Node.h
+                   NullComponent.h
 )
 
 add_library (cow_instrument SHARED ${SOURCE_FILES} ${INCLUDE_FILES})

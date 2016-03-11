@@ -55,9 +55,9 @@ bool Node::hasChildren() const { return m_next.size() > 0; }
 
 Node const *const Node::parentPtr() const { return m_previous.get(); }
 
-std::vector<std::shared_ptr<Node>> Node::children() { return m_next; }
+std::vector<std::shared_ptr<const Node>> Node::children() { return m_next; }
 
-Node_sptr Node::parent() { return m_previous; }
+Node_const_sptr Node::parent() { return m_previous; }
 
 Node const *const Node::obtainRoot() const {
   const Node *root = this;
@@ -65,6 +65,10 @@ Node const *const Node::obtainRoot() const {
     root = root->parentPtr();
   }
   return root;
+}
+
+std::shared_ptr<const Node> Node::child(size_t index) const{
+    return m_next.at(index);
 }
 
 const Component &Node::const_ref() const { return m_contents.const_ref(); }
