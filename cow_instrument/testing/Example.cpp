@@ -6,39 +6,49 @@
 #include "Node.h"
 #include "NullComponent.h"
 #include "InstrumentTree.h"
+#include <chrono>
+#include <iostream>
 
 using namespace testing;
 
 namespace {
 
+class ExampleTest : public ::testing::Test {
 
-CompositeComponent_sptr make_square_bank(size_t width, size_t height){
+public:
+  InstrumentTree m_instrument =
+      InstrumentTree(Node_sptr(new Node(new NullComponent)));
+
+private:
+  CompositeComponent_sptr make_square_bank(size_t width, size_t height) {
+    static size_t id = 1;
     CompositeComponent_sptr bank = std::make_shared<CompositeComponent>();
-    for(size_t i = 0; i < width; ++i){
-        for(size_t j = 0; j < height; ++j){
-            bank->addComponent(std::make_shared<Detector>(i * 100 + j, V3D{double(i), double(j), double(0)} ));
-        }
+    for (size_t i = 0; i < width; ++i) {
+      for (size_t j = 0; j < height; ++j) {
+        bank->addComponent(std::make_shared<Detector>(
+            id++, V3D{double(i), double(j), double(0)}));
+      }
     }
-    bank->deltaPos(V3D{-double(width)/2, -double(height)/2, 0}); // Center it
+    bank->deltaPos(
+        V3D{-double(width) / 2, -double(height) / 2, 0}); // Center it
     return bank;
-}
+  }
 
+protected:
+  ExampleTest() {
 
-TEST(example, simple_sans_example){
-    
-    
-/*
+    /*
 
-        instrument
-        |
- --------------------------------------------
-                    |                      |
-              front_trolley           rear_trolley
-                        |                       |
-             ________________________       ________________________
-            |       |       |       |       |                     |
-            N       S       E       W       l_curtain            r_curtain
-*/
+            instrument
+            |
+     --------------------------------------------
+                        |                      |
+                  front_trolley           rear_trolley
+                            |                       |
+                 ________________________       ________________________
+                |       |       |       |       |                     |
+                N       S       E       W       l_curtain            r_curtain
+    */
 
     const size_t width = 100;
     const size_t height = 100;
@@ -59,16 +69,24 @@ TEST(example, simple_sans_example){
     CompositeComponent_sptr r_curtain = make_square_bank(width, height);
     r_curtain->deltaPos(V3D{width_d, 0, 6});
 
-
-    Node_sptr root = std::make_shared<Node>(CowPtr<Component>(new NullComponent));
-    Node_sptr front_trolley = std::make_shared<Node>(root, CowPtr<Component>(new NullComponent));
-    Node_sptr nodeN = std::make_shared<Node>(front_trolley, CowPtr<Component>(N));
-    Node_sptr nodeE = std::make_shared<Node>(front_trolley, CowPtr<Component>(E));
-    Node_sptr nodeS = std::make_shared<Node>(front_trolley, CowPtr<Component>(S));
-    Node_sptr nodeW = std::make_shared<Node>(front_trolley, CowPtr<Component>(W));
-    Node_sptr rear_trolley = std::make_shared<Node>(root, CowPtr<Component>(new NullComponent));
-    Node_sptr nodeLCurtain = std::make_shared<Node>(rear_trolley, CowPtr<Component>(l_curtain));
-    Node_sptr nodeRCurtain = std::make_shared<Node>(rear_trolley, CowPtr<Component>(r_curtain));
+    Node_sptr root =
+        std::make_shared<Node>(CowPtr<Component>(new NullComponent));
+    Node_sptr front_trolley =
+        std::make_shared<Node>(root, CowPtr<Component>(new NullComponent));
+    Node_sptr nodeN =
+        std::make_shared<Node>(front_trolley, CowPtr<Component>(N));
+    Node_sptr nodeE =
+        std::make_shared<Node>(front_trolley, CowPtr<Component>(E));
+    Node_sptr nodeS =
+        std::make_shared<Node>(front_trolley, CowPtr<Component>(S));
+    Node_sptr nodeW =
+        std::make_shared<Node>(front_trolley, CowPtr<Component>(W));
+    Node_sptr rear_trolley =
+        std::make_shared<Node>(root, CowPtr<Component>(new NullComponent));
+    Node_sptr nodeLCurtain =
+        std::make_shared<Node>(rear_trolley, CowPtr<Component>(l_curtain));
+    Node_sptr nodeRCurtain =
+        std::make_shared<Node>(rear_trolley, CowPtr<Component>(r_curtain));
     root->addChild(front_trolley);
     root->addChild(rear_trolley);
     front_trolley->addChild(nodeN);
@@ -78,14 +96,38 @@ TEST(example, simple_sans_example){
     rear_trolley->addChild(nodeLCurtain);
     front_trolley->addChild(nodeRCurtain);
 
-    InstrumentTree tree(root);
-    
-    
+    auto start = std::chrono::system_clock::now();
+
+    m_instrument = InstrumentTree(root);
+
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end - start;
+    std::cout << "---------Instrument Tree Construction----------" << std::endl;
+    std::cout << "Creation took " << elapsed_seconds.count() << "seconds" << std::endl;
+    std::cout << "----------------------------------------" << std::endl;
+
+
+  }
+
+  virtual ~ExampleTest() {}
+};
+
+TEST_F(ExampleTest, simple_sans_example) {
+
+  auto start = std::chrono::system_clock::now();
+
+  size_t max = 100 * 100 * 6;
+  double pos_x = 0;
+  for (size_t i = 1; i < max; ++i) {
+    auto det = m_instrument.getDetector(1);
+    pos_x = det.getPos()[0];
+  }
+
+  auto end = std::chrono::system_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end - start;
+  std::cout << "---------Single Access Metrics----------" << std::endl;
+  std::cout << 100 * 100 * 6 << " accesses took " << elapsed_seconds.count() << "seconds" << std::endl;
+  std::cout << "----------------------------------------" << std::endl;
 }
-
-
-
-
-
 
 } // namespace
