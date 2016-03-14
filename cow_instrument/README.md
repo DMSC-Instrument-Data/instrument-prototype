@@ -57,3 +57,29 @@ public:
 };
 ```
 
+###The InstrumentTree###
+
+This is merely a wrapper around the root node. It may provide some other convenience functions.
+
+```cpp
+class InstrumentTree {
+public:
+
+    InstrumentTree(std::shared_ptr<const Node> root);
+
+    std::unique_ptr<NodeIterator> iterator() const;
+
+    std::shared_ptr<const Node> root() const;
+
+
+private:
+    
+    // TODO. Detector map.
+
+    std::shared_ptr<const Node> m_root;
+
+};
+```
+
+
+
