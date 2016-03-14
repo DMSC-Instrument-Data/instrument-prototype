@@ -15,6 +15,7 @@ public:
   bool equals(const Component &other) const override;
   void addComponent(std::shared_ptr<Component> child);
   size_t size() const {return m_children.size();}
+  std::shared_ptr<const Component> getChild(size_t index) const;
 
 private:
   std::vector<std::shared_ptr<Component>> m_children;
