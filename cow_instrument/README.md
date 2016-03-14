@@ -29,9 +29,10 @@ For the actual class declaration see [here](Node.h)
 class Node {
 public:
   /* Method for making instrument modifications. 
-  Note that it is const and return a new root node.
+  Instrument is mainly a wrapper around the root node of the new tree now.
+  Note that this method is const.
   */
-  Node_sptr modify(Command& command) const;
+  Instrument_uptr modify(Command& command) const;
   /* Only const access to the Component is allowed externally.
      Ensures immutability of any components.
   */
