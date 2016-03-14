@@ -10,7 +10,7 @@ public:
   CompositeComponent() = default;
   ~CompositeComponent() = default;
   V3D getPos() const override;
-  void setPos(const V3D &pos) override;
+  void deltaPos(const V3D &pos) override;
   CompositeComponent *clone() const override;
   bool equals(const Component &other) const override;
   void addComponent(std::shared_ptr<Component> child);
@@ -19,7 +19,6 @@ public:
 
 private:
   std::vector<std::shared_ptr<Component>> m_children;
-  V3D m_pos;
 };
 
 using CompositeComponent_sptr = std::shared_ptr<CompositeComponent>;

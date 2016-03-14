@@ -6,29 +6,30 @@
 #include <utility>
 #include <string>
 
-void InstrumentTree::findDetectors(const Component& component)
-{
+namespace {
 
-    if (Detector const *detector = dynamic_cast<const Detector *>(&component)) {
-      m_detectorMap.insert(std::make_pair(detector->id(), detector));
-    } else if (CompositeComponent const *composite =
-                   dynamic_cast<const CompositeComponent *>(&component)) {
-      for(size_t i = 0; i < composite->size(); ++i){
-          findDetectors(*composite->getChild(i));
-      }
+void findDetectors(const Component &component,
+                                   std::map<size_t, const Detector *> &store) {
+  if (Detector const *detector = dynamic_cast<const Detector *>(&component)) {
+    store.insert(std::make_pair(detector->id(), detector));
+  } else if (CompositeComponent const *composite =
+                 dynamic_cast<const CompositeComponent *>(&component)) {
+    for (size_t i = 0; i < composite->size(); ++i) {
+      findDetectors(*composite->getChild(i), store);
     }
+  }
+}
+
 }
 
 InstrumentTree::InstrumentTree(Node_const_sptr root) : m_root(root) {
-
-
 
   // TODO. Maybe we don't always want to do this?
   auto it = this->iterator();
   while (!it->atEnd()) {
     // Not pretty
     const auto &component = it->next()->const_ref();
-    findDetectors(component);
+    findDetectors(component, m_detectorMap);
   }
 }
 

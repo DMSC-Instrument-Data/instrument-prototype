@@ -40,40 +40,41 @@ TEST(instrument_tree_test, test_constructor) {
 
 TEST(instrument_tree_test, test_detector_access) {
 
-    /*
+  /*
 
-          A (not a detector)
-          |
-   -------------------------------------------------
-   |                                               |
-   B (Composite containing Detector)               C (Detector)
+        A (not a detector)
+        |
+ -------------------------------------------------
+ |                                               |
+ B (Composite containing Detector)               C (Detector)
 
-    */
+  */
 
-    auto a = std::make_shared<Node>(CowPtr<Component>(new MockComponent));
+  auto a = std::make_shared<Node>(CowPtr<Component>(new MockComponent));
 
-    size_t detector1Id = 1;
-    CompositeComponent_sptr composite = std::make_shared<CompositeComponent>();
-    composite->addComponent(std::make_shared<Detector>(detector1Id, V3D{1,1,1}));
-    auto b = std::make_shared<Node>(a, CowPtr<Component>(composite));
+  size_t detector1Id = 1;
+  CompositeComponent_sptr composite = std::make_shared<CompositeComponent>();
+  composite->addComponent(
+      std::make_shared<Detector>(detector1Id, V3D{1, 1, 1}));
+  auto b = std::make_shared<Node>(a, CowPtr<Component>(composite));
 
-    size_t detector2Id = detector1Id+1;
-    auto c = std::make_shared<Node>(a, CowPtr<Component>(std::make_shared<Detector>(detector2Id, V3D{2,2,2})));
+  size_t detector2Id = detector1Id + 1;
+  auto c = std::make_shared<Node>(
+      a,
+      CowPtr<Component>(std::make_shared<Detector>(detector2Id, V3D{2, 2, 2})));
 
-    a->addChild(b);
-    a->addChild(c);
+  a->addChild(b);
+  a->addChild(c);
 
-    InstrumentTree tree(a);
+  InstrumentTree tree(a);
 
-    const Detector& det1 = tree.getDetector(detector1Id);
-    EXPECT_EQ(det1.id(), detector1Id);
+  const Detector &det1 = tree.getDetector(detector1Id);
+  EXPECT_EQ(det1.id(), detector1Id);
 
-    const Detector& det2 = tree.getDetector(detector2Id);
-    EXPECT_EQ(det2.id(), detector2Id);
+  const Detector &det2 = tree.getDetector(detector2Id);
+  EXPECT_EQ(det2.id(), detector2Id);
 
-    EXPECT_THROW(tree.getDetector(3), std::invalid_argument);
-
-
+  // Ask for something that doesn't exist.
+  EXPECT_THROW(tree.getDetector(3), std::invalid_argument);
 }
-
 }

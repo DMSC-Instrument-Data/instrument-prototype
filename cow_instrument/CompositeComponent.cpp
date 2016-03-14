@@ -1,10 +1,29 @@
 #include "CompositeComponent.h"
 
 V3D CompositeComponent::getPos() const {
-  return m_pos; // TODO we should walk the tree up to get the actual position.
+
+  /*
+   An expensive operation on a composite component, but I don't think this
+   is commonly
+   */
+  V3D pos{0, 0, 0};
+  for (size_t i = 0; i < m_children.size(); ++i) {
+    auto childPos = m_children[i]->getPos();
+    pos[0] += childPos[0];
+    pos[1] += childPos[1];
+    pos[2] += childPos[2];
+  }
+  pos[0] /= m_children.size();
+  pos[1] /= m_children.size();
+  pos[2] /= m_children.size();
+  return pos;
 }
 
-void CompositeComponent::setPos(const V3D &pos) { m_pos = pos; }
+void CompositeComponent::deltaPos(const V3D &delta) {
+  for (size_t i = 0; i < m_children.size(); ++i) {
+    m_children[i]->deltaPos(delta);
+  }
+}
 
 CompositeComponent *CompositeComponent::clone() const {
   CompositeComponent *product = new CompositeComponent;
@@ -32,11 +51,12 @@ void CompositeComponent::addComponent(std::shared_ptr<Component> child) {
   m_children.push_back(child);
 }
 
-std::shared_ptr<const Component> CompositeComponent::getChild(size_t index) const {
+std::shared_ptr<const Component>
+CompositeComponent::getChild(size_t index) const {
   if (index >= m_children.size()) {
     throw std::invalid_argument(
         "index out of range in CompositeComponent::getChild");
   } else {
-      return m_children[index];
+    return m_children[index];
   }
 }

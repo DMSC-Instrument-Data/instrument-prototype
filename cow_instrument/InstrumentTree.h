@@ -7,7 +7,6 @@
 class Node;
 class NodeIterator;
 class Detector;
-class Component;
 
 /*
  The instrument is nothing more than syntatic sugar over the root Node.
@@ -24,8 +23,6 @@ public:
     const Detector& getDetector(size_t detectorId) const;
 
 private:
-
-    void findDetectors(const Component& component);
 
     std::map<size_t, Detector const *> m_detectorMap;
 

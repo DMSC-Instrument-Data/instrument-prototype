@@ -28,6 +28,26 @@ TEST(composite_component_test, test_clone){
     EXPECT_TRUE(Mock::VerifyAndClearExpectations(childB));
 }
 
+TEST(composite_component_test, test_get_pos){
+
+    MockComponent* childA = new MockComponent;
+    EXPECT_CALL(*childA, getPos()).WillRepeatedly(Return(V3D{1,1,1}));
+    MockComponent* childB = new MockComponent;
+    EXPECT_CALL(*childB, getPos()).WillRepeatedly(Return(V3D{2,2,2}));
+    MockComponent* childC = new MockComponent;
+    EXPECT_CALL(*childC, getPos()).WillRepeatedly(Return(V3D{3,3,3}));
+
+    CompositeComponent composite;
+    composite.addComponent(std::shared_ptr<MockComponent>(childA));
+    composite.addComponent(std::shared_ptr<MockComponent>(childB));
+    composite.addComponent(std::shared_ptr<MockComponent>(childC));
+
+    V3D pos = composite.getPos();
+    EXPECT_EQ(pos[0],2);
+    EXPECT_EQ(pos[1],2);
+    EXPECT_EQ(pos[2],2);
+}
+
 
 
 

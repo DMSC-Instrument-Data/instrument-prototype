@@ -4,9 +4,10 @@
 #include "Component.h"
 
 class NullComponent : public Component {
+public:
   NullComponent() = default;
   V3D getPos() const override;
-  void setPos(const V3D &pos) override;
+  void deltaPos(const V3D &delta) override;
   virtual ~NullComponent();
   NullComponent *clone() const override;
   bool equals(const Component &other) const override;

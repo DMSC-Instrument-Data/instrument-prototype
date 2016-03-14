@@ -12,7 +12,7 @@ public:
   Detector& operator=(const Detector&) = default;
 
   V3D getPos() const override;
-  void setPos(const V3D &pos) override;
+  void deltaPos(const V3D &pos) override;
   virtual ~Detector();
   Detector* clone() const override;
   bool equals(const Component& other) const override;
