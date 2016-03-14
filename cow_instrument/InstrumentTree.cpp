@@ -5,12 +5,11 @@
 #include "NodeIterator.h"
 #include <utility>
 #include <string>
-#include <mutex>
 
 namespace {
 
 void findDetectors(const Component &component,
-                   std::map<size_t, const Detector *> &store) {
+                                   std::map<size_t, const Detector *> &store) {
   if (Detector const *detector = dynamic_cast<const Detector *>(&component)) {
     store.insert(std::make_pair(detector->id(), detector));
   } else if (CompositeComponent const *composite =
@@ -20,29 +19,12 @@ void findDetectors(const Component &component,
     }
   }
 }
+
 }
 
-InstrumentTree::InstrumentTree(Node_const_sptr root) : m_root(root) {}
+InstrumentTree::InstrumentTree(Node_const_sptr root) : m_root(root) {
 
-InstrumentTree::InstrumentTree(const InstrumentTree &other)
-    : m_detectorMap(other.m_detectorMap), m_root(other.m_root) {}
-
-InstrumentTree &InstrumentTree::operator=(const InstrumentTree &other) {
-  if (this != &other) {
-    m_detectorMap = other.m_detectorMap;
-    m_root = other.m_root;
-  }
-  return *this;
-}
-
-std::unique_ptr<NodeIterator> InstrumentTree::iterator() const {
-  return std::unique_ptr<NodeIterator>(new NodeIterator(m_root));
-}
-
-Node_const_sptr InstrumentTree::root() const { return m_root; }
-
-void InstrumentTree::init() const {
-
+  // TODO. Maybe we don't always want to do this?
   auto it = this->iterator();
   while (!it->atEnd()) {
     // Not pretty
@@ -51,9 +33,13 @@ void InstrumentTree::init() const {
   }
 }
 
-const Detector &InstrumentTree::getDetector(size_t detectorId) const {
+std::unique_ptr<NodeIterator> InstrumentTree::iterator() const {
+  return std::unique_ptr<NodeIterator>(new NodeIterator(m_root));
+}
 
-  std::call_once(m_detectorMapFlag, &InstrumentTree::init, this);
+Node_const_sptr InstrumentTree::root() const { return m_root; }
+
+const Detector &InstrumentTree::getDetector(size_t detectorId) const {
 
   auto it = m_detectorMap.find(detectorId);
   if (it == m_detectorMap.end()) {
@@ -62,4 +48,3 @@ const Detector &InstrumentTree::getDetector(size_t detectorId) const {
   }
   return *(it->second);
 }
-
