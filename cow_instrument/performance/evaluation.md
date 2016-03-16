@@ -1,8 +1,8 @@
 ##Evaluation##
 
-We are attempting to measure and understand the read-performance of the new prototype (a.k.a Mapless Instrument) compared to the existing Instrument implementation in Mantid. The point of this testing is focused on the Instrument, so aspects relating to spectrum-detector mapping, and workspace owned parameter maps have not been considered. This is purely an evaluation of the Instrument configuration.
+We are attempting to measure and understand the read-performance of the new prototype (a.k.a **mapless Instrument**) compared to the existing Instrument implementation in Mantid. The point of this testing is focused on the Instrument, so aspects relating to spectrum-detector mapping, and workspace owned parameter maps have not been considered. This is purely an evaluation of the Instrument configuration.
 
-The same configuration was used in all tests. A fabricated instrument consisting of 6-panels, each containing 100*100 detectors. Panels where grouped onto one of two trolleys, which where themselves attached to the top-level instrument. Both Instrument v1, and Instrument v2 used the same setup.
+The same configuration was used in all tests. A fabricated instrument consisting of 6-panels, each containing 100*100 detectors. Panels where grouped onto one of two trolleys, which where themselves attached to the top-level instrument. Both Instrument v1, and Instrument v2 (mapless instrument) used the same setup.
 
 
 ##existing_no_map##
@@ -25,9 +25,9 @@ Profiling reveals that the the current implementation of the parameterised instr
 
 Prototype of an absolute positioned mapless instrument. Prototype is [here](https://github.com/DMSC-Instrument-Data/instrument-prototype/tree/master/cow_instrument). Example has been instrumented as above and can be found[here](https://github.com/DMSC-Instrument-Data/instrument-prototype/blob/master/cow_instrument/testing/Example.cpp). 
 
-cycles = 9x106
+**cycles = 9x10^6**
 
-Profiling reveals the expected results. The read implementation is now much simpler, with absolute positions stored directly against the component. This is why we see a **12x** speed up w.r.t the un-parameterized existing Instrument implementation and a **30x** speedup w.r.t the parameterized existing Instrument implementation.
+Profiling reveals the expected results. The read implementation is now much simpler, with absolute positions stored directly against the component. This is why we see a **12x faster** w.r.t the un-parameterized existing Instrument implementation and a **30x** speedup w.r.t the parameterized existing Instrument implementation.
 
 ##Notes##
 
