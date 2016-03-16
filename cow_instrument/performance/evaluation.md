@@ -23,11 +23,11 @@ Profiling reveals that the the current implementation of the parameterised instr
 
 ##mapless_instrument##
 
-Prototype of an absolute positioned mapless instrument. Prototype is [here](https://github.com/DMSC-Instrument-Data/instrument-prototype/tree/master/cow_instrument). Example has been instrumented as above and can be found[here](https://github.com/DMSC-Instrument-Data/instrument-prototype/blob/master/cow_instrument/testing/Example.cpp). 
+Prototype of an absolute positioned mapless instrument. Prototype is [here](https://github.com/DMSC-Instrument-Data/instrument-prototype/tree/master/cow_instrument). Example has been instrumented as above and can be found [here](https://github.com/DMSC-Instrument-Data/instrument-prototype/blob/master/cow_instrument/testing/Example.cpp). 
 
 **cycles = 9x10^6**
 
-Profiling reveals the expected results. The read implementation is now much simpler, with absolute positions stored directly against the component. This is why we see a **12x faster** w.r.t the un-parameterized existing Instrument implementation and a **30x** speedup w.r.t the parameterized existing Instrument implementation.
+Profiling reveals the expected results. The read implementation is now much simpler, with absolute positions stored directly against the component. This is why we see a **12x faster** w.r.t the un-parameterized existing Instrument implementation and **30x faster**  w.r.t the parameterized existing Instrument implementation.
 
 ##Notes##
 
