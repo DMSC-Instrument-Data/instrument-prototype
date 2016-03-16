@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite name="GeometryTest"  tests="2" errors="0" failures="0" package="GeometryTest" time="0.098004" >
+    <testcase classname="GeometryTest.InstrumentTestPerformance" name="test_access_non_parameterized" line="549" time="0.02847" totalTime="0.028515" CPUFraction="0.999965"> <measurement><name>CPUFraction</name><value>0.999965</value></measurement>    </testcase>
+    <testcase classname="GeometryTest.InstrumentTestPerformance" name="test_access_parameterized" line="558" time="0.069459" totalTime="0.069489" CPUFraction="0.999957"> <measurement><name>CPUFraction</name><value>0.999957</value></measurement>    </testcase>
+</testsuite>

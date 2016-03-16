@@ -1,0 +1,2512 @@
+version: 1
+creator: callgrind-3.10.0.SVN
+pid: 30825
+cmd:  bin/GeometryTest InstrumentTestPerformance
+part: 1
+
+
+desc: I1 cache: 
+desc: D1 cache: 
+desc: LL cache: 
+
+desc: Timerange: Basic block 0 - 55190346
+desc: Trigger: Program termination
+
+positions: line
+events: Ir
+summary: 0
+
+
+ob=(6) /lib/x86_64-linux-gnu/ld-2.19.so
+fl=(12) /build/eglibc-3GlaMS/eglibc-2.19/elf/dl-misc.c
+fn=(124) _dl_name_match_p
+288 380
++1 152
+cfi=(13) /build/eglibc-3GlaMS/eglibc-2.19/string/../sysdeps/x86_64/multiarch/../strcmp.S
+cfn=(126) strcmp
+calls=76 131 
+* 532
+* 76
++1 76
+-1 76
++3 76
++2 152
++4 76
+-4 152
++1 228
+cfi=(13)
+cfn=(126)
+calls=76 131 
+* 1988
+* 152
++6 76
+-1 76
++1 304
+
+fl=(6) /build/eglibc-3GlaMS/eglibc-2.19/elf/dl-lookup.c
+fn=(16) _dl_lookup_symbol_x
+714 372
+476 31
+714 62
+476 93
+-1 62
++2 31
+-1 31
++1 93
+-1 93
++1 2864
+-1 2864
++1 8592
+-1 8654
+716 31
++4 31
++4 31
+-8 31
++1 62
++7 39
++5 31
++2 62
+-2 31
++6 248
++2 403
+cfn=(18) do_lookup_x
+calls=31 82 
+* 22318
++3 62
+-12 62
++38 62
++22 31
++1 217
++26 31
++9 155
++14 93
++3 124
++5 31
++2 248
+
+fn=(20) check_match.9458
+131 217
++1 62
++2 62
++2 93
+-2 62
++12 93
++3 98
+cfi=(13)
+cfn=(126)
+calls=9 -18 
+* 4890
+* 18
++5 31
+-1 31
++1 31
+-1 31
++1 31
++2 8
++19 8
++1 32
++46 217
+-18 54
++2 54
++1 81
+-1 54
++1 27
+-1 54
+-29 12
+cfi=(13)
+cfn=(126)
+calls=4 -46 
+* 302
+* 8
+
+fn=(18)
+82 279
++1 31
+-6 31
++5 93
+-5 217
++12 31
+229 31
++3 62
+-3 31
++3 62
+98 31
+-3 31
++1 31
++2 31
++3 31
+-3 31
++3 31
+-3 123
+-3 123
++1 123
++2 123
++3 123
+-3 123
++3 123
++4 308
++4 308
++4 308
++6 462
++4 308
++1 462
+225 154
++1 308
++4 308
+-2 154
++5 616
++4 308
+-1 308
++1 154
+-1 308
++21 123
++24 246
+461 597
++1 380
+cfi=(12)
+cfn=(124)
+calls=76 288 
+* 4572
+* 456
++3 369
+286 212
++4 89
++13 31
++1 31
+-1 31
++1 31
++1 31
+469 248
+240 144
+-1 72
++2 72
++2 108
++10 108
+-7 335
++2 62
++1 124
+-1 62
++1 31
+-1 124
++1 93
+cfn=(20)
+calls=31 131 
+* 6661
++1 155
+
+fl=(4) /build/eglibc-3GlaMS/eglibc-2.19/elf/../sysdeps/x86_64/dl-trampoline.S
+fn=(12) _dl_runtime_resolve
+34 31
++2 31
++1 31
++1 31
++1 31
++1 31
++1 31
++1 31
++1 31
++1 31
++1 31
+cfi=(5) /build/eglibc-3GlaMS/eglibc-2.19/elf/../elf/dl-runtime.c
+cfn=(14) _dl_fixup
+calls=31 +21 
+* 50849
++1 31
++1 31
++1 31
++1 31
++1 31
++1 31
++1 31
++1 31
++1 31
++2 31
+
+fl=(13)
+fn=(126)
+131 165
++1 165
++1 165
++1 81
++1 81
++1 81
++1 81
+cfn=(127) strcmp'2
+calls=81 -6 
+* 6557
++5 84
++1 84
++1 84
++1 84
+
+fn=(127)
+131 933
++1 933
++1 933
++1 865
++1 865
++1 865
++1 865
+cfn=(127)
+calls=852 -6 
+* 311370
++2 13
++1 13
++2 68
++1 68
++1 68
++1 68
+
+fl=(5)
+fn=(14)
+66 62
++6 62
+-6 93
++3 31
+-1 31
++1 31
++3 31
++1 31
+-1 62
++1 155
++1 31
+-1 31
++1 62
++5 62
++4 62
++4 93
++4 62
++1 124
++2 124
++7 93
+-1 31
++8 62
++3 279
+cfi=(6)
+cfn=(16)
+calls=31 714 
+* 48276
+* 31
++4 93
++4 124
++6 186
++16 31
+-8 31
++8 93
++4 93
+fi=(7) /build/eglibc-3GlaMS/eglibc-2.19/elf/../sysdeps/x86_64/dl-machine.h
++65 31
+fe=(5)
+-61 155
+
+ob=(24) /lib/x86_64-linux-gnu/libpthread-2.19.so
+fl=(15) /build/eglibc-3GlaMS/eglibc-2.19/nptl/../nptl/pthread_mutex_lock.c
+fn=(138) pthread_mutex_lock
+63 120054
++3 120054
+-3 120054
++3 120054
++4 120054
+-4 120054
++4 240108
++4 240108
++2 360162
++3 600270
++1 360162
++78 120054
++5 120054
+-2 120054
++7 120054
++1 240108
+
+fl=(16) /build/eglibc-3GlaMS/eglibc-2.19/nptl/pthread_mutex_unlock.c
+fn=(144) pthread_mutex_unlock
+41 120054
+309 120054
+41 120054
++1 120054
+-1 120054
++1 240108
++4 240108
++5 120054
++3 120054
++3 360162
+311 240108
+
+ob=(44) /home/spu92482/builds/mantidbuild_release/bin/GeometryTest
+fl=(1) ???
+fn=(170) boost::detail::sp_counted_impl_pd<Mantid::Geometry::CompAssembly*, boost::detail::sp_ms_deleter<Mantid::Geometry::CompAssembly> >::get_untyped_deleter()
+0 20
+
+fn=(248) char* std::string::_S_construct<char const*>(char const*, char const*, std::allocator<char> const&, std::forward_iterator_tag)
+0 26
+cob=(7) /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.19
+cfi=(8) ???
+cfn=(252) std::string::_Rep::_S_create(unsigned long, unsigned long, std::allocator<char> const&)
+calls=2 0 
+0 268
+0 2
+0 30
+cob=(17) /lib/x86_64-linux-gnu/libc-2.19.so
+cfi=(18) /build/eglibc-3GlaMS/eglibc-2.19/string/../sysdeps/x86_64/multiarch/memcpy-sse2-unaligned.S
+cfn=(258) __memcpy_sse2_unaligned
+calls=2 25 
+0 38
+0 2
+0 12
+
+fn=(220) boost::detail::sp_counted_impl_pd<Mantid::Geometry::Instrument*, boost::detail::sp_ms_deleter<Mantid::Geometry::Instrument> >::get_untyped_deleter()
+0 4
+
+fn=(0) TestDescription_suite_InstrumentTestPerformance_test_access_parameterized::runTest()
+0 540006
+cob=(70) /home/spu92482/builds/mantidbuild_release/bin/libMantidGeometry.so
+cfi=(3) ???
+cfn=(4) Mantid::Geometry::Instrument::getDetector(int const&) const
+calls=60000 0 
+0 184512207
+0 60000
+0 360000
+cob=(70)
+cfi=(3)
+cfn=(96) virtual thunk to Mantid::Geometry::Component::getPos() const
+calls=60000 0 
+0 49885507
+0 600000
+cfn=(430) boost::detail::sp_counted_impl_p<Mantid::Geometry::Detector>::dispose()
+calls=60000 0 
+0 24091630
+0 420000
+cfn=(180) boost::detail::sp_counted_base::destroy()
+calls=60000 0 
+0 6060000
+0 60000
+
+fn=(296) boost::detail::sp_counted_impl_pd<Mantid::Geometry::Instrument*, boost::detail::sp_ms_deleter<Mantid::Geometry::Instrument> >::dispose()
+0 14
+cob=(70)
+cfi=(3)
+cfn=(298) Mantid::Geometry::Instrument::~Instrument()
+calls=2 0 
+0 8175
+0 6
+
+fn=(302) Mantid::Geometry::ReferenceFrame::~ReferenceFrame()
+0 20
+cob=(7)
+cfi=(8)
+cfn=(186) operator delete(void*)
+calls=2 0 
+0 186
+0 2
+0 26
+cob=(7)
+cfi=(8)
+cfn=(306) std::string::_Rep::_M_destroy(std::allocator<char> const&)
+calls=2 0 
+0 190
+0 2
+0 2
+
+fn=(352) boost::detail::sp_counted_impl_pd<Mantid::Geometry::Instrument*, boost::detail::sp_ms_deleter<Mantid::Geometry::Instrument> >::~sp_counted_impl_pd()
+0 18
+cob=(7)
+cfi=(8)
+cfn=(186)
+calls=2 0 
+0 254
+0 2
+
+fn=(364) boost::detail::sp_counted_impl_pd<Mantid::Geometry::CompAssembly*, boost::detail::sp_ms_deleter<Mantid::Geometry::CompAssembly> >::~sp_counted_impl_pd()
+0 90
+cob=(7)
+cfi=(8)
+cfn=(186)
+calls=10 0 
+0 1225
+0 10
+
+fn=(430)
+0 360000
+cob=(70)
+cfi=(3)
+cfn=(432) Mantid::Geometry::Detector::~Detector()
+calls=60000 0 
+0 23731630
+
+fn=(94) boost::detail::sp_counted_base::release()
+0 480048
+cob=(70)
+cfi=(3)
+cfn=(178) boost::detail::sp_counted_impl_pd<Mantid::Geometry::IComponent const*, Mantid::NoDeleting>::dispose()
+calls=2 0 
+0 2
+cob=(70)
+cfi=(3)
+cfn=(318) boost::detail::sp_counted_impl_pd<Mantid::Geometry::ParameterMap*, Mantid::NoDeleting>::dispose()
+calls=2 0 
+0 2
+cob=(70)
+cfi=(3)
+cfn=(300) boost::detail::sp_counted_impl_p<Mantid::Geometry::ReferenceFrame>::dispose()
+calls=2 0 
+0 440
+0 54
+cfn=(180)
+calls=6 0 
+0 618
+
+fn=(180)
+0 300140
+cfn=(450) boost::detail::sp_counted_impl_p<Mantid::Geometry::Detector>::~sp_counted_impl_p()
+calls=60000 0 
+0 5760000
+cfn=(364)
+calls=10 0 
+0 1325
+cfn=(352)
+calls=2 0 
+0 274
+cob=(70)
+cfi=(3)
+cfn=(320) boost::detail::sp_counted_impl_pd<Mantid::Geometry::ParameterMap*, Mantid::NoDeleting>::~sp_counted_impl_pd()
+calls=2 0 
+0 196
+cob=(70)
+cfi=(3)
+cfn=(312) boost::detail::sp_counted_impl_p<Mantid::Geometry::ReferenceFrame>::~sp_counted_impl_p()
+calls=2 0 
+0 196
+cob=(70)
+cfi=(3)
+cfn=(182) boost::detail::sp_counted_impl_pd<Mantid::Geometry::IComponent const*, Mantid::NoDeleting>::~sp_counted_impl_pd()
+calls=12 0 
+0 1176
+
+fn=(332) std::_Rb_tree<std::string, std::pair<std::string const, std::string>, std::_Select1st<std::pair<std::string const, std::string> >, std::less<std::string>, std::allocator<std::pair<std::string const, std::string> > >::_M_erase(std::_Rb_tree_node<std::pair<std::string const, std::string> >*)
+0 28
+
+fn=(362) boost::detail::sp_counted_impl_pd<Mantid::Geometry::CompAssembly*, boost::detail::sp_ms_deleter<Mantid::Geometry::CompAssembly> >::dispose()
+0 70
+cob=(70)
+cfi=(3)
+cfn=(350) Mantid::Geometry::CompAssembly::~CompAssembly()
+calls=10 0 
+0 380
+0 30
+
+fn=(338) std::_Rb_tree<std::pair<std::string, Mantid::Geometry::IComponent const*>, std::pair<std::pair<std::string, Mantid::Geometry::IComponent const*> const, boost::shared_ptr<Mantid::Geometry::XMLInstrumentParameter> >, std::_Select1st<std::pair<std::pair<std::string, Mantid::Geometry::IComponent const*> const, boost::shared_ptr<Mantid::Geometry::XMLInstrumentParameter> > >, std::less<std::pair<std::string, Mantid::Geometry::IComponent const*> >, std::allocator<std::pair<std::pair<std::string, Mantid::Geometry::IComponent const*> const, boost::shared_ptr<Mantid::Geometry::XMLInstrumentParameter> > > >::_M_erase(std::_Rb_tree_node<std::pair<std::pair<std::string, Mantid::Geometry::IComponent const*> const, boost::shared_ptr<Mantid::Geometry::XMLInstrumentParameter> > >*)
+0 32
+
+fn=(450)
+0 120000
+cob=(7)
+cfi=(8)
+cfn=(186)
+calls=60000 0 
+0 5580000
+0 60000
+
+fn=(344) std::_Rb_tree<int, std::pair<int const, boost::shared_ptr<Mantid::Geometry::IDetector const> >, std::_Select1st<std::pair<int const, boost::shared_ptr<Mantid::Geometry::IDetector const> > >, std::less<int>, std::allocator<std::pair<int const, boost::shared_ptr<Mantid::Geometry::IDetector const> > > >::_M_erase(std::_Rb_tree_node<std::pair<int const, boost::shared_ptr<Mantid::Geometry::IDetector const> > >*)
+0 38
+
+ob=(17)
+fl=(10) /build/eglibc-3GlaMS/eglibc-2.19/malloc/malloc.c
+fn=(192) _int_free
+3814 1920256
++13 240032
+-13 240032
++13 480064
++6 960128
++1 480064
++11 960128
++13 720096
++11 720080
++1 540060
+1869 180020
+3894 180020
+1869 360040
+3896 540060
++1 360040
++1 180020
++3 180020
+-3 180020
++9 540060
+-5 720080
++14 600080
++2 180020
++2 1080120
++2 600080
+4087 1440160
+3933 120024
++1 180036
++18 60012
+-4 60012
++4 120024
++6 120024
++8 180036
++6 120024
++1 120024
++1 120024
+1869 180036
+3983 120024
++7 120024
++5 120024
++1 500070
++1 50007
++11 50007
+-1 50007
++2 100014
+-1 10005
+-1 10005
++2 20010
++7 60012
+-2 60012
++1 60012
++1 60012
++5 60012
++1 60012
++2 180036
++1 60012
++30 120024
+3943 420084
++2 120024
+4075 180036
++1 180036
++1 240048
++10 480096
+-88 20010
+
+fn=(54) _int_malloc
+3302 1680350
++30 240050
+-30 240050
++30 2160450
++8 480100
++2 540114
++1 180038
++1 180038
+-1 360076
++5 360076
++3 900175
++1 180035
+-1 180035
++1 360070
++25 120030
++2 120030
++1 120030
++2 180045
++2 2
++4 1
++1 2
++5 1
++1 1
++1 1
++2 3
+1862 240049
+3743 240049
+1862 480098
+3806 2160450
+-16 60014
+4992 120028
+3790 180042
++2 1500350
+4990 60014
++2 60014
+-2 180042
+3442 120028
++66 100038
++1 150057
++1 50019
++50 300114
++7 50019
+-6 50019
++1 50019
++1 50019
++1 50019
++3 50019
+3442 330099
++3 60019
+-1 60019
++1 120038
++1 120038
++3 60019
++10 240076
++34 60018
+-5 60018
++1 60018
++4 60018
++13 100038
+-45 50013
+-1 100026
++2 11
+-1 22
++4 1
++1 1
++4 1
+-3 2
++1 1
++1 2
++1 1
++6 7
++2 2
+-2 1
++2 1
++1 1
++3 1
+1862 3
+3576 100028
++73 50014
++1 50014
++1 50014
+-1 50014
++1 50014
++1 100028
++1 100028
++5 300138
++4 6
++3 8
++9 250064
++2 500128
+-4 600174
++8 50023
++3 100046
++2 9
++1 9
++1 9
+-2 36
++62 9
+3496 9999
+-1 9999
++1 29997
+3355 900175
+2721 2
+3665 8
++2 2
++1 4
++24 150042
++3 100028
++5 50014
+-3 50014
++3 50014
+-3 50014
++3 400112
++3 100028
++3 5
+-1 5
++1 15
++12 50009
+-5 50009
++6 100018
++11 50009
+-6 50009
++1 50009
++1 50009
++1 50009
++3 50009
++1 50009
++1 100018
++5 350063
++2 100018
+-2 50009
++2 50009
++1 100018
+
+fn=(190) free
+2917 480064
++1 480064
++6 480064
++5 240032
+-2 240032
++2 480064
++16 720096
++1 480064
+cfn=(192)
+calls=240032 3814 
+* 19472731
+
+fn=(52) malloc
+2876 960200
++5 480100
++1 480100
++3 480100
++2 1920400
++4 720150
+cfn=(54)
+calls=240050 3302 
+* 21915362
++1 240050
+-1 240050
++1 240050
++11 960200
++1 1920400
++3 1200250
+
+fl=(17) /build/eglibc-3GlaMS/eglibc-2.19/string/../sysdeps/x86_64/strlen.S
+fn=(244) strlen
+66 2
++1 2
++1 2
++1 2
++1 2
++1 2
++1 2
++2 2
++2 2
++30 2
++1 2
++1 2
++1 2
++1 2
++1 2
++1 2
+
+fl=(9) /build/eglibc-3GlaMS/eglibc-2.19/string/../sysdeps/x86_64/multiarch/../strcmp.S
+fn=(38) __strcmp_ssse3
+180 660304
++1 660304
++2 660304
++1 660304
++21 660304
++1 660304
++1 660304
++1 660304
++1 660304
++1 660304
++1 660304
++1 660304
++21 660304
++1 660304
++1 660304
++1 660304
++1 660304
++1 660304
++1 660304
++5 660304
++1 660304
++9 660304
++1 660304
++1 660304
++1 660304
++1 660304
++1 660304
++1 660304
++1 660304
++21 660304
++1 660304
++1 660304
++2 660304
++6 660304
++1 660304
++1 660304
++1 660304
++1 660304
++5 660304
+2238 660304
++1 660304
++1 660304
++1 660304
++6 660304
++6 660304
++1 660304
++8 660304
++1 660304
+
+fl=(18)
+fn=(258)
+25 2
++1 2
++1 2
++1 2
++1 2
++1 2
++1 2
++1 2
++8 2
++1 2
++91 2
++1 2
++1 2
++2 2
++30 2
++1 2
++1 2
++1 2
++1 2
+
+ob=(70)
+fl=(3)
+fn=(4)
+0 720000
+cfn=(5) Mantid::Geometry::Instrument::getDetector(int const&) const'2
+calls=60000 0 
+0 7437702
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 851
+0 60004
+0 240000
+cfn=(28) Mantid::Geometry::ParComponentFactory::createDetector(Mantid::Geometry::IDetector const*, Mantid::Geometry::ParameterMap const*)
+calls=60000 0 
+0 174312427
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 1219
+0 60004
+0 720000
+cob=(44)
+cfi=(1)
+cfn=(94)
+calls=60000 0 
+0 480000
+0 60000
+0 420000
+
+fn=(5)
+0 7437702
+
+fn=(130) virtual thunk to Mantid::Geometry::Component::getComponentID() const
+0 360162
+cfn=(132) Mantid::Geometry::Component::getComponentID() const
+calls=120054 0 
+0 720324
+
+fn=(194) Mantid::Geometry::CompAssembly::getRotation() const
+0 99
+cob=(8) /home/spu92482/builds/mantidbuild_release/bin/libMantidKernel.so
+cfi=(11) ???
+cfn=(90) Mantid::Kernel::Quat::Quat()
+calls=9 0 
+0 63
+0 9
+0 72
+cfn=(200) Mantid::Geometry::ParameterMap::getCachedRotation(Mantid::Geometry::IComponent const*, Mantid::Kernel::Quat&) const
+calls=9 0 
+0 1220
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 1179
+0 13
+0 162
+cfn=(204) Mantid::Geometry::Component::getRotation() const
+calls=6 0 
+0 36144
+0 6
+0 96
+cfn=(278) Mantid::Geometry::ParameterMap::setCachedRotation(Mantid::Geometry::IComponent const*, Mantid::Kernel::Quat const&) const
+calls=6 0 
+0 2438
+0 6
+0 6
+
+fn=(195) Mantid::Geometry::CompAssembly::getRotation() const'2
+0 33
+cob=(8)
+cfi=(11)
+cfn=(90)
+calls=3 0 
+0 21
+0 3
+0 24
+cfn=(200)
+calls=3 0 
+0 368
+0 3
+0 57
+cfn=(205) Mantid::Geometry::Component::getRotation() const'2
+calls=3 0 
+0 23492
+0 3
+0 48
+cfn=(278)
+calls=3 0 
+0 5277
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 1203
+0 7
+0 3
+
+fn=(350)
+0 472
+
+fn=(64) Mantid::Geometry::IObjComponent::IObjComponent()
+0 660000
+cob=(7)
+cfi=(8)
+cfn=(48) operator new(unsigned long)
+calls=60000 0 
+0 6780006
+0 60000
+0 240000
+cfn=(68) Mantid::Geometry::CacheGeometryHandler::CacheGeometryHandler(Mantid::Geometry::IObjComponent*)
+calls=60000 0 
+0 8340000
+0 60000
+0 300000
+
+fn=(178)
+0 12
+
+fn=(204)
+0 96
+cob=(8)
+cfi=(11)
+cfn=(90)
+calls=6 0 
+0 42
+0 6
+0 24
+cfn=(200)
+calls=6 0 
+0 821
+0 6
+0 20
+cfn=(152) Mantid::Geometry::Component::getParent() const
+calls=2 0 
+0 9450
+0 12
+cfn=(195)
+calls=2 0 
+0 24533
+0 48
+cfn=(272) Mantid::Geometry::Component::getRelativeRot() const
+calls=6 0 
+0 270
+0 24
+cob=(8)
+cfi=(11)
+cfn=(356) Mantid::Kernel::Quat::operator*(Mantid::Kernel::Quat const&) const
+calls=6 0 
+0 360
+0 6
+0 48
+cob=(44)
+cfi=(1)
+cfn=(362)
+calls=2 0 
+0 96
+0 14
+cob=(44)
+cfi=(1)
+cfn=(180)
+calls=2 0 
+0 266
+0 2
+
+fn=(205)
+0 45
+cob=(8)
+cfi=(11)
+cfn=(90)
+calls=2 0 
+0 14
+0 2
+0 8
+cfn=(200)
+calls=2 0 
+0 255
+0 2
+0 8
+cfn=(152)
+calls=1 0 
+0 9272
+0 6
+cfn=(195)
+calls=1 0 
+0 6009
+0 21
+cfn=(272)
+calls=2 0 
+0 90
+0 8
+cob=(8)
+cfi=(11)
+cfn=(356)
+calls=2 0 
+0 120
+0 2
+0 24
+cob=(44)
+cfi=(1)
+cfn=(296)
+calls=1 0 
+0 7399
+0 7
+cob=(44)
+cfi=(1)
+cfn=(180)
+calls=1 0 
+0 142
+0 4
+cfn=(272)
+calls=1 0 
+0 45
+0 9
+
+fn=(266) Mantid::Geometry::directionToVector(Mantid::Geometry::PointingAlong const&)
+0 24
+cob=(8)
+cfi=(11)
+cfn=(86) Mantid::Kernel::V3D::V3D()
+calls=4 0 
+0 20
+0 4
+0 32
+cob=(8)
+cfi=(11)
+cfn=(270) Mantid::Kernel::V3D::V3D(double, double, double)
+calls=2 0 
+0 8
+0 2
+0 2
+cob=(8)
+cfi=(11)
+cfn=(270)
+calls=2 0 
+0 8
+0 2
+0 52
+
+fn=(284) std::_Rb_tree_iterator<std::pair<Mantid::Geometry::IComponent* const, Mantid::Kernel::Quat> > std::_Rb_tree<Mantid::Geometry::IComponent* const, std::pair<Mantid::Geometry::IComponent* const, Mantid::Kernel::Quat>, std::_Select1st<std::pair<Mantid::Geometry::IComponent* const, Mantid::Kernel::Quat> >, std::less<Mantid::Geometry::IComponent* const>, std::allocator<std::pair<Mantid::Geometry::IComponent* const, Mantid::Kernel::Quat> > >::_M_emplace_hint_unique<std::piecewise_construct_t const&, std::tuple<Mantid::Geometry::IComponent* const&>, std::tuple<> >(std::_Rb_tree_const_iterator<std::pair<Mantid::Geometry::IComponent* const, Mantid::Kernel::Quat> >, std::piecewise_construct_t const&, std::tuple<Mantid::Geometry::IComponent* const&>&&, std::tuple<>&&)
+0 108
+cob=(7)
+cfi=(8)
+cfn=(48)
+calls=9 0 
+0 1091
+0 9
+0 108
+cob=(8)
+cfi=(11)
+cfn=(90)
+calls=9 0 
+0 63
+0 9
+0 45
+cob=(7)
+cfi=(8)
+cfn=(458) std::_Rb_tree_decrement(std::_Rb_tree_node_base*)
+calls=1 0 
+0 15
+0 1
+0 48
+cob=(7)
+cfi=(8)
+cfn=(294) std::_Rb_tree_insert_and_rebalance(bool, std::_Rb_tree_node_base*, std::_Rb_tree_node_base*, std::_Rb_tree_node_base&)
+calls=9 0 
+0 499
+0 9
+0 136
+cfn=(290) std::_Rb_tree<Mantid::Geometry::IComponent* const, std::pair<Mantid::Geometry::IComponent* const, Mantid::Kernel::Quat>, std::_Select1st<std::pair<Mantid::Geometry::IComponent* const, Mantid::Kernel::Quat> >, std::less<Mantid::Geometry::IComponent* const>, std::allocator<std::pair<Mantid::Geometry::IComponent* const, Mantid::Kernel::Quat> > >::_M_get_insert_unique_pos(Mantid::Geometry::IComponent* const&)
+calls=1 0 
+0 17
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 1642
+0 5
+0 78
+
+fn=(290)
+0 17
+
+fn=(300)
+0 12
+cob=(44)
+cfi=(1)
+cfn=(302)
+calls=2 0 
+0 428
+
+fn=(96)
+0 180000
+cfn=(98) Mantid::Geometry::Component::getPos() const
+calls=60000 0 
+0 49705507
+
+fn=(100) Mantid::Geometry::Detector::getRelativePos() const
+0 180000
+cfn=(106) Mantid::Geometry::Component::getRelativePos() const
+calls=60000 0 
+0 3121015
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 843
+0 60004
+0 180000
+
+fn=(200)
+0 840266
+cob=(21) /usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0
+cfi=(14) ???
+cfn=(128) GOMP_critical_name_start
+calls=60019 0 
+0 480152
+0 60019
+0 180057
+cfn=(130)
+calls=60019 0 
+0 540171
+0 360114
+cob=(24)
+cfi=(15)
+cfn=(138)
+calls=60019 63 
+0 1620513
+0 60019
+0 2560517
+cob=(24)
+cfi=(16)
+cfn=(144)
+calls=60019 41 
+0 960304
+0 60019
+0 120038
+cob=(21)
+cfi=(14)
+cfn=(150) GOMP_critical_name_end
+calls=60019 0 
+0 300095
+0 60019
+0 540195
+
+fn=(380) Mantid::Geometry::ParameterMap::setCachedLocation(Mantid::Geometry::IComponent const*, Mantid::Kernel::V3D const&) const
+0 108
+cob=(21)
+cfi=(14)
+cfn=(128)
+calls=9 0 
+0 72
+0 9
+0 36
+cfn=(130)
+calls=9 0 
+0 81
+0 54
+cob=(24)
+cfi=(15)
+cfn=(138)
+calls=9 63 
+0 243
+0 9
+0 271
+cfn=(386) std::_Rb_tree_iterator<std::pair<Mantid::Geometry::IComponent* const, Mantid::Kernel::V3D> > std::_Rb_tree<Mantid::Geometry::IComponent* const, std::pair<Mantid::Geometry::IComponent* const, Mantid::Kernel::V3D>, std::_Select1st<std::pair<Mantid::Geometry::IComponent* const, Mantid::Kernel::V3D> >, std::less<Mantid::Geometry::IComponent* const>, std::allocator<std::pair<Mantid::Geometry::IComponent* const, Mantid::Kernel::V3D> > >::_M_emplace_hint_unique<std::piecewise_construct_t const&, std::tuple<Mantid::Geometry::IComponent* const&>, std::tuple<> >(std::_Rb_tree_const_iterator<std::pair<Mantid::Geometry::IComponent* const, Mantid::Kernel::V3D> >, std::piecewise_construct_t const&, std::tuple<Mantid::Geometry::IComponent* const&>&&, std::tuple<>&&)
+calls=9 0 
+0 3893
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 2514
+0 13
+0 90
+cob=(24)
+cfi=(16)
+cfn=(144)
+calls=9 41 
+0 144
+0 9
+0 18
+cob=(21)
+cfi=(14)
+cfn=(150)
+calls=9 0 
+0 45
+0 9
+0 65
+
+fn=(182)
+0 48
+cob=(7)
+cfi=(8)
+cfn=(186)
+calls=12 0 
+0 1116
+0 12
+
+fn=(236) Mantid::Geometry::ReferenceFrame::ReferenceFrame()
+0 32
+cob=(7)
+cfi=(8)
+cfn=(240) std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(char const*, std::allocator<char> const&)
+calls=2 0 
+0 460
+0 2
+0 4
+cob=(8)
+cfi=(11)
+cfn=(86)
+calls=2 0 
+0 10
+0 2
+0 4
+cob=(8)
+cfi=(11)
+cfn=(86)
+calls=2 0 
+0 10
+0 2
+0 4
+cfn=(262) Mantid::Geometry::ReferenceFrame::init()
+calls=2 0 
+0 210
+0 2
+0 10
+
+fn=(432)
+0 1920000
+cfn=(438) Mantid::Geometry::IObjComponent::~IObjComponent()
+calls=60000 0 
+0 13620831
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 795
+0 60004
+0 300000
+cob=(7)
+cfi=(8)
+cfn=(186)
+calls=60000 0 
+0 7530000
+0 60000
+0 240000
+
+fn=(28)
+0 1080000
+cob=(7)
+cfi=(8)
+cfn=(32) __dynamic_cast
+calls=60000 0 
+0 68040000
+0 60000
+0 1020000
+cob=(7)
+cfi=(8)
+cfn=(32)
+calls=60000 0 
+0 16500000
+0 60000
+0 300000
+cob=(7)
+cfi=(8)
+cfn=(48)
+calls=60000 0 
+0 15250383
+0 60000
+0 300000
+cfn=(60) Mantid::Geometry::Detector::Detector(Mantid::Geometry::Detector const*, Mantid::Geometry::ParameterMap const*)
+calls=60000 0 
+0 63901085
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 955
+0 60004
+0 240000
+cob=(7)
+cfi=(8)
+cfn=(48)
+calls=60000 0 
+0 6780000
+0 60000
+0 600000
+
+fn=(78) Mantid::Geometry::ObjComponent::ObjComponent(Mantid::Geometry::IComponent const*, Mantid::Geometry::ParameterMap const*)
+0 420000
+cfn=(82) Mantid::Geometry::Component::Component(Mantid::Geometry::IComponent const*, Mantid::Geometry::ParameterMap const*)
+calls=60000 0 
+0 42960000
+0 60000
+0 960000
+
+fn=(152)
+0 132
+cfn=(153) Mantid::Geometry::Component::getParent() const'2
+calls=12 0 
+0 1656
+0 132
+cfn=(158) Mantid::Geometry::ParComponentFactory::create(boost::shared_ptr<Mantid::Geometry::IComponent const>, Mantid::Geometry::ParameterMap const*)
+calls=12 0 
+0 63083
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 1331
+0 16
+0 282
+cfn=(178)
+calls=10 0 
+0 10
+0 70
+cob=(44)
+cfi=(1)
+cfn=(180)
+calls=10 0 
+0 1030
+0 10
+
+fn=(153)
+0 144
+cob=(7)
+cfi=(8)
+cfn=(48)
+calls=12 0 
+0 1356
+0 12
+0 144
+
+fn=(278)
+0 108
+cob=(21)
+cfi=(14)
+cfn=(128)
+calls=9 0 
+0 72
+0 9
+0 36
+cfn=(130)
+calls=9 0 
+0 81
+0 54
+cob=(24)
+cfi=(15)
+cfn=(138)
+calls=9 63 
+0 243
+0 9
+0 271
+cfn=(284)
+calls=9 0 
+0 3883
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 2538
+0 13
+0 108
+cob=(24)
+cfi=(16)
+cfn=(144)
+calls=9 41 
+0 144
+0 9
+0 18
+cob=(21)
+cfi=(14)
+cfn=(150)
+calls=9 0 
+0 45
+0 9
+0 65
+
+fn=(312)
+0 8
+cob=(7)
+cfi=(8)
+cfn=(186)
+calls=2 0 
+0 186
+0 2
+
+fn=(112) Mantid::Geometry::ParameterMap::contains(Mantid::Geometry::IComponent const*, char const*, char const*) const
+0 1260378
+
+fn=(158)
+0 192
+cob=(7)
+cfi=(8)
+cfn=(32)
+calls=12 0 
+0 9406
+0 12
+0 180
+cob=(7)
+cfi=(8)
+cfn=(32)
+calls=12 0 
+0 9406
+0 12
+0 84
+cob=(7)
+cfi=(8)
+cfn=(32)
+calls=12 0 
+0 8272
+0 12
+0 54
+cob=(7)
+cfi=(8)
+cfn=(48)
+calls=2 0 
+0 226
+0 2
+0 32
+cfn=(214) Mantid::Geometry::ParComponentFactory::createInstrument(boost::shared_ptr<Mantid::Geometry::Instrument const>, boost::shared_ptr<Mantid::Geometry::ParameterMap>)
+calls=2 0 
+0 7151
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 1467
+0 6
+0 106
+cob=(7)
+cfi=(8)
+cfn=(32)
+calls=10 0 
+0 7570
+0 10
+0 80
+cob=(7)
+cfi=(8)
+cfn=(32)
+calls=10 0 
+0 3430
+0 10
+0 70
+cfn=(164) _ZN5boost11make_sharedIN6Mantid8Geometry12CompAssemblyERPKS3_IRPKNS2_12ParameterMapEEEENS_6detail15sp_if_not_arrayIT_E4typeEOT0_DpOT1_
+calls=10 0 
+0 13624
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 1565
+0 14
+0 90
+
+fn=(164)
+0 120
+cob=(7)
+cfi=(8)
+cfn=(48)
+calls=10 0 
+0 2875
+0 10
+0 100
+cob=(44)
+cfi=(1)
+cfn=(170)
+calls=10 0 
+0 20
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 2164
+0 14
+0 120
+cfn=(176) Mantid::Geometry::CompAssembly::CompAssembly(Mantid::Geometry::IComponent const*, Mantid::Geometry::ParameterMap const*)
+calls=10 0 
+0 6950
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 1067
+0 14
+0 170
+
+fn=(272)
+0 135
+cfn=(112)
+calls=9 0 
+0 189
+0 9
+0 72
+
+fn=(68)
+0 300000
+cfn=(72) Mantid::Geometry::GeometryHandler::GeometryHandler(Mantid::Geometry::IObjComponent*)
+calls=60000 0 
+0 480000
+0 60000
+0 360000
+cob=(7)
+cfi=(8)
+cfn=(48)
+calls=60000 0 
+0 6780000
+0 60000
+0 300000
+
+fn=(106)
+0 960144
+cfn=(112)
+calls=60009 0 
+0 1260189
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 1011
+0 60013
+0 840126
+
+fn=(262)
+0 14
+cfn=(266)
+calls=2 0 
+0 78
+0 2
+0 18
+cfn=(266)
+calls=2 0 
+0 76
+0 2
+0 20
+
+fn=(298)
+0 30
+cob=(44)
+cfi=(1)
+cfn=(94)
+calls=2 0 
+0 680
+0 2
+0 16
+cob=(7)
+cfi=(8)
+cfn=(316) std::string::_Rep::_M_dispose(std::allocator<char> const&)
+calls=2 0 
+0 6
+0 2
+0 8
+cob=(7)
+cfi=(8)
+cfn=(316)
+calls=2 0 
+0 6
+0 2
+0 8
+cob=(44)
+cfi=(1)
+cfn=(94)
+calls=2 0 
+0 242
+0 2
+0 8
+cob=(44)
+cfi=(1)
+cfn=(94)
+calls=2 0 
+0 242
+0 2
+0 8
+cob=(7)
+cfi=(8)
+cfn=(316)
+calls=2 0 
+0 26
+0 2
+0 8
+cob=(7)
+cfi=(8)
+cfn=(316)
+calls=2 0 
+0 26
+0 2
+0 12
+cob=(44)
+cfi=(1)
+cfn=(332)
+calls=2 0 
+0 28
+0 2
+0 6
+cob=(44)
+cfi=(1)
+cfn=(338)
+calls=2 0 
+0 32
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 3229
+0 6
+0 6
+cob=(44)
+cfi=(1)
+cfn=(344)
+calls=2 0 
+0 38
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 2599
+0 6
+0 8
+cfn=(350)
+calls=2 0 
+0 92
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 763
+0 6
+0 14
+
+fn=(440) Mantid::Geometry::CacheGeometryHandler::~CacheGeometryHandler()
+0 180000
+cfn=(441) Mantid::Geometry::CacheGeometryHandler::~CacheGeometryHandler()'2
+calls=60000 0 
+0 7140000
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 827
+0 60004
+0 180000
+cob=(7)
+cfi=(8)
+cfn=(186)
+calls=60000 0 
+0 5340000
+0 60000
+
+fn=(441)
+0 840000
+cob=(7)
+cfi=(8)
+cfn=(186)
+calls=60000 0 
+0 5580000
+0 60000
+0 300000
+cfn=(448) Mantid::Geometry::GeometryHandler::~GeometryHandler()
+calls=60000 0 
+0 300000
+0 60000
+
+fn=(60)
+0 1080000
+cfn=(64)
+calls=60000 0 
+0 16440006
+0 60000
+0 780000
+cfn=(78)
+calls=60000 0 
+0 44400000
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 1075
+0 60004
+0 1080000
+
+fn=(72)
+0 480000
+
+fn=(82)
+0 1200240
+cob=(7)
+cfi=(8)
+cfn=(32)
+calls=60012 0 
+0 39727750
+0 60012
+0 480096
+cob=(8)
+cfi=(11)
+cfn=(86)
+calls=60012 0 
+0 300060
+0 60012
+0 180036
+cob=(8)
+cfi=(11)
+cfn=(90)
+calls=60012 0 
+0 420084
+0 60012
+0 480096
+
+fn=(98)
+0 1260000
+cfn=(100)
+calls=60000 0 
+0 3541862
+0 120000
+cob=(8)
+cfi=(11)
+cfn=(90)
+calls=60000 0 
+0 420000
+0 60000
+0 120000
+cob=(8)
+cfi=(11)
+cfn=(86)
+calls=60000 0 
+0 300000
+0 60000
+0 240000
+cfn=(118) Mantid::Geometry::ParameterMap::getCachedLocation(Mantid::Geometry::IComponent const*, Mantid::Kernel::V3D&) const
+calls=60000 0 
+0 8632370
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 1187
+0 60004
+0 120024
+cfn=(152)
+calls=6 0 
+0 35033
+0 36
+cfn=(194)
+calls=6 0 
+0 40951
+0 72
+cfn=(372) Mantid::Geometry::CompAssembly::getPos() const
+calls=6 0 
+0 33609
+0 180078
+cob=(8)
+cfi=(11)
+cfn=(396) Mantid::Kernel::Quat::rotate(Mantid::Kernel::V3D&) const
+calls=60000 0 
+0 23460000
+0 60000
+0 180000
+cob=(8)
+cfi=(11)
+cfn=(428) Mantid::Kernel::V3D::operator+=(Mantid::Kernel::V3D const&)
+calls=60000 0 
+0 660000
+0 60000
+0 1139976
+cfn=(200)
+calls=59994 0 
+0 8739126
+0 59994
+0 120006
+cob=(44)
+cfi=(1)
+cfn=(362)
+calls=6 0 
+0 288
+0 42
+cob=(44)
+cfi=(1)
+cfn=(180)
+calls=6 0 
+0 843
+0 6
+
+fn=(99) Mantid::Geometry::Component::getPos() const'2
+0 183
+cfn=(106)
+calls=8 0 
+0 416
+0 16
+cob=(8)
+cfi=(11)
+cfn=(90)
+calls=8 0 
+0 56
+0 8
+0 16
+cob=(8)
+cfi=(11)
+cfn=(86)
+calls=8 0 
+0 40
+0 8
+0 32
+cfn=(118)
+calls=8 0 
+0 1066
+0 8
+0 28
+cfn=(152)
+calls=3 0 
+0 13997
+0 18
+cfn=(194)
+calls=3 0 
+0 562
+0 36
+cfn=(373) Mantid::Geometry::CompAssembly::getPos() const'2
+calls=3 0 
+0 21074
+0 63
+cob=(8)
+cfi=(11)
+cfn=(396)
+calls=8 0 
+0 3128
+0 8
+0 24
+cob=(8)
+cfi=(11)
+cfn=(428)
+calls=8 0 
+0 88
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 956
+0 12
+0 149
+cfn=(200)
+calls=5 0 
+0 708
+0 5
+0 19
+cob=(44)
+cfi=(1)
+cfn=(362)
+calls=2 0 
+0 96
+cob=(44)
+cfi=(1)
+cfn=(296)
+calls=1 0 
+0 796
+0 21
+cob=(44)
+cfi=(1)
+cfn=(180)
+calls=3 0 
+0 408
+0 5
+cfn=(106)
+calls=1 0 
+0 52
+0 1
+
+fn=(118)
+0 840238
+cob=(21)
+cfi=(14)
+cfn=(128)
+calls=60017 0 
+0 480136
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 4036
+0 60021
+0 180051
+cfn=(130)
+calls=60017 0 
+0 540153
+0 360102
+cob=(24)
+cfi=(15)
+cfn=(138)
+calls=60017 63 
+0 1620459
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 2177
+0 60021
+0 2440365
+cob=(24)
+cfi=(16)
+cfn=(144)
+calls=60017 41 
+0 960272
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 2261
+0 60021
+0 120034
+cob=(21)
+cfi=(14)
+cfn=(150)
+calls=60017 0 
+0 300085
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 3952
+0 60021
+0 540189
+
+fn=(132)
+0 720324
+
+fn=(176)
+0 26
+cfn=(82)
+calls=2 0 
+0 1668
+0 2
+0 130
+cfn=(82)
+calls=10 0 
+0 6730
+0 10
+0 110
+
+fn=(214)
+0 24
+cob=(7)
+cfi=(8)
+cfn=(48)
+calls=2 0 
+0 454
+0 2
+0 20
+cob=(44)
+cfi=(1)
+cfn=(220)
+calls=2 0 
+0 4
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 2134
+0 6
+0 42
+cfn=(226) Mantid::Geometry::Instrument::Instrument(boost::shared_ptr<Mantid::Geometry::Instrument const>, boost::shared_ptr<Mantid::Geometry::ParameterMap>)
+calls=2 0 
+0 3250
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 1147
+0 6
+0 62
+
+fn=(226)
+0 44
+cfn=(176)
+calls=2 0 
+0 1726
+0 2
+0 78
+cob=(7)
+cfi=(8)
+cfn=(232) std::basic_string<char, std::char_traits<char>, std::allocator<char> >::basic_string(std::string const&)
+calls=2 0 
+0 38
+0 2
+0 8
+cob=(7)
+cfi=(8)
+cfn=(232)
+calls=2 0 
+0 38
+0 2
+0 54
+cob=(7)
+cfi=(8)
+cfn=(48)
+calls=2 0 
+0 226
+0 2
+0 6
+cfn=(236)
+calls=2 0 
+0 752
+0 2
+0 8
+cob=(7)
+cfi=(8)
+cfn=(48)
+calls=2 0 
+0 226
+0 2
+0 34
+
+fn=(318)
+0 2
+
+fn=(320)
+0 8
+cob=(7)
+cfi=(8)
+cfn=(186)
+calls=2 0 
+0 186
+0 2
+
+fn=(372)
+0 66
+cob=(8)
+cfi=(11)
+cfn=(86)
+calls=6 0 
+0 30
+0 6
+0 48
+cfn=(118)
+calls=6 0 
+0 790
+0 6
+0 102
+cfn=(99)
+calls=6 0 
+0 29993
+0 6
+0 84
+cfn=(380)
+calls=6 0 
+0 2466
+0 6
+0 6
+
+fn=(373)
+0 33
+cob=(8)
+cfi=(11)
+cfn=(86)
+calls=3 0 
+0 15
+0 3
+0 24
+cfn=(118)
+calls=3 0 
+0 368
+0 3
+0 51
+cfn=(99)
+calls=3 0 
+0 14110
+0 3
+0 42
+cfn=(380)
+calls=3 0 
+0 5217
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 1195
+0 7
+0 3
+
+fn=(386)
+0 108
+cob=(7)
+cfi=(8)
+cfn=(48)
+calls=9 0 
+0 1143
+0 9
+0 108
+cob=(8)
+cfi=(11)
+cfn=(86)
+calls=9 0 
+0 45
+0 9
+0 45
+cob=(7)
+cfi=(8)
+cfn=(458)
+calls=1 0 
+0 15
+0 1
+0 48
+cob=(7)
+cfi=(8)
+cfn=(294)
+calls=9 0 
+0 499
+0 9
+0 136
+cfn=(392) std::_Rb_tree<Mantid::Geometry::IComponent* const, std::pair<Mantid::Geometry::IComponent* const, Mantid::Kernel::V3D>, std::_Select1st<std::pair<Mantid::Geometry::IComponent* const, Mantid::Kernel::V3D> >, std::less<Mantid::Geometry::IComponent* const>, std::allocator<std::pair<Mantid::Geometry::IComponent* const, Mantid::Kernel::V3D> > >::_M_get_insert_unique_pos(Mantid::Geometry::IComponent* const&)
+calls=1 0 
+0 17
+cob=(6)
+cfi=(4)
+cfn=(12)
+calls=1 34 
+0 1618
+0 5
+0 78
+
+fn=(392)
+0 17
+
+fn=(438)
+0 660000
+cfn=(440)
+calls=60000 0 
+0 12960831
+
+fn=(448)
+0 300000
+
+ob=(8)
+fl=(11)
+fn=(360) Mantid::Kernel::Quat::Quat(double, double, double, double)
+0 600120
+
+fn=(422) Mantid::Kernel::Quat::operator[](int)
+0 2280304
+
+fn=(400) Mantid::Kernel::Quat::inverse()
+0 180024
+cfn=(404) Mantid::Kernel::Quat::conjugate()
+calls=60008 0 
+0 660088
+0 60008
+0 120016
+cfn=(408) Mantid::Kernel::Quat::len2() const
+calls=60008 0 
+0 720096
+0 60008
+0 1140152
+
+fn=(404)
+0 660088
+
+fn=(396)
+0 1140152
+cfn=(400)
+calls=60008 0 
+0 2940392
+0 60008
+0 180024
+cfn=(412) Mantid::Kernel::V3D::operator[](unsigned long)
+calls=60008 0 
+0 960128
+0 60008
+0 300040
+cfn=(412)
+calls=60008 0 
+0 780104
+0 60008
+0 300040
+cfn=(412)
+calls=60008 0 
+0 840112
+0 60008
+0 360048
+cfn=(360)
+calls=60008 0 
+0 300040
+0 60008
+0 180024
+cfn=(416) Mantid::Kernel::Quat::operator*=(Mantid::Kernel::Quat const&)
+calls=60008 0 
+0 3240432
+0 60008
+0 240032
+cfn=(356)
+calls=60008 0 
+0 3600480
+0 60008
+0 660088
+cfn=(412)
+calls=60008 0 
+0 840112
+0 60008
+0 240032
+cfn=(422)
+calls=60008 0 
+0 600080
+0 60008
+0 300040
+cfn=(412)
+calls=60008 0 
+0 780104
+0 60008
+0 240032
+cfn=(422)
+calls=60008 0 
+0 780104
+0 60008
+0 300040
+cfn=(412)
+calls=60008 0 
+0 960128
+0 60008
+0 240032
+cfn=(422)
+calls=60008 0 
+0 900120
+0 60008
+0 480064
+
+fn=(86)
+0 600230
+
+fn=(90)
+0 840343
+
+fn=(356)
+0 3060816
+cfn=(360)
+calls=60016 0 
+0 300080
+0 60016
+0 180048
+
+fn=(416)
+0 3240432
+
+fn=(428)
+0 660088
+
+fn=(408)
+0 720096
+
+fn=(412)
+0 5160688
+
+fn=(270)
+0 16
+
+ob=(21)
+fl=(14)
+fn=(150)
+0 600270
+
+fn=(128)
+0 960432
+
+ob=(7)
+fl=(8)
+fn=(240)
+0 24
+cob=(17)
+cfi=(17)
+cfn=(244)
+calls=2 66 
+0 32
+0 2
+0 10
+cob=(44)
+cfi=(1)
+cfn=(248)
+calls=2 0 
+0 378
+0 2
+0 12
+
+fn=(34) __cxxabiv1::__vmi_class_type_info::__do_dyncast(long, __cxxabiv1::__class_type_info::__sub_kind, __cxxabiv1::__class_type_info const*, void const*, __cxxabiv1::__class_type_info const*, void const*, __cxxabiv1::__class_type_info::__dyncast_result&) const
+0 5041818
+cob=(17)
+cfi=(9)
+cfn=(38)
+calls=120056 180 
+0 5762688
+0 120056
+0 7924368
+cfn=(35) __cxxabiv1::__vmi_class_type_info::__do_dyncast(long, __cxxabiv1::__class_type_info::__sub_kind, __cxxabiv1::__class_type_info const*, void const*, __cxxabiv1::__class_type_info const*, void const*, __cxxabiv1::__class_type_info::__dyncast_result&) const'2
+calls=180112 0 
+0 79402640
+0 6904450
+cob=(17)
+cfi=(9)
+cfn=(38)
+calls=66 180 
+0 3168
+0 66
+0 120310
+
+fn=(35)
+0 10682932
+cob=(17)
+cfi=(9)
+cfn=(38)
+calls=300100 180 
+0 14404800
+0 300100
+0 19445400
+cfn=(40) __cxxabiv1::__class_type_info::__do_dyncast(long, __cxxabiv1::__class_type_info::__sub_kind, __cxxabiv1::__class_type_info const*, void const*, __cxxabiv1::__class_type_info const*, void const*, __cxxabiv1::__class_type_info::__dyncast_result&) const
+calls=180100 0 
+0 17281800
+cfn=(35)
+calls=240000 0 
+0 50280000
+0 16024496
+cob=(17)
+cfi=(9)
+cfn=(38)
+calls=56 180 
+0 2688
+0 56
+0 1260368
+
+fn=(44) __cxxabiv1::__class_type_info::__do_find_public_src(long, void const*, __cxxabiv1::__class_type_info const*, void const*) const
+0 300060
+
+fn=(42) __cxxabiv1::__vmi_class_type_info::__do_find_public_src(long, void const*, __cxxabiv1::__class_type_info const*, void const*) const
+0 2040408
+cfn=(43) __cxxabiv1::__vmi_class_type_info::__do_find_public_src(long, void const*, __cxxabiv1::__class_type_info const*, void const*) const'2
+calls=60012 0 
+0 6780732
+0 720228
+cob=(17)
+cfi=(9)
+cfn=(38)
+calls=12 180 
+0 576
+0 12
+0 360120
+
+fn=(43)
+0 3900456
+cfn=(44)
+calls=60012 0 
+0 300060
+0 420000
+cfn=(43)
+calls=60000 0 
+0 3660000
+0 2160216
+
+fn=(186)
+0 720096
+cob=(17)
+cfi=(10)
+cfn=(190)
+calls=240032 2917 
+0 23073211
+0 240032
+
+fn=(208) __cxxabiv1::__si_class_type_info::__do_find_public_src(long, void const*, __cxxabiv1::__class_type_info const*, void const*) const
+0 30
+cfn=(42)
+calls=2 0 
+0 346
+0 20
+cob=(17)
+cfi=(9)
+cfn=(38)
+calls=2 180 
+0 96
+0 2
+0 10
+
+fn=(316)
+0 64
+
+fn=(366) 0x0000000000074b80
+0 118
+
+fn=(306)
+0 2
+cfn=(186)
+calls=2 0 
+0 186
+0 2
+
+fn=(232)
+0 76
+
+fn=(458)
+0 30
+
+fn=(32)
+0 4861836
+cfn=(206) __cxxabiv1::__si_class_type_info::__do_dyncast(long, __cxxabiv1::__class_type_info::__sub_kind, __cxxabiv1::__class_type_info const*, void const*, __cxxabiv1::__class_type_info const*, void const*, __cxxabiv1::__class_type_info::__dyncast_result&) const
+calls=8 0 
+0 5052
+cfn=(34)
+calls=180060 0 
+0 105275540
+0 3961112
+cfn=(208)
+calls=2 0 
+0 504
+cfn=(42)
+calls=60010 0 
+0 9901730
+0 300060
+
+fn=(48)
+0 2160450
+cob=(17)
+cfi=(10)
+cfn=(52)
+calls=240050 2876 
+0 31757412
+0 240050
+0 1440300
+
+fn=(206)
+0 182
+cob=(17)
+cfi=(9)
+cfn=(38)
+calls=6 180 
+0 288
+0 6
+0 138
+cfn=(34)
+calls=6 0 
+0 4024
+0 90
+cob=(17)
+cfi=(9)
+cfn=(38)
+calls=6 180 
+0 288
+0 6
+0 30
+
+fn=(252)
+0 32
+cfn=(48)
+calls=2 0 
+0 226
+0 2
+0 8
+
+fn=(294)
+0 866
+cfn=(366)
+calls=8 0 
+0 118
+0 14
+
+fn=(40)
+0 1920600
+cob=(17)
+cfi=(9)
+cfn=(38)
+calls=120000 180 
+0 5760000
+0 120000
+0 2700900
+cob=(17)
+cfi=(9)
+cfn=(38)
+calls=120000 180 
+0 5760000
+0 120000
+0 900300
+
+totals: 266589350

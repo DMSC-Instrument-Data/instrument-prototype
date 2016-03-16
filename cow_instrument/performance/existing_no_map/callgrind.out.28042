@@ -1,0 +1,588 @@
+version: 1
+creator: callgrind-3.10.0.SVN
+pid: 28042
+cmd:  bin/GeometryTest InstrumentTestPerformance
+part: 1
+
+
+desc: I1 cache: 
+desc: D1 cache: 
+desc: LL cache: 
+
+desc: Timerange: Basic block 0 - 23077456
+desc: Trigger: Program termination
+
+positions: line
+events: Ir
+summary: 0
+
+
+ob=(6) /lib/x86_64-linux-gnu/ld-2.19.so
+fl=(5) /build/eglibc-3GlaMS/eglibc-2.19/elf/dl-lookup.c
+fn=(14) do_lookup_x
+82 135
++1 15
+-6 15
++5 45
+-5 105
++12 15
+229 15
++3 30
+-3 15
++3 30
+98 15
+-3 15
++1 15
++2 15
++3 15
+-3 15
++3 15
+-3 42
+-3 42
++1 42
++2 42
++3 42
+-3 42
++3 42
++4 114
++4 114
++4 114
++6 171
++4 114
++1 171
+225 57
++1 114
++4 114
+-2 57
++5 228
++4 114
+-1 114
++1 57
+-1 114
++21 42
++24 84
+461 126
++4 126
+286 120
++4 30
++13 15
++1 15
+-1 15
++1 15
++1 15
+469 120
+240 76
+-1 38
++2 38
++2 51
++10 36
+-7 135
++2 30
++1 60
+-1 30
++1 15
+-1 60
++1 45
+cfn=(16) check_match.9458
+calls=15 131 
+* 1792
++1 75
+
+fn=(12) _dl_lookup_symbol_x
+714 180
+476 15
+714 30
+476 45
+-1 30
++2 15
+-1 15
++1 45
+-1 45
++1 486
+-1 486
++1 1458
+-1 1488
+716 15
++4 15
++4 15
+-8 15
++1 30
++7 15
++5 15
++2 30
+-2 15
++6 120
++2 195
+cfn=(14)
+calls=15 82 
+* 5790
++3 30
+-12 30
++38 30
++22 15
++1 105
++26 15
++9 75
++14 45
++3 60
++5 15
++2 120
+
+fn=(16)
+131 105
++1 30
++2 30
++2 45
+-2 30
++12 45
++3 46
+cfi=(6) /build/eglibc-3GlaMS/eglibc-2.19/string/../sysdeps/x86_64/multiarch/../strcmp.S
+cfn=(18) strcmp
+calls=4 -18 
+* 1093
+* 8
++5 15
+-1 15
++1 15
+-1 15
++1 15
++68 105
+-18 30
++2 30
++1 45
+-1 30
++1 15
+-1 30
+
+fl=(3) /build/eglibc-3GlaMS/eglibc-2.19/elf/../sysdeps/x86_64/dl-trampoline.S
+fn=(8) _dl_runtime_resolve
+34 15
++2 15
++1 15
++1 15
++1 15
++1 15
++1 15
++1 15
++1 15
++1 15
++1 15
+cfi=(4) /build/eglibc-3GlaMS/eglibc-2.19/elf/../elf/dl-runtime.c
+cfn=(10) _dl_fixup
+calls=15 +21 
+* 12393
++1 15
++1 15
++1 15
++1 15
++1 15
++1 15
++1 15
++1 15
++1 15
++2 15
+
+fl=(4)
+fn=(10)
+66 30
++6 30
+-6 45
++3 15
+-1 15
++1 15
++3 15
++1 15
+-1 30
++1 75
++1 15
+-1 15
++1 30
++5 30
++4 30
++4 45
++4 30
++1 60
++2 60
++7 45
+-1 15
++8 30
++3 135
+cfi=(5)
+cfn=(12)
+calls=15 714 
+* 11148
+* 15
++4 45
++4 60
++6 90
++16 15
+-8 15
++8 45
++4 45
+fi=(7) /build/eglibc-3GlaMS/eglibc-2.19/elf/../sysdeps/x86_64/dl-machine.h
++65 15
+fe=(4)
+-61 75
+
+fl=(6)
+fn=(18)
+131 4
++1 4
++1 4
++1 4
++1 4
++1 4
++1 4
+cfn=(19) strcmp'2
+calls=4 -6 
+* 1065
+
+fn=(19)
+131 151
++1 151
++1 151
++1 151
++1 151
++1 151
++1 151
+cfn=(19)
+calls=147 -6 
+* 20566
++2 4
++1 4
+
+ob=(44) /home/spu92482/builds/mantidbuild_release/bin/GeometryTest
+fl=(1) ???
+fn=(0) TestDescription_suite_InstrumentTestPerformance_test_access::runTest()
+0 480006
+cob=(70) /home/spu92482/builds/mantidbuild_release/bin/libMantidGeometry.so
+cfi=(8) ???
+cfn=(22) Mantid::Geometry::Instrument::getDetector(int const&) const
+calls=60000 0 
+0 7437702
+cob=(6)
+cfi=(3)
+cfn=(8)
+calls=1 34 
+0 1209
+0 60004
+0 360000
+cob=(70)
+cfi=(8)
+cfn=(24) virtual thunk to Mantid::Geometry::Component::getPos() const
+calls=60000 0 
+0 115571555
+0 420000
+
+ob=(70)
+fl=(8)
+fn=(36) Mantid::Geometry::Component::getRotation() const
+0 3060000
+cfn=(29) Mantid::Geometry::CompAssembly::getRotation() const'2
+calls=120000 0 
+0 11701759
+0 480000
+cob=(8) /home/spu92482/builds/mantidbuild_release/bin/libMantidKernel.so
+cfi=(9) ???
+cfn=(42) Mantid::Kernel::Quat::operator*(Mantid::Kernel::Quat const&) const
+calls=120000 0 
+0 7200000
+0 120000
+0 1380000
+
+fn=(37) Mantid::Geometry::Component::getRotation() const'2
+0 3240000
+cfn=(29)
+calls=60000 0 
+0 2700000
+0 240000
+cob=(8)
+cfi=(9)
+cfn=(42)
+calls=60000 0 
+0 3600769
+cob=(6)
+cfi=(3)
+cfn=(8)
+calls=1 34 
+0 986
+0 60004
+0 1500000
+
+fn=(28) Mantid::Geometry::CompAssembly::getRotation() const
+0 1800000
+cfn=(36)
+calls=180000 0 
+0 23941759
+cob=(6)
+cfi=(3)
+cfn=(8)
+calls=1 34 
+0 819
+0 180004
+0 1080000
+
+fn=(29)
+0 1800000
+cfn=(37)
+calls=180000 0 
+0 11341759
+0 180000
+0 1080000
+
+fn=(26) Mantid::Geometry::Component::getPos() const
+0 2040000
+cfn=(28)
+calls=60000 0 
+0 15302582
+0 180000
+cob=(8)
+cfi=(9)
+cfn=(56) Mantid::Kernel::Quat::rotate(Mantid::Kernel::V3D&) const
+calls=60000 0 
+0 23465317
+cob=(6)
+cfi=(3)
+cfn=(8)
+calls=1 34 
+0 1144
+0 60004
+0 240000
+cfn=(98) Mantid::Geometry::CompAssembly::getPos() const
+calls=60000 0 
+0 72242508
+0 240000
+cob=(8)
+cfi=(9)
+cfn=(108) Mantid::Kernel::V3D::operator+(Mantid::Kernel::V3D const&) const
+calls=60000 0 
+0 1500000
+0 60000
+0 60000
+
+fn=(27) Mantid::Geometry::Component::getPos() const'2
+0 5520000
+cfn=(28)
+calls=120000 0 
+0 11700000
+0 360000
+cob=(8)
+cfi=(9)
+cfn=(56)
+calls=120000 0 
+0 46920000
+0 120000
+0 480000
+cfn=(99) Mantid::Geometry::CompAssembly::getPos() const'2
+calls=120000 0 
+0 37201717
+0 480000
+cob=(8)
+cfi=(9)
+cfn=(108)
+calls=120000 0 
+0 3000742
+cob=(6)
+cfi=(3)
+cfn=(8)
+calls=1 34 
+0 971
+0 120004
+0 480000
+
+fn=(22)
+0 7437702
+
+fn=(24)
+0 180000
+cfn=(26)
+calls=60000 0 
+0 115391555
+
+fn=(98)
+0 600000
+cfn=(27)
+calls=60000 0 
+0 71221717
+cob=(6)
+cfi=(3)
+cfn=(8)
+calls=1 34 
+0 787
+0 60004
+0 360000
+
+fn=(99)
+0 1200000
+cfn=(27)
+calls=120000 0 
+0 35161717
+0 120000
+0 720000
+
+ob=(8)
+fl=(9)
+fn=(80) Mantid::Kernel::V3D::operator[](unsigned long)
+0 15480000
+
+fn=(42)
+0 18360000
+cfn=(50) Mantid::Kernel::Quat::Quat(double, double, double, double)
+calls=360000 0 
+0 1800000
+cob=(6)
+cfi=(3)
+cfn=(8)
+calls=1 34 
+0 765
+0 360004
+0 1080000
+
+fn=(62) Mantid::Kernel::Quat::inverse()
+0 540000
+cfn=(68) Mantid::Kernel::Quat::conjugate()
+calls=180000 0 
+0 1980000
+cob=(6)
+cfi=(3)
+cfn=(8)
+calls=1 34 
+0 786
+0 180004
+0 360000
+cfn=(74) Mantid::Kernel::Quat::len2() const
+calls=180000 0 
+0 2160000
+cob=(6)
+cfi=(3)
+cfn=(8)
+calls=1 34 
+0 781
+0 180004
+0 3420000
+
+fn=(86) Mantid::Kernel::Quat::operator*=(Mantid::Kernel::Quat const&)
+0 9720000
+
+fn=(50)
+0 2700000
+
+fn=(56)
+0 3420000
+cfn=(62)
+calls=180000 0 
+0 8821575
+cob=(6)
+cfi=(3)
+cfn=(8)
+calls=1 34 
+0 770
+0 180004
+0 540000
+cfn=(80)
+calls=180000 0 
+0 2880000
+cob=(6)
+cfi=(3)
+cfn=(8)
+calls=1 34 
+0 722
+0 180004
+0 900000
+cfn=(80)
+calls=180000 0 
+0 2340000
+0 180000
+0 900000
+cfn=(80)
+calls=180000 0 
+0 2520000
+0 180000
+0 1080000
+cfn=(50)
+calls=180000 0 
+0 900000
+0 180000
+0 540000
+cfn=(86)
+calls=180000 0 
+0 9720000
+cob=(6)
+cfi=(3)
+cfn=(8)
+calls=1 34 
+0 754
+0 180004
+0 720000
+cfn=(42)
+calls=180000 0 
+0 10800000
+cob=(6)
+cfi=(3)
+cfn=(8)
+calls=1 34 
+0 754
+0 180004
+0 1980000
+cfn=(80)
+calls=180000 0 
+0 2520000
+0 180000
+0 720000
+cfn=(96) Mantid::Kernel::Quat::operator[](int)
+calls=180000 0 
+0 1800000
+cob=(6)
+cfi=(3)
+cfn=(8)
+calls=1 34 
+0 722
+0 180004
+0 900000
+cfn=(80)
+calls=180000 0 
+0 2340000
+0 180000
+0 720000
+cfn=(96)
+calls=180000 0 
+0 2340000
+0 180000
+0 900000
+cfn=(80)
+calls=180000 0 
+0 2880000
+0 180000
+0 720000
+cfn=(96)
+calls=180000 0 
+0 2700000
+0 180000
+0 1440000
+
+fn=(114) Mantid::Kernel::V3D::operator+=(Mantid::Kernel::V3D const&)
+0 1980000
+
+fn=(68)
+0 1980000
+
+fn=(74)
+0 2160000
+
+fn=(96)
+0 6840000
+
+fn=(108)
+0 1800000
+cfn=(114)
+calls=180000 0 
+0 1980000
+cob=(6)
+cfi=(3)
+cfn=(8)
+calls=1 34 
+0 738
+0 180004
+0 540000
+
+totals: 124330476
