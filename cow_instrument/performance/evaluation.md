@@ -37,7 +37,7 @@ Profiling was achieved with a combination of *callgrind*, and *kcachegrind*
 
 ##Conclusion##
 
-The prototype was found to be signficantly faster x30 in some cases, than the existing implementation of the instrument. This is only utilising the the absolute aspects present in the new design. This testing has not yet addressed the high-level copies of instruments, for which the new design is also expected to perform well.
+The prototype was found to be signficantly faster, x30, in some cases, than the existing implementation of the instrument. This is only utilising the the absolute aspects present in the new design. This testing has not yet addressed the high-level copies of instruments, for which the new design is also expected to perform well.
 
 
 
