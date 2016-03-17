@@ -11,6 +11,7 @@ public:
   MOCK_METHOD1(deltaPos, void(const V3D &));
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
+  MOCK_CONST_METHOD1(registerDetectors, void(std::map<size_t, const Detector*>&));
   ~MockComponent() {}
 };
 

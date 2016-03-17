@@ -4,7 +4,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "MockTypes.h"
-#include "Detector.h"
+#include "DetectorComponent.h"
 #include "CompositeComponent.h"
 
 using namespace testing;
@@ -23,9 +23,9 @@ TEST(instrument_tree_test, test_constructor) {
 
   */
 
-  MockComponent *a_contents = new MockComponent;
-  MockComponent *b_contents = new MockComponent;
-  MockComponent *c_contents = new MockComponent;
+  MockComponent *a_contents = new NiceMock<MockComponent>();
+  MockComponent *b_contents = new NiceMock<MockComponent>();
+  MockComponent *c_contents = new NiceMock<MockComponent>();
 
   auto a = std::make_shared<Node>(CowPtr<Component>(a_contents));
   auto b = std::make_shared<Node>(a, CowPtr<Component>(b_contents));
@@ -50,18 +50,18 @@ TEST(instrument_tree_test, test_detector_access) {
 
   */
 
-  auto a = std::make_shared<Node>(CowPtr<Component>(new MockComponent));
+  auto a = std::make_shared<Node>(CowPtr<Component>(new NiceMock<MockComponent>()));
 
   size_t detector1Id = 1;
   CompositeComponent_sptr composite = std::make_shared<CompositeComponent>();
   composite->addComponent(
-      std::make_shared<Detector>(detector1Id, V3D{1, 1, 1}));
+      std::make_shared<DetectorComponent>(detector1Id, V3D{1, 1, 1}));
   auto b = std::make_shared<Node>(a, CowPtr<Component>(composite));
 
   size_t detector2Id = detector1Id + 1;
   auto c = std::make_shared<Node>(
       a,
-      CowPtr<Component>(std::make_shared<Detector>(detector2Id, V3D{2, 2, 2})));
+      CowPtr<Component>(std::make_shared<DetectorComponent>(detector2Id, V3D{2, 2, 2})));
 
   a->addChild(b);
   a->addChild(c);

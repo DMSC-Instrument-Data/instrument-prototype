@@ -1,4 +1,4 @@
-#include "Detector.h"
+#include "DetectorComponent.h"
 #include "CompositeComponent.h"
 #include "cow_ptr.h"
 #include "gtest/gtest.h"
@@ -25,7 +25,7 @@ private:
     CompositeComponent_sptr bank = std::make_shared<CompositeComponent>();
     for (size_t i = 0; i < width; ++i) {
       for (size_t j = 0; j < height; ++j) {
-        bank->addComponent(std::make_shared<Detector>(
+        bank->addComponent(std::make_shared<DetectorComponent>(
             id++, V3D{double(i), double(j), double(0)}));
       }
     }
@@ -119,7 +119,7 @@ TEST_F(ExampleTest, simple_sans_example) {
   size_t max = 100 * 100 * 6;
   double pos_x = 0;
   for (size_t i = 1; i < max; ++i) {
-    auto det = m_instrument.getDetector(1);
+    const auto& det = m_instrument.getDetector(1);
     pos_x = det.getPos()[0];
   }
 

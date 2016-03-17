@@ -63,11 +63,11 @@ TEST(node_test, test_modify_linear) {
     a -> b -> c
   */
 
-  MockComponent *a_contents = new MockComponent;
+  auto *a_contents = new NiceMock<MockComponent>();
   EXPECT_CALL(*a_contents, equals(_)).WillOnce(Return(false));
-  MockComponent *b_contents = new MockComponent;
+  auto *b_contents = new NiceMock<MockComponent>();
   EXPECT_CALL(*b_contents, equals(_)).WillOnce(Return(false));
-  MockComponent *c_contents = new MockComponent;
+  auto *c_contents = new NiceMock<MockComponent>();
   EXPECT_CALL(*c_contents, equals(_)).WillOnce(Return(true));
 
   auto a = std::make_shared<Node>(CowPtr<Component>(a_contents));
@@ -88,7 +88,7 @@ TEST(node_test, test_modify_linear) {
   EXPECT_CALL(command, execute(_)).Times(1);
 
   // We would also expect that the contents of c are deep copied.
-  EXPECT_CALL(*c_contents, clone()).WillOnce(Return(new MockComponent));
+  EXPECT_CALL(*c_contents, clone()).WillOnce(Return(new NiceMock<MockComponent>()));
 
   auto newTree = c->modify(command);
 
@@ -127,11 +127,11 @@ TEST(node_test, test_modify_tree) {
 
   */
 
-  MockComponent *a_contents = new MockComponent;
+  MockComponent *a_contents = new NiceMock<MockComponent>();
   EXPECT_CALL(*a_contents, equals(_)).WillOnce(Return(false));
-  MockComponent *b_contents = new MockComponent;
+  MockComponent *b_contents = new NiceMock<MockComponent>();
   EXPECT_CALL(*b_contents, equals(_)).WillOnce(Return(false));
-  MockComponent *c_contents = new MockComponent;
+  MockComponent *c_contents = new NiceMock<MockComponent>();
   EXPECT_CALL(*c_contents, equals(_)).WillOnce(Return(true));
 
   auto a = std::make_shared<Node>(CowPtr<Component>(a_contents));
@@ -156,7 +156,7 @@ TEST(node_test, test_modify_tree) {
   EXPECT_CALL(command, execute(_)).Times(1);
 
   // We would also expect that the contents of c are deep copied.
-  EXPECT_CALL(*c_contents, clone()).WillOnce(Return(new MockComponent));
+  EXPECT_CALL(*c_contents, clone()).WillOnce(Return(new NiceMock<MockComponent>()));
 
   auto newTree = c->modify(command);
 
@@ -200,13 +200,13 @@ TEST(node_test, test_tree_cascade) {
 
   */
 
-  MockComponent *a_contents = new MockComponent;
+  auto *a_contents = new NiceMock<MockComponent>();
   EXPECT_CALL(*a_contents, equals(_)).WillOnce(Return(false));
-  MockComponent *b_contents = new MockComponent;
+  auto *b_contents = new NiceMock<MockComponent>();
   EXPECT_CALL(*b_contents, equals(_)).WillOnce(Return(false));
-  MockComponent *c_contents = new MockComponent;
+  auto *c_contents = new NiceMock<MockComponent>();
   EXPECT_CALL(*c_contents, equals(_)).WillOnce(Return(true)); // To force an update of c
-  MockComponent *d_contents = new MockComponent;
+  auto *d_contents = new NiceMock<MockComponent>();
   EXPECT_CALL(*d_contents, equals(_)).WillOnce(Return(false)); // Will force and update even though not explicitly requested
 
   auto a = std::make_shared<Node>(CowPtr<Component>(a_contents));
@@ -237,8 +237,8 @@ TEST(node_test, test_tree_cascade) {
   EXPECT_CALL(command, execute(_)).Times(2);
 
   // We would also expect that the contents of c are deep copied.
-  EXPECT_CALL(*c_contents, clone()).WillOnce(Return(new MockComponent));
-  EXPECT_CALL(*d_contents, clone()).WillOnce(Return(new MockComponent));
+  EXPECT_CALL(*c_contents, clone()).WillOnce(Return(new NiceMock<MockComponent>()));
+  EXPECT_CALL(*d_contents, clone()).WillOnce(Return(new NiceMock<MockComponent>()));
 
   auto newTree = c->modify(command);
 

@@ -13,7 +13,7 @@ include_directories(${GTEST_INCLUDE_DIRS} ${GMOCK_INCLUDE_DIRS})
 
 set ( TEST_FILES
                  CompositeComponentTest.cpp
-                 DetectorTest.cpp
+                 DetectorComponentTest.cpp
                  Example.cpp
                  InstrumentTreeTest.cpp
                  MoveCommandTest.cpp

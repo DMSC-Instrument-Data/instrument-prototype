@@ -10,14 +10,8 @@ namespace {
 
 void findDetectors(const Component &component,
                                    std::map<size_t, const Detector *> &store) {
-  if (Detector const *detector = dynamic_cast<const Detector *>(&component)) {
-    store.insert(std::make_pair(detector->id(), detector));
-  } else if (CompositeComponent const *composite =
-                 dynamic_cast<const CompositeComponent *>(&component)) {
-    for (size_t i = 0; i < composite->size(); ++i) {
-      findDetectors(*composite->getChild(i), store);
-    }
-  }
+
+    component.registerDetectors(store);
 }
 
 }

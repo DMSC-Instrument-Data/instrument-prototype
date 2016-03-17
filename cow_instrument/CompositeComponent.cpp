@@ -1,4 +1,5 @@
 #include "CompositeComponent.h"
+#include "Detector.h"
 
 V3D CompositeComponent::getPos() const {
 
@@ -59,4 +60,11 @@ CompositeComponent::getChild(size_t index) const {
   } else {
     return m_children[index];
   }
+}
+
+void CompositeComponent::registerDetectors(std::map<size_t, const Detector *> &lookup) const
+{
+    for(auto& child : m_children){
+        child->registerDetectors(lookup);
+    }
 }
