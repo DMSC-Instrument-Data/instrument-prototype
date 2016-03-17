@@ -16,7 +16,7 @@ public:
 
 private:
    void addToBuffer(std::shared_ptr<const Node> item);
-   std::stack<std::shared_ptr<const Node> > m_buffer;
+   std::stack<std::weak_ptr<const Node> > m_buffer;
 
 };
 

@@ -64,5 +64,6 @@ private:
 
 using Node_sptr = std::shared_ptr<Node>;
 using Node_const_sptr = std::shared_ptr<const Node>;
+using Node_const_wptr = std::weak_ptr<const Node>;
 
 #endif

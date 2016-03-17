@@ -45,7 +45,19 @@ TEST(node_iterator_test, simple_iterator){
     delete a_contents;
     delete b_contents;
     delete c_contents;
+}
 
+TEST(node_iterator_test, test_locking){
+
+    auto node_sptr = std::make_shared<Node>(CowPtr<Component>(new MockComponent));
+    NodeIterator iteratorA(node_sptr);
+    EXPECT_TRUE(node_sptr.get() == iteratorA.next().get());
+
+    NodeIterator iteratorB(node_sptr);
+    // Deliberately reset it.
+    node_sptr.reset();
+    EXPECT_TRUE(node_sptr.get() == nullptr);
+    EXPECT_TRUE(node_sptr.get() == iteratorB.next().get());
 }
 
 }

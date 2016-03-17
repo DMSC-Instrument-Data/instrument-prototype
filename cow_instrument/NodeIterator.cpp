@@ -20,7 +20,7 @@ void NodeIterator::addToBuffer(Node_const_sptr item) {
 
 Node_const_sptr NodeIterator::next() {
   if (!atEnd()) {
-    auto current = m_buffer.top();
+    auto current = m_buffer.top().lock();
     m_buffer.pop();
     return current;
   } else {
