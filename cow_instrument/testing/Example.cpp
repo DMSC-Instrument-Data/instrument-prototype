@@ -69,36 +69,27 @@ protected:
     CompositeComponent_sptr r_curtain = make_square_bank(width, height);
     r_curtain->deltaPos(V3D{width_d, 0, 6});
 
-    Node_sptr root =
-        std::make_shared<Node>(CowPtr<Component>(new NullComponent));
-    Node_sptr front_trolley =
-        std::make_shared<Node>(root, CowPtr<Component>(new NullComponent));
-    Node_sptr nodeN =
-        std::make_shared<Node>(front_trolley, CowPtr<Component>(N));
-    Node_sptr nodeE =
-        std::make_shared<Node>(front_trolley, CowPtr<Component>(E));
-    Node_sptr nodeS =
-        std::make_shared<Node>(front_trolley, CowPtr<Component>(S));
-    Node_sptr nodeW =
-        std::make_shared<Node>(front_trolley, CowPtr<Component>(W));
-    Node_sptr rear_trolley =
-        std::make_shared<Node>(root, CowPtr<Component>(new NullComponent));
-    Node_sptr nodeLCurtain =
-        std::make_shared<Node>(rear_trolley, CowPtr<Component>(l_curtain));
-    Node_sptr nodeRCurtain =
-        std::make_shared<Node>(rear_trolley, CowPtr<Component>(r_curtain));
-    root->addChild(front_trolley);
-    root->addChild(rear_trolley);
-    front_trolley->addChild(nodeN);
-    front_trolley->addChild(nodeE);
-    front_trolley->addChild(nodeS);
-    front_trolley->addChild(nodeW);
-    rear_trolley->addChild(nodeLCurtain);
-    front_trolley->addChild(nodeRCurtain);
+    Node_uptr root(new Node(CowPtr<Component>(new NullComponent)));
+    Node_uptr front_trolley(new Node(CowPtr<Component>(new NullComponent)));
+    Node_uptr nodeN(new Node(front_trolley.get(), CowPtr<Component>(N)));
+    Node_uptr nodeE(new Node(front_trolley.get(), CowPtr<Component>(E)));
+    Node_uptr nodeS(new Node(front_trolley.get(), CowPtr<Component>(S)));
+    Node_uptr nodeW(new Node(front_trolley.get(), CowPtr<Component>(W)));
+    Node_uptr rear_trolley(new Node(CowPtr<Component>(new NullComponent)));
+    Node_uptr nodeLCurtain(new Node(rear_trolley.get(), CowPtr<Component>(l_curtain)));
+    Node_uptr nodeRCurtain(new Node(rear_trolley.get(), CowPtr<Component>(r_curtain)));
+    front_trolley->addChild(std::move(nodeN));
+    front_trolley->addChild(std::move(nodeE));
+    front_trolley->addChild(std::move(nodeS));
+    front_trolley->addChild(std::move(nodeW));
+    rear_trolley->addChild(std::move(nodeLCurtain));
+    front_trolley->addChild(std::move(nodeRCurtain));
+    root->addChild(std::move(front_trolley));
+    root->addChild(std::move(rear_trolley));
 
     auto start = std::chrono::system_clock::now();
 
-    m_instrument = InstrumentTree(root);
+    m_instrument = InstrumentTree(std::move(root));
 
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;

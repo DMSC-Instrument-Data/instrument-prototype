@@ -32,11 +32,10 @@ TEST(node_test, test_indirection) {
 
 TEST(node_test, test_construction_with_parent) {
 
-  Node_sptr parent =
-      std::make_shared<Node>(CowPtr<Component>(new MockComponent));
+  Node_uptr parent(new Node(CowPtr<Component>(new MockComponent)));
   CowPtr<Component> contents(new MockComponent);
 
-  Node node(parent, contents);
+  Node node(parent.get(), contents);
 
   EXPECT_TRUE(node.hasParent());
   EXPECT_FALSE(node.hasChildren());
@@ -44,13 +43,11 @@ TEST(node_test, test_construction_with_parent) {
 
 TEST(node_test, test_construction_with_parent_and_child) {
 
-  Node_sptr parent =
-      std::make_shared<Node>(CowPtr<Component>(new MockComponent));
-  Node_sptr child =
-      std::make_shared<Node>(CowPtr<Component>(new MockComponent));
+  Node_uptr parent(new Node(CowPtr<Component>(new MockComponent)));
+  Node_uptr child(new Node(CowPtr<Component>(new MockComponent)));
   CowPtr<Component> contents(new MockComponent);
 
-  Node node(parent, child, contents);
+  Node node(parent.get(), std::move(child), contents);
 
   EXPECT_TRUE(node.hasParent());
   EXPECT_TRUE(node.hasChildren());
@@ -70,11 +67,11 @@ TEST(node_test, test_modify_linear) {
   auto *c_contents = new NiceMock<MockComponent>();
   EXPECT_CALL(*c_contents, equals(_)).WillOnce(Return(true));
 
-  auto a = std::make_shared<Node>(CowPtr<Component>(a_contents));
-  auto b = std::make_shared<Node>(a, CowPtr<Component>(b_contents));
-  a->addChild(b);
-  auto c = std::make_shared<Node>(b, CowPtr<Component>(c_contents));
-  b->addChild(c);
+  Node_uptr a(new Node(CowPtr<Component>(a_contents)));
+  Node_uptr b(new Node(a.get(), CowPtr<Component>(b_contents)));
+  Node_uptr c(new Node(b.get(), CowPtr<Component>(c_contents)));
+  b->addChild(std::move(c));
+  a->addChild(std::move(b));
 
   /*
     we then modify c.
@@ -90,28 +87,22 @@ TEST(node_test, test_modify_linear) {
   // We would also expect that the contents of c are deep copied.
   EXPECT_CALL(*c_contents, clone()).WillOnce(Return(new NiceMock<MockComponent>()));
 
-  auto newTree = c->modify(command);
-
-  // Sanity check newTree. We expect all nodes to be different.
-  EXPECT_NE(newTree->root().get(), a.get()); // compare a to a`
-  EXPECT_NE(newTree->root()->child(0).get(),
-            a->child(0).get()); // compare b to b`
-  EXPECT_NE(newTree->root()->child(0)->child(0).get(),
-            a->child(0)->child(0).get()); // compare c to c`
+  // Go from a to be to c, and modify that.
+  auto newTree = a->child(0).child(0).modify(command);
 
   // However, only the contents of one component should be different.
-  EXPECT_EQ(&newTree->root()->const_ref(), &a->const_ref());
-  EXPECT_EQ(&newTree->root()->child(0)->const_ref(), &b->const_ref());
-  EXPECT_NE(&newTree->root()->child(0)->child(0)->const_ref(),
-            &c->const_ref());
+  EXPECT_EQ(&newTree->root()->const_ref(), a_contents);
+  EXPECT_EQ(&newTree->root()->child(0).const_ref(), b_contents);
+  EXPECT_NE(&newTree->root()->child(0).child(0).const_ref(),
+            c_contents);
 
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(a_contents));
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(b_contents));
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(c_contents));
 
-  delete a_contents;
-  delete b_contents;
-  delete c_contents;
+  //delete a_contents;
+  //delete b_contents;
+  //delete c_contents;
 }
 
 TEST(node_test, test_modify_tree) {
@@ -134,11 +125,11 @@ TEST(node_test, test_modify_tree) {
   MockComponent *c_contents = new NiceMock<MockComponent>();
   EXPECT_CALL(*c_contents, equals(_)).WillOnce(Return(true));
 
-  auto a = std::make_shared<Node>(CowPtr<Component>(a_contents));
-  auto b = std::make_shared<Node>(a, CowPtr<Component>(b_contents));
-  auto c = std::make_shared<Node>(a, CowPtr<Component>(c_contents));
-  a->addChild(b);
-  a->addChild(c);
+  Node_uptr a(new Node(CowPtr<Component>(a_contents)));
+  Node_uptr b(new Node(a.get(), CowPtr<Component>(b_contents)));
+  Node_uptr c(new Node(a.get(), CowPtr<Component>(c_contents)));
+  a->addChild(std::move(b));
+  a->addChild(std::move(c));
 
   /*
     we then modify c.
@@ -158,27 +149,21 @@ TEST(node_test, test_modify_tree) {
   // We would also expect that the contents of c are deep copied.
   EXPECT_CALL(*c_contents, clone()).WillOnce(Return(new NiceMock<MockComponent>()));
 
-  auto newTree = c->modify(command);
+  // Get to c via a, and modify c
+  auto newTree = a->child(1).modify(command);
 
   EXPECT_TRUE(Mock::VerifyAndClear(a_contents));
   EXPECT_TRUE(Mock::VerifyAndClear(b_contents));
   EXPECT_TRUE(Mock::VerifyAndClear(c_contents));
 
-  // Sanity check newTree. We expect all nodes to be different.
-  EXPECT_NE(newTree->root().get(), a.get()); // compare a to a`
-  EXPECT_NE(newTree->root()->child(0).get(),
-            a->child(0).get()); // compare b to b`
-  EXPECT_NE(newTree->root()->child(1).get(),
-            a->child(1).get()); // compare c to c`
-
   // However, only the contents of one component should be different.
-  EXPECT_EQ(&newTree->root()->const_ref(), &a->const_ref());
-  EXPECT_EQ(&newTree->root()->child(0)->const_ref(), &b->const_ref());
-  EXPECT_NE(&newTree->root()->child(1)->const_ref(), &c->const_ref());
+  EXPECT_EQ(&newTree->root()->const_ref(), a_contents);
+  EXPECT_EQ(&newTree->root()->child(0).const_ref(), b_contents);
+  EXPECT_NE(&newTree->root()->child(1).const_ref(), c_contents);
 
-  delete a_contents;
-  delete b_contents;
-  delete c_contents;
+  //delete a_contents;
+  //delete b_contents;
+  //delete c_contents;
 }
 
 TEST(node_test, test_tree_cascade) {
@@ -209,13 +194,14 @@ TEST(node_test, test_tree_cascade) {
   auto *d_contents = new NiceMock<MockComponent>();
   EXPECT_CALL(*d_contents, equals(_)).WillOnce(Return(false)); // Will force and update even though not explicitly requested
 
-  auto a = std::make_shared<Node>(CowPtr<Component>(a_contents));
-  auto b = std::make_shared<Node>(a, CowPtr<Component>(b_contents));
-  auto c = std::make_shared<Node>(a, CowPtr<Component>(c_contents));
-  auto d = std::make_shared<Node>(c, CowPtr<Component>(d_contents));
-  a->addChild(b);
-  a->addChild(c);
-  c->addChild(d);
+  Node_uptr a(new Node(CowPtr<Component>(a_contents)));
+  Node_uptr b(new Node(a.get(), CowPtr<Component>(b_contents)));
+  Node_uptr c(new Node(a.get(), CowPtr<Component>(c_contents)));
+  Node_uptr d(new Node(c.get(), CowPtr<Component>(d_contents)));
+  c->addChild(std::move(d));
+  a->addChild(std::move(b));
+  a->addChild(std::move(c));
+
 
   /*
     we then modify c.
@@ -240,32 +226,19 @@ TEST(node_test, test_tree_cascade) {
   EXPECT_CALL(*c_contents, clone()).WillOnce(Return(new NiceMock<MockComponent>()));
   EXPECT_CALL(*d_contents, clone()).WillOnce(Return(new NiceMock<MockComponent>()));
 
-  auto newTree = c->modify(command);
+  auto newTree = a->child(1).modify(command);
 
   EXPECT_TRUE(Mock::VerifyAndClear(a_contents));
   EXPECT_TRUE(Mock::VerifyAndClear(b_contents));
   EXPECT_TRUE(Mock::VerifyAndClear(c_contents));
 
-  // Sanity check newTree. We expect all nodes to be different.
-  EXPECT_NE(newTree->root().get(), a.get()); // compare a to a`
-  EXPECT_NE(newTree->root()->child(0).get(),
-            a->child(0).get()); // compare b to b`
-  EXPECT_NE(newTree->root()->child(1).get(),
-            a->child(1).get()); // compare c to c`
-  EXPECT_NE(newTree->root()->child(1)->child(0).get(),
-            a->child(1)->child(0).get()); // compare d to d`
-
   // These contents should be the same
-  EXPECT_EQ(&newTree->root()->const_ref(), &a->const_ref());
-  EXPECT_EQ(&newTree->root()->child(0)->const_ref(), &b->const_ref());
+  EXPECT_EQ(&newTree->root()->const_ref(), a_contents);
+  EXPECT_EQ(&newTree->root()->child(0).const_ref(), b_contents);
   // These should not
-  EXPECT_NE(&newTree->root()->child(1)->const_ref(), &c->const_ref());
-  EXPECT_NE(&newTree->root()->child(1)->child(0)->const_ref(), &d->const_ref());
+  EXPECT_NE(&newTree->root()->child(1).const_ref(), c_contents);
+  EXPECT_NE(&newTree->root()->child(1).child(0).const_ref(), d_contents);
 
-  delete a_contents;
-  delete b_contents;
-  delete c_contents;
-  delete d_contents;
 }
 
 }

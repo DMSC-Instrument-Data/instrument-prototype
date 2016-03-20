@@ -20,10 +20,10 @@ class InstrumentTree;
 
 class Node {
 public:
-  Node(std::shared_ptr<Node> previous, std::shared_ptr<Node> next,
+  Node(Node const * const previous, std::unique_ptr<Node>&& next,
        CowPtr<Component> contents);
 
-  Node(std::shared_ptr<Node> previous, CowPtr<Component> contents);
+  Node(Node const * const  previous, CowPtr<Component> contents);
 
   Node(CowPtr<Component> contents);
 
@@ -37,15 +37,17 @@ public:
 
   bool hasChildren() const;
 
-  void addChild(std::shared_ptr<Node> child);
+  void addChild(std::unique_ptr<Node>&& child);
 
-  //std::vector<std::shared_ptr<const Node>> children() const;
-  std::shared_ptr<const Node> parent() const;
+  //std::vector<std::unique_ptr<const Node>> children() const;
+  Node const * const parent() const;
 
   // Provide read-only access outside of modify.
   const Component &const_ref() const;
 
-  std::shared_ptr<const Node> child(size_t index) const;
+  const Node& child(size_t index) const;
+
+  size_t nChildren() const {return m_next.size();}
 
 private:
   Node const *const parentPtr() const;
@@ -53,12 +55,12 @@ private:
 
   void doModify(const Command &command);
 
-  std::shared_ptr<Node> smartCopy(const Command &command,
+  std::unique_ptr<Node> smartCopy(const Command &command,
                                   const Component &component,
-                                  std::shared_ptr<Node> &newPrevious,
+                                  Node const * const newPrevious,
                                   bool cascade) const;
-  std::shared_ptr<Node> m_previous;          // parent
-  std::vector<std::shared_ptr<const Node>> m_next; // Children
+  Node const * const m_previous;          // parent
+  std::vector<std::unique_ptr<const Node>> m_next; // Children
   CowPtr<Component> m_contents;
 };
 

@@ -11,12 +11,14 @@ class NodeIterator {
 public:
 
    NodeIterator(std::shared_ptr<const Node> begin);
-   std::shared_ptr<const Node> next();
+   Node const * const next();
    bool atEnd() const;
 
 private:
-   void addToBuffer(std::shared_ptr<const Node> item);
-   std::stack<std::weak_ptr<const Node> > m_buffer;
+   // To guarantee we have some ownership of the thing we are iterating. TODO!
+   std::shared_ptr<const Node> m_iterateable;
+   void addToBuffer(Node const * const item);
+   std::stack<Node const * const > m_buffer;
 
 };
 
