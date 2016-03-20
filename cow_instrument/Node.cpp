@@ -71,7 +71,7 @@ bool Node::hasChildren() const { return m_next.size() > 0; }
 
 Node const *const Node::parentPtr() const { return m_previous.get(); }
 
-std::vector<std::shared_ptr<const Node>> Node::children() const { return m_next; }
+//std::vector<std::shared_ptr<const Node>> Node::children() const { return m_next; }
 
 Node_const_sptr Node::parent() const { return m_previous; }
 

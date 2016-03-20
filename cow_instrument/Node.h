@@ -39,7 +39,7 @@ public:
 
   void addChild(std::shared_ptr<Node> child);
 
-  std::vector<std::shared_ptr<const Node>> children() const;
+  //std::vector<std::shared_ptr<const Node>> children() const;
   std::shared_ptr<const Node> parent() const;
 
   // Provide read-only access outside of modify.
@@ -66,4 +66,6 @@ using Node_sptr = std::shared_ptr<Node>;
 using Node_const_sptr = std::shared_ptr<const Node>;
 using Node_const_wptr = std::weak_ptr<const Node>;
 
+using Node_uptr = std::unique_ptr<Node>;
+using Node_const_uptr = std::unique_ptr<const Node>;
 #endif

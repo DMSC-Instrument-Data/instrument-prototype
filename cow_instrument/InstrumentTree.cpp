@@ -11,17 +11,18 @@ namespace {
 void findDetectors(const Component &component,
                                    std::map<size_t, const Detector *> &store) {
 
+    // Walk through and register all detectors on the store.
     component.registerDetectors(store);
 }
 
 }
+
 
 InstrumentTree::InstrumentTree(Node_const_sptr root) : m_root(root) {
 
   // TODO. Maybe we don't always want to do this?
   auto it = this->iterator();
   while (!it->atEnd()) {
-    // Not pretty
     const auto &component = it->next()->const_ref();
     findDetectors(component, m_detectorMap);
   }
@@ -42,3 +43,5 @@ const Detector &InstrumentTree::getDetector(size_t detectorId) const {
   }
   return *(it->second);
 }
+
+

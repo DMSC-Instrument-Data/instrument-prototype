@@ -11,6 +11,15 @@ using namespace testing;
 
 namespace {
 
+TEST(instrument_tree_test, test_uptr_constructor) {
+
+    auto a = Node_uptr(new Node(CowPtr<Component>(new NiceMock<MockComponent>())));
+
+    // Calls std::shared_ptr<T>(std::unique_ptr<T>&&) constructor
+    InstrumentTree instrument(std::move(a));
+
+}
+
 TEST(instrument_tree_test, test_constructor) {
 
   /*
