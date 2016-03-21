@@ -12,40 +12,37 @@ namespace {
 TEST(detector_component_test, test_construction) {
 
   V3D input{1, 2, 3};
-  size_t id = 1;
-  DetectorComponent det(ComponentIdType(1), id, input);
+  DetectorIdType det_id(1);
+  ComponentIdType comp_id(1);
+  DetectorComponent det(comp_id, det_id, input);
   EXPECT_EQ(det.getPos(), input);
-  EXPECT_EQ(det.detectorId(), id);
-  EXPECT_EQ(det.componentId(), ComponentIdType(1));
+  EXPECT_EQ(det.detectorId(), det_id);
+  EXPECT_EQ(det.componentId(), comp_id);
 }
 
-TEST(detector_component_test, test_equals){
+TEST(detector_component_test, test_equals) {
 
-    V3D input{1, 2, 3};
-    DetectorComponent a(ComponentIdType(1), 1, input);
-    DetectorComponent b(ComponentIdType(2), 2, input); // Different id.
+  V3D input{1, 2, 3};
+  DetectorComponent a(ComponentIdType(1), DetectorIdType(1), input);
+  DetectorComponent b(ComponentIdType(2), DetectorIdType(2), input); // Different id.
 
-    EXPECT_FALSE(a.equals(b));
+  EXPECT_FALSE(a.equals(b));
 
-    MockComponent c;
-    EXPECT_FALSE(a.equals(c));
+  MockComponent c;
+  EXPECT_FALSE(a.equals(c));
 
-    DetectorComponent d(ComponentIdType(3), 1, input);
-    EXPECT_TRUE(a.equals(d));
+  DetectorComponent d(ComponentIdType(3), DetectorIdType(1), input);
+  EXPECT_TRUE(a.equals(d));
 }
 
-TEST(detector_component_test, test_clone){
-    V3D input{1, 2, 3};
-    DetectorComponent det(ComponentIdType(1), 1, input);
-    DetectorComponent* clone = det.clone();
+TEST(detector_component_test, test_clone) {
+  V3D input{1, 2, 3};
+  DetectorComponent det(ComponentIdType(1), DetectorIdType(1), input);
+  DetectorComponent *clone = det.clone();
 
-    EXPECT_TRUE(det.equals(*clone));
-    EXPECT_NE(&det, clone); // different objects
-    delete clone;
-
+  EXPECT_TRUE(det.equals(*clone));
+  EXPECT_NE(&det, clone); // different objects
+  delete clone;
 }
-
-
-
 
 } // namespace

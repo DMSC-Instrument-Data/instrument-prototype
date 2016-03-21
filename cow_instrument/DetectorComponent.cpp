@@ -1,7 +1,7 @@
 #include "DetectorComponent.h"
 
-DetectorComponent::DetectorComponent(ComponentIdType componentId, size_t detectorId,
-                                     const V3D &pos)
+DetectorComponent::DetectorComponent(ComponentIdType componentId,
+                                     DetectorIdType detectorId, const V3D &pos)
     : m_componentId(componentId), m_detectorId(detectorId), m_pos(pos) {}
 
 V3D DetectorComponent::getPos() const { return m_pos; }
@@ -14,7 +14,8 @@ void DetectorComponent::deltaPos(const V3D &delta) {
 
 DetectorComponent *DetectorComponent::clone() const {
 
-  return new DetectorComponent(this->m_componentId, this->m_detectorId, this->m_pos);
+  return new DetectorComponent(this->m_componentId, this->m_detectorId,
+                               this->m_pos);
 }
 
 bool DetectorComponent::equals(const Component &other) const {
@@ -26,11 +27,11 @@ bool DetectorComponent::equals(const Component &other) const {
 
 void DetectorComponent::registerDetectors(
     std::map<size_t, const Detector *> &lookup) const {
-  lookup.insert(std::make_pair(this->detectorId(), this));
+  lookup.insert(std::make_pair(this->detectorId().const_ref(), this));
 }
 
 DetectorComponent::~DetectorComponent() {}
 
-size_t DetectorComponent::detectorId() const { return m_detectorId; }
+DetectorIdType DetectorComponent::detectorId() const { return m_detectorId; }
 
 ComponentIdType DetectorComponent::componentId() const { return m_componentId; }

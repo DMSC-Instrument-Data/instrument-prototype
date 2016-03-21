@@ -80,16 +80,16 @@ TEST(instrument_tree_test, test_detector_access) {
   */
 
   Node_uptr a(new Node(CowPtr<Component>(new NiceMock<MockComponent>())));
-  size_t detector1Id = 1;
+  DetectorIdType detector1Id(1);
   CompositeComponent_sptr composite = std::make_shared<CompositeComponent>(ComponentIdType(1));
   composite->addComponent(
-      std::make_shared<DetectorComponent>(ComponentIdType(detector1Id), detector1Id, V3D{1, 1, 1}));
+      std::make_shared<DetectorComponent>(ComponentIdType(1), DetectorIdType(detector1Id), V3D{1, 1, 1}));
   Node_uptr b(new Node(a.get(), CowPtr<Component>(composite)));
 
-  size_t detector2Id = detector1Id + 1;
+  DetectorIdType detector2Id = detector1Id + 1;
   Node_uptr c(
       new Node(a.get(), CowPtr<Component>(std::make_shared<DetectorComponent>(
-                            ComponentIdType(detector2Id), detector2Id, V3D{2, 2, 2}))));
+                            ComponentIdType(2), DetectorIdType(detector2Id), V3D{2, 2, 2}))));
 
   a->addChild(std::move(b));
   a->addChild(std::move(c));

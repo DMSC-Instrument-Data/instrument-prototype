@@ -21,9 +21,10 @@ public:
 
 private:
   CompositeComponent_sptr make_square_bank(size_t width, size_t height) {
-    static size_t detectorId = 1;
+    static DetectorIdType detectorId(1);
     static ComponentIdType componentId(1);
-    CompositeComponent_sptr bank = std::make_shared<CompositeComponent>(ComponentIdType(0));
+    CompositeComponent_sptr bank =
+        std::make_shared<CompositeComponent>(ComponentIdType(0));
     for (size_t i = 0; i < width; ++i) {
       for (size_t j = 0; j < height; ++j) {
         bank->addComponent(std::make_shared<DetectorComponent>(
@@ -112,7 +113,7 @@ TEST_F(ExampleTest, simple_sans_example) {
   size_t max = 100 * 100 * 6;
   double pos_x = 0;
   for (size_t i = 1; i < max; ++i) {
-    const auto &det = m_instrument.getDetector(1);
+    const auto &det = m_instrument.getDetector(i);
     pos_x = det.getPos()[0];
   }
 

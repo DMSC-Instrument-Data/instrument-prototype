@@ -26,6 +26,12 @@ public:
       ++value;
       return temp;
   }
+  const T& const_ref(){
+      return value;
+  }
+  IntToType<I, T> operator+(const T & increment){
+      return IntToType<I,T>(value+increment);
+  }
 
 private:
   T value;

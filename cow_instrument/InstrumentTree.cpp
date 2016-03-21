@@ -16,10 +16,12 @@ void findDetectors(const Component &component,
 }
 }
 
-InstrumentTree::InstrumentTree(Node_const_uptr&& root) : m_root(std::move(root)) {
+InstrumentTree::InstrumentTree(Node_const_uptr &&root)
+    : m_root(std::move(root)) {
 
-  if(!m_root){
-      throw std::invalid_argument("No root Node. Cannot create an InstrumentTree");
+  if (!m_root) {
+    throw std::invalid_argument(
+        "No root Node. Cannot create an InstrumentTree");
   }
 
   const unsigned int expectedVersion = this->version();
@@ -40,7 +42,7 @@ std::unique_ptr<NodeIterator> InstrumentTree::iterator() const {
   return std::unique_ptr<NodeIterator>(new NodeIterator(m_root->clone()));
 }
 
-const Node& InstrumentTree::root() const { return *m_root; }
+const Node &InstrumentTree::root() const { return *m_root; }
 
 const Detector &InstrumentTree::getDetector(size_t detectorId) const {
 
@@ -50,6 +52,10 @@ const Detector &InstrumentTree::getDetector(size_t detectorId) const {
                                 std::to_string(detectorId));
   }
   return *(it->second);
+}
+
+const Detector &InstrumentTree::getDetector(DetectorIdType detectorId) const {
+  return getDetector(detectorId.const_ref());
 }
 
 unsigned int InstrumentTree::version() const { return m_root->version(); }
