@@ -21,12 +21,13 @@ public:
 
 private:
   CompositeComponent_sptr make_square_bank(size_t width, size_t height) {
-    static size_t id = 1;
-    CompositeComponent_sptr bank = std::make_shared<CompositeComponent>();
+    static size_t detectorId = 1;
+    static ComponentIdType componentId(1);
+    CompositeComponent_sptr bank = std::make_shared<CompositeComponent>(ComponentIdType(0));
     for (size_t i = 0; i < width; ++i) {
       for (size_t j = 0; j < height; ++j) {
         bank->addComponent(std::make_shared<DetectorComponent>(
-            id++, V3D{double(i), double(j), double(0)}));
+            componentId++, detectorId++, V3D{double(i), double(j), double(0)}));
       }
     }
     bank->deltaPos(
@@ -76,8 +77,10 @@ protected:
     Node_uptr nodeS(new Node(front_trolley.get(), CowPtr<Component>(S)));
     Node_uptr nodeW(new Node(front_trolley.get(), CowPtr<Component>(W)));
     Node_uptr rear_trolley(new Node(CowPtr<Component>(new NullComponent)));
-    Node_uptr nodeLCurtain(new Node(rear_trolley.get(), CowPtr<Component>(l_curtain)));
-    Node_uptr nodeRCurtain(new Node(rear_trolley.get(), CowPtr<Component>(r_curtain)));
+    Node_uptr nodeLCurtain(
+        new Node(rear_trolley.get(), CowPtr<Component>(l_curtain)));
+    Node_uptr nodeRCurtain(
+        new Node(rear_trolley.get(), CowPtr<Component>(r_curtain)));
     front_trolley->addChild(std::move(nodeN));
     front_trolley->addChild(std::move(nodeE));
     front_trolley->addChild(std::move(nodeS));
@@ -94,10 +97,9 @@ protected:
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
     std::cout << "---------Instrument Tree Construction----------" << std::endl;
-    std::cout << "Creation took " << elapsed_seconds.count() << "seconds" << std::endl;
+    std::cout << "Creation took " << elapsed_seconds.count() << "seconds"
+              << std::endl;
     std::cout << "----------------------------------------" << std::endl;
-
-
   }
 
   virtual ~ExampleTest() {}
@@ -110,14 +112,15 @@ TEST_F(ExampleTest, simple_sans_example) {
   size_t max = 100 * 100 * 6;
   double pos_x = 0;
   for (size_t i = 1; i < max; ++i) {
-    const auto& det = m_instrument.getDetector(1);
+    const auto &det = m_instrument.getDetector(1);
     pos_x = det.getPos()[0];
   }
 
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
   std::cout << "---------Single Access Metrics----------" << std::endl;
-  std::cout << 100 * 100 * 6 << " accesses took " << elapsed_seconds.count() << "seconds" << std::endl;
+  std::cout << 100 * 100 * 6 << " accesses took " << elapsed_seconds.count()
+            << "seconds" << std::endl;
   std::cout << "----------------------------------------" << std::endl;
 }
 

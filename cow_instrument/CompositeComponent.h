@@ -9,7 +9,7 @@ class Detector;
 
 class CompositeComponent : public Component {
 public:
-  CompositeComponent() = default;
+  CompositeComponent(ComponentIdType componentId);
   ~CompositeComponent() = default;
   V3D getPos() const override;
   void deltaPos(const V3D &pos) override;
@@ -19,9 +19,12 @@ public:
   size_t size() const {return m_children.size();}
   std::shared_ptr<const Component> getChild(size_t index) const;
   void registerDetectors(std::map<size_t, const Detector*>& lookup) const override;
-
+  ComponentIdType componentId() const override;
 private:
+  const ComponentIdType m_componentId;
   std::vector<std::shared_ptr<Component>> m_children;
+
+
 };
 
 using CompositeComponent_sptr = std::shared_ptr<CompositeComponent>;

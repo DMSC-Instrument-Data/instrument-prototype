@@ -8,7 +8,7 @@
  */
 class Detector : public Component {
 public:
-    virtual size_t id() const = 0;
+    virtual size_t detectorId() const = 0;
     virtual ~Detector(){}
 };
 

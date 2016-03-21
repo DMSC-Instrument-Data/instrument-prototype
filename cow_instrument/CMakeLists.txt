@@ -23,6 +23,7 @@ set ( INCLUDE_FILES
                    Node.h
                    NodeIterator.h
                    NullComponent.h
+                   IntToType.h
 )
 
 add_library (cow_instrument SHARED ${SOURCE_FILES} ${INCLUDE_FILES})

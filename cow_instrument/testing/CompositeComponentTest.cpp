@@ -7,12 +7,12 @@ using namespace testing;
 namespace {
 
 TEST(composite_component_test, test_construction){
-    CompositeComponent composite;
+    CompositeComponent composite{ComponentIdType(1)};
     EXPECT_EQ(0, composite.size());
 }
 
 TEST(composite_component_test, test_clone){
-    CompositeComponent composite;
+    CompositeComponent composite{ComponentIdType(1)};
 
     MockComponent* childA = new MockComponent;
     EXPECT_CALL(*childA, clone()).WillRepeatedly(Return(new MockComponent));
@@ -37,7 +37,7 @@ TEST(composite_component_test, test_get_pos){
     MockComponent* childC = new MockComponent;
     EXPECT_CALL(*childC, getPos()).WillRepeatedly(Return(V3D{3,3,3}));
 
-    CompositeComponent composite;
+    CompositeComponent composite{ComponentIdType(1)};
     composite.addComponent(std::shared_ptr<MockComponent>(childA));
     composite.addComponent(std::shared_ptr<MockComponent>(childB));
     composite.addComponent(std::shared_ptr<MockComponent>(childC));

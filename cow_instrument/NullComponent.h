@@ -12,6 +12,7 @@ public:
   NullComponent *clone() const override;
   bool equals(const Component &other) const override;
   void registerDetectors(std::map<size_t, const Detector *> &lookup) const override;
+  ComponentIdType componentId() const override;
 };
 
 #endif

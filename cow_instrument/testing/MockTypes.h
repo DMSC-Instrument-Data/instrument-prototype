@@ -13,6 +13,7 @@ public:
   MOCK_CONST_METHOD1(equals, bool(const Component &));
   MOCK_CONST_METHOD1(registerDetectors, void(std::map<size_t, const Detector*>&));
   ~MockComponent() {}
+  MOCK_CONST_METHOD0(componentId, ComponentIdType());
 };
 
 class MockCommmand : public Command {

@@ -15,3 +15,8 @@ bool NullComponent::equals(const Component& other) const{
 void NullComponent::registerDetectors(std::map<size_t, const Detector *> &) const
 {
 }
+
+ComponentIdType NullComponent::componentId() const
+{
+    throw std::runtime_error("NullComponent does not implement componentId");
+}
