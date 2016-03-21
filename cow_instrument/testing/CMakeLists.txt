@@ -1,15 +1,23 @@
 enable_testing()
-find_package(GTest REQUIRED)
 
+# Auto-find correct threading library
+find_package(Threads)
 
-get_filename_component(GTEST_LIBRARY_DIR ${GTEST_LIBRARY} DIRECTORY)
-MESSAGE(STATUS ${GTEST_LIBRARY_DIR})
-set( GMOCK_INCLUDE_DIRS ${GTEST_INCLUDE_DIRS}/../../googlemock/include/ CACHE FILEPATH "gmock include dir")
-set( GMOCK_LIBRARIES ${GTEST_LIBRARY_DIR}/../libgmock.a CACHE FILEPATH  "libgmock.a")
-set( GMOCK_MAIN_LIBRARIES ${GTEST_LIBRARY_DIR}/../libgmock-main.a CACHE FILEPATH  "libgmock-main.a")
+# TOP Directory of googletest (currently expected adjacent to instrument-prototype)
+get_filename_component( GTEST_DIR ${CMAKE_SOURCE_DIR}/../googletest REALPATH CACHE )
 
-include_directories(${GTEST_INCLUDE_DIRS} ${GMOCK_INCLUDE_DIRS})
+# GTest config
+get_filename_component( GTEST_INCLUDE_DIR ${GTEST_DIR}/googletest/include REALPATH CACHE )
+get_filename_component( GTEST_LIBRARY ${GTEST_DIR}/googlemock/gtest/libgtest.a REALPATH CACHE )
+get_filename_component( GTEST_MAIN_LIBRARY ${GTEST_DIR}/googlemock/gtest/libgtest_main.a REALPATH CACHE )
 
+# GMock config
+get_filename_component( GMOCK_INCLUDE_DIR ${GTEST_DIR}/googlemock/include REALPATH CACHE )
+get_filename_component( GMOCK_LIBRARY ${GTEST_DIR}/googlemock/libgmock.a REALPATH CACHE )
+get_filename_component( GMOCK_MAIN_LIBRARY ${GTEST_DIR}/googlemock/libgmock_main.a REALPATH CACHE )
+
+# Set include directories
+include_directories(${GTEST_INCLUDE_DIR} ${GMOCK_INCLUDE_DIR})
 
 set ( TEST_FILES
                  CompositeComponentTest.cpp
@@ -22,6 +30,8 @@ set ( TEST_FILES
 )
 
 add_executable(cow_instrument_test runner.cpp MockTypes.h ${TEST_FILES})
-target_link_libraries(cow_instrument_test LINK_PUBLIC cow_instrument ${GTEST_BOTH_LIBRARIES} ${GMOCK_LIBRARIES} ${GMOCK_MAIN_LIBRARIES})
+
+target_link_libraries(cow_instrument_test LINK_PUBLIC cow_instrument ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} ${GMOCK_LIBRARY} ${GMOCK_MAIN_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
+
 add_test(cow_instrument_test cow_instrument_test)
 
