@@ -2,8 +2,11 @@
 #define COMPONENT_H
 
 #include <array>
+#include <map>
 
 using V3D = std::array<double, 3>;
+
+class Detector;
 
 class Component {
 public:
@@ -12,6 +15,7 @@ public:
   virtual ~Component(){}
   virtual Component* clone() const = 0;
   virtual bool equals(const Component& other) const = 0;
+  virtual void registerDetectors(std::map<size_t, const Detector*>& lookup) const = 0;
 };
 
 #endif

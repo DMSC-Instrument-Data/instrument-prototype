@@ -9,35 +9,38 @@
 namespace {
 
 void findDetectors(const Component &component,
-                                   std::map<size_t, const Detector *> &store) {
-  if (Detector const *detector = dynamic_cast<const Detector *>(&component)) {
-    store.insert(std::make_pair(detector->id(), detector));
-  } else if (CompositeComponent const *composite =
-                 dynamic_cast<const CompositeComponent *>(&component)) {
-    for (size_t i = 0; i < composite->size(); ++i) {
-      findDetectors(*composite->getChild(i), store);
+                   std::map<size_t, const Detector *> &store) {
+
+  // Walk through and register all detectors on the store.
+  component.registerDetectors(store);
+}
+}
+
+InstrumentTree::InstrumentTree(Node_const_uptr&& root) : m_root(std::move(root)) {
+
+  if(!m_root){
+      throw std::invalid_argument("No root Node. Cannot create an InstrumentTree");
+  }
+
+  const unsigned int expectedVersion = this->version();
+  auto it = this->iterator();
+  while (!it->atEnd()) {
+    auto node = it->next();
+    const auto &component = node->const_ref();
+    // Put all detectors into a flat map.
+    findDetectors(component, m_detectorMap);
+    if (node->version() != expectedVersion) {
+      throw std::invalid_argument(
+          "Cannot make an Instrument tree around Nodes of differing version");
     }
   }
 }
 
-}
-
-InstrumentTree::InstrumentTree(Node_const_sptr root) : m_root(root) {
-
-  // TODO. Maybe we don't always want to do this?
-  auto it = this->iterator();
-  while (!it->atEnd()) {
-    // Not pretty
-    const auto &component = it->next()->const_ref();
-    findDetectors(component, m_detectorMap);
-  }
-}
-
 std::unique_ptr<NodeIterator> InstrumentTree::iterator() const {
-  return std::unique_ptr<NodeIterator>(new NodeIterator(m_root));
+  return std::unique_ptr<NodeIterator>(new NodeIterator(m_root->clone()));
 }
 
-Node_const_sptr InstrumentTree::root() const { return m_root; }
+const Node& InstrumentTree::root() const { return *m_root; }
 
 const Detector &InstrumentTree::getDetector(size_t detectorId) const {
 
@@ -48,3 +51,5 @@ const Detector &InstrumentTree::getDetector(size_t detectorId) const {
   }
   return *(it->second);
 }
+
+unsigned int InstrumentTree::version() const { return m_root->version(); }

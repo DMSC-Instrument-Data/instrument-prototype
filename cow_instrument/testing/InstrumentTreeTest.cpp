@@ -4,12 +4,41 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "MockTypes.h"
-#include "Detector.h"
+#include "DetectorComponent.h"
 #include "CompositeComponent.h"
 
 using namespace testing;
 
 namespace {
+
+TEST(instrument_tree_test, test_uptr_constructor) {
+
+  auto a =
+      Node_uptr(new Node(CowPtr<Component>(new NiceMock<MockComponent>())));
+
+  // Calls std::shared_ptr<T>(std::unique_ptr<T>&&) constructor
+  InstrumentTree instrument(std::move(a));
+
+  EXPECT_EQ(0, instrument.version());
+}
+
+TEST(instrument_tree_test, test_root_node_must_be_valid){
+
+    EXPECT_THROW(InstrumentTree(Node_const_uptr(nullptr)), std::invalid_argument);
+}
+
+TEST(instrument_tree_test, test_version_check_on_constructor) {
+
+  const unsigned int versionNumber = 1;
+  auto a = Node_uptr(new Node(CowPtr<Component>(new NiceMock<MockComponent>()),
+                              versionNumber));
+  auto b = Node_uptr(
+      new Node(a.get(), CowPtr<Component>(new NiceMock<MockComponent>()),
+               versionNumber + 1 /*version number incremented. This is bad*/));
+  a->addChild(std::move(b));
+
+  EXPECT_THROW(InstrumentTree(std::move(a)), std::invalid_argument);
+}
 
 TEST(instrument_tree_test, test_constructor) {
 
@@ -23,18 +52,18 @@ TEST(instrument_tree_test, test_constructor) {
 
   */
 
-  MockComponent *a_contents = new MockComponent;
-  MockComponent *b_contents = new MockComponent;
-  MockComponent *c_contents = new MockComponent;
+  MockComponent *a_contents = new NiceMock<MockComponent>();
+  MockComponent *b_contents = new NiceMock<MockComponent>();
+  MockComponent *c_contents = new NiceMock<MockComponent>();
 
-  auto a = std::make_shared<Node>(CowPtr<Component>(a_contents));
-  auto b = std::make_shared<Node>(a, CowPtr<Component>(b_contents));
-  auto c = std::make_shared<Node>(a, CowPtr<Component>(c_contents));
-  a->addChild(b);
-  a->addChild(c);
+  Node_uptr a(new Node(CowPtr<Component>(a_contents)));
+  Node_uptr b(new Node(a.get(), CowPtr<Component>(b_contents)));
+  Node_uptr c(new Node(a.get(), CowPtr<Component>(c_contents)));
+  a->addChild(std::move(b));
+  a->addChild(std::move(c));
 
-  InstrumentTree instrument(a);
-  EXPECT_EQ(instrument.root().get(), a.get());
+  InstrumentTree instrument(std::move(a));
+  EXPECT_EQ(&instrument.root().const_ref(), a_contents);
   EXPECT_FALSE(instrument.iterator()->atEnd());
 }
 
@@ -50,23 +79,23 @@ TEST(instrument_tree_test, test_detector_access) {
 
   */
 
-  auto a = std::make_shared<Node>(CowPtr<Component>(new MockComponent));
+  Node_uptr a(new Node(CowPtr<Component>(new NiceMock<MockComponent>())));
 
   size_t detector1Id = 1;
   CompositeComponent_sptr composite = std::make_shared<CompositeComponent>();
   composite->addComponent(
-      std::make_shared<Detector>(detector1Id, V3D{1, 1, 1}));
-  auto b = std::make_shared<Node>(a, CowPtr<Component>(composite));
+      std::make_shared<DetectorComponent>(detector1Id, V3D{1, 1, 1}));
+  Node_uptr b(new Node(a.get(), CowPtr<Component>(composite)));
 
   size_t detector2Id = detector1Id + 1;
-  auto c = std::make_shared<Node>(
-      a,
-      CowPtr<Component>(std::make_shared<Detector>(detector2Id, V3D{2, 2, 2})));
+  Node_uptr c(
+      new Node(a.get(), CowPtr<Component>(std::make_shared<DetectorComponent>(
+                            detector2Id, V3D{2, 2, 2}))));
 
-  a->addChild(b);
-  a->addChild(c);
+  a->addChild(std::move(b));
+  a->addChild(std::move(c));
 
-  InstrumentTree tree(a);
+  InstrumentTree tree(std::move(a));
 
   const Detector &det1 = tree.getDetector(detector1Id);
   EXPECT_EQ(det1.id(), detector1Id);

@@ -8,56 +8,51 @@ using namespace testing;
 
 namespace {
 
-TEST(node_iterator_test, simple_iterator){
+TEST(node_iterator_test, node_construction){
 
-    /*
-
-          A
-          |
-   ------------------
-   |                |
-   B                C
-
-    */
-
-    MockComponent *a_contents = new MockComponent;
-    MockComponent *b_contents = new MockComponent;
-    MockComponent *c_contents = new MockComponent;
-
-    auto a = std::make_shared<Node>(CowPtr<Component>(a_contents));
-    auto b = std::make_shared<Node>(a, CowPtr<Component>(b_contents));
-    auto c = std::make_shared<Node>(a, CowPtr<Component>(c_contents));
-    a->addChild(b);
-    a->addChild(c);
-
-
-    NodeIterator iterator(a);
-
-
-    EXPECT_EQ(iterator.next().get(), c.get()); // stack implementation last first.
-    EXPECT_EQ(iterator.next().get(), b.get());
-    EXPECT_EQ(iterator.next().get(), a.get());
-    auto null_result = iterator.next();
-    EXPECT_TRUE(nullptr == null_result.get());
-    EXPECT_TRUE(iterator.atEnd());
-
-
-    delete a_contents;
-    delete b_contents;
-    delete c_contents;
+    // We have something we want to iterate over
+    Node node{CowPtr<Component>(new MockComponent)};
+    // We create the iterator
+    NodeIterator iterator{node};
+    // Check that the iterator is fundamentally working off a copy
+    EXPECT_NE(iterator.next(), &node);
 }
 
-TEST(node_iterator_test, test_locking){
+TEST(node_iterator_test, node_uptr_construction){
+    NodeIterator iterator{Node_uptr(new Node{CowPtr<Component>(new MockComponent)})};
+    EXPECT_FALSE(iterator.atEnd());
+}
 
-    auto node_sptr = std::make_shared<Node>(CowPtr<Component>(new MockComponent));
-    NodeIterator iteratorA(node_sptr);
-    EXPECT_TRUE(node_sptr.get() == iteratorA.next().get());
+TEST(node_iterator_test, simple_iterator) {
 
-    NodeIterator iteratorB(node_sptr);
-    // Deliberately reset it.
-    node_sptr.reset();
-    EXPECT_TRUE(node_sptr.get() == nullptr);
-    EXPECT_TRUE(node_sptr.get() == iteratorB.next().get());
+  /*
+
+        A
+        |
+ ------------------
+ |                |
+ B                C
+
+  */
+
+  MockComponent *a_contents = new MockComponent;
+  MockComponent *b_contents = new MockComponent;
+  MockComponent *c_contents = new MockComponent;
+
+  Node_uptr a(new Node(CowPtr<Component>(a_contents)));
+  Node_uptr b(new Node(a.get(), CowPtr<Component>(b_contents)));
+  Node_uptr c(new Node(a.get(), CowPtr<Component>(c_contents)));
+  a->addChild(std::move(b));
+  a->addChild(std::move(c));
+
+  NodeIterator iterator(std::move(a));
+
+  iterator.next(); // stack implementation last first.
+  iterator.next();
+  iterator.next();
+  auto null_result = iterator.next();
+  EXPECT_TRUE(nullptr == null_result);
+  EXPECT_TRUE(iterator.atEnd());
 }
 
 }

@@ -11,3 +11,7 @@ NullComponent *NullComponent::clone() const { return new NullComponent{}; }
 bool NullComponent::equals(const Component& other) const{
     return dynamic_cast<const NullComponent*>(&other) != nullptr;
 }
+
+void NullComponent::registerDetectors(std::map<size_t, const Detector *> &) const
+{
+}
