@@ -14,19 +14,21 @@ class Detector;
 class InstrumentTree {
 public:
 
-    InstrumentTree(std::shared_ptr<const Node> root);
+    InstrumentTree(std::unique_ptr<const Node>&& root);
 
     std::unique_ptr<NodeIterator> iterator() const;
 
-    std::shared_ptr<const Node> root() const;
+    const Node& root() const;
 
     const Detector& getDetector(size_t detectorId) const;
+
+    unsigned int version() const;
 
 private:
 
     std::map<size_t, Detector const *> m_detectorMap;
 
-    std::shared_ptr<const Node> m_root;
+    std::unique_ptr<const Node> m_root;
 
 };
 

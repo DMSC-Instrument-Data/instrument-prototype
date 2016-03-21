@@ -8,6 +8,21 @@ using namespace testing;
 
 namespace {
 
+TEST(node_iterator_test, node_construction){
+
+    // We have something we want to iterate over
+    Node node{CowPtr<Component>(new MockComponent)};
+    // We create the iterator
+    NodeIterator iterator{node};
+    // Check that the iterator is fundamentally working off a copy
+    EXPECT_NE(iterator.next(), &node);
+}
+
+TEST(node_iterator_test, node_uptr_construction){
+    NodeIterator iterator{Node_uptr(new Node{CowPtr<Component>(new MockComponent)})};
+    EXPECT_FALSE(iterator.atEnd());
+}
+
 TEST(node_iterator_test, simple_iterator) {
 
   /*
@@ -38,9 +53,6 @@ TEST(node_iterator_test, simple_iterator) {
   auto null_result = iterator.next();
   EXPECT_TRUE(nullptr == null_result);
   EXPECT_TRUE(iterator.atEnd());
-
-  //delete a_contents;
-  //delete b_contents;
-  //delete c_contents;
 }
+
 }

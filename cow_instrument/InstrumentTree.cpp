@@ -9,30 +9,38 @@
 namespace {
 
 void findDetectors(const Component &component,
-                                   std::map<size_t, const Detector *> &store) {
+                   std::map<size_t, const Detector *> &store) {
 
-    // Walk through and register all detectors on the store.
-    component.registerDetectors(store);
+  // Walk through and register all detectors on the store.
+  component.registerDetectors(store);
+}
 }
 
-}
+InstrumentTree::InstrumentTree(Node_const_uptr&& root) : m_root(std::move(root)) {
 
+  if(!m_root){
+      throw std::invalid_argument("No root Node. Cannot create an InstrumentTree");
+  }
 
-InstrumentTree::InstrumentTree(Node_const_sptr root) : m_root(root) {
-
-  // TODO. Maybe we don't always want to do this?
+  const unsigned int expectedVersion = this->version();
   auto it = this->iterator();
   while (!it->atEnd()) {
-    const auto &component = it->next()->const_ref();
+    auto node = it->next();
+    const auto &component = node->const_ref();
+    // Put all detectors into a flat map.
     findDetectors(component, m_detectorMap);
+    if (node->version() != expectedVersion) {
+      throw std::invalid_argument(
+          "Cannot make an Instrument tree around Nodes of differing version");
+    }
   }
 }
 
 std::unique_ptr<NodeIterator> InstrumentTree::iterator() const {
-  return std::unique_ptr<NodeIterator>(new NodeIterator(m_root));
+  return std::unique_ptr<NodeIterator>(new NodeIterator(m_root->clone()));
 }
 
-Node_const_sptr InstrumentTree::root() const { return m_root; }
+const Node& InstrumentTree::root() const { return *m_root; }
 
 const Detector &InstrumentTree::getDetector(size_t detectorId) const {
 
@@ -44,4 +52,4 @@ const Detector &InstrumentTree::getDetector(size_t detectorId) const {
   return *(it->second);
 }
 
-
+unsigned int InstrumentTree::version() const { return m_root->version(); }

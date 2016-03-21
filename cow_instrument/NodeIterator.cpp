@@ -1,14 +1,12 @@
 #include "NodeIterator.h"
 #include "Node.h"
 
-NodeIterator::NodeIterator(Node_const_sptr begin) : m_iterateable(begin) {
-  /*
-There's probably a better way to do this. The current approach of flattening
-the tree aprori is inferior to calcuating on the fly. However this is not a
-binary tree, and c++ has no std yield.
-*/
+NodeIterator::NodeIterator(Node_const_uptr &&begin)
+    : m_iterateable(std::move(begin)) {
   addToBuffer(m_iterateable.get());
 }
+
+NodeIterator::NodeIterator(const Node &begin) : m_iterateable(begin.clone()) {}
 
 void NodeIterator::addToBuffer(Node const *const item) {
 
@@ -18,7 +16,7 @@ void NodeIterator::addToBuffer(Node const *const item) {
   }
 }
 
-Node const * const NodeIterator::next() {
+Node const *const NodeIterator::next() {
   if (!atEnd()) {
     auto current = m_buffer.top();
     m_buffer.pop();

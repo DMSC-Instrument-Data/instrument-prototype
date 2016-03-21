@@ -10,13 +10,14 @@ class NodeIterator {
 
 public:
 
-   NodeIterator(std::shared_ptr<const Node> begin);
+   NodeIterator(std::unique_ptr<const Node>&& begin);
+   NodeIterator(const Node& begin);
    Node const * const next();
    bool atEnd() const;
 
 private:
-   // To guarantee we have some ownership of the thing we are iterating. TODO!
-   std::shared_ptr<const Node> m_iterateable;
+   /// Node iterator owns the thing it iterates over.
+   std::unique_ptr<const Node> m_iterateable;
    void addToBuffer(Node const * const item);
    std::stack<Node const * const > m_buffer;
 

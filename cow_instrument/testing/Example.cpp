@@ -17,7 +17,7 @@ class ExampleTest : public ::testing::Test {
 
 public:
   InstrumentTree m_instrument =
-      InstrumentTree(Node_sptr(new Node(new NullComponent)));
+      InstrumentTree(Node_uptr(new Node(new NullComponent)));
 
 private:
   CompositeComponent_sptr make_square_bank(size_t width, size_t height) {

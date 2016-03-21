@@ -20,12 +20,13 @@ class InstrumentTree;
 
 class Node {
 public:
-  Node(Node const * const previous, std::unique_ptr<Node>&& next,
-       CowPtr<Component> contents);
+  Node(Node const *const previous, std::unique_ptr<Node> &&next,
+       CowPtr<Component> contents, unsigned int version = 0);
 
-  Node(Node const * const  previous, CowPtr<Component> contents);
+  Node(Node const *const previous, CowPtr<Component> contents,
+       unsigned int version = 0);
 
-  Node(CowPtr<Component> contents);
+  Node(CowPtr<Component> contents, unsigned int version = 0);
 
   ~Node();
 
@@ -37,36 +38,45 @@ public:
 
   bool hasChildren() const;
 
-  void addChild(std::unique_ptr<Node>&& child);
+  void addChild(std::unique_ptr<Node> &&child);
 
-  //std::vector<std::unique_ptr<const Node>> children() const;
-  Node const * const parent() const;
+  Node const *const parent() const;
 
   // Provide read-only access outside of modify.
   const Component &const_ref() const;
 
-  const Node& child(size_t index) const;
+  const Node &child(size_t index) const;
 
-  size_t nChildren() const {return m_next.size();}
+  size_t nChildren() const { return m_next.size(); }
+
+  unsigned int version() const;
+
+  /// Copy, do not increment version, do not modify
+  std::unique_ptr<Node> clone() const;
 
 private:
-  Node const *const parentPtr() const;
-  Node const *const obtainRoot() const;
+
+  std::unique_ptr<Node> clone(Node const * const previous) const;
 
   void doModify(const Command &command);
 
+  /// Copy, increment version, apply command
   std::unique_ptr<Node> smartCopy(const Command &command,
                                   const Component &component,
-                                  Node const * const newPrevious,
+                                  Node const *const newPrevious,
                                   bool cascade) const;
-  Node const * const m_previous;          // parent
-  std::vector<std::unique_ptr<const Node>> m_next; // Children
-  CowPtr<Component> m_contents;
-};
 
-using Node_sptr = std::shared_ptr<Node>;
-using Node_const_sptr = std::shared_ptr<const Node>;
-using Node_const_wptr = std::weak_ptr<const Node>;
+  Node const *const obtainRoot() const;
+
+  /// Parent node (nullable)
+  Node const *const m_previous;
+  /// Next or child nodes (owned)
+  std::vector<std::unique_ptr<const Node>> m_next; // Children
+  /// COW managed contents. The component.
+  CowPtr<Component> m_contents;
+  /// version of the node.
+  unsigned int m_version;
+};
 
 using Node_uptr = std::unique_ptr<Node>;
 using Node_const_uptr = std::unique_ptr<const Node>;
