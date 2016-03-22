@@ -5,9 +5,9 @@ find_package(Threads)
 
 # Location of googletest (by default, expected adjacent to instrument-prototype)
 get_filename_component( DEFAULT_GTEST_SOURCE_DIR "${CMAKE_SOURCE_DIR}/../googletest" REALPATH )
-get_filename_component( DEFAULT_GTEST_BUILD_DIR "${CMAKE_SOURCE_DIR}/../googltest" REALPATH )
-set( GTEST_SOURCE_DIR "${DEFAULT_GTEST_SOURCE_DIR}" CACHE FILEPATH "GoogleTest top directory" )
-set( GTEST_BUILD_DIR "${DEFAULT_GTEST_BUILD_DIR}" CACHE FILEPATH "GoogleTest build directory" )
+get_filename_component( DEFAULT_GTEST_BUILD_DIR "${CMAKE_SOURCE_DIR}/../googletest" REALPATH )
+set( GTEST_SOURCE_DIR "${DEFAULT_GTEST_SOURCE_DIR}" CACHE PATH "GoogleTest top directory" )
+set( GTEST_BUILD_DIR "${DEFAULT_GTEST_BUILD_DIR}" CACHE PATH "GoogleTest build directory" )
 
 # GTest config
 get_filename_component( GTEST_INCLUDE_DIR "${GTEST_SOURCE_DIR}/googletest/include" REALPATH )
