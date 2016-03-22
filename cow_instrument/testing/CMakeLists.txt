@@ -4,17 +4,18 @@ enable_testing()
 find_package(Threads)
 
 # TOP Directory of googletest (currently expected adjacent to instrument-prototype)
-get_filename_component( GTEST_DIR ${CMAKE_SOURCE_DIR}/../googletest REALPATH CACHE )
+get_filename_component( GTEST_SOURCE_DIR ${CMAKE_SOURCE_DIR}/../googletest REALPATH CACHE )
+get_filename_component( GTEST_BUILD_DIR ${CMAKE_SOURCE_DIR}/../googletest REALPATH CACHE )
 
 # GTest config
-get_filename_component( GTEST_INCLUDE_DIR ${GTEST_DIR}/googletest/include REALPATH CACHE )
-get_filename_component( GTEST_LIBRARY ${GTEST_DIR}/googlemock/gtest/libgtest.a REALPATH CACHE )
-get_filename_component( GTEST_MAIN_LIBRARY ${GTEST_DIR}/googlemock/gtest/libgtest_main.a REALPATH CACHE )
+get_filename_component( GTEST_INCLUDE_DIR ${GTEST_SOURCE_DIR}/googletest/include REALPATH CACHE )
+get_filename_component( GTEST_LIBRARY ${GTEST_BUILD_DIR}/googlemock/gtest/libgtest.a REALPATH CACHE )
+get_filename_component( GTEST_MAIN_LIBRARY ${GTEST_BUILD_DIR}/googlemock/gtest/libgtest_main.a REALPATH CACHE )
 
 # GMock config
-get_filename_component( GMOCK_INCLUDE_DIR ${GTEST_DIR}/googlemock/include REALPATH CACHE )
-get_filename_component( GMOCK_LIBRARY ${GTEST_DIR}/googlemock/libgmock.a REALPATH CACHE )
-get_filename_component( GMOCK_MAIN_LIBRARY ${GTEST_DIR}/googlemock/libgmock_main.a REALPATH CACHE )
+get_filename_component( GMOCK_INCLUDE_DIR ${GTEST_SOURCE_DIR}/googlemock/include REALPATH CACHE )
+get_filename_component( GMOCK_LIBRARY ${GTEST_BUILD_DIR}/googlemock/libgmock.a REALPATH CACHE )
+get_filename_component( GMOCK_MAIN_LIBRARY ${GTEST_BUILD_DIR}/googlemock/libgmock_main.a REALPATH CACHE )
 
 # Set include directories
 include_directories(${GTEST_INCLUDE_DIR} ${GMOCK_INCLUDE_DIR})
