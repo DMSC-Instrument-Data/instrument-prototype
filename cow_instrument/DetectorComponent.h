@@ -20,7 +20,7 @@ public:
   DetectorIdType detectorId() const override;
   ComponentIdType componentId() const override;
   void
-  registerDetectors(std::map<size_t, const Detector *> &lookup) const override;
+  registerContents(std::map<size_t, const Detector *> &lookup) const override;
 
 private:
   const DetectorIdType m_detectorId;

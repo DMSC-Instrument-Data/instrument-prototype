@@ -12,7 +12,7 @@ void findDetectors(const Component &component,
                    std::map<size_t, const Detector *> &store) {
 
   // Walk through and register all detectors on the store.
-  component.registerDetectors(store);
+  component.registerContents(store);
 }
 }
 

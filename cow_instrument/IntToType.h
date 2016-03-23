@@ -3,6 +3,13 @@
 
 #include <memory>
 
+/**
+ This allows us to simply create unique types holding a T. I simply enforces
+ that concrete types made from IntToType are incompatible.
+
+ Typical usage:
+        using MyUniqueDouble = IntToType<0, double>;
+ */
 template <int I, typename T> class IntToType {
 public:
   explicit IntToType(const T &val) : value(val) {}
