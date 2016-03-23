@@ -12,6 +12,11 @@ bool NullComponent::equals(const Component& other) const{
     return dynamic_cast<const NullComponent*>(&other) != nullptr;
 }
 
-void NullComponent::registerDetectors(std::map<size_t, const Detector *> &) const
+void NullComponent::registerContents(std::map<size_t, const Detector *> &) const
 {
+}
+
+ComponentIdType NullComponent::componentId() const
+{
+    throw std::runtime_error("NullComponent does not implement componentId");
 }

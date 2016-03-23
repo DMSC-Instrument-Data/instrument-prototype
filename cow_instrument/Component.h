@@ -3,10 +3,13 @@
 
 #include <array>
 #include <map>
+#include "IntToType.h"
 
 using V3D = std::array<double, 3>;
 
 class Detector;
+
+using ComponentIdType = IntToType<0, size_t>;
 
 class Component {
 public:
@@ -15,7 +18,8 @@ public:
   virtual ~Component(){}
   virtual Component* clone() const = 0;
   virtual bool equals(const Component& other) const = 0;
-  virtual void registerDetectors(std::map<size_t, const Detector*>& lookup) const = 0;
+  virtual void registerContents(std::map<size_t, const Detector*>& lookup) const = 0;
+  virtual ComponentIdType componentId() const = 0;
 };
 
 #endif

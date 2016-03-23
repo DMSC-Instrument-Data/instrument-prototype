@@ -80,17 +80,16 @@ TEST(instrument_tree_test, test_detector_access) {
   */
 
   Node_uptr a(new Node(CowPtr<Component>(new NiceMock<MockComponent>())));
-
-  size_t detector1Id = 1;
-  CompositeComponent_sptr composite = std::make_shared<CompositeComponent>();
+  DetectorIdType detector1Id(1);
+  CompositeComponent_sptr composite = std::make_shared<CompositeComponent>(ComponentIdType(1));
   composite->addComponent(
-      std::make_shared<DetectorComponent>(detector1Id, V3D{1, 1, 1}));
+      std::make_shared<DetectorComponent>(ComponentIdType(1), DetectorIdType(detector1Id), V3D{1, 1, 1}));
   Node_uptr b(new Node(a.get(), CowPtr<Component>(composite)));
 
-  size_t detector2Id = detector1Id + 1;
+  DetectorIdType detector2Id = detector1Id + 1;
   Node_uptr c(
       new Node(a.get(), CowPtr<Component>(std::make_shared<DetectorComponent>(
-                            detector2Id, V3D{2, 2, 2}))));
+                            ComponentIdType(2), DetectorIdType(detector2Id), V3D{2, 2, 2}))));
 
   a->addChild(std::move(b));
   a->addChild(std::move(c));
@@ -98,10 +97,10 @@ TEST(instrument_tree_test, test_detector_access) {
   InstrumentTree tree(std::move(a));
 
   const Detector &det1 = tree.getDetector(detector1Id);
-  EXPECT_EQ(det1.id(), detector1Id);
+  EXPECT_EQ(det1.detectorId(), detector1Id);
 
   const Detector &det2 = tree.getDetector(detector2Id);
-  EXPECT_EQ(det2.id(), detector2Id);
+  EXPECT_EQ(det2.detectorId(), detector2Id);
 
   // Ask for something that doesn't exist.
   EXPECT_THROW(tree.getDetector(3), std::invalid_argument);
