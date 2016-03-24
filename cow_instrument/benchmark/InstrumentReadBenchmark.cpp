@@ -86,23 +86,7 @@ Node_uptr construct_root_node() {
   return root;
 }
 
-
-
 void BM_InstrumentTreeConstruction(benchmark::State& state) {
-  while (state.KeepRunning()) {
-    state.PauseTiming();
-
-    InstrumentTree instrument(Node_uptr(new Node(new NullComponent)), 0);
-    Node_uptr root = construct_root_node();
-
-    state.ResumeTiming();
-
-    instrument = InstrumentTree(std::move(root), 60000);
-  }
-}
-BENCHMARK(BM_InstrumentTreeConstruction);
-
-void BM_InstrumentTreeConstruction2(benchmark::State& state) {
   while (state.KeepRunning()) {
     state.PauseTiming();
     Node_uptr root = construct_root_node();
@@ -111,7 +95,7 @@ void BM_InstrumentTreeConstruction2(benchmark::State& state) {
     InstrumentTree instrument(std::move(root), 60000);
   }
 }
-BENCHMARK(BM_InstrumentTreeConstruction2);
+BENCHMARK(BM_InstrumentTreeConstruction);
 
 void BM_SingleAccessMetrics(benchmark::State& state) {
   while (state.KeepRunning()) {
