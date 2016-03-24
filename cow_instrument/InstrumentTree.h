@@ -3,11 +3,14 @@
 
 #include <memory>
 #include <vector>
-#include "Detector.h"
+#include <map>
+#include "IDType.h"
+
 
 class Node;
 class NodeIterator;
 class Command;
+class Detector;
 
 /*
  The instrument is nothing more than syntatic sugar over the root Node.
@@ -25,6 +28,9 @@ public:
   unsigned int version() const;
 
   std::unique_ptr<const InstrumentTree> modify(const Command &command) const;
+
+  // This is how we help the client out when they want to work with detector ids.
+  void fillDetectorMap(const std::map<DetectorIdType, size_t>& toFill);
 
 private:
 

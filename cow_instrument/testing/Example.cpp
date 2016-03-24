@@ -6,6 +6,7 @@
 #include "Node.h"
 #include "NullComponent.h"
 #include "InstrumentTree.h"
+#include "Detector.h"
 #include <chrono>
 #include <iostream>
 #include <memory>

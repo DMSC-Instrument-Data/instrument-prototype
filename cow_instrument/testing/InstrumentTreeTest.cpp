@@ -25,7 +25,8 @@ TEST(instrument_tree_test, test_uptr_constructor) {
 
 TEST(instrument_tree_test, test_root_node_must_be_valid) {
 
-  EXPECT_THROW(InstrumentTree(Node_const_uptr(nullptr), 0), std::invalid_argument);
+  EXPECT_THROW(InstrumentTree(Node_const_uptr(nullptr), 0),
+               std::invalid_argument);
 }
 
 TEST(instrument_tree_test, test_version_check_on_constructor) {
@@ -102,12 +103,23 @@ TEST(instrument_tree_test, test_detector_access) {
   InstrumentTree tree(std::move(a), 2);
 
   const Detector &det1 = tree.getDetector(0);
-  EXPECT_TRUE(det1.detectorId() == detector1Id);
+  EXPECT_EQ(det1.detectorId(), detector1Id);
 
   const Detector &det2 = tree.getDetector(1);
-  EXPECT_TRUE(det2.detectorId() == detector2Id);
+  EXPECT_EQ(det2.detectorId(), detector2Id);
 
   // Ask for something that doesn't exist.
   EXPECT_THROW(tree.getDetector(3), std::invalid_argument);
+}
+
+TEST(instrument_tree_test, test_fill_map) {
+  auto a =
+      Node_uptr(new Node(CowPtr<Component>(new NiceMock<MockComponent>())));
+
+  InstrumentTree instrument(std::move(a), 0);
+
+  std::map<DetectorIdType, size_t> container;
+  EXPECT_THROW(instrument.fillDetectorMap(container), std::runtime_error)
+      << "Characterize that this has not been implemented yet";
 }
 }
