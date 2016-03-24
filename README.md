@@ -27,10 +27,10 @@ $ cmake .
 $ make
 ```
 
-There are two variables that may need to be set when configuring the prototype: `GTEST_SOURCE_DIR` and `GTEST_BUILD_DIR`.
+There are four variables that may need to be set when configuring the prototype: `GTEST_SOURCE_DIR`, `GTEST_BUILD_DIR`, `GBENCH_BUILD_DIR`, `GBENCH_SOURCE_DIR`.
 
 `GTEST_SOURCE_DIR` should be the path to the googletest topmost directory.
-`GTEST_BUILD_DIR` should be the path to the googletest build directory (will be the same as `GTEST_SOURCE_DIR` in case of in-source builds).
+`GTEST_BUILD_DIR` should be the path to the googletest build directory (will be the same as `GTEST_SOURCE_DIR` in case of in-source builds). `GBENCH_SOURCE_DIR` should be the path to the googlebenchmark topmost directory containing the toplevel CMakeLists.txt. `GBENCH_BUILD_DIR` should be the path to the googlebench build directory, containing CMakeCache.txt. The respective projects are located [here for googletest](https://github.com/google/googletest) and [here for google benchmark](https://github.com/google/benchmark).  
 
 Both variables have defaults that assume googletest was built in-source (as shown above) and is adjacent to instrument-prototype. How instrument-prototype is built doesn't matter. For example:
 
