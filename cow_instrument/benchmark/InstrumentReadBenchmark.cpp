@@ -1,6 +1,7 @@
 #include "CompositeComponent.h"
 #include "cow_ptr.h"
 #include "DetectorComponent.h"
+#include "DetectorComponentFactory.h"
 #include "InstrumentTree.h"
 #include "MoveCommand.h"
 #include "Node.h"
@@ -12,25 +13,25 @@
 
 namespace {
 
-CompositeComponent_sptr make_square_bank(size_t width, size_t height) {
+std::shared_ptr<CompositeComponent>
+make_square_bank(size_t width, size_t height,
+                 const DetectorComponentFactory &detectorFactory) {
   static DetectorIdType detectorId(1);
   static ComponentIdType componentId(1);
-  CompositeComponent_sptr bank =
-      std::make_shared<CompositeComponent>(ComponentIdType(0));
+  auto bank = std::make_shared<CompositeComponent>(ComponentIdType(0));
+
   for (size_t i = 0; i < width; ++i) {
     for (size_t j = 0; j < height; ++j) {
-      bank->addComponent(std::make_shared<DetectorComponent>(
+      bank->addComponent(detectorFactory.create_unique(
           componentId++, detectorId++, V3D{double(i), double(j), double(0)}));
     }
   }
-  bank->deltaPos(
-      V3D{-double(width) / 2, -double(height) / 2, 0}); // Center it
+  bank->deltaPos(V3D{-double(width) / 2, -double(height) / 2, 0}); // Center it
   return bank;
 }
 
 Node_uptr construct_root_node() {
   /*
-
           instrument
           |
    --------------------------------------------
@@ -47,18 +48,19 @@ Node_uptr construct_root_node() {
   const double width_d = double(width);
   const double height_d = double(height);
 
-  CompositeComponent_sptr N = make_square_bank(width, height);
+  DetectorComponentFactory detectorFactory;
+  auto N = make_square_bank(width, height, detectorFactory);
   N->deltaPos(V3D{0, height_d, 3});
-  CompositeComponent_sptr E = make_square_bank(width, height);
+  auto E = make_square_bank(width, height, detectorFactory);
   E->deltaPos(V3D{-width_d, 0, 3});
-  CompositeComponent_sptr S = make_square_bank(width, height);
+  auto S = make_square_bank(width, height, detectorFactory);
   S->deltaPos(V3D{0, -height_d, 3});
-  CompositeComponent_sptr W = make_square_bank(width, height);
+  auto W = make_square_bank(width, height, detectorFactory);
   E->deltaPos(V3D{width_d, 0, 3});
 
-  CompositeComponent_sptr l_curtain = make_square_bank(width, height);
+  auto l_curtain = make_square_bank(width, height, detectorFactory);
   l_curtain->deltaPos(V3D{-width_d, 0, 6});
-  CompositeComponent_sptr r_curtain = make_square_bank(width, height);
+  auto r_curtain = make_square_bank(width, height, detectorFactory);
   r_curtain->deltaPos(V3D{width_d, 0, 6});
 
   Node_uptr root(new Node(CowPtr<Component>(new NullComponent)));
@@ -90,20 +92,31 @@ void BM_InstrumentTreeConstruction(benchmark::State& state) {
   while (state.KeepRunning()) {
     state.PauseTiming();
 
-    InstrumentTree instrument2(Node_uptr(new Node(new NullComponent)));
+    InstrumentTree instrument(Node_uptr(new Node(new NullComponent)), 0);
     Node_uptr root = construct_root_node();
 
     state.ResumeTiming();
 
-    instrument2 = InstrumentTree(std::move(root));
+    instrument = InstrumentTree(std::move(root), 60000);
   }
 }
-//BENCHMARK(BM_InstrumentTreeConstruction);
+BENCHMARK(BM_InstrumentTreeConstruction);
+
+void BM_InstrumentTreeConstruction2(benchmark::State& state) {
+  while (state.KeepRunning()) {
+    state.PauseTiming();
+    Node_uptr root = construct_root_node();
+    state.ResumeTiming();
+
+    InstrumentTree instrument(std::move(root), 60000);
+  }
+}
+BENCHMARK(BM_InstrumentTreeConstruction2);
 
 void BM_SingleAccessMetrics(benchmark::State& state) {
   while (state.KeepRunning()) {
     state.PauseTiming();
-    static InstrumentTree instrument(construct_root_node());
+    InstrumentTree instrument(construct_root_node(), 60000);
     state.ResumeTiming();
 
     size_t max = 100 * 100 * 6;
@@ -115,6 +128,22 @@ void BM_SingleAccessMetrics(benchmark::State& state) {
   }
 }
 BENCHMARK(BM_SingleAccessMetrics);
+
+void BM_SingleAccessMetricsStatic(benchmark::State& state) {
+  while (state.KeepRunning()) {
+    state.PauseTiming();
+    static InstrumentTree instrument(construct_root_node(), 60000);
+    state.ResumeTiming();
+
+    size_t max = 100 * 100 * 6;
+    double pos_x = 0;
+    for (size_t i = 1; i < max; ++i) {
+      const auto &det = instrument.getDetector(i);
+      pos_x = det.getPos()[0];
+    }
+  }
+}
+BENCHMARK(BM_SingleAccessMetricsStatic);
 
 } // namespace
 
