@@ -1,5 +1,5 @@
 add_subdirectory(testing)
-
+add_subdirectory(benchmark)
 
 set ( SOURCE_FILES
                    CompositeComponent.cpp
