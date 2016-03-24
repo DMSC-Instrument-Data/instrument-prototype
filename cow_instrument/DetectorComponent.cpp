@@ -1,8 +1,8 @@
 #include "DetectorComponent.h"
 
 DetectorComponent::DetectorComponent(ComponentIdType componentId,
-                                     DetectorIdType detectorId, const V3D &pos)
-    : m_componentId(componentId), m_detectorId(detectorId), m_pos(pos) {}
+                                     DetectorIdType detectorId, const V3D &pos, size_t detectorIndex)
+    : m_componentId(componentId), m_detectorId(detectorId), m_pos(pos), m_detectorIndex(detectorIndex) {}
 
 V3D DetectorComponent::getPos() const { return m_pos; }
 
@@ -15,11 +15,12 @@ void DetectorComponent::deltaPos(const V3D &delta) {
 DetectorComponent *DetectorComponent::clone() const {
 
   return new DetectorComponent(this->m_componentId, this->m_detectorId,
-                               this->m_pos);
+                               this->m_pos, m_detectorIndex);
 }
 
 bool DetectorComponent::equals(const Component &other) const {
   if (auto *otherDetector = dynamic_cast<const DetectorComponent *>(&other)) {
+    // Comparision is only based on ID. Index is assumed to be auxillary.
     return otherDetector->detectorId() == this->detectorId();
   }
   return false;
@@ -27,7 +28,12 @@ bool DetectorComponent::equals(const Component &other) const {
 
 void DetectorComponent::registerContents(
     std::map<size_t, const Detector *> &lookup) const {
-  lookup.insert(std::make_pair(this->detectorId().const_ref(), this));
+    lookup.insert(std::make_pair(this->detectorId().const_ref(), this));
+}
+
+size_t DetectorComponent::detectorIndex() const
+{
+    return m_detectorIndex;
 }
 
 DetectorComponent::~DetectorComponent() {}

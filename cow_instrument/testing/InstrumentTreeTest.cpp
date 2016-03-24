@@ -4,6 +4,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "MockTypes.h"
+#include "DetectorComponentFactory.h"
 #include "DetectorComponent.h"
 #include "CompositeComponent.h"
 
@@ -22,9 +23,9 @@ TEST(instrument_tree_test, test_uptr_constructor) {
   EXPECT_EQ(0, instrument.version());
 }
 
-TEST(instrument_tree_test, test_root_node_must_be_valid){
+TEST(instrument_tree_test, test_root_node_must_be_valid) {
 
-    EXPECT_THROW(InstrumentTree(Node_const_uptr(nullptr)), std::invalid_argument);
+  EXPECT_THROW(InstrumentTree(Node_const_uptr(nullptr)), std::invalid_argument);
 }
 
 TEST(instrument_tree_test, test_version_check_on_constructor) {
@@ -81,15 +82,16 @@ TEST(instrument_tree_test, test_detector_access) {
 
   Node_uptr a(new Node(CowPtr<Component>(new NiceMock<MockComponent>())));
   DetectorIdType detector1Id(1);
-  CompositeComponent_sptr composite = std::make_shared<CompositeComponent>(ComponentIdType(1));
-  composite->addComponent(
-      std::make_shared<DetectorComponent>(ComponentIdType(1), DetectorIdType(detector1Id), V3D{1, 1, 1}));
+  auto composite = std::make_shared<CompositeComponent>(ComponentIdType(1));
+  DetectorComponentFactory detFactory;
+  composite->addComponent(detFactory.create_unique(ComponentIdType(1), DetectorIdType(detector1Id), V3D{1, 1, 1}));
+
   Node_uptr b(new Node(a.get(), CowPtr<Component>(composite)));
 
   DetectorIdType detector2Id = detector1Id + 1;
   Node_uptr c(
       new Node(a.get(), CowPtr<Component>(std::make_shared<DetectorComponent>(
-                            ComponentIdType(2), DetectorIdType(detector2Id), V3D{2, 2, 2}))));
+                            ComponentIdType(2), DetectorIdType(detector2Id), V3D{2, 2, 2}, 0))));
 
   a->addChild(std::move(b));
   a->addChild(std::move(c));

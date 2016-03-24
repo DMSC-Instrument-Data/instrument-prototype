@@ -3,13 +3,9 @@
 
 #include <array>
 #include <map>
-#include "IntToType.h"
-
-using V3D = std::array<double, 3>;
+#include "IDType.h"
 
 class Detector;
-
-using ComponentIdType = IntToType<0, size_t>;
 
 class Component {
 public:

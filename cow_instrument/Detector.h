@@ -2,9 +2,9 @@
 #define DETECTOR_H
 
 #include "Component.h"
-#include "IntToType.h"
+#include "IdType.h"
 
-using DetectorIdType = IntToType<1, size_t>;
+
 
 /**
  * Pure abstract detector
@@ -12,6 +12,7 @@ using DetectorIdType = IntToType<1, size_t>;
 class Detector : public Component {
 public:
     virtual DetectorIdType detectorId() const = 0;
+    virtual size_t detectorIndex() const = 0;
     virtual ~Detector(){}
 };
 

@@ -1,4 +1,4 @@
-#include "DetectorComponent.h"
+#include "DetectorComponentFactory.h"
 #include "CompositeComponent.h"
 #include "cow_ptr.h"
 #include "gtest/gtest.h"
@@ -8,6 +8,7 @@
 #include "InstrumentTree.h"
 #include <chrono>
 #include <iostream>
+#include <memory>
 
 using namespace testing;
 
@@ -20,14 +21,15 @@ public:
       InstrumentTree(Node_uptr(new Node(new NullComponent)));
 
 private:
-  CompositeComponent_sptr make_square_bank(size_t width, size_t height) {
+  std::shared_ptr<CompositeComponent> make_square_bank(size_t width, size_t height) {
     static DetectorIdType detectorId(1);
     static ComponentIdType componentId(1);
-    CompositeComponent_sptr bank =
+    auto bank =
         std::make_shared<CompositeComponent>(ComponentIdType(0));
+    DetectorComponentFactory detectorFactory;
     for (size_t i = 0; i < width; ++i) {
       for (size_t j = 0; j < height; ++j) {
-        bank->addComponent(std::make_shared<DetectorComponent>(
+        bank->addComponent(detectorFactory.create_unique(
             componentId++, detectorId++, V3D{double(i), double(j), double(0)}));
       }
     }
@@ -57,18 +59,18 @@ protected:
     const double width_d = double(width);
     const double height_d = double(height);
 
-    CompositeComponent_sptr N = make_square_bank(width, height);
+    auto N = make_square_bank(width, height);
     N->deltaPos(V3D{0, height_d, 3});
-    CompositeComponent_sptr E = make_square_bank(width, height);
+    auto E = make_square_bank(width, height);
     E->deltaPos(V3D{-width_d, 0, 3});
-    CompositeComponent_sptr S = make_square_bank(width, height);
+    auto S = make_square_bank(width, height);
     S->deltaPos(V3D{0, -height_d, 3});
-    CompositeComponent_sptr W = make_square_bank(width, height);
+    auto W = make_square_bank(width, height);
     E->deltaPos(V3D{width_d, 0, 3});
 
-    CompositeComponent_sptr l_curtain = make_square_bank(width, height);
+    auto l_curtain = make_square_bank(width, height);
     l_curtain->deltaPos(V3D{-width_d, 0, 6});
-    CompositeComponent_sptr r_curtain = make_square_bank(width, height);
+    auto r_curtain = make_square_bank(width, height);
     r_curtain->deltaPos(V3D{width_d, 0, 6});
 
     Node_uptr root(new Node(CowPtr<Component>(new NullComponent)));
