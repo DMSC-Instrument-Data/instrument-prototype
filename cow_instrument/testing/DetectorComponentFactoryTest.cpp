@@ -22,7 +22,7 @@ TEST(detector_component_factory_test, test_basic_product) {
 TEST(detector_component_factory_test, test_index_increment) {
 
   DetectorComponentFactory factory;
-  size_t expectedIndex = 1;
+  size_t expectedIndex = 0;
 
   auto product1 =
       factory.create_unique(ComponentIdType(1), DetectorIdType(1), V3D{1, 1, 1});

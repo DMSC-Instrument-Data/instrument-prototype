@@ -27,8 +27,8 @@ bool DetectorComponent::equals(const Component &other) const {
 }
 
 void DetectorComponent::registerContents(
-    std::map<size_t, const Detector *> &lookup) const {
-    lookup.insert(std::make_pair(this->detectorId().const_ref(), this));
+    std::vector<const Detector *> &lookup) const {
+    lookup[m_detectorIndex] = this;
 }
 
 size_t DetectorComponent::detectorIndex() const

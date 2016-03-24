@@ -1,5 +1,4 @@
 #include "Node.h"
-#include "InstrumentTree.h"
 #include "cow_ptr.h"
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
@@ -120,9 +119,9 @@ TEST(node_test, test_modify_linear) {
   EXPECT_EQ(newTree->version(), a->child(0).child(0).version() + 1);
 
   // However, only the contents of one component should be different.
-  EXPECT_EQ(&newTree->root().const_ref(), a_contents);
-  EXPECT_EQ(&newTree->root().child(0).const_ref(), b_contents);
-  EXPECT_NE(&newTree->root().child(0).child(0).const_ref(), c_contents);
+  EXPECT_EQ(&newTree->const_ref(), a_contents);
+  EXPECT_EQ(&newTree->child(0).const_ref(), b_contents);
+  EXPECT_NE(&newTree->child(0).child(0).const_ref(), c_contents);
 
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(a_contents));
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(b_contents));
@@ -188,9 +187,9 @@ TEST(node_test, test_modify_tree) {
   EXPECT_TRUE(Mock::VerifyAndClear(c_contents));
 
   // However, only the contents of one component should be different.
-  EXPECT_EQ(&newTree->root().const_ref(), a_contents);
-  EXPECT_EQ(&newTree->root().child(0).const_ref(), b_contents);
-  EXPECT_NE(&newTree->root().child(1).const_ref(), c_contents);
+  EXPECT_EQ(&newTree->const_ref(), a_contents);
+  EXPECT_EQ(&newTree->child(0).const_ref(), b_contents);
+  EXPECT_NE(&newTree->child(1).const_ref(), c_contents);
 }
 
 TEST(node_test, test_tree_cascade) {
@@ -265,10 +264,10 @@ TEST(node_test, test_tree_cascade) {
   EXPECT_TRUE(Mock::VerifyAndClear(c_contents));
 
   // These contents should be the same
-  EXPECT_EQ(&newTree->root().const_ref(), a_contents);
-  EXPECT_EQ(&newTree->root().child(0).const_ref(), b_contents);
+  EXPECT_EQ(&newTree->const_ref(), a_contents);
+  EXPECT_EQ(&newTree->child(0).const_ref(), b_contents);
   // These should not
-  EXPECT_NE(&newTree->root().child(1).const_ref(), c_contents);
-  EXPECT_NE(&newTree->root().child(1).child(0).const_ref(), d_contents);
+  EXPECT_NE(&newTree->child(1).const_ref(), c_contents);
+  EXPECT_NE(&newTree->child(1).child(0).const_ref(), d_contents);
 }
 }

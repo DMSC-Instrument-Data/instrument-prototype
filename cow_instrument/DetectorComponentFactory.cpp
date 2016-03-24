@@ -18,6 +18,6 @@ Detector *DetectorComponentFactory::create(ComponentIdType componentId,
                                                  DetectorIdType detectorId,
                                                  const V3D &pos) const {
 
-    return new DetectorComponent(componentId, detectorId, pos, ++m_index);
+    return new DetectorComponent(componentId, detectorId, pos, m_index++);
 
 }

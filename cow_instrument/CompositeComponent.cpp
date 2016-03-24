@@ -67,7 +67,7 @@ CompositeComponent::getChild(size_t index) const {
   }
 }
 
-void CompositeComponent::registerContents(std::map<size_t, const Detector *> &lookup) const
+void CompositeComponent::registerContents(std::vector<const Detector *> &lookup) const
 {
     for(auto& child : m_children){
         child->registerContents(lookup);

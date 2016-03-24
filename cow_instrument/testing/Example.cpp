@@ -18,15 +18,16 @@ class ExampleTest : public ::testing::Test {
 
 public:
   InstrumentTree m_instrument =
-      InstrumentTree(Node_uptr(new Node(new NullComponent)));
+      InstrumentTree(Node_uptr(new Node(new NullComponent)), 0);
 
 private:
-  std::shared_ptr<CompositeComponent> make_square_bank(size_t width, size_t height) {
+  std::shared_ptr<CompositeComponent>
+  make_square_bank(size_t width, size_t height, const
+                   DetectorComponentFactory& detectorFactory) {
     static DetectorIdType detectorId(1);
     static ComponentIdType componentId(1);
-    auto bank =
-        std::make_shared<CompositeComponent>(ComponentIdType(0));
-    DetectorComponentFactory detectorFactory;
+    auto bank = std::make_shared<CompositeComponent>(ComponentIdType(0));
+
     for (size_t i = 0; i < width; ++i) {
       for (size_t j = 0; j < height; ++j) {
         bank->addComponent(detectorFactory.create_unique(
@@ -59,18 +60,19 @@ protected:
     const double width_d = double(width);
     const double height_d = double(height);
 
-    auto N = make_square_bank(width, height);
+    DetectorComponentFactory detectorFactory;
+    auto N = make_square_bank(width, height, detectorFactory);
     N->deltaPos(V3D{0, height_d, 3});
-    auto E = make_square_bank(width, height);
+    auto E = make_square_bank(width, height, detectorFactory);
     E->deltaPos(V3D{-width_d, 0, 3});
-    auto S = make_square_bank(width, height);
+    auto S = make_square_bank(width, height, detectorFactory);
     S->deltaPos(V3D{0, -height_d, 3});
-    auto W = make_square_bank(width, height);
+    auto W = make_square_bank(width, height, detectorFactory);
     E->deltaPos(V3D{width_d, 0, 3});
 
-    auto l_curtain = make_square_bank(width, height);
+    auto l_curtain = make_square_bank(width, height, detectorFactory);
     l_curtain->deltaPos(V3D{-width_d, 0, 6});
-    auto r_curtain = make_square_bank(width, height);
+    auto r_curtain = make_square_bank(width, height, detectorFactory);
     r_curtain->deltaPos(V3D{width_d, 0, 6});
 
     Node_uptr root(new Node(CowPtr<Component>(new NullComponent)));
@@ -95,7 +97,7 @@ protected:
 
     auto start = std::chrono::system_clock::now();
 
-    m_instrument = InstrumentTree(std::move(root));
+    m_instrument = InstrumentTree(std::move(root), 60000);
 
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end - start;
@@ -114,7 +116,7 @@ TEST_F(ExampleTest, simple_sans_example) {
 
   size_t max = 100 * 100 * 6;
   double pos_x = 0;
-  for (size_t i = 1; i < max; ++i) {
+  for (size_t i = 0; i < max; ++i) {
     const auto &det = m_instrument.getDetector(i);
     pos_x = det.getPos()[0];
   }
