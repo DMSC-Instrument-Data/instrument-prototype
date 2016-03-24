@@ -9,15 +9,15 @@
 namespace {
 
 void findDetectors(const Component &component,
-                   std::map<size_t, const Detector *> &store) {
+                   std::vector<const Detector *> &store) {
 
   // Walk through and register all detectors on the store.
   component.registerContents(store);
 }
 }
 
-InstrumentTree::InstrumentTree(Node_const_uptr &&root)
-    : m_root(std::move(root)) {
+InstrumentTree::InstrumentTree(Node_const_uptr &&root, size_t nDetectors)
+    : m_root(std::move(root)), m_detectorVec(nDetectors) {
 
   if (!m_root) {
     throw std::invalid_argument(
@@ -30,7 +30,7 @@ InstrumentTree::InstrumentTree(Node_const_uptr &&root)
     auto node = it->next();
     const auto &component = node->const_ref();
     // Put all detectors into a flat map.
-    findDetectors(component, m_detectorMap);
+    findDetectors(component, m_detectorVec);
     if (node->version() != expectedVersion) {
       throw std::invalid_argument(
           "Cannot make an Instrument tree around Nodes of differing version");
@@ -44,18 +44,28 @@ std::unique_ptr<NodeIterator> InstrumentTree::iterator() const {
 
 const Node &InstrumentTree::root() const { return *m_root; }
 
-const Detector &InstrumentTree::getDetector(size_t detectorId) const {
+const Detector &InstrumentTree::getDetector(size_t detectorIndex) const {
 
-  auto it = m_detectorMap.find(detectorId);
-  if (it == m_detectorMap.end()) {
-    throw std::invalid_argument("No detector by this id " +
-                                std::to_string(detectorId));
+  if(detectorIndex >= m_detectorVec.size()){
+      throw std::invalid_argument("Index is outside range of detector ids. Index is: " +
+                                  std::to_string(detectorIndex));
   }
-  return *(it->second);
-}
 
-const Detector &InstrumentTree::getDetector(DetectorIdType detectorId) const {
-  return getDetector(detectorId.const_ref());
+  return *m_detectorVec[detectorIndex];
 }
 
 unsigned int InstrumentTree::version() const { return m_root->version(); }
+
+void InstrumentTree::fillDetectorMap(const std::map<DetectorIdType, size_t> &)
+{
+    throw std::runtime_error("Not Implemented. But likely required.");
+    /*
+     * Should be simple enough. We have the vector already, just interogate that
+     * to create the map.
+    */
+}
+
+InstrumentTree_const_uptr InstrumentTree::modify(const Command &command) const
+{
+    return InstrumentTree_const_uptr(new InstrumentTree(m_root->modify(command), m_detectorVec.size()));
+}

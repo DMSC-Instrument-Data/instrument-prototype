@@ -19,8 +19,8 @@ TEST(composite_component_test, test_clone){
     MockComponent* childB = new MockComponent;
     EXPECT_CALL(*childB, clone()).WillRepeatedly(Return(new MockComponent));
 
-    composite.addComponent(std::shared_ptr<MockComponent>(childA));
-    composite.addComponent(std::shared_ptr<MockComponent>(childB));
+    composite.addComponent(std::unique_ptr<MockComponent>(childA));
+    composite.addComponent(std::unique_ptr<MockComponent>(childB));
     auto* clone = composite.clone();
     EXPECT_EQ(clone->size(), composite.size());
     delete clone;
@@ -38,9 +38,9 @@ TEST(composite_component_test, test_get_pos){
     EXPECT_CALL(*childC, getPos()).WillRepeatedly(Return(V3D{3,3,3}));
 
     CompositeComponent composite{ComponentIdType(1)};
-    composite.addComponent(std::shared_ptr<MockComponent>(childA));
-    composite.addComponent(std::shared_ptr<MockComponent>(childB));
-    composite.addComponent(std::shared_ptr<MockComponent>(childC));
+    composite.addComponent(std::unique_ptr<MockComponent>(childA));
+    composite.addComponent(std::unique_ptr<MockComponent>(childB));
+    composite.addComponent(std::unique_ptr<MockComponent>(childC));
 
     V3D pos = composite.getPos();
     EXPECT_EQ(pos[0],2);

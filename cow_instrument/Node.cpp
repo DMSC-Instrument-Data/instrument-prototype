@@ -1,7 +1,6 @@
 #include "Node.h"
 #include "Command.h"
 #include "Component.h"
-#include "InstrumentTree.h"
 
 Node::Node(Node const *const previous, Node_uptr &&next,
            CowPtr<Component> contents, unsigned int version)
@@ -18,14 +17,13 @@ Node::Node(CowPtr<Component> contents, unsigned int version)
 
 Node::~Node() {}
 
-std::unique_ptr<InstrumentTree> Node::modify(const Command &command) const {
+std::unique_ptr<Node> Node::modify(const Command &command) const {
 
   auto *root = obtainRoot();
   Node_uptr newRoot = root->smartCopy(
       command, m_contents.const_ref(), nullptr,
       false /*start cascading modifications*/); // New Instrument
-  return std::unique_ptr<InstrumentTree>(
-      new InstrumentTree(std::move(newRoot)));
+  return newRoot;
 }
 
 void Node::doModify(const Command &command) {

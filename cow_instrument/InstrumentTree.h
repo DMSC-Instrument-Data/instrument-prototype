@@ -2,33 +2,43 @@
 #define INSTRUMENT_TREE_H
 
 #include <memory>
+#include <vector>
 #include <map>
-#include "Detector.h"
+#include "IDType.h"
+
 
 class Node;
 class NodeIterator;
+class Command;
+class Detector;
 
 /*
  The instrument is nothing more than syntatic sugar over the root Node.
  */
 class InstrumentTree {
 public:
-  InstrumentTree(std::unique_ptr<const Node> &&root);
+  InstrumentTree(std::unique_ptr<const Node> &&root, size_t nDetectors);
 
   std::unique_ptr<NodeIterator> iterator() const;
 
   const Node &root() const;
 
-  const Detector &getDetector(size_t detectorId) const;
+  const Detector &getDetector(size_t detectorIndex) const;
 
-  const Detector &getDetector(DetectorIdType detectorId) const;
+  unsigned int version() const;
 
-      unsigned int version() const;
+  std::unique_ptr<const InstrumentTree> modify(const Command &command) const;
+
+  // This is how we help the client out when they want to work with detector ids.
+  void fillDetectorMap(const std::map<DetectorIdType, size_t>& toFill);
 
 private:
-  std::map<size_t, Detector const *> m_detectorMap;
+
+  std::vector<Detector const*> m_detectorVec;
 
   std::unique_ptr<const Node> m_root;
 };
+
+using InstrumentTree_const_uptr = std::unique_ptr<const InstrumentTree>;
 
 #endif

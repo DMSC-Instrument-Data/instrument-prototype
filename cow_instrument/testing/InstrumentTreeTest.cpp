@@ -4,6 +4,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "MockTypes.h"
+#include "DetectorComponentFactory.h"
 #include "DetectorComponent.h"
 #include "CompositeComponent.h"
 
@@ -17,14 +18,15 @@ TEST(instrument_tree_test, test_uptr_constructor) {
       Node_uptr(new Node(CowPtr<Component>(new NiceMock<MockComponent>())));
 
   // Calls std::shared_ptr<T>(std::unique_ptr<T>&&) constructor
-  InstrumentTree instrument(std::move(a));
+  InstrumentTree instrument(std::move(a), 0);
 
   EXPECT_EQ(0, instrument.version());
 }
 
-TEST(instrument_tree_test, test_root_node_must_be_valid){
+TEST(instrument_tree_test, test_root_node_must_be_valid) {
 
-    EXPECT_THROW(InstrumentTree(Node_const_uptr(nullptr)), std::invalid_argument);
+  EXPECT_THROW(InstrumentTree(Node_const_uptr(nullptr), 0),
+               std::invalid_argument);
 }
 
 TEST(instrument_tree_test, test_version_check_on_constructor) {
@@ -37,7 +39,7 @@ TEST(instrument_tree_test, test_version_check_on_constructor) {
                versionNumber + 1 /*version number incremented. This is bad*/));
   a->addChild(std::move(b));
 
-  EXPECT_THROW(InstrumentTree(std::move(a)), std::invalid_argument);
+  EXPECT_THROW(InstrumentTree(std::move(a), 0), std::invalid_argument);
 }
 
 TEST(instrument_tree_test, test_constructor) {
@@ -62,7 +64,7 @@ TEST(instrument_tree_test, test_constructor) {
   a->addChild(std::move(b));
   a->addChild(std::move(c));
 
-  InstrumentTree instrument(std::move(a));
+  InstrumentTree instrument(std::move(a), 0);
   EXPECT_EQ(&instrument.root().const_ref(), a_contents);
   EXPECT_FALSE(instrument.iterator()->atEnd());
 }
@@ -81,28 +83,43 @@ TEST(instrument_tree_test, test_detector_access) {
 
   Node_uptr a(new Node(CowPtr<Component>(new NiceMock<MockComponent>())));
   DetectorIdType detector1Id(1);
-  CompositeComponent_sptr composite = std::make_shared<CompositeComponent>(ComponentIdType(1));
-  composite->addComponent(
-      std::make_shared<DetectorComponent>(ComponentIdType(1), DetectorIdType(detector1Id), V3D{1, 1, 1}));
+  auto composite = std::make_shared<CompositeComponent>(ComponentIdType(1));
+  DetectorComponentFactory detFactory;
+  composite->addComponent(detFactory.create_unique(
+      ComponentIdType(1), DetectorIdType(detector1Id), V3D{1, 1, 1}));
+
   Node_uptr b(new Node(a.get(), CowPtr<Component>(composite)));
 
   DetectorIdType detector2Id = detector1Id + 1;
-  Node_uptr c(
-      new Node(a.get(), CowPtr<Component>(std::make_shared<DetectorComponent>(
-                            ComponentIdType(2), DetectorIdType(detector2Id), V3D{2, 2, 2}))));
+  Node_uptr c(new Node(
+      a.get(),
+      CowPtr<Component>(detFactory.create_unique(ComponentIdType(1),
+                                                 DetectorIdType(detector2Id),
+                                                 V3D{1, 1, 1}).release())));
 
   a->addChild(std::move(b));
   a->addChild(std::move(c));
 
-  InstrumentTree tree(std::move(a));
+  InstrumentTree tree(std::move(a), 2);
 
-  const Detector &det1 = tree.getDetector(detector1Id);
+  const Detector &det1 = tree.getDetector(0);
   EXPECT_EQ(det1.detectorId(), detector1Id);
 
-  const Detector &det2 = tree.getDetector(detector2Id);
+  const Detector &det2 = tree.getDetector(1);
   EXPECT_EQ(det2.detectorId(), detector2Id);
 
   // Ask for something that doesn't exist.
   EXPECT_THROW(tree.getDetector(3), std::invalid_argument);
+}
+
+TEST(instrument_tree_test, test_fill_map) {
+  auto a =
+      Node_uptr(new Node(CowPtr<Component>(new NiceMock<MockComponent>())));
+
+  InstrumentTree instrument(std::move(a), 0);
+
+  std::map<DetectorIdType, size_t> container;
+  EXPECT_THROW(instrument.fillDetectorMap(container), std::runtime_error)
+      << "Characterize that this has not been implemented yet";
 }
 }

@@ -11,7 +11,7 @@ public:
   virtual ~NullComponent();
   NullComponent *clone() const override;
   bool equals(const Component &other) const override;
-  void registerContents(std::map<size_t, const Detector *> &lookup) const override;
+  void registerContents(std::vector<const Detector *> &lookup) const override;
   ComponentIdType componentId() const override;
 };
 

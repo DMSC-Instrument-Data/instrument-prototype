@@ -8,7 +8,6 @@
 
 class Component;
 class Command;
-class InstrumentTree;
 
 /**
  * To give us a way of reusing components, and simply updating the association
@@ -32,7 +31,7 @@ public:
 
   // What this will return is the new root node (instrument) with the command
   // applied.
-  std::unique_ptr<InstrumentTree> modify(const Command &command) const;
+  std::unique_ptr<Node> modify(const Command &command) const;
 
   bool hasParent() const;
 

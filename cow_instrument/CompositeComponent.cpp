@@ -34,7 +34,7 @@ void CompositeComponent::deltaPos(const V3D &delta) {
 CompositeComponent *CompositeComponent::clone() const {
   CompositeComponent *product = new CompositeComponent{m_componentId};
   for (size_t i = 0; i < this->size(); ++i) {
-    product->addComponent(std::shared_ptr<Component>(m_children[i]->clone()));
+    product->addComponent(std::unique_ptr<Component>(m_children[i]->clone()));
   }
   return product;
 }
@@ -53,21 +53,21 @@ bool CompositeComponent::equals(const Component &other) const {
   return false;
 }
 
-void CompositeComponent::addComponent(std::shared_ptr<Component> child) {
-  m_children.push_back(child);
+void CompositeComponent::addComponent(std::unique_ptr<Component>&& child) {
+  m_children.emplace_back(std::move(child));
 }
 
-std::shared_ptr<const Component>
+const Component&
 CompositeComponent::getChild(size_t index) const {
   if (index >= m_children.size()) {
     throw std::invalid_argument(
         "index out of range in CompositeComponent::getChild");
   } else {
-    return m_children[index];
+    return *m_children[index];
   }
 }
 
-void CompositeComponent::registerContents(std::map<size_t, const Detector *> &lookup) const
+void CompositeComponent::registerContents(std::vector<const Detector *> &lookup) const
 {
     for(auto& child : m_children){
         child->registerContents(lookup);
