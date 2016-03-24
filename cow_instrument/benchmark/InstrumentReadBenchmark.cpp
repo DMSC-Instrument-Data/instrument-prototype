@@ -101,10 +101,10 @@ void BM_InstrumentTreeConstruction(benchmark::State& state) {
 //BENCHMARK(BM_InstrumentTreeConstruction);
 
 void BM_SingleAccessMetrics(benchmark::State& state) {
-  //while (state.KeepRunning()) {
-    //state.PauseTiming();
+  while (state.KeepRunning()) {
+    state.PauseTiming();
     static InstrumentTree instrument(construct_root_node());
-    //state.ResumeTiming();
+    state.ResumeTiming();
 
     size_t max = 100 * 100 * 6;
     double pos_x = 0;
@@ -112,7 +112,7 @@ void BM_SingleAccessMetrics(benchmark::State& state) {
       const auto &det = instrument.getDetector(i);
       pos_x = det.getPos()[0];
     }
-  //}
+  }
 }
 BENCHMARK(BM_SingleAccessMetrics);
 
