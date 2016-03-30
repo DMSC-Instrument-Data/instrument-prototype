@@ -32,22 +32,23 @@ There are four variables that may need to be set when configuring the prototype:
 `GTEST_SOURCE_DIR` should be the path to the googletest topmost directory.
 `GTEST_BUILD_DIR` should be the path to the googletest build directory (will be the same as `GTEST_SOURCE_DIR` in case of in-source builds). `GBENCH_SOURCE_DIR` should be the path to the googlebenchmark topmost directory containing the toplevel CMakeLists.txt. `GBENCH_BUILD_DIR` should be the path to the googlebench build directory, containing CMakeCache.txt. The respective projects are located [here for googletest](https://github.com/google/googletest) and [here for google benchmark](https://github.com/google/benchmark).  
 
-Both variables have defaults that assume googletest was built in-source (as shown above) and is adjacent to instrument-prototype. How instrument-prototype is built doesn't matter. For example:
+Variables mentioned above have defaults that assume googletest was built in-source (as shown above) and is adjacent to instrument-prototype. How instrument-prototype is built doesn't matter. For example:
 
 ```
 - Dev
 |-- googletest
+|-- googlebench
 |-- instrument-prototype
 ```
 
-If this is not how your directories are set up, or if you built googletest as an out of source build, you will need to provide those variables to CMake when configuring the prototype. This can be done via the GUI or the commandline, e.g.:
+If this is not how your directories are set up, or if you built googletest or googlebench as an out of source build, you will need to provide those variables to CMake when configuring the prototype. This can be done via the GUI or the commandline, e.g.:
 
 ```
 $ git clone https://github.com/DMSC-Instrument-Data/instrument-prototype.git
 $ cd instrument-prototype
 $ mkdir build
 $ cd build
-$ cmake -DGTEST_SOURCE_DIR="../../googletest" -DGTEST_BUILD_DIR="../../googletest" ..
+$ cmake -DGTEST_SOURCE_DIR="{path_to_gtest_source}" -DGTEST_BUILD_DIR="{path_to_gtest_build}" -DGBENCH_SOURCE_DIR={path_to_gbench_source} -DGBENCH_BUILD_DIR="{path_to_gbench_build}"
 $ make
 ```
 
