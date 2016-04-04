@@ -17,7 +17,10 @@ void findDetectors(const Component &component,
 }
 
 InstrumentTree::InstrumentTree(Node_const_uptr &&root, size_t nDetectors)
-    : m_root(std::move(root)), m_detectorVec(nDetectors) {
+    : m_root(std::move(root)) {
+
+  // This will make the push_backs faster
+  m_detectorVec.reserve(nDetectors);
 
   if (!m_root) {
     throw std::invalid_argument(
@@ -36,6 +39,9 @@ InstrumentTree::InstrumentTree(Node_const_uptr &&root, size_t nDetectors)
           "Cannot make an Instrument tree around Nodes of differing version");
     }
   }
+
+  // Should we shrink to fit to reduce excess capacity?
+  // m_detectorVec.shrink_to_fit(); This could be costly
 }
 
 std::unique_ptr<NodeIterator> InstrumentTree::iterator() const {

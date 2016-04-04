@@ -12,7 +12,6 @@
 class Detector : public Component {
 public:
     virtual DetectorIdType detectorId() const = 0;
-    virtual size_t detectorIndex() const = 0;
     virtual ~Detector(){}
 };
 

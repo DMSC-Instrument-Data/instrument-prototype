@@ -4,7 +4,6 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "MockTypes.h"
-#include "DetectorComponentFactory.h"
 #include "DetectorComponent.h"
 #include "CompositeComponent.h"
 
@@ -82,30 +81,31 @@ TEST(instrument_tree_test, test_detector_access) {
   */
 
   Node_uptr a(new Node(CowPtr<Component>(new NiceMock<MockComponent>())));
-  DetectorIdType detector1Id(1);
+  DetectorIdType detector1Id(0);
   auto composite = std::make_shared<CompositeComponent>(ComponentIdType(1));
-  DetectorComponentFactory detFactory;
-  composite->addComponent(detFactory.create_unique(
-      ComponentIdType(1), DetectorIdType(detector1Id), V3D{1, 1, 1}));
+  composite->addComponent(
+      std::unique_ptr<DetectorComponent>(new DetectorComponent(
+          ComponentIdType(1), DetectorIdType(detector1Id), V3D{1, 1, 1})));
 
   Node_uptr b(new Node(a.get(), CowPtr<Component>(composite)));
 
   DetectorIdType detector2Id = detector1Id + 1;
   Node_uptr c(new Node(
       a.get(),
-      CowPtr<Component>(detFactory.create_unique(ComponentIdType(1),
-                                                 DetectorIdType(detector2Id),
-                                                 V3D{1, 1, 1}).release())));
+      CowPtr<Component>(std::unique_ptr<DetectorComponent>(
+                            new DetectorComponent(ComponentIdType(1),
+                                                  DetectorIdType(detector2Id),
+                                                  V3D{1, 1, 1})).release())));
 
   a->addChild(std::move(b));
   a->addChild(std::move(c));
 
   InstrumentTree tree(std::move(a), 2);
 
-  const Detector &det1 = tree.getDetector(0);
+  const Detector &det1 = tree.getDetector(1);
   EXPECT_EQ(det1.detectorId(), detector1Id);
 
-  const Detector &det2 = tree.getDetector(1);
+  const Detector &det2 = tree.getDetector(0);
   EXPECT_EQ(det2.detectorId(), detector2Id);
 
   // Ask for something that doesn't exist.
