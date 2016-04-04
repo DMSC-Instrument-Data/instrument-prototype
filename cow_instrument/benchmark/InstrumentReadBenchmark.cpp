@@ -1,29 +1,28 @@
 #include "CompositeComponent.h"
 #include "cow_ptr.h"
 #include "DetectorComponent.h"
-#include "DetectorComponentFactory.h"
 #include "InstrumentTree.h"
 #include "MoveCommand.h"
 #include "Node.h"
 #include "NullComponent.h"
 
-#include "benchmark/benchmark_api.h"
+#include <benchmark/benchmark_api.h>
 #include <chrono>
 #include <iostream>
 
 namespace {
 
-std::shared_ptr<CompositeComponent>
-make_square_bank(size_t width, size_t height,
-                 const DetectorComponentFactory &detectorFactory) {
+std::shared_ptr<CompositeComponent> make_square_bank(size_t width,
+                                                     size_t height) {
   static DetectorIdType detectorId(1);
   static ComponentIdType componentId(1);
   auto bank = std::make_shared<CompositeComponent>(ComponentIdType(0));
 
   for (size_t i = 0; i < width; ++i) {
     for (size_t j = 0; j < height; ++j) {
-      bank->addComponent(detectorFactory.create_unique(
-          componentId++, detectorId++, V3D{double(i), double(j), double(0)}));
+      bank->addComponent(std::unique_ptr<DetectorComponent>(
+          new DetectorComponent(componentId++, detectorId++,
+                                V3D{double(i), double(j), double(0)})));
     }
   }
   bank->deltaPos(V3D{-double(width) / 2, -double(height) / 2, 0}); // Center it
@@ -48,19 +47,18 @@ Node_uptr construct_root_node() {
   const double width_d = double(width);
   const double height_d = double(height);
 
-  DetectorComponentFactory detectorFactory;
-  auto N = make_square_bank(width, height, detectorFactory);
+  auto N = make_square_bank(width, height);
   N->deltaPos(V3D{0, height_d, 3});
-  auto E = make_square_bank(width, height, detectorFactory);
+  auto E = make_square_bank(width, height);
   E->deltaPos(V3D{-width_d, 0, 3});
-  auto S = make_square_bank(width, height, detectorFactory);
+  auto S = make_square_bank(width, height);
   S->deltaPos(V3D{0, -height_d, 3});
-  auto W = make_square_bank(width, height, detectorFactory);
+  auto W = make_square_bank(width, height);
   E->deltaPos(V3D{width_d, 0, 3});
 
-  auto l_curtain = make_square_bank(width, height, detectorFactory);
+  auto l_curtain = make_square_bank(width, height);
   l_curtain->deltaPos(V3D{-width_d, 0, 6});
-  auto r_curtain = make_square_bank(width, height, detectorFactory);
+  auto r_curtain = make_square_bank(width, height);
   r_curtain->deltaPos(V3D{width_d, 0, 6});
 
   Node_uptr root(new Node(CowPtr<Component>(new NullComponent)));

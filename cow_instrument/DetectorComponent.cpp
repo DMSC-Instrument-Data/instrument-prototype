@@ -1,8 +1,8 @@
 #include "DetectorComponent.h"
 
 DetectorComponent::DetectorComponent(ComponentIdType componentId,
-                                     DetectorIdType detectorId, const V3D &pos, size_t detectorIndex)
-    : m_componentId(componentId), m_detectorId(detectorId), m_pos(pos), m_detectorIndex(detectorIndex) {}
+                                     DetectorIdType detectorId, const V3D &pos)
+    : m_componentId(componentId), m_pos(pos), m_detectorId(detectorId) {}
 
 V3D DetectorComponent::getPos() const { return m_pos; }
 
@@ -15,7 +15,7 @@ void DetectorComponent::deltaPos(const V3D &delta) {
 DetectorComponent *DetectorComponent::clone() const {
 
   return new DetectorComponent(this->m_componentId, this->m_detectorId,
-                               this->m_pos, m_detectorIndex);
+                               this->m_pos);
 }
 
 bool DetectorComponent::equals(const Component &other) const {
@@ -28,12 +28,7 @@ bool DetectorComponent::equals(const Component &other) const {
 
 void DetectorComponent::registerContents(
     std::vector<const Detector *> &lookup) const {
-    lookup[m_detectorIndex] = this;
-}
-
-size_t DetectorComponent::detectorIndex() const
-{
-    return m_detectorIndex;
+    lookup.push_back(this);
 }
 
 DetectorComponent::~DetectorComponent() {}
