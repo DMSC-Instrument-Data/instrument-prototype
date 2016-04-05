@@ -41,6 +41,46 @@ TEST(instrument_tree_test, test_version_check_on_constructor) {
   EXPECT_THROW(InstrumentTree(std::move(a), 0), std::invalid_argument);
 }
 
+TEST(instrument_tree_test, test_copy) {
+
+  /*
+   * Create a simple tree with two nodes
+   InstrumentTree a ----> b
+   */
+
+  const unsigned int versionNumber = 1;
+  auto a = Node_uptr(new Node(CowPtr<Component>(new NiceMock<MockComponent>()),
+                              versionNumber));
+
+  auto b = Node_uptr(new Node(a.get(),
+                              CowPtr<Component>(new NiceMock<MockComponent>()),
+                              versionNumber));
+
+  a->addChild(std::move(b));
+
+  InstrumentTree original(std::move(a), 0);
+
+  // Perform copy.
+  auto copy = original;
+
+  // Check that the version numbers of the nodes are the same.
+  EXPECT_EQ(copy.root().version(), original.root().version());
+  EXPECT_EQ(copy.root().child(0).version(), original.root().child(0).version());
+
+  auto itOrig = original.iterator();
+  auto itCopy = copy.iterator();
+
+  do {
+    auto nodeOrig = itOrig->next();
+    auto nodeCopy = itCopy->next();
+
+    EXPECT_NE(nodeOrig, nodeCopy) << "All Nodes should be copies";
+
+    EXPECT_EQ(&nodeOrig->const_ref(), &nodeCopy->const_ref())
+        << "But underlying components should be the same objects upon copy";
+  } while (!itOrig->atEnd() && !itCopy->atEnd());
+}
+
 TEST(instrument_tree_test, test_constructor) {
 
   /*

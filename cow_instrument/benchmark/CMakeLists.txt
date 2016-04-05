@@ -23,11 +23,17 @@ endif()
 # Set include directories
 include_directories(${GBENCH_INCLUDE_DIR})
 
-set ( BENCH_FILES
+set ( BENCH_FILES_SRC
+                 InstrumentCopyBenchmark.cpp
                  InstrumentReadBenchmark.cpp
+                 StandardInstrument.cpp
 )
 
-add_executable(cow_instrument_bench ${BENCH_FILES})
+set ( BENCH_FILES_H
+                 StandardInstrument.h
+)
+
+add_executable(cow_instrument_bench ${BENCH_FILES_SRC} ${BENCH_FILES_H})
 
 target_link_libraries(cow_instrument_bench LINK_PUBLIC cow_instrument ${GBENCH_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
 

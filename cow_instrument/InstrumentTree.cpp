@@ -44,6 +44,9 @@ InstrumentTree::InstrumentTree(Node_const_uptr &&root, size_t nDetectors)
   // m_detectorVec.shrink_to_fit(); This could be costly
 }
 
+InstrumentTree::InstrumentTree(const InstrumentTree &other)
+    : InstrumentTree(other.root().clone(), other.m_detectorVec.size()) {}
+
 std::unique_ptr<NodeIterator> InstrumentTree::iterator() const {
   return std::unique_ptr<NodeIterator>(new NodeIterator(m_root->clone()));
 }
@@ -52,9 +55,10 @@ const Node &InstrumentTree::root() const { return *m_root; }
 
 const Detector &InstrumentTree::getDetector(size_t detectorIndex) const {
 
-  if(detectorIndex >= m_detectorVec.size()){
-      throw std::invalid_argument("Index is outside range of detector ids. Index is: " +
-                                  std::to_string(detectorIndex));
+  if (detectorIndex >= m_detectorVec.size()) {
+    throw std::invalid_argument(
+        "Index is outside range of detector ids. Index is: " +
+        std::to_string(detectorIndex));
   }
 
   return *m_detectorVec[detectorIndex];
@@ -62,16 +66,17 @@ const Detector &InstrumentTree::getDetector(size_t detectorIndex) const {
 
 unsigned int InstrumentTree::version() const { return m_root->version(); }
 
-void InstrumentTree::fillDetectorMap(const std::map<DetectorIdType, size_t> &)
-{
-    throw std::runtime_error("Not Implemented. But likely required.");
-    /*
-     * Should be simple enough. We have the vector already, just interogate that
-     * to create the map.
-    */
+void InstrumentTree::fillDetectorMap(const std::map<DetectorIdType, size_t> &) {
+  throw std::runtime_error("Not Implemented. But likely required.");
+  /*
+   * Should be simple enough. We have the vector already, just interogate that
+   * to create the map.
+  */
 }
 
-InstrumentTree_const_uptr InstrumentTree::modify(const Command &command) const
-{
-    return InstrumentTree_const_uptr(new InstrumentTree(m_root->modify(command), m_detectorVec.size()));
+size_t InstrumentTree::nDetectors() const { return m_detectorVec.size(); }
+
+InstrumentTree_const_uptr InstrumentTree::modify(const Command &command) const {
+  return InstrumentTree_const_uptr(
+      new InstrumentTree(m_root->modify(command), m_detectorVec.size()));
 }
