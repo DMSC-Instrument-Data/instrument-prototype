@@ -1,10 +1,9 @@
 #include "CompositeComponent.h"
 #include "Detector.h"
 
-CompositeComponent::CompositeComponent(ComponentIdType componentId) : m_componentId(componentId)
-{
-
-}
+CompositeComponent::CompositeComponent(ComponentIdType componentId,
+                                       std::string name)
+    : m_componentId(componentId), m_name(name) {}
 
 V3D CompositeComponent::getPos() const {
 
@@ -53,12 +52,11 @@ bool CompositeComponent::equals(const Component &other) const {
   return false;
 }
 
-void CompositeComponent::addComponent(std::unique_ptr<Component>&& child) {
+void CompositeComponent::addComponent(std::unique_ptr<Component> &&child) {
   m_children.emplace_back(std::move(child));
 }
 
-const Component&
-CompositeComponent::getChild(size_t index) const {
+const Component &CompositeComponent::getChild(size_t index) const {
   if (index >= m_children.size()) {
     throw std::invalid_argument(
         "index out of range in CompositeComponent::getChild");
@@ -67,14 +65,15 @@ CompositeComponent::getChild(size_t index) const {
   }
 }
 
-void CompositeComponent::registerContents(std::vector<const Detector *> &lookup) const
-{
-    for(auto& child : m_children){
-        child->registerContents(lookup);
-    }
+void CompositeComponent::registerContents(
+    std::vector<const Detector *> &lookup) const {
+  for (auto &child : m_children) {
+    child->registerContents(lookup);
+  }
 }
 
-ComponentIdType CompositeComponent::componentId() const
-{
-    return m_componentId;
+ComponentIdType CompositeComponent::componentId() const {
+  return m_componentId;
 }
+
+std::string CompositeComponent::name() const { return m_name; }

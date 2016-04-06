@@ -19,6 +19,8 @@ class InstrumentTree {
 public:
   InstrumentTree(std::unique_ptr<const Node> &&root, size_t nDetectors);
 
+  InstrumentTree(const InstrumentTree& other);
+
   std::unique_ptr<NodeIterator> iterator() const;
 
   const Node &root() const;
@@ -31,6 +33,8 @@ public:
 
   // This is how we help the client out when they want to work with detector ids.
   void fillDetectorMap(const std::map<DetectorIdType, size_t>& toFill);
+
+  size_t nDetectors() const;
 
 private:
 

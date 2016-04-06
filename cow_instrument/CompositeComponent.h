@@ -4,12 +4,14 @@
 #include "Component.h"
 #include <vector>
 #include <memory>
+#include <string>
 
 class Detector;
 
 class CompositeComponent : public Component {
 public:
-  CompositeComponent(ComponentIdType componentId);
+  CompositeComponent(ComponentIdType componentId,
+                     std::string name = std::string(""));
   ~CompositeComponent() = default;
   V3D getPos() const override;
   void deltaPos(const V3D &pos) override;
@@ -20,11 +22,12 @@ public:
   const Component& getChild(size_t index) const;
   void registerContents(std::vector<const Detector*>& lookup) const override;
   ComponentIdType componentId() const override;
+  std::string name() const override;
+
 private:
   const ComponentIdType m_componentId;
   std::vector<std::unique_ptr<Component>> m_children;
-
-
+  std::string m_name;
 };
 
 using CompositeComponent_uptr = std::unique_ptr<const CompositeComponent>;

@@ -20,3 +20,7 @@ ComponentIdType NullComponent::componentId() const
 {
     throw std::runtime_error("NullComponent does not implement componentId");
 }
+
+std::string NullComponent::name() const { return NullComponent::TypeName; }
+
+const std::string NullComponent::TypeName = "NullComponent";

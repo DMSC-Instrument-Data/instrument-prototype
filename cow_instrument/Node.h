@@ -5,6 +5,7 @@
 #include <memory>
 #include <tuple>
 #include <vector>
+#include <string>
 
 class Component;
 class Command;
@@ -20,12 +21,14 @@ class Command;
 class Node {
 public:
   Node(Node const *const previous, std::unique_ptr<Node> &&next,
-       CowPtr<Component> contents, unsigned int version = 0);
-
-  Node(Node const *const previous, CowPtr<Component> contents,
+       CowPtr<Component> contents, std::string name = "",
        unsigned int version = 0);
 
-  Node(CowPtr<Component> contents, unsigned int version = 0);
+  Node(Node const *const previous, CowPtr<Component> contents,
+       std::string name = "", unsigned int version = 0);
+
+  Node(CowPtr<Component> contents, std::string name = "",
+       unsigned int version = 0);
 
   ~Node();
 
@@ -53,6 +56,8 @@ public:
   /// Copy, do not increment version, do not modify
   std::unique_ptr<Node> clone() const;
 
+  std::string name() const;
+
 private:
 
   std::unique_ptr<Node> clone(Node const * const previous) const;
@@ -73,6 +78,8 @@ private:
   std::vector<std::unique_ptr<const Node>> m_next; // Children
   /// COW managed contents. The component.
   CowPtr<Component> m_contents;
+  /// friendly name.
+  std::string m_name;
   /// version of the node.
   unsigned int m_version;
 };

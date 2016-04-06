@@ -22,12 +22,12 @@ public:
   ComponentIdType componentId() const override;
   void
   registerContents(std::vector<const Detector *> &lookup) const override;
+  std::string name() const override;
 
 private:
   const DetectorIdType m_detectorId;
   const ComponentIdType m_componentId;
   V3D m_pos;
-
 };
 
 #endif

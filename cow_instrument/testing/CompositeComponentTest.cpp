@@ -11,6 +11,12 @@ TEST(composite_component_test, test_construction){
     EXPECT_EQ(0, composite.size());
 }
 
+TEST(composite_component_test, test_provide_name) {
+  const std::string name = "bank_x";
+  CompositeComponent composite{ComponentIdType(1), name};
+  EXPECT_EQ(composite.name(), name);
+}
+
 TEST(composite_component_test, test_clone){
     CompositeComponent composite{ComponentIdType(1)};
 
