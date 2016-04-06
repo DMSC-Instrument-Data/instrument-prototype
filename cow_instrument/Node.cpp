@@ -22,7 +22,7 @@ Node::~Node() {}
 
 std::unique_ptr<Node> Node::modify(const Command &command) const {
 
-  auto *root = this; // obtainRoot();
+  auto *root = obtainRoot();
   Node_uptr newRoot = root->smartCopy(
       command, m_contents.const_ref(), nullptr,
       false /*start cascading modifications*/); // New Instrument
