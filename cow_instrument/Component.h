@@ -1,8 +1,8 @@
 #ifndef COMPONENT_H
 #define COMPONENT_H
 
-#include <array>
 #include <vector>
+#include <string>
 #include "IdType.h"
 
 class Detector;
@@ -16,6 +16,7 @@ public:
   virtual bool equals(const Component& other) const = 0;
   virtual void registerContents(std::vector<const Detector*>& lookup) const = 0;
   virtual ComponentIdType componentId() const = 0;
+  virtual std::string name() const = 0;
 };
 
 #endif

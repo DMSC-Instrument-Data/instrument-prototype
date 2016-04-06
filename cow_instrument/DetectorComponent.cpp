@@ -31,6 +31,10 @@ void DetectorComponent::registerContents(
     lookup.push_back(this);
 }
 
+std::string DetectorComponent::name() const {
+  return ""; // Not implmented (yet) for detector component.
+}
+
 DetectorComponent::~DetectorComponent() {}
 
 DetectorIdType DetectorComponent::detectorId() const { return m_detectorId; }

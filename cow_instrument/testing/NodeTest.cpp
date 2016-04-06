@@ -11,11 +11,13 @@ namespace {
 TEST(node_test, test_construction_isolated) {
 
   CowPtr<Component> contents(new MockComponent);
-  Node node(contents);
+  const std::string nodeName = "node1";
+  Node node(contents, nodeName);
 
   EXPECT_FALSE(node.hasParent());
   EXPECT_FALSE(node.hasChildren());
   EXPECT_EQ(node.version(), 0);
+  EXPECT_EQ(node.name(), nodeName);
 }
 
 TEST(node_test, test_indirection) {
@@ -66,6 +68,9 @@ TEST(node_test, test_clone) {
 
   // Version should not be different.
   EXPECT_EQ(clone->version(), node.version());
+
+  // Name should not be different.
+  EXPECT_EQ(clone->name(), node.name());
 
   // Version should be consistent across children
   EXPECT_EQ(clone->version(), clone->child(0).version());

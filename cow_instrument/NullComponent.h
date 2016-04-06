@@ -13,6 +13,8 @@ public:
   bool equals(const Component &other) const override;
   void registerContents(std::vector<const Detector *> &lookup) const override;
   ComponentIdType componentId() const override;
+  std::string name() const override;
+  static const std::string TypeName;
 };
 
 #endif

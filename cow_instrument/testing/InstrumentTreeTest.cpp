@@ -32,9 +32,9 @@ TEST(instrument_tree_test, test_version_check_on_constructor) {
 
   const unsigned int versionNumber = 1;
   auto a = Node_uptr(new Node(CowPtr<Component>(new NiceMock<MockComponent>()),
-                              versionNumber));
+                              "a", versionNumber));
   auto b = Node_uptr(
-      new Node(a.get(), CowPtr<Component>(new NiceMock<MockComponent>()),
+      new Node(a.get(), CowPtr<Component>(new NiceMock<MockComponent>()), "b",
                versionNumber + 1 /*version number incremented. This is bad*/));
   a->addChild(std::move(b));
 
@@ -50,11 +50,11 @@ TEST(instrument_tree_test, test_copy) {
 
   const unsigned int versionNumber = 1;
   auto a = Node_uptr(new Node(CowPtr<Component>(new NiceMock<MockComponent>()),
-                              versionNumber));
+                              "a", versionNumber));
 
   auto b = Node_uptr(new Node(a.get(),
                               CowPtr<Component>(new NiceMock<MockComponent>()),
-                              versionNumber));
+                              "b", versionNumber));
 
   a->addChild(std::move(b));
 

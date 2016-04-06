@@ -14,6 +14,7 @@ public:
   MOCK_CONST_METHOD1(registerContents, void(std::vector<const Detector*>&));
   ~MockComponent() {}
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
+  MOCK_CONST_METHOD0(name, std::string());
 };
 
 class MockCommmand : public Command {
