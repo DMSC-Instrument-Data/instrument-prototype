@@ -12,9 +12,10 @@ namespace {
  * Helper function to perform the benchmark at the specified deth in the
  * Instrument tree.
 */
-void modifyNodeAtDepth(size_t depth, benchmark::State &state) {
+void modifyNodeAtDepth(size_t depth, bool recordInstrumentCreation,
+                       benchmark::State &state) {
 
-  int countVersion = 0;
+  int counter = 0;
   while (state.KeepRunning()) {
     state.PauseTiming();
     InstrumentTree instrument(std_instrument::construct_root_node(), 60000);
@@ -26,11 +27,18 @@ void modifyNodeAtDepth(size_t depth, benchmark::State &state) {
     MoveCommand moveIt{V3D{1, 0, 0}};
     state.ResumeTiming();
 
-    // Then modify that node.
+    // Then modify that node
     Node_const_uptr copyNode = node->modify(moveIt);
+    counter += copyNode->version();
     // Then create the instrument around that node
+    if (!recordInstrumentCreation) {
+      state.PauseTiming();
+    }
     InstrumentTree copyTree(std::move(copyNode), instrument.nDetectors());
-    countVersion += copyTree.version();
+    counter += copyTree.version();
+    if (!recordInstrumentCreation) {
+      state.ResumeTiming();
+    }
   }
   state.SetItemsProcessed(state.iterations() * 1);
 }
@@ -48,20 +56,52 @@ void BM_copy_unmodified(benchmark::State &state) {
 }
 BENCHMARK(BM_copy_unmodified);
 
-void BM_copy_move_root(benchmark::State &state) {
-  modifyNodeAtDepth(0 /*down to the root*/, state);
+// ------------ Timings to include instrument tree creation ------------- //
+void
+BM_copy_move_root_with_instrument_creation_timing(benchmark::State &state) {
+  modifyNodeAtDepth(0 /*down to the root*/, true /*Time instrument creation*/,
+                    state);
 }
-BENCHMARK(BM_copy_move_root);
+BENCHMARK(BM_copy_move_root_with_instrument_creation_timing);
 
-void BM_copy_move_one_trolley(benchmark::State &state) {
-  modifyNodeAtDepth(1 /*down to the trolley*/, state);
+void BM_copy_move_one_trolley_with_instrument_creation_timing(
+    benchmark::State &state) {
+  modifyNodeAtDepth(1 /*down to the trolley*/,
+                    true /*Time instrument creation*/, state);
 }
-BENCHMARK(BM_copy_move_one_trolley);
+BENCHMARK(BM_copy_move_one_trolley_with_instrument_creation_timing);
 
-void BM_copy_move_one_bank(benchmark::State &state) {
-  modifyNodeAtDepth(2 /*down to the bank*/, state);
+void
+BM_copy_move_one_bank_with_instrument_creation_timing(benchmark::State &state) {
+  modifyNodeAtDepth(2 /*down to the bank*/, true /*Time instrument creation*/,
+                    state);
 }
-BENCHMARK(BM_copy_move_one_bank);
+BENCHMARK(BM_copy_move_one_bank_with_instrument_creation_timing);
+// ------------ End Timings to include instrument tree creation ------------- //
+
+// ------------ Timings NOT to include instrument tree creation ------------- //
+void
+BM_copy_move_root_without_instrument_creation_timing(benchmark::State &state) {
+  modifyNodeAtDepth(0 /*down to the root*/, false /*Time instrument creation*/,
+                    state);
+}
+BENCHMARK(BM_copy_move_root_without_instrument_creation_timing);
+
+void BM_copy_move_one_trolley_without_instrument_creation_timing(
+    benchmark::State &state) {
+  modifyNodeAtDepth(1 /*down to the trolley*/,
+                    false /*Time instrument creation*/, state);
+}
+BENCHMARK(BM_copy_move_one_trolley_without_instrument_creation_timing);
+
+void BM_copy_move_one_bank_without_instrument_creation_timing(
+    benchmark::State &state) {
+  modifyNodeAtDepth(2 /*down to the bank*/, false /*Time instrument creation*/,
+                    state);
+}
+BENCHMARK(BM_copy_move_one_bank_without_instrument_creation_timing);
+// ------------ End Timings NOT to include instrument tree creation
+// ------------- //
 
 } // namespace
 
