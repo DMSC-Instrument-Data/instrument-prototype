@@ -66,7 +66,8 @@ const Detector &InstrumentTree::getDetector(size_t detectorIndex) const {
 
 unsigned int InstrumentTree::version() const { return m_root->version(); }
 
-void InstrumentTree::fillDetectorMap(const std::map<DetectorIdType, size_t> &) const{
+void InstrumentTree::fillDetectorMap(
+    const std::map<DetectorIdType, size_t> &) const {
   throw std::runtime_error("Not Implemented. But likely required.");
   /*
    * Should be simple enough. We have the vector already, just interogate that
@@ -75,6 +76,16 @@ void InstrumentTree::fillDetectorMap(const std::map<DetectorIdType, size_t> &) c
 }
 
 size_t InstrumentTree::nDetectors() const { return m_detectorVec.size(); }
+
+V3D InstrumentTree::sourcePos() const {
+
+  return V3D{0, 0, 0}; // HACK!
+}
+
+V3D InstrumentTree::samplePos() const {
+
+  return V3D{0, 0, 20}; // HACK!
+}
 
 InstrumentTree_const_uptr InstrumentTree::modify(const Command &command) const {
   return InstrumentTree_const_uptr(

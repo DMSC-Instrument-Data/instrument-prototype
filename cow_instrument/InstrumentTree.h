@@ -36,6 +36,10 @@ public:
 
   size_t nDetectors() const;
 
+  V3D sourcePos() const;
+
+  V3D samplePos() const;
+
 private:
 
   std::vector<Detector const*> m_detectorVec;
