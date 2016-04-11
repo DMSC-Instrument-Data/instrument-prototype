@@ -15,6 +15,7 @@ void BM_InstrumentTreeConstruction(benchmark::State &state) {
 
     InstrumentTree instrument(std::move(root), 60000);
   }
+  state.SetItemsProcessed(state.iterations() * 1);
 }
 BENCHMARK(BM_InstrumentTreeConstruction);
 
@@ -31,6 +32,7 @@ void BM_SingleAccessMetrics(benchmark::State &state) {
       pos_x = det.getPos()[0];
     }
   }
+  state.SetItemsProcessed(state.iterations() * 1);
 }
 BENCHMARK(BM_SingleAccessMetrics);
 
@@ -48,6 +50,7 @@ void BM_SingleAccessMetricsStatic(benchmark::State &state) {
       pos_x = det.getPos()[0];
     }
   }
+  state.SetItemsProcessed(state.iterations() * 1);
 }
 BENCHMARK(BM_SingleAccessMetricsStatic);
 

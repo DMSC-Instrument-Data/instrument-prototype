@@ -4,6 +4,7 @@ add_subdirectory(benchmark)
 set ( SOURCE_FILES
                    CompositeComponent.cpp
                    DetectorComponent.cpp
+                   DetectorInfo.cpp                   
                    InstrumentTree.cpp
                    MoveCommand.cpp
                    Node.cpp
@@ -18,7 +19,7 @@ set ( INCLUDE_FILES
                    cow_ptr.h
                    Detector.h
                    DetectorComponent.h
-                   DetectorFactory.h
+                   DetectorInfo.cpp
                    IdType.h
                    InstrumentTree.h
                    MoveCommand.h

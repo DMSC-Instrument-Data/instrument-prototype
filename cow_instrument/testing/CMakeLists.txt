@@ -34,6 +34,7 @@ include_directories(${GTEST_INCLUDE_DIR} ${GMOCK_INCLUDE_DIR})
 set ( TEST_FILES
                  CompositeComponentTest.cpp
                  DetectorComponentTest.cpp
+                 DetectorInfoTest.cpp
                  InstrumentTreeTest.cpp
                  MoveCommandTest.cpp
                  NodeIteratorTest.cpp

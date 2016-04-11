@@ -32,7 +32,7 @@ public:
   std::unique_ptr<const InstrumentTree> modify(const Command &command) const;
 
   // This is how we help the client out when they want to work with detector ids.
-  void fillDetectorMap(const std::map<DetectorIdType, size_t>& toFill);
+  void fillDetectorMap(const std::map<DetectorIdType, size_t>& toFill) const;
 
   size_t nDetectors() const;
 
