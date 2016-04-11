@@ -29,7 +29,8 @@ using DetectorInfoWithMockInstrument = DetectorInfo<MockInstrumentTree>;
 TEST(detector_info_test, test_construct) {
 
   MockInstrumentTree *pMockInstrumentTree = new MockInstrumentTree;
-  EXPECT_CALL(*pMockInstrumentTree, nDetectors()).WillRepeatedly(testing::Return(10));
+  EXPECT_CALL(*pMockInstrumentTree, nDetectors())
+      .WillRepeatedly(testing::Return(10));
 
   std::shared_ptr<MockInstrumentTree> mockInstrumentTree{pMockInstrumentTree};
 
