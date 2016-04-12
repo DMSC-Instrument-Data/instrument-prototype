@@ -28,9 +28,7 @@ double distance(const V3D &a, const V3D &b) {
 
 template <typename InstTree> class DetectorInfo {
 public:
-
-  template
-    <typename V>
+  template <typename V>
   DetectorInfo(V &&instrumentTree)
       : m_isMasked(instrumentTree->nDetectors(), false),
         m_isMonitor(instrumentTree->nDetectors(), false),
