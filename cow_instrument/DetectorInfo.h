@@ -30,10 +30,9 @@ template <typename InstTree> class DetectorInfo {
 public:
   template <typename V>
   DetectorInfo(V &&instrumentTree)
-      : m_isMasked(instrumentTree->nDetectors(), false),
-        m_isMonitor(instrumentTree->nDetectors(), false),
-        m_l2(instrumentTree->nDetectors()),
-        m_sourcePos(instrumentTree->sourcePos()),
+      : m_nDetectors(instrumentTree->nDetectors()),
+        m_isMasked(m_nDetectors, false), m_isMonitor(m_nDetectors, false),
+        m_l2(m_nDetectors), m_sourcePos(instrumentTree->sourcePos()),
         m_samplePos(instrumentTree->samplePos()),
         m_instrumentTree(instrumentTree) {
 
@@ -45,6 +44,18 @@ public:
 
     // Calculate this once.
     m_l1 = distance(m_sourcePos, m_samplePos);
+  }
+
+  template <typename V>
+  std::unique_ptr<DetectorInfo> cloneWithInstrumentTree(V &&instrumentTree) {
+
+    if (instrumentTree.nDetectors() != m_instrumentTree.nDetectors()) {
+      throw std::invalid_argument("The new InstrumentTree does not look the "
+                                  "same as the existing InstrumentTree");
+    }
+
+    return std::unique_ptr<DetectorInfo>{
+        new DetectorInfo(instrumentTree, *this)};
   }
 
   void setMasked(size_t detectorIndex) {
@@ -89,11 +100,29 @@ public:
   }
 
   double l1() const { return m_l1; }
+  double nDetectors() { return m_nDetectors; }
 
   const InstTree &const_instrumentTree() const { return *m_instrumentTree; }
 
 private:
+  /**
+   Private constructor, used by cloneWithInstrumentTree to
+   replace the instrument tree, while keeping the rest of the metadata.
+   */
+  template <typename V>
+  DetectorInfo(V &&instrumentTree, const DetectorInfo &metaDataSource)
+      : m_nDetectors(instrumentTree->nDetectors()),
+        m_isMasked(metaDataSource.m_isMasked),
+        m_isMonitor(metaDataSource.m_isMonitor), m_l2(m_nDetectors),
+        m_sourcePos(instrumentTree->sourcePos()),
+        m_samplePos(instrumentTree->samplePos()),
+        m_instrumentTree(instrumentTree) {
+
+    m_l1 = distance(m_sourcePos, m_samplePos);
+  }
+
   double m_l1;
+  const size_t m_nDetectors;
   const V3D m_sourcePos; // This can't be copied upon instrument change
   const V3D m_samplePos; // This can't be copied upon instrument change
   const std::shared_ptr<InstTree> m_instrumentTree;

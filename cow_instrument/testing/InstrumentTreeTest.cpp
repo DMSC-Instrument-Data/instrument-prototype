@@ -11,6 +11,40 @@ using namespace testing;
 
 namespace {
 
+InstrumentTree make_simple_tree(DetectorIdType detector1Id,
+                                DetectorIdType detector2Id) {
+
+  /*
+
+        A (not a detector)
+        |
+ -------------------------------------------------
+ |                                               |
+ B (Composite containing Detector)               C (Detector)
+
+  */
+
+  Node_uptr a(new Node(CowPtr<Component>(new NiceMock<MockComponent>())));
+
+  auto composite = std::make_shared<CompositeComponent>(ComponentIdType(1));
+  composite->addComponent(
+      std::unique_ptr<DetectorComponent>(new DetectorComponent(
+          ComponentIdType(1), DetectorIdType(detector1Id), V3D{1, 1, 1})));
+
+  Node_uptr b(new Node(a.get(), CowPtr<Component>(composite)));
+
+  Node_uptr c(new Node(
+      a.get(),
+      CowPtr<Component>(std::unique_ptr<DetectorComponent>(
+                            new DetectorComponent(ComponentIdType(1),
+                                                  DetectorIdType(detector2Id),
+                                                  V3D{1, 1, 1})).release())));
+  a->addChild(std::move(b));
+  a->addChild(std::move(c));
+
+  return InstrumentTree(std::move(a), 2);
+}
+
 TEST(instrument_tree_test, test_uptr_constructor) {
 
   auto a =
@@ -110,37 +144,10 @@ TEST(instrument_tree_test, test_constructor) {
 
 TEST(instrument_tree_test, test_detector_access) {
 
-  /*
-
-        A (not a detector)
-        |
- -------------------------------------------------
- |                                               |
- B (Composite containing Detector)               C (Detector)
-
-  */
-
-  Node_uptr a(new Node(CowPtr<Component>(new NiceMock<MockComponent>())));
   DetectorIdType detector1Id(0);
-  auto composite = std::make_shared<CompositeComponent>(ComponentIdType(1));
-  composite->addComponent(
-      std::unique_ptr<DetectorComponent>(new DetectorComponent(
-          ComponentIdType(1), DetectorIdType(detector1Id), V3D{1, 1, 1})));
-
-  Node_uptr b(new Node(a.get(), CowPtr<Component>(composite)));
-
   DetectorIdType detector2Id = detector1Id + 1;
-  Node_uptr c(new Node(
-      a.get(),
-      CowPtr<Component>(std::unique_ptr<DetectorComponent>(
-                            new DetectorComponent(ComponentIdType(1),
-                                                  DetectorIdType(detector2Id),
-                                                  V3D{1, 1, 1})).release())));
 
-  a->addChild(std::move(b));
-  a->addChild(std::move(c));
-
-  InstrumentTree tree(std::move(a), 2);
+  InstrumentTree tree = make_simple_tree(detector1Id, detector2Id);
 
   const Detector &det1 = tree.getDetector(1);
   EXPECT_EQ(det1.detectorId(), detector1Id);
@@ -153,13 +160,15 @@ TEST(instrument_tree_test, test_detector_access) {
 }
 
 TEST(instrument_tree_test, test_fill_map) {
-  auto a =
-      Node_uptr(new Node(CowPtr<Component>(new NiceMock<MockComponent>())));
+  DetectorIdType detector1Id(0);
+  DetectorIdType detector2Id = detector1Id + 1;
 
-  InstrumentTree instrument(std::move(a), 0);
+  InstrumentTree tree = make_simple_tree(detector1Id, detector2Id);
 
-  std::map<DetectorIdType, size_t> container;
-  EXPECT_THROW(instrument.fillDetectorMap(container), std::runtime_error)
-      << "Characterize that this has not been implemented yet";
+  std::map<DetectorIdType, size_t> idMap;
+  tree.fillDetectorMap(idMap);
+  EXPECT_EQ(idMap.size(), 2);
+  EXPECT_NE(idMap.find(detector1Id), idMap.end()) << "Should find detector id";
+  EXPECT_NE(idMap.find(detector2Id), idMap.end()) << "Should find detector id";
 }
 }

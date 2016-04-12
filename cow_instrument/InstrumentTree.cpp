@@ -67,12 +67,10 @@ const Detector &InstrumentTree::getDetector(size_t detectorIndex) const {
 unsigned int InstrumentTree::version() const { return m_root->version(); }
 
 void InstrumentTree::fillDetectorMap(
-    const std::map<DetectorIdType, size_t> &) const {
-  throw std::runtime_error("Not Implemented. But likely required.");
-  /*
-   * Should be simple enough. We have the vector already, just interogate that
-   * to create the map.
-  */
+    std::map<DetectorIdType, size_t> &toFill) const {
+  for (size_t index = 0; index < m_detectorVec.size(); ++index) {
+    toFill.insert(std::make_pair(m_detectorVec[index]->detectorId(), index));
+  }
 }
 
 size_t InstrumentTree::nDetectors() const { return m_detectorVec.size(); }
