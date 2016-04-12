@@ -18,7 +18,7 @@ set ( INCLUDE_FILES
                    cow_ptr.h
                    Detector.h
                    DetectorComponent.h
-                   DetectorInfo.cpp
+                   DetectorInfo.h
                    IdType.h
                    InstrumentTree.h
                    MoveCommand.h
