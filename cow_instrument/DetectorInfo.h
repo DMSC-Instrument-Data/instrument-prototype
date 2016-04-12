@@ -28,21 +28,26 @@ double distance(const V3D &a, const V3D &b) {
 
 template <typename InstTree> class DetectorInfo {
 public:
-  DetectorInfo(std::shared_ptr<InstTree> &&instrumentTree)
-      : m_isMasked(instrumentTree->nDetectors(), false),
-        m_isMonitor(instrumentTree->nDetectors(), false),
-        m_l2(instrumentTree->nDetectors()),
-        m_sourcePos(instrumentTree->sourcePos()),
-        m_samplePos(instrumentTree->samplePos()),
-        m_instrumentTree(instrumentTree) {}
 
-  DetectorInfo(const std::shared_ptr<InstTree> &instrumentTree)
+  template
+    <typename V>
+  DetectorInfo(V &&instrumentTree)
       : m_isMasked(instrumentTree->nDetectors(), false),
         m_isMonitor(instrumentTree->nDetectors(), false),
         m_l2(instrumentTree->nDetectors()),
         m_sourcePos(instrumentTree->sourcePos()),
         m_samplePos(instrumentTree->samplePos()),
-        m_instrumentTree(instrumentTree) {}
+        m_instrumentTree(instrumentTree) {
+
+    /* The lifetime of the DetectorInfo is tied to the lifetime of the
+       InstrumentTree (see constructor). So no danger that instrument movement
+       gets
+       out of step with this. InstrumentTrees are immutable.
+     */
+
+    // Calculate this once.
+    m_l1 = distance(m_sourcePos, m_samplePos);
+  }
 
   void setMasked(size_t detectorIndex) {
     rangeCheck(detectorIndex, m_isMasked);
@@ -69,27 +74,31 @@ public:
   }
 
   double l2(size_t detectorIndex) const {
-    /* The lifetime of the DetectorInfo is tied to the lifetime of the
-       InstrumentTree (see constructor). So no danger that instrument movement
-       gets
-       out of step with this. InstrumentTrees are immutable.
-     */
+
     rangeCheck(detectorIndex, m_l2);
     if (!m_l2[detectorIndex]) {
       const Detector &det = m_instrumentTree->getDetector(detectorIndex);
       auto detPos = det.getPos();
 
+      /*
+       * Long-term is is not right. We cannot assume that the L2 path is simply
+       * sample
+       * to detector.
+       */
       m_l2[detectorIndex] = distance(detPos, m_samplePos);
     }
     return *m_l2[detectorIndex];
   }
 
+  double l1() const { return m_l1; }
+
   const InstTree &const_instrumentTree() const { return *m_instrumentTree; }
 
 private:
-  V3D m_sourcePos; // This can't be copied upon instrument change
-  V3D m_samplePos; // This can't be copied upon instrument change
-  std::shared_ptr<InstTree> m_instrumentTree;
+  double m_l1;
+  const V3D m_sourcePos; // This can't be copied upon instrument change
+  const V3D m_samplePos; // This can't be copied upon instrument change
+  const std::shared_ptr<InstTree> m_instrumentTree;
   std::vector<bool> m_isMasked;  // This could be copied upon instrument change
   std::vector<bool> m_isMonitor; // This could be copied upon instrument change
   mutable std::vector<boost::optional<double>>
