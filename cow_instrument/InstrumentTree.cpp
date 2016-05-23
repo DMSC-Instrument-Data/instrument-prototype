@@ -17,6 +17,9 @@ void findDetectors(const Component &component,
 }
 }
 
+/*
+ * Derived, detector vector is always recreated.
+*/
 InstrumentTree::InstrumentTree(std::vector<Node> &&nodes, size_t nDetectors)
     : m_nodes(std::move(nodes)) {
 
@@ -79,15 +82,21 @@ InstrumentTree InstrumentTree::modify(size_t node,
   std::for_each(newNodes.begin(), newNodes.end(),
                 [](Node &node) { node.incrementVersion(); });
 
-  std::vector<size_t> toModify = {node};
-  for (size_t index = 0; index < toModify.size(); ++index) {
-    auto &currentNode = newNodes[toModify[index]];
+  if (command.isMetaDataCommand()) {
+    // No cascading behaviour.
+    auto &currentNode = newNodes[node];
     currentNode.doModify(command);
-    const auto &currentChildren = currentNode.children();
-    toModify.insert(toModify.end(), currentChildren.begin(),
-                    currentChildren.end());
+  } else {
+    // Cascading behaviour
+      std::vector<size_t> toModify = {node};
+    for (size_t index = 0; index < toModify.size(); ++index) {
+      auto &currentNode = newNodes[toModify[index]];
+      currentNode.doModify(command);
+      const auto &currentChildren = currentNode.children();
+      toModify.insert(toModify.end(), currentChildren.begin(),
+                      currentChildren.end());
+    }
   }
-
   return InstrumentTree(std::move(newNodes), m_detectorVec.size());
 }
 

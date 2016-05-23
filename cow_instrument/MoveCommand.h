@@ -9,7 +9,8 @@ class MoveCommand : public Command {
   // Command interface
 public:
   MoveCommand(V3D pos);
-  void execute(Component &component) const;
+  virtual void execute(Component &component) const override;
+  virtual bool isMetaDataCommand() const override;
   virtual ~MoveCommand() = default;
 
 private:
