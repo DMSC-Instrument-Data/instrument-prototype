@@ -42,7 +42,9 @@ public:
 
 private:
   std::vector<Detector const *> m_detectorVec;
-  std::vector<Node> m_nodes;
+
+  // This should never change. This defines the instrument.
+  const std::vector<Node> m_nodes;
 
 public:
 };
