@@ -35,8 +35,7 @@ set ( TEST_FILES
                  CompositeComponentTest.cpp
                  DetectorComponentTest.cpp
                  InstrumentTreeTest.cpp
-                 #MoveCommandTest.cpp
-                 #NodeIteratorTest.cpp
+                 MoveCommandTest.cpp
                  NodeTest.cpp
 )
 

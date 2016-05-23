@@ -27,7 +27,7 @@ make_square_bank(size_t width, size_t height, std::string name) {
 
 namespace std_instrument {
 
-std::unique_ptr<Node> construct_root_node() {
+std::vector<Node> construct_root_node() {
   /*
           instrument
           |
@@ -59,32 +59,27 @@ std::unique_ptr<Node> construct_root_node() {
   auto r_curtain = make_square_bank(width, height, "Right curtain");
   r_curtain->deltaPos(V3D{width_d, 0, 6});
 
-  Node_uptr root(new Node(CowPtr<Component>(new NullComponent), "Root node"));
-  Node_uptr front_trolley(
-      new Node(CowPtr<Component>(new NullComponent), "Front trolley node"));
-  Node_uptr nodeN(
-      new Node(front_trolley.get(), CowPtr<Component>(N), "North node"));
-  Node_uptr nodeE(
-      new Node(front_trolley.get(), CowPtr<Component>(E), "East node"));
-  Node_uptr nodeS(
-      new Node(front_trolley.get(), CowPtr<Component>(S), "South node"));
-  Node_uptr nodeW(
-      new Node(front_trolley.get(), CowPtr<Component>(W), "West node"));
-  Node_uptr rear_trolley(
-      new Node(CowPtr<Component>(new NullComponent), "Rear trolley node"));
-  Node_uptr nodeLCurtain(new Node(
-      rear_trolley.get(), CowPtr<Component>(l_curtain), "Left curtain node"));
-  Node_uptr nodeRCurtain(new Node(
-      rear_trolley.get(), CowPtr<Component>(r_curtain), "Right curtain node"));
-  front_trolley->addChild(std::move(nodeN));
-  front_trolley->addChild(std::move(nodeE));
-  front_trolley->addChild(std::move(nodeS));
-  front_trolley->addChild(std::move(nodeW));
-  rear_trolley->addChild(std::move(nodeLCurtain));
-  front_trolley->addChild(std::move(nodeRCurtain));
-  root->addChild(std::move(front_trolley));
-  root->addChild(std::move(rear_trolley));
+  std::vector<Node> nodes;
+  nodes.emplace_back(CowPtr<Component>(new NullComponent), "Root node");
+  nodes.emplace_back(CowPtr<Component>(new NullComponent),
+                     "Front trolley node");
+  nodes.emplace_back(CowPtr<Component>(N), "North node");
+  nodes.emplace_back(CowPtr<Component>(E), "East node");
+  nodes.emplace_back(CowPtr<Component>(S), "South node");
+  nodes.emplace_back(CowPtr<Component>(W), "West node");
+  nodes.emplace_back(CowPtr<Component>(new NullComponent), "Rear trolley node");
+  nodes.emplace_back(CowPtr<Component>(l_curtain), "Left curtain node");
+  nodes.emplace_back(CowPtr<Component>(l_curtain), "Left curtain node");
 
-  return root;
+  // Assemble flattened node node tree
+  nodes[0].addChild(1);
+  nodes[1].addChild(2);
+  nodes[1].addChild(3);
+  nodes[1].addChild(4);
+  nodes[1].addChild(5);
+  nodes[6].addChild(7);
+  nodes[6].addChild(8);
+
+  return nodes;
 }
 }

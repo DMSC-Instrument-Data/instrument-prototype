@@ -5,9 +5,8 @@ set ( SOURCE_FILES
                    CompositeComponent.cpp
                    DetectorComponent.cpp
                    InstrumentTree.cpp
-                   #MoveCommand.cpp
+                   MoveCommand.cpp
                    Node.cpp
-                   #NodeIterator.cpp
                    NullComponent.cpp                   
 )
 
@@ -18,12 +17,10 @@ set ( INCLUDE_FILES
                    cow_ptr.h
                    Detector.h
                    DetectorComponent.h
-                   #DetectorFactory.h
                    IdType.h
                    InstrumentTree.h
-                   #MoveCommand.h
+                   MoveCommand.h
                    Node.h
-                   #NodeIterator.h
                    NullComponent.h
                    IntToType.h
 )

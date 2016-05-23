@@ -1,5 +1,4 @@
 #include "InstrumentTree.h"
-#include "NodeIterator.h"
 #include "Node.h"
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"

@@ -2,7 +2,6 @@
 #include "Node.h"
 #include "Detector.h"
 #include "CompositeComponent.h"
-#include "NodeIterator.h"
 #include "Command.h"
 #include <utility>
 #include <string>
@@ -30,7 +29,7 @@ InstrumentTree::InstrumentTree(std::vector<Node> &&nodes, size_t nDetectors)
   }
 
   const unsigned int expectedVersion = this->version();
-  for(const auto &node : m_nodes) {
+  for (const auto &node : m_nodes) {
     const auto &component = node.const_ref();
     // Put all detectors into a flat map.
     findDetectors(component, m_detectorVec);
@@ -69,7 +68,12 @@ void InstrumentTree::fillDetectorMap(const std::map<DetectorIdType, size_t> &) {
 
 size_t InstrumentTree::nDetectors() const { return m_detectorVec.size(); }
 
-InstrumentTree InstrumentTree::modify(size_t node, const Command &command) const {
+const Node *const InstrumentTree::nodeAt(size_t index) const {
+  return &m_nodes[index];
+}
+
+InstrumentTree InstrumentTree::modify(size_t node,
+                                      const Command &command) const {
 
   auto newNodes(m_nodes);
   std::for_each(newNodes.begin(), newNodes.end(),
@@ -87,11 +91,12 @@ InstrumentTree InstrumentTree::modify(size_t node, const Command &command) const
   return InstrumentTree(std::move(newNodes), m_detectorVec.size());
 }
 
-InstrumentTree InstrumentTree::modify(const Node *node, const Command &command) const {
+InstrumentTree InstrumentTree::modify(const Node *node,
+                                      const Command &command) const {
   for (size_t index = 0; index < m_nodes.size(); ++index) {
     if (&m_nodes[index] == node) {
       return modify(index, command);
     }
   }
-  // TODO throw node not found
+  throw std::invalid_argument("Node has not been found");
 }

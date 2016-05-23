@@ -6,7 +6,6 @@
 #include <map>
 #include "IdType.h"
 
-
 class Node;
 class NodeIterator;
 class Command;
@@ -28,16 +27,13 @@ public:
   InstrumentTree modify(size_t node, const Command &command) const;
   InstrumentTree modify(const Node *node, const Command &command) const;
 
-  // This is how we help the client out when they want to work with detector ids.
-  void fillDetectorMap(const std::map<DetectorIdType, size_t>& toFill);
+  // This is how we help the client out when they want to work with detector
+  // ids.
+  void fillDetectorMap(const std::map<DetectorIdType, size_t> &toFill);
 
   size_t nDetectors() const;
 
-  void addChild(const Node *node, const Command &command) {
-    // find node index
-    // append new node to m_nodes, parent = index
-    // parent.addChild(m_nodes.size()-1)
-  }
+  Node const *const nodeAt(size_t index) const;
 
   std::vector<Node>::const_iterator begin() const { return m_nodes.begin(); }
   std::vector<Node>::const_iterator end() const { return m_nodes.end(); }
@@ -45,8 +41,7 @@ public:
   std::vector<Node>::const_iterator cend() const { return m_nodes.cend(); }
 
 private:
-  std::vector<Detector const*> m_detectorVec;
-
+  std::vector<Detector const *> m_detectorVec;
   std::vector<Node> m_nodes;
 
 public:

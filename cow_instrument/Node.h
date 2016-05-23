@@ -42,12 +42,13 @@ public:
 
   size_t child(size_t index) const;
 
-  const std::vector<size_t> &children() const { return m_next; }
+  const std::vector<size_t> &children() const;
 
-  size_t nChildren() const { return m_next.size(); }
+  size_t nChildren() const;
 
   unsigned int version() const;
-  void incrementVersion() { ++m_version; }
+
+  unsigned int incrementVersion();
 
   std::string name() const;
 
