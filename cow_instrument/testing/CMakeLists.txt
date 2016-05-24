@@ -35,10 +35,12 @@ set ( TEST_FILES
                  CompositeComponentTest.cpp
                  DetectorComponentTest.cpp
                  DetectorInfoTest.cpp
+                 FixedLengthVectorTest.cpp
                  InstrumentTreeTest.cpp
                  MoveCommandTest.cpp
                  NodeIteratorTest.cpp
                  NodeTest.cpp
+                 SpectrumInfoTest.cpp
 )
 
 add_executable(cow_instrument_test runner.cpp MockTypes.h ${TEST_FILES})

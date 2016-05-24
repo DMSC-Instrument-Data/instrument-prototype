@@ -42,6 +42,8 @@ public:
 
 private:
 
+  //const std::shared_ptr<std::map<DetectorIdType, size_t> > m_detectorIdMap;
+
   std::vector<Detector const*> m_detectorVec;
 
   std::unique_ptr<const Node> m_root;

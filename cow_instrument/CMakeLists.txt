@@ -19,13 +19,16 @@ set ( INCLUDE_FILES
                    Detector.h
                    DetectorComponent.h
                    DetectorInfo.h
+                   FixedLengthVector.h
                    IdType.h
                    InstrumentTree.h
+                   MaskFlags.h
                    MoveCommand.h
                    Node.h
                    NodeIterator.h
                    NullComponent.h
                    IntToType.h
+                   SpectrumInfo.h
 )
 
 add_library (cow_instrument SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
