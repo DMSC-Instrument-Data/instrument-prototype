@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include "IdType.h"
+#include "V3D.h"
 
 
 class Node;

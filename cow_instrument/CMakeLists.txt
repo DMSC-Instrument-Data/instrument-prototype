@@ -12,6 +12,7 @@ set ( SOURCE_FILES
 )
 
 set ( INCLUDE_FILES
+                   Bool.h
                    Command.h
                    Component.h
                    CompositeComponent.h
@@ -29,6 +30,7 @@ set ( INCLUDE_FILES
                    NullComponent.h
                    IntToType.h
                    SpectrumInfo.h
+                   V3D.h
 )
 
 add_library (cow_instrument SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
