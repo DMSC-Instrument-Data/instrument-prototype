@@ -1,10 +1,10 @@
 #ifndef STANDARD_INSTRUMENT_H
 #define STANDARD_INSTRUMENT_H
 
-#include <memory>
+#include <vector>
 class Node;
 namespace std_instrument {
-std::unique_ptr<Node> construct_root_node();
+std::vector<Node> construct_root_node();
 }
 
 #endif

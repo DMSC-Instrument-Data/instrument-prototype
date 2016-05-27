@@ -6,7 +6,9 @@ class Component;
 class Command{
   public:
     virtual void execute(Component& component) const = 0;
+    virtual bool isMetaDataCommand() const = 0;
     virtual ~Command() {}
 };
+
 
 #endif

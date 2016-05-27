@@ -6,7 +6,6 @@
 #include <map>
 #include "IdType.h"
 
-
 class Node;
 class NodeIterator;
 class Command;
@@ -17,11 +16,7 @@ class Detector;
  */
 class InstrumentTree {
 public:
-  InstrumentTree(std::unique_ptr<const Node> &&root, size_t nDetectors);
-
-  InstrumentTree(const InstrumentTree& other);
-
-  std::unique_ptr<NodeIterator> iterator() const;
+  InstrumentTree(std::vector<Node> &&nodes, size_t nDetectors);
 
   const Node &root() const;
 
@@ -29,18 +24,29 @@ public:
 
   unsigned int version() const;
 
-  std::unique_ptr<const InstrumentTree> modify(const Command &command) const;
+  InstrumentTree modify(size_t node, const Command &command) const;
+  InstrumentTree modify(const Node *node, const Command &command) const;
 
-  // This is how we help the client out when they want to work with detector ids.
-  void fillDetectorMap(const std::map<DetectorIdType, size_t>& toFill);
+  // This is how we help the client out when they want to work with detector
+  // ids.
+  void fillDetectorMap(const std::map<DetectorIdType, size_t> &toFill);
 
   size_t nDetectors() const;
 
+  Node const *const nodeAt(size_t index) const;
+
+  std::vector<Node>::const_iterator begin() const { return m_nodes.begin(); }
+  std::vector<Node>::const_iterator end() const { return m_nodes.end(); }
+  std::vector<Node>::const_iterator cbegin() const { return m_nodes.cbegin(); }
+  std::vector<Node>::const_iterator cend() const { return m_nodes.cend(); }
+
 private:
+  std::vector<Detector const *> m_detectorVec;
 
-  std::vector<Detector const*> m_detectorVec;
+  // This should never change. This defines the instrument.
+  const std::vector<Node> m_nodes;
 
-  std::unique_ptr<const Node> m_root;
+public:
 };
 
 using InstrumentTree_const_uptr = std::unique_ptr<const InstrumentTree>;

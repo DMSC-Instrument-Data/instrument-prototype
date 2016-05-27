@@ -2,9 +2,10 @@
 #include "Node.h"
 #include "Detector.h"
 #include "CompositeComponent.h"
-#include "NodeIterator.h"
+#include "Command.h"
 #include <utility>
 #include <string>
+#include <algorithm>
 
 namespace {
 
@@ -16,25 +17,26 @@ void findDetectors(const Component &component,
 }
 }
 
-InstrumentTree::InstrumentTree(Node_const_uptr &&root, size_t nDetectors)
-    : m_root(std::move(root)) {
+/*
+ * Derived, detector vector is always recreated.
+*/
+InstrumentTree::InstrumentTree(std::vector<Node> &&nodes, size_t nDetectors)
+    : m_nodes(std::move(nodes)) {
 
   // This will make the push_backs faster
   m_detectorVec.reserve(nDetectors);
 
-  if (!m_root) {
+  if (m_nodes.empty()) {
     throw std::invalid_argument(
         "No root Node. Cannot create an InstrumentTree");
   }
 
   const unsigned int expectedVersion = this->version();
-  auto it = this->iterator();
-  while (!it->atEnd()) {
-    auto node = it->next();
-    const auto &component = node->const_ref();
+  for (const auto &node : m_nodes) {
+    const auto &component = node.const_ref();
     // Put all detectors into a flat map.
     findDetectors(component, m_detectorVec);
-    if (node->version() != expectedVersion) {
+    if (node.version() != expectedVersion) {
       throw std::invalid_argument(
           "Cannot make an Instrument tree around Nodes of differing version");
     }
@@ -44,14 +46,7 @@ InstrumentTree::InstrumentTree(Node_const_uptr &&root, size_t nDetectors)
   // m_detectorVec.shrink_to_fit(); This could be costly
 }
 
-InstrumentTree::InstrumentTree(const InstrumentTree &other)
-    : InstrumentTree(other.root().clone(), other.m_detectorVec.size()) {}
-
-std::unique_ptr<NodeIterator> InstrumentTree::iterator() const {
-  return std::unique_ptr<NodeIterator>(new NodeIterator(m_root->clone()));
-}
-
-const Node &InstrumentTree::root() const { return *m_root; }
+const Node &InstrumentTree::root() const { return m_nodes[0]; }
 
 const Detector &InstrumentTree::getDetector(size_t detectorIndex) const {
 
@@ -64,7 +59,7 @@ const Detector &InstrumentTree::getDetector(size_t detectorIndex) const {
   return *m_detectorVec[detectorIndex];
 }
 
-unsigned int InstrumentTree::version() const { return m_root->version(); }
+unsigned int InstrumentTree::version() const { return m_nodes[0].version(); }
 
 void InstrumentTree::fillDetectorMap(const std::map<DetectorIdType, size_t> &) {
   throw std::runtime_error("Not Implemented. But likely required.");
@@ -76,7 +71,41 @@ void InstrumentTree::fillDetectorMap(const std::map<DetectorIdType, size_t> &) {
 
 size_t InstrumentTree::nDetectors() const { return m_detectorVec.size(); }
 
-InstrumentTree_const_uptr InstrumentTree::modify(const Command &command) const {
-  return InstrumentTree_const_uptr(
-      new InstrumentTree(m_root->modify(command), m_detectorVec.size()));
+const Node *const InstrumentTree::nodeAt(size_t index) const {
+  return &m_nodes[index];
+}
+
+InstrumentTree InstrumentTree::modify(size_t node,
+                                      const Command &command) const {
+
+  auto newNodes(m_nodes);
+  std::for_each(newNodes.begin(), newNodes.end(),
+                [](Node &node) { node.incrementVersion(); });
+
+  if (command.isMetaDataCommand()) {
+    // No cascading behaviour.
+    auto &currentNode = newNodes[node];
+    currentNode.doModify(command);
+  } else {
+    // Cascading behaviour
+      std::vector<size_t> toModify = {node};
+    for (size_t index = 0; index < toModify.size(); ++index) {
+      auto &currentNode = newNodes[toModify[index]];
+      currentNode.doModify(command);
+      const auto &currentChildren = currentNode.children();
+      toModify.insert(toModify.end(), currentChildren.begin(),
+                      currentChildren.end());
+    }
+  }
+  return InstrumentTree(std::move(newNodes), m_detectorVec.size());
+}
+
+InstrumentTree InstrumentTree::modify(const Node *node,
+                                      const Command &command) const {
+  for (size_t index = 0; index < m_nodes.size(); ++index) {
+    if (&m_nodes[index] == node) {
+      return modify(index, command);
+    }
+  }
+  throw std::invalid_argument("Node has not been found");
 }
