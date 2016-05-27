@@ -17,7 +17,6 @@ class Detector;
 class InstrumentTree {
 public:
   InstrumentTree(std::vector<Node> &&nodes, size_t nDetectors);
-  InstrumentTree(const InstrumentTree& original) = default;
 
   const Node &root() const;
 
