@@ -7,7 +7,6 @@
 #include "IdType.h"
 #include "V3D.h"
 
-
 class Node;
 class NodeIterator;
 class Command;

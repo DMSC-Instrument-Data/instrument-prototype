@@ -23,7 +23,9 @@ set ( INCLUDE_FILES
                    FixedLengthVector.h
                    IdType.h
                    InstrumentTree.h
+                   L2s.h
                    MaskFlags.h
+                   MonitorFlags.h
                    MoveCommand.h
                    Node.h
                    NodeIterator.h

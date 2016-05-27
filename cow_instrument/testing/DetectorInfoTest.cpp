@@ -5,7 +5,9 @@
 #include <gmock/gmock.h>
 #include <map>
 #include <stdexcept>
+#include <memory>
 #include "IdType.h"
+#include "Command.h"
 
 namespace {
 
@@ -15,6 +17,7 @@ public:
   virtual V3D sourcePos() const = 0;
   virtual V3D samplePos() const = 0;
   virtual const Detector &getDetector(size_t detectorIndex) const = 0;
+  virtual std::unique_ptr<const InstrumentTree> modify(const Command &command) const = 0;
   virtual ~PolymorphicInstrumentTree() {}
 };
 
@@ -33,6 +36,7 @@ public:
   MOCK_CONST_METHOD0(sourcePos, V3D());
   MOCK_CONST_METHOD0(samplePos, V3D());
   MOCK_CONST_METHOD1(getDetector, const Detector &(size_t));
+  MOCK_CONST_METHOD1(modify, std::unique_ptr<const InstrumentTree>(const Command&));
   virtual ~MockInstrumentTree() {}
 };
 
@@ -122,5 +126,22 @@ TEST(detector_info_test, test_calculate_l2_calculate) {
 
   auto l2 = detectorInfo.l2(0);
   EXPECT_EQ(l2, 20) << "sqrt((40 - 20)^2)";
+}
+
+TEST(detector_info_test, test_modify) {
+
+  auto *pMockInstrumentTree = new testing::NiceMock<MockInstrumentTree>();
+
+  EXPECT_CALL(*pMockInstrumentTree, modify(testing::_)).Times(1);
+
+  DetectorInfoWithNiceMockInstrument detectorInfo{
+      std::shared_ptr<NiceMockInstrumentTree>(pMockInstrumentTree)};
+
+  MockCommmand command;
+  detectorInfo.modify(0, command);
+
+  EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree));
+
+  // test modify called on instrument.
 }
 }

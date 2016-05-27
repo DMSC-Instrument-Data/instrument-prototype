@@ -8,10 +8,10 @@
 struct Bool {
 public:
   Bool(bool value) : m_value(value) {}
-  operator bool() const { return m_value;}
+  operator bool() const { return m_value; }
+
 private:
   bool m_value;
 };
-
 
 #endif
