@@ -117,9 +117,15 @@ public:
   const InstTree &const_instrumentTree() const { return *m_instrumentTree; }
 
   void modify(size_t nodeIndex, Command& command){
-      m_instrumentTree = std::shared_ptr<InstTree>(m_instrumentTree->modify(command).release());
+      m_instrumentTree = m_instrumentTree->modify(command);
       // L2 cache is invalid.
       m_l2flags = L2Flags(m_nDetectors, Bool(false));
+
+      //All other geometry-derived information is now also invalid. Very important!
+      m_sourcePos = m_instrumentTree->sourcePos();
+      m_samplePos = m_instrumentTree->samplePos();
+      m_l1 = distance(m_sourcePos, m_samplePos);
+
       // Meta-data should all still be valid.
   }
 
@@ -140,7 +146,7 @@ private:
     m_l1 = distance(m_sourcePos, m_samplePos);
   }
 
-  const std::shared_ptr<InstTree> m_instrumentTree;
+  std::shared_ptr<const InstTree> m_instrumentTree;
 
   //------------------- MetaData -------------
   const size_t m_nDetectors;
@@ -149,8 +155,8 @@ private:
 
   //------------------- DerivedInfo
   double m_l1;               // This can't be copied upon instrument change
-  const V3D m_sourcePos;     // This can't be copied upon instrument change
-  const V3D m_samplePos;     // This can't be copied upon instrument change
+  V3D m_sourcePos;     // This can't be copied upon instrument change
+  V3D m_samplePos;     // This can't be copied upon instrument change
   mutable L2s m_l2;          // This can't be copied upon instrument change
   mutable L2Flags m_l2flags; // This can't be copied upon instrument change
 };

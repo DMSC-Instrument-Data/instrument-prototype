@@ -11,17 +11,18 @@
 
 namespace {
 
-class PolymorphicInstrumentTree {
+template <typename T> class PolymorphicInstrumentTree {
 public:
   virtual size_t nDetectors() const = 0;
   virtual V3D sourcePos() const = 0;
   virtual V3D samplePos() const = 0;
   virtual const Detector &getDetector(size_t detectorIndex) const = 0;
-  virtual std::unique_ptr<const InstrumentTree> modify(const Command &command) const = 0;
+  virtual std::unique_ptr<const T> modify(const Command &command) const = 0;
   virtual ~PolymorphicInstrumentTree() {}
 };
 
-class MockInstrumentTree : public PolymorphicInstrumentTree {
+class MockInstrumentTree
+    : public PolymorphicInstrumentTree<MockInstrumentTree> {
 public:
   MockInstrumentTree() {
     ON_CALL(*this, samplePos()).WillByDefault(testing::Return(V3D{0, 0, 20}));
@@ -36,7 +37,14 @@ public:
   MOCK_CONST_METHOD0(sourcePos, V3D());
   MOCK_CONST_METHOD0(samplePos, V3D());
   MOCK_CONST_METHOD1(getDetector, const Detector &(size_t));
-  MOCK_CONST_METHOD1(modify, std::unique_ptr<const InstrumentTree>(const Command&));
+
+  // std::unique_ptr is not copy constructable. So we can't mock that directly. Indirect via mockProxy.
+  virtual std::unique_ptr<const MockInstrumentTree> modify(const Command & command) const{
+      return std::unique_ptr<const MockInstrumentTree>(modifyProxy(command));
+  }
+  // We create a mock proxy because return types have to be copyable in gmock
+  MOCK_CONST_METHOD1(modifyProxy, MockInstrumentTree*(const Command&));
+
   virtual ~MockInstrumentTree() {}
 };
 
@@ -130,18 +138,31 @@ TEST(detector_info_test, test_calculate_l2_calculate) {
 
 TEST(detector_info_test, test_modify) {
 
-  auto *pMockInstrumentTree = new testing::NiceMock<MockInstrumentTree>();
+  using namespace testing;
+  auto *pMockInstrumentTree = new MockInstrumentTree{};
+  auto *pMockInstrumentTreeNew = new MockInstrumentTree{};
 
-  EXPECT_CALL(*pMockInstrumentTree, modify(testing::_)).Times(1);
+  // We expect that the modify method of the existing instrument tree gets called
+  EXPECT_CALL(*pMockInstrumentTree, modifyProxy(testing::_))
+      .Times(1)
+      .WillOnce(Return(pMockInstrumentTreeNew));
+  // We expect that the source position of the new instrument is required
+  EXPECT_CALL(*pMockInstrumentTreeNew, sourcePos())
+      .Times(1)
+      .WillOnce(Return(V3D{0, 0, 0}));
+  // We expect that the sample position of the new instrument is required
+  EXPECT_CALL(*pMockInstrumentTreeNew, samplePos())
+      .Times(1)
+      .WillOnce(Return(V3D{1, 1, 1}));
 
-  DetectorInfoWithNiceMockInstrument detectorInfo{
-      std::shared_ptr<NiceMockInstrumentTree>(pMockInstrumentTree)};
+  DetectorInfoWithMockInstrument detectorInfo{
+      std::shared_ptr<MockInstrumentTree>(pMockInstrumentTree)};
 
   MockCommmand command;
   detectorInfo.modify(0, command);
 
-  EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree));
-
   // test modify called on instrument.
+  EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree));
+  EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTreeNew));
 }
 }
