@@ -10,10 +10,10 @@ namespace {
 void BM_InstrumentTreeConstruction(benchmark::State &state) {
   while (state.KeepRunning()) {
     state.PauseTiming();
-    Node_uptr root = std_instrument::construct_root_node();
+    auto flattenedNodeTree = std_instrument::construct_root_node();
     state.ResumeTiming();
 
-    InstrumentTree instrument(std::move(root), 60000);
+    InstrumentTree instrument(std::move(flattenedNodeTree), 60000);
   }
   state.SetItemsProcessed(state.iterations() * 1);
 }

@@ -18,10 +18,15 @@ public:
   MOCK_CONST_METHOD0(name, std::string());
 };
 
-class MockCommmand : public Command {
+class MockCommand : public Command {
 public:
+  MockCommand(){
+      using namespace testing;
+      ON_CALL(*this, isMetaDataCommand()).WillByDefault(Return(false));
+  }
   MOCK_CONST_METHOD1(execute, void(Component &));
-  ~MockCommmand() {}
+  MOCK_CONST_METHOD0(isMetaDataCommand, bool());
+  ~MockCommand() {}
 };
 
 class MockDetector : public Detector {

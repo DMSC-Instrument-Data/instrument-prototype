@@ -158,7 +158,7 @@ TEST(detector_info_test, test_modify) {
   DetectorInfoWithMockInstrument detectorInfo{
       std::shared_ptr<MockInstrumentTree>(pMockInstrumentTree)};
 
-  MockCommmand command;
+  MockCommand command;
   detectorInfo.modify(0, command);
 
   // test modify called on instrument.

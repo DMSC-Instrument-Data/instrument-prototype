@@ -38,7 +38,6 @@ set ( TEST_FILES
                  FixedLengthVectorTest.cpp
                  InstrumentTreeTest.cpp
                  MoveCommandTest.cpp
-                 NodeIteratorTest.cpp
                  NodeTest.cpp
                  SpectrumInfoTest.cpp
 )

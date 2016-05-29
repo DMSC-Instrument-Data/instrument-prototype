@@ -5,6 +5,7 @@
 #include "MoveCommand.h"
 #include <iostream>
 #include <benchmark/benchmark_api.h>
+#include "IdType.h"
 
 namespace {
 
@@ -15,27 +16,27 @@ namespace {
 void modifyNodeAtDepth(size_t depth, bool recordInstrumentCreation,
                        benchmark::State &state) {
 
-  int counter = 0;
+  // int counter = 0;
   while (state.KeepRunning()) {
     state.PauseTiming();
     InstrumentTree instrument(std_instrument::construct_root_node(), 60000);
     // Walk down the tree to depth
+    size_t nodeIndex = 0;
     const Node *node = &instrument.root();
     for (size_t i = 0; i < depth; ++i) {
-      node = &node->child(0);
+      nodeIndex = node->child(0);
+      node = instrument.nodeAt(i);
     }
     MoveCommand moveIt{V3D{1, 0, 0}};
     state.ResumeTiming();
 
-    // Then modify that node
-    Node_const_uptr copyNode = node->modify(moveIt);
-    counter += copyNode->version();
     // Then create the instrument around that node
     if (!recordInstrumentCreation) {
       state.PauseTiming();
     }
-    InstrumentTree copyTree(std::move(copyNode), instrument.nDetectors());
-    counter += copyTree.version();
+    // Then modify that node
+    InstrumentTree copyInstrument = instrument.modify(nodeIndex, moveIt);
+
     if (!recordInstrumentCreation) {
       state.ResumeTiming();
     }

@@ -7,7 +7,6 @@ set ( SOURCE_FILES
                    InstrumentTree.cpp
                    MoveCommand.cpp
                    Node.cpp
-                   NodeIterator.cpp
                    NullComponent.cpp                   
 )
 
@@ -28,7 +27,6 @@ set ( INCLUDE_FILES
                    MonitorFlags.h
                    MoveCommand.h
                    Node.h
-                   NodeIterator.h
                    NullComponent.h
                    IntToType.h
                    SpectrumInfo.h
