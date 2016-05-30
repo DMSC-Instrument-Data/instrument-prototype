@@ -40,6 +40,7 @@ set ( TEST_FILES
                  MoveCommandTest.cpp
                  NodeTest.cpp
                  SpectrumInfoTest.cpp
+                 SpectrumTest.cpp
 )
 
 add_executable(cow_instrument_test runner.cpp MockTypes.h ${TEST_FILES})

@@ -7,7 +7,8 @@ set ( SOURCE_FILES
                    InstrumentTree.cpp
                    MoveCommand.cpp
                    Node.cpp
-                   NullComponent.cpp                   
+                   NullComponent.cpp
+                   Spectrum.cpp
 )
 
 set ( INCLUDE_FILES
@@ -30,6 +31,7 @@ set ( INCLUDE_FILES
                    NullComponent.h
                    IntToType.h
                    SpectrumInfo.h
+                   Spectrum.h
                    V3D.h
 )
 
