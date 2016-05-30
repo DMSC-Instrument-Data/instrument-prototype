@@ -27,8 +27,10 @@ public:
 
   unsigned int version() const;
 
-  InstrumentTree modify(size_t node, const Command &command) const;
-  InstrumentTree modify(const Node *node, const Command &command) const;
+  std::unique_ptr<const InstrumentTree> modify(size_t node,
+                                               const Command &command) const;
+  std::unique_ptr<const InstrumentTree> modify(const Node *node,
+                                               const Command &command) const;
 
   // This is how we help the client out when they want to work with detector
   // ids.

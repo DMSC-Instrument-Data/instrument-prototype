@@ -35,7 +35,7 @@ double distance(const V3D &a, const V3D &b) {
 template <typename InstTree> class DetectorInfo {
 public:
   template <typename V>
-  DetectorInfo(V &&instrumentTree)
+  explicit DetectorInfo(V &&instrumentTree)
       : m_nDetectors(instrumentTree->nDetectors()),
         m_isMasked(m_nDetectors, Bool(false)),
         m_isMonitor(m_nDetectors, Bool(false)), m_l2(m_nDetectors),
@@ -53,6 +53,9 @@ public:
     // Calculate this once.
     m_l1 = distance(m_sourcePos, m_samplePos);
   }
+
+  // template <typename V>
+  // DetectorInfo(const DetectorInfo<V> &other) = default;
 
   template <typename V>
   std::unique_ptr<DetectorInfo> cloneWithInstrumentTree(V &&instrumentTree) {

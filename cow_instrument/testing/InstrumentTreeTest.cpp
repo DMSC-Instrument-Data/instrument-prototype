@@ -242,18 +242,18 @@ TEST(instrument_tree_test, test_modify_linear) {
   auto newTree = instrument.modify(2, command);
 
   // Check that our tree has an incremented version
-  EXPECT_EQ(newTree.version(), instrument.version() + 1);
+  EXPECT_EQ(newTree->version(), instrument.version() + 1);
   // And check further down in the tree too. The version should be the same
   // across the whole tree.
-  EXPECT_EQ((newTree.begin() + 1)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 1)->version(), instrument.version() + 1);
   // And bottom of tree too. The version should be the same across the whole
   // tree.
-  EXPECT_EQ((newTree.begin() + 2)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 2)->version(), instrument.version() + 1);
 
   // However, only the contents of one component should be different.
-  EXPECT_EQ(&(newTree.begin() + 0)->const_ref(), a_contents);
-  EXPECT_EQ(&(newTree.begin() + 1)->const_ref(), b_contents);
-  EXPECT_NE(&(newTree.begin() + 2)->const_ref(), c_contents);
+  EXPECT_EQ(&(newTree->begin() + 0)->const_ref(), a_contents);
+  EXPECT_EQ(&(newTree->begin() + 1)->const_ref(), b_contents);
+  EXPECT_NE(&(newTree->begin() + 2)->const_ref(), c_contents);
 
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(a_contents));
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(b_contents));
@@ -309,20 +309,20 @@ TEST(instrument_tree_test, test_modify_tree) {
   auto newTree = instrument.modify(2, command);
 
   // Check that our tree has an incremented version
-  EXPECT_EQ(newTree.version(), instrument.version() + 1);
+  EXPECT_EQ(newTree->version(), instrument.version() + 1);
   // And check further down in the tree too. The version should be the same
   // across the whole tree.
-  EXPECT_EQ((newTree.begin() + 1)->version(), instrument.version() + 1);
-  EXPECT_EQ((newTree.begin() + 2)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 1)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 2)->version(), instrument.version() + 1);
 
   EXPECT_TRUE(Mock::VerifyAndClear(a_contents));
   EXPECT_TRUE(Mock::VerifyAndClear(b_contents));
   EXPECT_TRUE(Mock::VerifyAndClear(c_contents));
 
   // However, only the contents of one component should be different.
-  EXPECT_EQ(&(newTree.begin() + 0)->const_ref(), a_contents);
-  EXPECT_EQ(&(newTree.begin() + 1)->const_ref(), b_contents);
-  EXPECT_NE(&(newTree.begin() + 2)->const_ref(), c_contents);
+  EXPECT_EQ(&(newTree->begin() + 0)->const_ref(), a_contents);
+  EXPECT_EQ(&(newTree->begin() + 1)->const_ref(), b_contents);
+  EXPECT_NE(&(newTree->begin() + 2)->const_ref(), c_contents);
 }
 
 TEST(node_test, test_tree_cascade) {
@@ -394,19 +394,19 @@ TEST(node_test, test_tree_cascade) {
   EXPECT_TRUE(Mock::VerifyAndClear(d_contents));
 
   // Check that our tree has an incremented version
-  EXPECT_EQ(newTree.version(), instrument.version() + 1);
+  EXPECT_EQ(newTree->version(), instrument.version() + 1);
   // And check further down in the tree too. The version should be the same
   // across the whole tree.
-  EXPECT_EQ((newTree.begin() + 1)->version(), instrument.version() + 1);
-  EXPECT_EQ((newTree.begin() + 2)->version(), instrument.version() + 1);
-  EXPECT_EQ((newTree.begin() + 3)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 1)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 2)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 3)->version(), instrument.version() + 1);
 
   // These contents should be the same
-  EXPECT_EQ(&(newTree.begin() + 0)->const_ref(), a_contents);
-  EXPECT_EQ(&(newTree.begin() + 1)->const_ref(), b_contents);
+  EXPECT_EQ(&(newTree->begin() + 0)->const_ref(), a_contents);
+  EXPECT_EQ(&(newTree->begin() + 1)->const_ref(), b_contents);
   // These should not
-  EXPECT_NE(&(newTree.begin() + 2)->const_ref(), c_contents);
-  EXPECT_NE(&(newTree.begin() + 3)->const_ref(), d_contents);
+  EXPECT_NE(&(newTree->begin() + 2)->const_ref(), c_contents);
+  EXPECT_NE(&(newTree->begin() + 3)->const_ref(), d_contents);
 }
 
 TEST(node_test, test_tree_no_cascade) {
@@ -476,18 +476,18 @@ TEST(node_test, test_tree_no_cascade) {
   EXPECT_TRUE(Mock::VerifyAndClear(d_contents));
 
   // Check that our tree has an incremented version
-  EXPECT_EQ(newTree.version(), instrument.version() + 1);
+  EXPECT_EQ(newTree->version(), instrument.version() + 1);
   // And check further down in the tree too. The version should be the same
   // across the whole tree.
-  EXPECT_EQ((newTree.begin() + 1)->version(), instrument.version() + 1);
-  EXPECT_EQ((newTree.begin() + 2)->version(), instrument.version() + 1);
-  EXPECT_EQ((newTree.begin() + 3)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 1)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 2)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 3)->version(), instrument.version() + 1);
 
   // These contents should be the same
-  EXPECT_EQ(&(newTree.begin() + 0)->const_ref(), a_contents);
-  EXPECT_EQ(&(newTree.begin() + 1)->const_ref(), b_contents);
-  EXPECT_EQ(&(newTree.begin() + 3)->const_ref(), d_contents);
+  EXPECT_EQ(&(newTree->begin() + 0)->const_ref(), a_contents);
+  EXPECT_EQ(&(newTree->begin() + 1)->const_ref(), b_contents);
+  EXPECT_EQ(&(newTree->begin() + 3)->const_ref(), d_contents);
   // These should not
-  EXPECT_NE(&(newTree.begin() + 2)->const_ref(), c_contents);
+  EXPECT_NE(&(newTree->begin() + 2)->const_ref(), c_contents);
 }
 }

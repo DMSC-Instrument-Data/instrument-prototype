@@ -35,7 +35,7 @@ void modifyNodeAtDepth(size_t depth, bool recordInstrumentCreation,
       state.PauseTiming();
     }
     // Then modify that node
-    InstrumentTree copyInstrument = instrument.modify(nodeIndex, moveIt);
+    auto copyInstrument = instrument.modify(nodeIndex, moveIt);
 
     if (!recordInstrumentCreation) {
       state.ResumeTiming();

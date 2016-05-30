@@ -77,9 +77,8 @@ V3D InstrumentTree::sourcePos() const {
 
 size_t InstrumentTree::nDetectors() const { return m_detectorVec.size(); }
 
-
-InstrumentTree InstrumentTree::modify(size_t node,
-                                      const Command &command) const {
+std::unique_ptr<const InstrumentTree>
+InstrumentTree::modify(size_t node, const Command &command) const {
 
   auto newNodes(m_nodes);
   std::for_each(newNodes.begin(), newNodes.end(),
@@ -100,11 +99,12 @@ InstrumentTree InstrumentTree::modify(size_t node,
                       currentChildren.end());
     }
   }
-  return InstrumentTree(std::move(newNodes), m_detectorVec.size());
+  return std::unique_ptr<const InstrumentTree>(
+      new InstrumentTree(std::move(newNodes), m_detectorVec.size()));
 }
 
-InstrumentTree InstrumentTree::modify(const Node *node,
-                                      const Command &command) const {
+std::unique_ptr<const InstrumentTree>
+InstrumentTree::modify(const Node *node, const Command &command) const {
   for (size_t index = 0; index < m_nodes.size(); ++index) {
     if (&m_nodes[index] == node) {
       return modify(index, command);
