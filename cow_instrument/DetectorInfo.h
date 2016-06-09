@@ -17,6 +17,8 @@
 #include <mutex>
 #include <thread>
 
+namespace {
+
 template <typename U>
 void rangeCheck(size_t detectorIndex, const U &container) {
   if (detectorIndex >= container.size()) {
@@ -30,6 +32,7 @@ double distance(const V3D &a, const V3D &b) {
   return std::sqrt(((a[0] - b[0]) * (a[0] - b[0])) +
                    ((a[1] - b[1]) * (a[1] - b[1])) +
                    ((a[2] - b[2]) * (a[2] - b[2])));
+}
 }
 
 template <typename InstTree> class DetectorInfo {
@@ -115,21 +118,22 @@ public:
   }
 
   double l1() const { return m_l1; }
-  double nDetectors() { return m_nDetectors; }
+  double size() const { return m_nDetectors; }
 
   const InstTree &const_instrumentTree() const { return *m_instrumentTree; }
 
-  void modify(size_t nodeIndex, Command& command){
-      m_instrumentTree = m_instrumentTree->modify(command);
-      // L2 cache is invalid.
-      m_l2flags = L2Flags(m_nDetectors, Bool(false));
+  void modify(size_t nodeIndex, Command &command) {
+    m_instrumentTree = m_instrumentTree->modify(command);
+    // L2 cache is invalid.
+    m_l2flags = L2Flags(m_nDetectors, Bool(false));
 
-      //All other geometry-derived information is now also invalid. Very important!
-      m_sourcePos = m_instrumentTree->sourcePos();
-      m_samplePos = m_instrumentTree->samplePos();
-      m_l1 = distance(m_sourcePos, m_samplePos);
+    // All other geometry-derived information is now also invalid. Very
+    // important!
+    m_sourcePos = m_instrumentTree->sourcePos();
+    m_samplePos = m_instrumentTree->samplePos();
+    m_l1 = distance(m_sourcePos, m_samplePos);
 
-      // Meta-data should all still be valid.
+    // Meta-data should all still be valid.
   }
 
 private:
@@ -158,8 +162,8 @@ private:
 
   //------------------- DerivedInfo
   double m_l1;               // This can't be copied upon instrument change
-  V3D m_sourcePos;     // This can't be copied upon instrument change
-  V3D m_samplePos;     // This can't be copied upon instrument change
+  V3D m_sourcePos;           // This can't be copied upon instrument change
+  V3D m_samplePos;           // This can't be copied upon instrument change
   mutable L2s m_l2;          // This can't be copied upon instrument change
   mutable L2Flags m_l2flags; // This can't be copied upon instrument change
 };

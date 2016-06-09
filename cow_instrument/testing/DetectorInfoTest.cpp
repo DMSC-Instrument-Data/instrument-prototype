@@ -11,46 +11,6 @@
 
 namespace {
 
-template <typename T> class PolymorphicInstrumentTree {
-public:
-  virtual size_t nDetectors() const = 0;
-  virtual V3D sourcePos() const = 0;
-  virtual V3D samplePos() const = 0;
-  virtual const Detector &getDetector(size_t detectorIndex) const = 0;
-  virtual std::unique_ptr<T> modify(const Command &command) const = 0;
-  virtual ~PolymorphicInstrumentTree() {}
-};
-
-class MockInstrumentTree
-    : public PolymorphicInstrumentTree<MockInstrumentTree> {
-public:
-  MockInstrumentTree() {
-    ON_CALL(*this, samplePos()).WillByDefault(testing::Return(V3D{0, 0, 20}));
-    ON_CALL(*this, sourcePos()).WillByDefault(testing::Return(V3D{0, 0, 0}));
-  }
-  MockInstrumentTree(size_t nDetectors) {
-    ON_CALL(*this, nDetectors()).WillByDefault(testing::Return(nDetectors));
-    ON_CALL(*this, samplePos()).WillByDefault(testing::Return(V3D{0, 0, 20}));
-    ON_CALL(*this, sourcePos()).WillByDefault(testing::Return(V3D{0, 0, 0}));
-  }
-  MOCK_CONST_METHOD0(nDetectors, size_t());
-  MOCK_CONST_METHOD0(sourcePos, V3D());
-  MOCK_CONST_METHOD0(samplePos, V3D());
-  MOCK_CONST_METHOD1(getDetector, const Detector &(size_t));
-
-  std::unique_ptr<MockInstrumentTree> modify(const Command &command) const {
-    return std::unique_ptr<MockInstrumentTree>(modifyProxy(command));
-  }
-
-  MOCK_CONST_METHOD1(modifyProxy, MockInstrumentTree *(const Command &));
-
-  virtual ~MockInstrumentTree() {}
-};
-
-using NiceMockInstrumentTree = testing::NiceMock<MockInstrumentTree>;
-using DetectorInfoWithMockInstrument = DetectorInfo<MockInstrumentTree>;
-using DetectorInfoWithNiceMockInstrument = DetectorInfo<NiceMockInstrumentTree>;
-
 TEST(detector_info_test, test_construct) {
 
   MockInstrumentTree *pMockInstrumentTree =
