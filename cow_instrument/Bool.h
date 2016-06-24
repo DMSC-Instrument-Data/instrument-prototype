@@ -7,6 +7,7 @@
  */
 struct Bool {
 public:
+  Bool() : m_value(false) {}
   Bool(bool value) : m_value(value) {}
   operator bool() const { return m_value; }
 

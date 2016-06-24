@@ -32,6 +32,10 @@ bool Spectrum::operator!=(const Spectrum &other) const {
   return m_detectorIndexes != other.m_detectorIndexes;
 }
 
+const std::vector<size_t> &Spectrum::detectorIndexes() const {
+  return m_detectorIndexes;
+}
+
 size_t Spectrum::size() const { return m_detectorIndexes.size(); }
 
 const size_t &Spectrum::operator[](size_t pos) const {

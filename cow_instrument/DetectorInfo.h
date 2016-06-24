@@ -111,10 +111,14 @@ public:
 
       // TODO. These operations two following operations
       // need to be atomic and thread-safe per detectorIndex.
-      m_l2[detectorIndex] = distance(detPos, m_samplePos);
+      m_l2[detectorIndex] = distanceToSample(detPos);
       m_l2flags[detectorIndex] = true;
     }
     return m_l2[detectorIndex];
+  }
+
+  V3D position(size_t detectorIndex) const {
+    return m_instrumentTree->getDetector(detectorIndex).getPos();
   }
 
   double l1() const { return m_l1; }
@@ -134,6 +138,10 @@ public:
     m_l1 = distance(m_sourcePos, m_samplePos);
 
     // Meta-data should all still be valid.
+  }
+
+  double distanceToSample(const V3D &item) const {
+    return distance(item, m_samplePos);
   }
 
 private:

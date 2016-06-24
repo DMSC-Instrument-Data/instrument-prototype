@@ -17,6 +17,7 @@ public:
   Spectrum &operator=(std::initializer_list<size_t> ilist);
   bool operator==(const Spectrum &other) const;
   bool operator!=(const Spectrum &other) const;
+  const std::vector<size_t> &detectorIndexes() const;
 
   size_t size() const;
   const size_t &operator[](size_t pos) const;

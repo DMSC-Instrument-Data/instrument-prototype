@@ -36,4 +36,41 @@ TEST(spectrum_info_test, test_spectra_fetch){
     EXPECT_EQ(spectrum, (Spectrum{4,5,6}));
 }
 
+TEST(spectrum_info_test, test_getl2) {
 
+  using namespace testing;
+
+  // Create a Detector
+  size_t nDetectors = 1;
+  MockDetector detector;
+  // This is where I place the detector
+  EXPECT_CALL(detector, getPos()).WillOnce(testing::Return(V3D{0, 0, 40}));
+
+  // Create an Instrument around the Detector
+  auto instrument =
+      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors);
+  EXPECT_CALL(*instrument.get(), getDetector(_)).WillOnce(ReturnRef(detector));
+  EXPECT_CALL(*instrument.get(), samplePos()).WillOnce(Return(V3D{0, 0, 20}));
+
+  // Create a DetectorInfo around the Instrument
+  DetectorInfoWithMockInstrument detectorInfo{instrument};
+
+  // Create a SpectrumInfo around the DetectorInfo
+  // Single detector in single spectra
+  std::vector<Spectrum> spectra{{0}};
+  SpectrumInfo<MockInstrumentTree> spectrumInfo(spectra, detectorInfo);
+
+  // This is the point of the test. Do we calculate L2 correctly for our single
+  // spectra.
+  EXPECT_EQ(20.0, spectrumInfo.getL2(0));
+
+  EXPECT_TRUE(Mock::VerifyAndClearExpectations(&detector))
+      << "Mock Detector used incorrectly";
+  EXPECT_TRUE(Mock::VerifyAndClearExpectations(&detectorInfo))
+      << "Mock DetectorInfo used incorrectly";
+}
+
+TEST(spectrum_info_test, test_getL2_mapped) {
+  EXPECT_TRUE(false) << "TODO. Test similar to above but with multiple "
+                        "detectors in each spectra";
+}
