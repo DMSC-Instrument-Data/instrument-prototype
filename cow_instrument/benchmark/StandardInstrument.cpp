@@ -73,6 +73,7 @@ std::vector<Node> construct_root_node() {
 
   // Assemble flattened node node tree
   nodes[0].addChild(1);
+  nodes[0].addChild(6);
   nodes[1].addChild(2);
   nodes[1].addChild(3);
   nodes[1].addChild(4);

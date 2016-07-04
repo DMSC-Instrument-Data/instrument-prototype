@@ -7,4 +7,6 @@ void MoveCommand::execute(Component &component) const {
   component.deltaPos(m_offset);
 }
 
-bool MoveCommand::isMetaDataCommand() const { return true; }
+bool MoveCommand::isMetaDataCommand() const { /*Moving is recursive*/
+  return false;
+}
