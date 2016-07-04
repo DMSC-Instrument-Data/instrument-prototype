@@ -32,18 +32,9 @@ public:
   }
 };
 
-<<<<<<< Updated upstream
-    // Then create the instrument around that node
-    if (!recordInstrumentCreation) {
-      state.PauseTiming();
-    }
-    // Then modify that node
-    InstrumentTree copyInstrument = instrument.modify(nodeIndex, moveIt);
-=======
 using CopyAtRootLevel = CopyFixture<0>;
 using CopyAtTrolleyLevel = CopyFixture<1>;
 using CopyAtBankLevel = CopyFixture<2>;
->>>>>>> Stashed changes
 
 BENCHMARK_F(CopyAtRootLevel, BM_copy_unmodified)(benchmark::State &state) {
   while (state.KeepRunning()) {
