@@ -18,21 +18,12 @@ public:
    */
   SpectrumInfo(const DetectorInfo<InstTree> &detectorInfo)
       : m_detectorInfo(detectorInfo), m_l2Flags(detectorInfo.size()),
-        m_l2(detectorInfo.size()), m_spectra(detectorInfo.size(), 0) {
+        m_l2(detectorInfo.size()),
+        m_spectra(std::move(detectorInfo.makeSpectra())) {
 
     // TODO. Meta-data arrays can just reference the same cow ptrs as used in
     // detector_info.
 
-    /* TODO. constructor m_spectra is non ideal. We construct n * Spectra, and
-       then assign correct
-       values as per below. However, if we used boost::counting_itertor, we
-       could create m_spectra
-       correctly first time around with no assignment.
-    */
-
-    for (size_t i = 0; i < detectorInfo.size(); ++i) {
-      m_spectra[i] = Spectrum(i);
-    }
   }
 
   /**

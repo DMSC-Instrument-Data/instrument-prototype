@@ -14,6 +14,7 @@
 #include "MonitorFlags.h"
 #include "L2s.h"
 #include "Command.h"
+#include "Spectrum.h"
 #include <mutex>
 #include <thread>
 
@@ -142,6 +143,15 @@ public:
 
   double distanceToSample(const V3D &item) const {
     return distance(item, m_samplePos);
+  }
+
+  std::vector<Spectrum> makeSpectra() const {
+    std::vector<Spectrum> spectra;
+    spectra.reserve(this->size());
+    for (size_t i = 0; i < this->size(); ++i) {
+      spectra.push_back(i);
+    }
+    return spectra;
   }
 
 private:
