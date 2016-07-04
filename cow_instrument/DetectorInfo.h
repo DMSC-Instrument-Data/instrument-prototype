@@ -122,7 +122,7 @@ public:
   }
 
   double l1() const { return m_l1; }
-  double size() const { return m_nDetectors; }
+  size_t size() const { return m_nDetectors; }
 
   const InstTree &const_instrumentTree() const { return *m_instrumentTree; }
 

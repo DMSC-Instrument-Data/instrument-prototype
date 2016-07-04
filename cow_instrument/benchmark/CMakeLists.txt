@@ -26,6 +26,7 @@ include_directories(${GBENCH_INCLUDE_DIR})
 set ( BENCH_FILES_SRC
                  InstrumentCopyBenchmark.cpp
                  InstrumentReadBenchmark.cpp
+                 SpectrumInfoBenchmark.cpp
                  StandardInstrument.cpp
 )
 

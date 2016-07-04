@@ -11,6 +11,36 @@ template <typename InstTree> class SpectrumInfo {
 public:
   size_t size() { return m_spectra.size(); }
 
+  /**
+   * @brief SpectrumInfo constructor. Suitable for 1:1 spectra to detector only
+   * mapping.
+   * @param detectorInfo : DetectorInfo object
+   */
+  SpectrumInfo(const DetectorInfo<InstTree> &detectorInfo)
+      : m_detectorInfo(detectorInfo), m_l2Flags(detectorInfo.size()),
+        m_l2(detectorInfo.size()), m_spectra(detectorInfo.size(), 0) {
+
+    // TODO. Meta-data arrays can just reference the same cow ptrs as used in
+    // detector_info.
+
+    /* TODO. constructor m_spectra is non ideal. We construct n * Spectra, and
+       then assign correct
+       values as per below. However, if we used boost::counting_itertor, we
+       could create m_spectra
+       correctly first time around with no assignment.
+    */
+
+    for (size_t i = 0; i < detectorInfo.size(); ++i) {
+      m_spectra[i] = Spectrum(i);
+    }
+  }
+
+  /**
+   * @brief SpectrumInfo constructor. Suitable for 1:n spectra to detector
+   * mapping.
+   * @param spectra : DetectorIndexes to SpectraIndexes
+   * @param detectorInfo : DetectorInfo object
+   */
   SpectrumInfo(const std::vector<Spectrum> &spectra,
                const DetectorInfo<InstTree> &detectorInfo)
       : m_spectra(spectra), m_detectorInfo(detectorInfo),

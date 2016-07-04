@@ -69,11 +69,12 @@ void InstrumentTree::fillDetectorMap(
 }
 
 V3D InstrumentTree::sourcePos() const {
-
   return V3D{0, 0, 0}; // HACK!
 }
 
-
+V3D InstrumentTree::samplePos() const {
+  return V3D{0, 0, 10}; // HACK!
+}
 
 size_t InstrumentTree::nDetectors() const { return m_detectorVec.size(); }
 

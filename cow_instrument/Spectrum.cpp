@@ -1,5 +1,8 @@
 #include "Spectrum.h"
 
+Spectrum::Spectrum(size_t detectorIndex)
+    : m_detectorIndexes(1, detectorIndex) {}
+
 Spectrum::Spectrum(std::initializer_list<size_t> init)
     : m_detectorIndexes(init) {}
 

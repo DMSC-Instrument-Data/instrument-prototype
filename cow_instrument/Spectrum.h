@@ -4,6 +4,7 @@
 
 class Spectrum {
 public:
+  Spectrum(size_t index);
   Spectrum(std::initializer_list<size_t> init);
   Spectrum(const Spectrum &) = default;
   Spectrum(Spectrum &&) = default;
