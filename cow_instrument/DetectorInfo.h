@@ -43,7 +43,8 @@ public:
   explicit DetectorInfo(V &&instrumentTree)
       : m_nDetectors(instrumentTree->nDetectors()),
         m_isMasked(std::make_shared<MaskFlags>(m_nDetectors, Bool(false))),
-        m_isMonitor(m_nDetectors, Bool(false)), m_l2(m_nDetectors),
+        m_isMonitor(std::make_shared<MonitorFlags>(m_nDetectors, Bool(false))),
+        m_l2(std::make_shared<L2s>(m_nDetectors)),
         m_sourcePos(instrumentTree->sourcePos()),
         m_samplePos(instrumentTree->samplePos()),
         m_instrumentTree(instrumentTree) {
@@ -85,8 +86,8 @@ public:
   }
 
   void setMonitor(size_t detectorIndex) {
-    detectorRangeCheck(detectorIndex, m_isMonitor);
-    m_isMonitor[detectorIndex] = true;
+    detectorRangeCheck(detectorIndex, *m_isMonitor);
+    (*m_isMonitor)[detectorIndex] = true;
   }
 
   /* In some use cases scientists decide to use arbitrary
@@ -94,8 +95,8 @@ public:
    * so lets have the client code tell us which ones are monitors.
    */
   bool isMonitor(size_t detectorIndex) const {
-    detectorRangeCheck(detectorIndex, m_isMonitor);
-    return m_isMonitor[detectorIndex];
+    detectorRangeCheck(detectorIndex, *m_isMonitor);
+    return (*m_isMonitor)[detectorIndex];
   }
 
   void initL2() {
@@ -110,13 +111,13 @@ public:
        * to detector.
        */
 
-      m_l2[detectorIndex] = distanceToSample(detPos);
+      (*m_l2)[detectorIndex] = distanceToSample(detPos);
     }
   }
 
   double l2(size_t detectorIndex) const {
-    detectorRangeCheck(detectorIndex, m_l2);
-    return m_l2[detectorIndex];
+    detectorRangeCheck(detectorIndex, *m_l2);
+    return (*m_l2)[detectorIndex];
   }
 
   V3D position(size_t detectorIndex) const {
@@ -176,13 +177,14 @@ private:
   //------------------- MetaData -------------
   const size_t m_nDetectors;
   CowPtr<MaskFlags> m_isMasked; // This could be copied upon instrument change
-  MonitorFlags m_isMonitor; // This could be copied upon instrument change
+  CowPtr<MonitorFlags>
+      m_isMonitor; // This could be copied upon instrument change
 
   //------------------- DerivedInfo
   double m_l1;               // This can't be copied upon instrument change
   V3D m_sourcePos;           // This can't be copied upon instrument change
   V3D m_samplePos;           // This can't be copied upon instrument change
-  L2s m_l2;          // This can't be copied upon instrument change
+  CowPtr<L2s> m_l2;          // This can't be copied upon instrument change
 };
 
 #endif
