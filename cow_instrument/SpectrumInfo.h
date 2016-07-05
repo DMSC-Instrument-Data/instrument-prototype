@@ -75,7 +75,7 @@ public:
     return m_spectra[index];
   }
 
-  double getL2(size_t index) {
+  double l2(size_t index) {
     spectraRangeCheck(index, m_spectra);
     return m_l2[index];
   }

@@ -35,7 +35,7 @@ TEST(spectrum_info_test, test_spectra_fetch) {
   EXPECT_EQ(spectrum, (Spectrum{3, 4, 5}));
 }
 
-TEST(spectrum_info_test, test_getl2) {
+TEST(spectrum_info_test, test_l2) {
 
   using namespace testing;
 
@@ -65,7 +65,7 @@ TEST(spectrum_info_test, test_getl2) {
 
   // This is the point of the test. Do we calculate L2 correctly for our single
   // spectra.
-  EXPECT_EQ(20.0, spectrumInfo.getL2(0));
+  EXPECT_EQ(20.0, spectrumInfo.l2(0));
 
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(&detector))
       << "Mock Detector used incorrectly";
@@ -73,7 +73,7 @@ TEST(spectrum_info_test, test_getl2) {
       << "Mock DetectorInfo used incorrectly";
 }
 
-TEST(spectrum_info_test, test_getL2_mapped) {
+TEST(spectrum_info_test, test_l2_mapped) {
 
   using namespace testing;
 
@@ -105,7 +105,7 @@ TEST(spectrum_info_test, test_getL2_mapped) {
   // This is the point of the test. Do we calculate L2 correctly for our dual
   // detector
   // spectra.
-  EXPECT_EQ(15.0, spectrumInfo.getL2(0)) << "(40 + 30)/2 - 20";
+  EXPECT_EQ(15.0, spectrumInfo.l2(0)) << "(40 + 30)/2 - 20";
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(&detectorA))
       << "Mock Detector used incorrectly";
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(&detectorB))
