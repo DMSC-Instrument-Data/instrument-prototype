@@ -43,7 +43,6 @@ public:
       : m_nDetectors(instrumentTree->nDetectors()),
         m_isMasked(m_nDetectors, Bool(false)),
         m_isMonitor(m_nDetectors, Bool(false)), m_l2(m_nDetectors),
-        m_l2flags(m_nDetectors, Bool(false)),
         m_sourcePos(instrumentTree->sourcePos()),
         m_samplePos(instrumentTree->samplePos()),
         m_instrumentTree(instrumentTree) {
@@ -56,6 +55,7 @@ public:
 
     // Calculate this once.
     m_l1 = distance(m_sourcePos, m_samplePos);
+    initL2();
   }
 
   // template <typename V>
@@ -97,10 +97,9 @@ public:
     return m_isMonitor[detectorIndex];
   }
 
-  double l2(size_t detectorIndex) const {
-
-    rangeCheck(detectorIndex, m_l2);
-    if (!m_l2flags[detectorIndex]) {
+  void initL2() {
+    for (size_t detectorIndex = 0; detectorIndex < m_nDetectors;
+         ++detectorIndex) {
       const Detector &det = m_instrumentTree->getDetector(detectorIndex);
       auto detPos = det.getPos();
 
@@ -110,11 +109,12 @@ public:
        * to detector.
        */
 
-      // TODO. These operations two following operations
-      // need to be atomic and thread-safe per detectorIndex.
       m_l2[detectorIndex] = distanceToSample(detPos);
-      m_l2flags[detectorIndex] = true;
     }
+  }
+
+  double l2(size_t detectorIndex) const {
+    rangeCheck(detectorIndex, m_l2);
     return m_l2[detectorIndex];
   }
 
@@ -129,14 +129,13 @@ public:
 
   void modify(size_t nodeIndex, Command &command) {
     m_instrumentTree = m_instrumentTree->modify(command);
-    // L2 cache is invalid.
-    m_l2flags = L2Flags(m_nDetectors, Bool(false));
 
     // All other geometry-derived information is now also invalid. Very
     // important!
     m_sourcePos = m_instrumentTree->sourcePos();
     m_samplePos = m_instrumentTree->samplePos();
     m_l1 = distance(m_sourcePos, m_samplePos);
+    initL2();
 
     // Meta-data should all still be valid.
   }
@@ -182,8 +181,7 @@ private:
   double m_l1;               // This can't be copied upon instrument change
   V3D m_sourcePos;           // This can't be copied upon instrument change
   V3D m_samplePos;           // This can't be copied upon instrument change
-  mutable L2s m_l2;          // This can't be copied upon instrument change
-  mutable L2Flags m_l2flags; // This can't be copied upon instrument change
+  L2s m_l2;          // This can't be copied upon instrument change
 };
 
 #endif

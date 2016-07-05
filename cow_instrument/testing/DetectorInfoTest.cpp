@@ -13,12 +13,15 @@ namespace {
 
 TEST(detector_info_test, test_construct) {
 
+  using namespace testing;
   MockInstrumentTree *pMockInstrumentTree =
       new testing::NiceMock<MockInstrumentTree>{};
   EXPECT_CALL(*pMockInstrumentTree, nDetectors())
-      .WillRepeatedly(testing::Return(10));
+      .WillRepeatedly(testing::Return(1));
   EXPECT_CALL(*pMockInstrumentTree, sourcePos()).Times(1);
   EXPECT_CALL(*pMockInstrumentTree, samplePos()).Times(1);
+  NiceMock<MockDetector> mockDetector;
+  EXPECT_CALL(*pMockInstrumentTree, getDetector(_)).Times(1).WillOnce(ReturnRef(mockDetector));
 
   std::shared_ptr<MockInstrumentTree> mockInstrumentTree{pMockInstrumentTree};
 
@@ -31,7 +34,7 @@ TEST(detector_info_test, test_masking) {
 
   size_t nDetectors = 3;
 
-  DetectorInfoWithMockInstrument detectorInfo{
+  DetectorInfoWithNiceMockInstrument detectorInfo{
       std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors)};
 
   EXPECT_FALSE(detectorInfo.isMasked(0));

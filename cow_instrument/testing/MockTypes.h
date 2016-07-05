@@ -57,13 +57,17 @@ class MockInstrumentTree
     : public PolymorphicInstrumentTree<MockInstrumentTree> {
 public:
   MockInstrumentTree() {
+    ON_CALL(m_detector, getPos()).WillByDefault(testing::Return(V3D{0,0,10}));
     ON_CALL(*this, samplePos()).WillByDefault(testing::Return(V3D{0, 0, 20}));
     ON_CALL(*this, sourcePos()).WillByDefault(testing::Return(V3D{0, 0, 0}));
+    ON_CALL(*this, getDetector(testing::_)).WillByDefault(testing::ReturnRef(m_detector));
   }
   MockInstrumentTree(size_t nDetectors) {
+    ON_CALL(m_detector, getPos()).WillByDefault(testing::Return(V3D{0,0,10}));
     ON_CALL(*this, nDetectors()).WillByDefault(testing::Return(nDetectors));
     ON_CALL(*this, samplePos()).WillByDefault(testing::Return(V3D{0, 0, 20}));
     ON_CALL(*this, sourcePos()).WillByDefault(testing::Return(V3D{0, 0, 0}));
+    ON_CALL(*this, getDetector(testing::_)).WillByDefault(testing::ReturnRef(m_detector));
   }
   MOCK_CONST_METHOD0(nDetectors, size_t());
   MOCK_CONST_METHOD0(sourcePos, V3D());
@@ -77,6 +81,8 @@ public:
   MOCK_CONST_METHOD1(modifyProxy, MockInstrumentTree *(const Command &));
 
   virtual ~MockInstrumentTree() {}
+private:
+  testing::NiceMock<MockDetector> m_detector;
 };
 
 using NiceMockInstrumentTree = testing::NiceMock<MockInstrumentTree>;

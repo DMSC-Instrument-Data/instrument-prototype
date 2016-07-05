@@ -22,6 +22,7 @@ public:
 BENCHMARK_F(SpectrumInfoFixture, BM_l2_access)(benchmark::State &state) {
   double l2 = 0;
   while (state.KeepRunning()) {
+    // Loop over all spectrum and extract all L2 values
     for (size_t i = 0; i < m_spectrumInfo.size(); ++i) {
       l2 += m_spectrumInfo.getL2(i);
     }

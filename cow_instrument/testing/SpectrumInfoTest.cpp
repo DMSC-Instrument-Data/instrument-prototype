@@ -43,13 +43,17 @@ TEST(spectrum_info_test, test_getl2) {
   size_t nDetectors = 1;
   MockDetector detector;
   // This is where I place the detector
-  EXPECT_CALL(detector, getPos()).WillOnce(testing::Return(V3D{0, 0, 40}));
+  EXPECT_CALL(detector, getPos())
+      .WillRepeatedly(testing::Return(V3D{0, 0, 40}));
 
   // Create an Instrument around the Detector
   auto instrument =
       std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors);
-  EXPECT_CALL(*instrument.get(), getDetector(_)).WillOnce(ReturnRef(detector));
+  EXPECT_CALL(*instrument.get(), getDetector(_))
+      .WillRepeatedly(ReturnRef(detector));
+
   EXPECT_CALL(*instrument.get(), samplePos()).WillOnce(Return(V3D{0, 0, 20}));
+  MockDetector mockDetector;
 
   // Create a DetectorInfo around the Instrument
   DetectorInfoWithMockInstrument detectorInfo{instrument};
@@ -77,13 +81,17 @@ TEST(spectrum_info_test, test_getL2_mapped) {
   size_t nDetectors = 2;
   MockDetector detectorA, detectorB;
   // This is where I place one of the the detectors
-  EXPECT_CALL(detectorA, getPos()).WillOnce(testing::Return(V3D{0, 0, 40}));
+  EXPECT_CALL(detectorA, getPos())
+      .WillRepeatedly(testing::Return(V3D{0, 0, 40}));
   // This is where I place the other of the the detectors
-  EXPECT_CALL(detectorB, getPos()).WillOnce(testing::Return(V3D{0, 0, 30}));
+  EXPECT_CALL(detectorB, getPos())
+      .WillRepeatedly(testing::Return(V3D{0, 0, 30}));
 
   auto instrument =
       std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors);
   EXPECT_CALL(*instrument.get(), getDetector(_))
+      .WillOnce(ReturnRef(detectorA))
+      .WillOnce(ReturnRef(detectorB))
       .WillOnce(ReturnRef(detectorA))
       .WillOnce(ReturnRef(detectorB));
   EXPECT_CALL(*instrument.get(), samplePos()).WillOnce(Return(V3D{0, 0, 20}));
@@ -96,7 +104,8 @@ TEST(spectrum_info_test, test_getL2_mapped) {
   std::vector<Spectrum> spectra{{0, 1}};
   SpectrumInfo<MockInstrumentTree> spectrumInfo(spectra, detectorInfo);
 
-  // This is the point of the test. Do we calculate L2 correctly for our dual detector
+  // This is the point of the test. Do we calculate L2 correctly for our dual
+  // detector
   // spectra.
   EXPECT_EQ(15.0, spectrumInfo.getL2(0)) << "(40 + 30)/2 - 20";
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(&detectorA))
