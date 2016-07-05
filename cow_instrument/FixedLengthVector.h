@@ -58,6 +58,8 @@ public:
   /// Returns a const reference to the underlying vector.
   const std::vector<U> &rawData() const { return m_data; }
 
+  T *clone() const { return new T(static_cast<T const &>(*this)); }
+
 protected:
   /** Returns a reference to the underlying vector.
    *

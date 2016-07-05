@@ -8,6 +8,7 @@
  * MaskFlags fixed length vector
  */
 class MaskFlags : public FixedLengthVector<MaskFlags, Bool> {
+public:
   using FixedLengthVector<MaskFlags, Bool>::FixedLengthVector;
 };
 

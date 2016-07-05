@@ -15,6 +15,7 @@
 #include "L2s.h"
 #include "Command.h"
 #include "Spectrum.h"
+#include "cow_ptr.h"
 #include <mutex>
 #include <thread>
 
@@ -41,7 +42,7 @@ public:
   template <typename V>
   explicit DetectorInfo(V &&instrumentTree)
       : m_nDetectors(instrumentTree->nDetectors()),
-        m_isMasked(m_nDetectors, Bool(false)),
+        m_isMasked(std::make_shared<MaskFlags>(m_nDetectors, Bool(false))),
         m_isMonitor(m_nDetectors, Bool(false)), m_l2(m_nDetectors),
         m_sourcePos(instrumentTree->sourcePos()),
         m_samplePos(instrumentTree->samplePos()),
@@ -74,13 +75,13 @@ public:
   }
 
   void setMasked(size_t detectorIndex) {
-    detectorRangeCheck(detectorIndex, m_isMasked);
-    m_isMasked[detectorIndex] = true;
+    detectorRangeCheck(detectorIndex, *m_isMasked);
+    (*m_isMasked)[detectorIndex] = true;
   }
 
   bool isMasked(size_t detectorIndex) const {
-    detectorRangeCheck(detectorIndex, m_isMasked);
-    return m_isMasked[detectorIndex];
+    detectorRangeCheck(detectorIndex, *m_isMasked);
+    return (*m_isMasked)[detectorIndex];
   }
 
   void setMonitor(size_t detectorIndex) {
@@ -174,7 +175,7 @@ private:
 
   //------------------- MetaData -------------
   const size_t m_nDetectors;
-  MaskFlags m_isMasked;     // This could be copied upon instrument change
+  CowPtr<MaskFlags> m_isMasked; // This could be copied upon instrument change
   MonitorFlags m_isMonitor; // This could be copied upon instrument change
 
   //------------------- DerivedInfo
