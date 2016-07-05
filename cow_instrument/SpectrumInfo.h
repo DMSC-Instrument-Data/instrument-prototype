@@ -7,6 +7,18 @@
 #include "InstrumentTree.h"
 #include "L2s.h"
 
+namespace {
+
+template <typename U>
+void spectraRangeCheck(size_t spectraIndex, const U &container) {
+  if (spectraIndex >= container.size()) {
+    std::stringstream buffer;
+    buffer << "Spectra at index " << spectraIndex << " is out of range";
+    throw std::out_of_range(buffer.str());
+  }
+}
+}
+
 template <typename InstTree> class SpectrumInfo {
 public:
   size_t size() { return m_spectra.size(); }
@@ -38,18 +50,13 @@ public:
   void initL2() {
     for (size_t spectraIndex = 0; spectraIndex < this->size(); ++spectraIndex) {
 
-      V3D temp;
+      double l2Temp = 0;
       for (auto detectorIndex : m_spectra[spectraIndex].detectorIndexes()) {
-        auto pos = m_detectorInfo.position(detectorIndex);
-        temp[0] += pos[0];
-        temp[1] += pos[1];
-        temp[2] += pos[2];
+        l2Temp += m_detectorInfo.l2(detectorIndex);
       }
       // Divide through by number of detectors
-      temp[0] /= m_spectra[spectraIndex].size();
-      temp[1] /= m_spectra[spectraIndex].size();
-      temp[2] /= m_spectra[spectraIndex].size();
-      m_l2[spectraIndex] = m_detectorInfo.distanceToSample(temp);
+      l2Temp /= m_spectra[spectraIndex].size();
+      m_l2[spectraIndex] = l2Temp;
     }
   }
 
@@ -63,9 +70,15 @@ public:
     return count;
   }
 
-  Spectrum spectra(size_t index) { return m_spectra[index]; }
+  Spectrum spectra(size_t index) {
+    spectraRangeCheck(index, m_spectra);
+    return m_spectra[index];
+  }
 
-  double getL2(size_t index) { return m_l2[index]; }
+  double getL2(size_t index) {
+    spectraRangeCheck(index, m_spectra);
+    return m_l2[index];
+  }
 
 private:
   DetectorInfo<InstTree> m_detectorInfo;
