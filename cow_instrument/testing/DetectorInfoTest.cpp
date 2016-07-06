@@ -45,6 +45,18 @@ TEST(detector_info_test, test_masking) {
   EXPECT_THROW(detectorInfo.isMasked(nDetectors), std::out_of_range);
 }
 
+TEST(detector_info_test, test_get_l2s) {
+
+  size_t nDetectors = 3;
+
+  DetectorInfoWithNiceMockInstrument detectorInfo{
+      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors)};
+
+  auto l2s = detectorInfo.l2s();
+
+  EXPECT_EQ(l2s->size(), nDetectors);
+}
+
 TEST(detector_info_test, test_monitors) {
 
   size_t nDetectors = 3;

@@ -14,6 +14,17 @@ TEST(spectrum_info_test, test_constructor_lhr) {
   EXPECT_EQ(3, spectrumInfo.nDetectors());
 }
 
+TEST(spectrum_info_test, test_constructor_one_to_one) {
+  size_t nDetectors = 3;
+  auto instrument = std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors);
+  DetectorInfoWithMockInstrument detectorInfo{instrument};
+  SpectrumInfo<MockInstrumentTree> spectrumInfo(detectorInfo);
+
+  EXPECT_EQ(3, spectrumInfo.size());
+  EXPECT_EQ(3, spectrumInfo.nDetectors());
+  EXPECT_EQ(&spectrumInfo.l2s().const_ref(), &detectorInfo.l2s().const_ref()) << "We expect L2s to be shared";
+}
+
 TEST(spectrum_info_test, test_spectra_fetch) {
 
   std::vector<Spectrum> spectra{{0}, {1, 2}, {3, 4, 5}};
@@ -25,13 +36,13 @@ TEST(spectrum_info_test, test_spectra_fetch) {
   EXPECT_EQ(3, spectrumInfo.size());
   EXPECT_EQ(6, spectrumInfo.nDetectors());
 
-  auto spectrum = spectrumInfo.spectra(0);
+  auto spectrum = spectrumInfo.spectrum(0);
   EXPECT_EQ(spectrum, (Spectrum{0}));
 
-  spectrum = spectrumInfo.spectra(1);
+  spectrum = spectrumInfo.spectrum(1);
   EXPECT_EQ(spectrum, (Spectrum{1, 2}));
 
-  spectrum = spectrumInfo.spectra(2);
+  spectrum = spectrumInfo.spectrum(2);
   EXPECT_EQ(spectrum, (Spectrum{3, 4, 5}));
 }
 

@@ -61,17 +61,17 @@ public:
   }
 
   void setMasked(size_t detectorIndex) {
-    detectorRangeCheck(detectorIndex, *m_isMasked);
+    detectorRangeCheck(detectorIndex, m_isMasked.const_ref());
     (*m_isMasked)[detectorIndex] = true;
   }
 
   bool isMasked(size_t detectorIndex) const {
-    detectorRangeCheck(detectorIndex, *m_isMasked);
-    return m_isMasked->operator [](detectorIndex);
+    detectorRangeCheck(detectorIndex, m_isMasked.const_ref());
+    return m_isMasked.const_ref()[detectorIndex];
   }
 
   void setMonitor(size_t detectorIndex) {
-    detectorRangeCheck(detectorIndex, *m_isMonitor);
+    detectorRangeCheck(detectorIndex, m_isMonitor.const_ref());
     (*m_isMonitor)[detectorIndex] = true;
   }
 
@@ -80,8 +80,8 @@ public:
    * so lets have the client code tell us which ones are monitors.
    */
   bool isMonitor(size_t detectorIndex) const {
-    detectorRangeCheck(detectorIndex, *m_isMonitor);
-    return m_isMonitor->operator [](detectorIndex);
+    detectorRangeCheck(detectorIndex, m_isMonitor.const_ref());
+    return m_isMonitor.const_ref()[detectorIndex];
   }
 
   void initL2() {
@@ -101,8 +101,8 @@ public:
   }
 
   double l2(size_t detectorIndex) const {
-    detectorRangeCheck(detectorIndex, *m_l2);
-    return m_l2->operator[](detectorIndex);
+    detectorRangeCheck(detectorIndex, m_l2.const_ref());
+    return m_l2.const_ref()[detectorIndex];
   }
 
   V3D position(size_t detectorIndex) const {
@@ -140,21 +140,8 @@ public:
     return spectra;
   }
 
-private:
-  /**
-   Private constructor, used by cloneWithInstrumentTree to
-   replace the instrument tree, while keeping the rest of the metadata.
-   */
-  template <typename V>
-  DetectorInfo(V &&instrumentTree, const DetectorInfo &metaDataSource)
-      : m_nDetectors(instrumentTree->nDetectors()),
-        m_isMasked(metaDataSource.m_isMasked),
-        m_isMonitor(metaDataSource.m_isMonitor), m_l2(m_nDetectors),
-        m_sourcePos(instrumentTree->sourcePos()),
-        m_samplePos(instrumentTree->samplePos()),
-        m_instrumentTree(std::forward<V>(instrumentTree)) {
-
-    m_l1 = distance(m_sourcePos, m_samplePos);
+  CowPtr<L2s> l2s() const{
+      return m_l2;
   }
 
   std::shared_ptr<const InstTree> m_instrumentTree;

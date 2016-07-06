@@ -22,69 +22,78 @@ void spectraRangeCheck(size_t spectrumIndex, const U &container) {
 
 template <typename InstTree> class SpectrumInfo {
 public:
-  size_t size() { return m_spectrum.size(); }
+  size_t size() { return m_spectra->size(); }
 
   /**
-   * @brief SpectrumInfo constructor. Suitable for 1:1 spectra to detector only
+   * @brief SpectrumInfo constructor. Suitable for 1:1 spectrum to detector only
    * mapping.
    * @param detectorInfo : DetectorInfo object
    */
   SpectrumInfo(const DetectorInfo<InstTree> &detectorInfo)
-      : m_detectorInfo(detectorInfo), m_l2(detectorInfo.size()),
-        m_spectrum(std::move(detectorInfo.makeSpectra())) {
+      : m_detectorInfo(detectorInfo), m_l2(detectorInfo.l2s()),
+        m_spectra(
+            std::make_shared<Spectra>(std::move(detectorInfo.makeSpectra()))) {
 
-    initL2();
+    /* 1:1 mapping. Meta-data arrays can be
+     * referenced directly from DetectorInfo via COW mechanism.
+     */
   }
 
   /**
-   * @brief SpectrumInfo constructor. Suitable for 1:n spectra to detector
+   * @brief SpectrumInfo constructor. Suitable for 1:n spectrum to detector
    * mapping.
-   * @param spectrum : DetectorIndexes to spectrumIndexes
+   * @param spectra : DetectorIndexes to spectrumIndexes
    * @param detectorInfo : DetectorInfo object
    */
-  SpectrumInfo(const std::vector<Spectrum> &spectrum,
+  SpectrumInfo(const std::vector<Spectrum> &spectra,
                const DetectorInfo<InstTree> &detectorInfo)
-      : m_spectrum(spectrum), m_detectorInfo(detectorInfo), m_l2(spectrum.size()) {
+      : m_spectra(std::make_shared<Spectra>(spectra.begin(), spectra.end())),
+        m_detectorInfo(detectorInfo),
+        m_l2(std::make_shared<L2s>(spectra.size())) {
     initL2();
   }
 
   void initL2() {
-    for (size_t spectrumIndex = 0; spectrumIndex < this->size(); ++spectrumIndex) {
+    for (size_t spectrumIndex = 0; spectrumIndex < this->size();
+         ++spectrumIndex) {
 
       double l2Temp = 0;
-      for (auto detectorIndex : m_spectrum[spectrumIndex].detectorIndexes()) {
+      for (auto detectorIndex :
+           m_spectra.const_ref()[spectrumIndex].detectorIndexes()) {
         l2Temp += m_detectorInfo.l2(detectorIndex);
       }
       // Divide through by number of detectors
-      l2Temp /= m_spectrum[spectrumIndex].size();
-      m_l2[spectrumIndex] = l2Temp;
+      l2Temp /= m_spectra.const_ref()[spectrumIndex].size();
+      (*m_l2)[spectrumIndex] = l2Temp;
     }
   }
 
-  size_t size() const { return m_spectrum.size(); }
+  size_t size() const { return m_spectra->size(); }
 
   size_t nDetectors() const {
     size_t count = 0;
-    for (const Spectrum &s : m_spectrum) {
+    for (const Spectrum &s : m_spectra.const_ref()) {
       count += s.size();
     }
     return count;
   }
 
-  Spectrum spectra(size_t index) {
-    spectraRangeCheck(index, m_spectrum);
-    return m_spectrum[index];
+  Spectrum spectrum(size_t index) const {
+    spectraRangeCheck(index, m_spectra.const_ref());
+    return m_spectra.const_ref()[index];
   }
 
-  double l2(size_t index) {
-    spectraRangeCheck(index, m_spectrum);
-    return m_l2[index];
+  double l2(size_t index) const {
+    spectraRangeCheck(index, m_spectra.const_ref());
+    return m_l2->operator[](index);
   }
+
+  CowPtr<L2s> l2s() const { return m_l2; }
 
 private:
   DetectorInfo<InstTree> m_detectorInfo;
-  const std::vector<Spectrum> m_spectrum;
-  L2s m_l2;
+  CowPtr<Spectra> m_spectra;
+  CowPtr<L2s> m_l2;
 };
 
 #endif

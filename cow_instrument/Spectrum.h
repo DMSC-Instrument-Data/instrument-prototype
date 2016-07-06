@@ -1,5 +1,6 @@
 #ifndef SPECTRUM_H
 #define SPECTRUM_H
+#include "FixedLengthVector.h"
 #include <vector>
 
 class Spectrum {
@@ -26,6 +27,12 @@ public:
 
 private:
   std::vector<size_t> m_detectorIndexes;
+};
+
+// TODO: Spectra may not have a fixed length.
+class Spectra : public FixedLengthVector<Spectra, Spectrum> {
+public:
+    using FixedLengthVector<Spectra, Spectrum>::FixedLengthVector;
 };
 
 #endif
