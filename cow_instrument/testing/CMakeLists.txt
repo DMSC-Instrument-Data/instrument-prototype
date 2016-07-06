@@ -34,9 +34,13 @@ include_directories(${GTEST_INCLUDE_DIR} ${GMOCK_INCLUDE_DIR})
 set ( TEST_FILES
                  CompositeComponentTest.cpp
                  DetectorComponentTest.cpp
+                 DetectorInfoTest.cpp
+                 FixedLengthVectorTest.cpp
                  InstrumentTreeTest.cpp
                  MoveCommandTest.cpp
                  NodeTest.cpp
+                 SpectrumInfoTest.cpp
+                 SpectrumTest.cpp
 )
 
 add_executable(cow_instrument_test runner.cpp MockTypes.h ${TEST_FILES})

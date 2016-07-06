@@ -6,6 +6,9 @@
 #include <map>
 #include "IdType.h"
 
+
+#include "V3D.h"
+
 class Node;
 class NodeIterator;
 class Command;
@@ -24,21 +27,25 @@ public:
 
   unsigned int version() const;
 
-  InstrumentTree modify(size_t node, const Command &command) const;
-  InstrumentTree modify(const Node *node, const Command &command) const;
+  std::unique_ptr<const InstrumentTree> modify(size_t node,
+                                               const Command &command) const;
+  std::unique_ptr<const InstrumentTree> modify(const Node *node,
+                                               const Command &command) const;
 
   // This is how we help the client out when they want to work with detector
   // ids.
-  void fillDetectorMap(const std::map<DetectorIdType, size_t> &toFill);
+  void fillDetectorMap(std::map<DetectorIdType, size_t> &toFill) const;
 
   size_t nDetectors() const;
 
   Node const *const nodeAt(size_t index) const;
+  V3D sourcePos() const;
 
   std::vector<Node>::const_iterator begin() const { return m_nodes.begin(); }
   std::vector<Node>::const_iterator end() const { return m_nodes.end(); }
   std::vector<Node>::const_iterator cbegin() const { return m_nodes.cbegin(); }
   std::vector<Node>::const_iterator cend() const { return m_nodes.cend(); }
+  V3D samplePos() const;
 
 private:
   std::vector<Detector const *> m_detectorVec;

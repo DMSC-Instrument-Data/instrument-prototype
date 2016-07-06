@@ -28,13 +28,13 @@ void BM_InstrumentTreeConstruction(benchmark::State &state) {
 }
 BENCHMARK(BM_InstrumentTreeConstruction);
 
-BENCHMARK_F(ReadFixture, BM_SngleAccessMetric)(benchmark::State &state) {
+BENCHMARK_F(ReadFixture, BM_SingleAccessMetric)(benchmark::State &state) {
   while (state.KeepRunning()) {
     size_t max = 100 * 100 * 6;
     double pos_x = 0;
     for (size_t i = 1; i < max; ++i) {
       const auto &det = m_instrument.getDetector(i);
-      pos_x = det.getPos()[0];
+      benchmark::DoNotOptimize(pos_x += det.getPos()[0]);
     }
   }
   state.SetItemsProcessed(state.iterations() * m_instrument.nDetectors());

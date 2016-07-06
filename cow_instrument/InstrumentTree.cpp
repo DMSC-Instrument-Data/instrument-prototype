@@ -61,22 +61,25 @@ const Detector &InstrumentTree::getDetector(size_t detectorIndex) const {
 
 unsigned int InstrumentTree::version() const { return m_nodes[0].version(); }
 
-void InstrumentTree::fillDetectorMap(const std::map<DetectorIdType, size_t> &) {
-  throw std::runtime_error("Not Implemented. But likely required.");
-  /*
-   * Should be simple enough. We have the vector already, just interogate that
-   * to create the map.
-  */
+void InstrumentTree::fillDetectorMap(
+    std::map<DetectorIdType, size_t> &toFill) const {
+  for (size_t index = 0; index < m_detectorVec.size(); ++index) {
+    toFill.insert(std::make_pair(m_detectorVec[index]->detectorId(), index));
+  }
+}
+
+V3D InstrumentTree::sourcePos() const {
+  return V3D{0, 0, 0}; // HACK!
+}
+
+V3D InstrumentTree::samplePos() const {
+  return V3D{0, 0, 10}; // HACK!
 }
 
 size_t InstrumentTree::nDetectors() const { return m_detectorVec.size(); }
 
-const Node *const InstrumentTree::nodeAt(size_t index) const {
-  return &m_nodes[index];
-}
-
-InstrumentTree InstrumentTree::modify(size_t node,
-                                      const Command &command) const {
+std::unique_ptr<const InstrumentTree>
+InstrumentTree::modify(size_t node, const Command &command) const {
 
   auto newNodes(m_nodes);
   std::for_each(newNodes.begin(), newNodes.end(),
@@ -97,15 +100,20 @@ InstrumentTree InstrumentTree::modify(size_t node,
                       currentChildren.end());
     }
   }
-  return InstrumentTree(std::move(newNodes), m_detectorVec.size());
+  return std::unique_ptr<const InstrumentTree>(
+      new InstrumentTree(std::move(newNodes), m_detectorVec.size()));
 }
 
-InstrumentTree InstrumentTree::modify(const Node *node,
-                                      const Command &command) const {
+std::unique_ptr<const InstrumentTree>
+InstrumentTree::modify(const Node *node, const Command &command) const {
   for (size_t index = 0; index < m_nodes.size(); ++index) {
     if (&m_nodes[index] == node) {
       return modify(index, command);
     }
   }
   throw std::invalid_argument("Node has not been found");
+}
+
+const Node *const InstrumentTree::nodeAt(size_t index) const {
+  return &m_nodes[index];
 }

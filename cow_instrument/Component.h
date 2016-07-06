@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include "IdType.h"
+#include "V3D.h"
 
 class Detector;
 

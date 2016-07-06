@@ -22,6 +22,9 @@ public:
   bool operator==(const IntToType<I, T> &other) const {
     return value == other.value;
   }
+  bool operator<(const IntToType<I, T> &other) const {
+    return value < other.value;
+  }
   IntToType<I, T>& operator++()
   {
        ++value;

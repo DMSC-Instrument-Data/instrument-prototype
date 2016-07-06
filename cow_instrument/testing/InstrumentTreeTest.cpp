@@ -10,6 +10,39 @@ using namespace testing;
 
 namespace {
 
+InstrumentTree make_simple_tree(DetectorIdType detector1Id,
+                                DetectorIdType detector2Id) {
+
+  /*
+
+        A (not a detector)
+        |
+ -------------------------------------------------
+ |                                               |
+ B (Composite containing Detector)               C (Detector)
+
+  */
+
+  auto composite = std::make_shared<CompositeComponent>(ComponentIdType(1));
+  composite->addComponent(
+      std::unique_ptr<DetectorComponent>(new DetectorComponent(
+          ComponentIdType(1), DetectorIdType(detector1Id), V3D{1, 1, 1})));
+
+  std::vector<Node> nodes;
+
+  nodes.push_back(Node(CowPtr<Component>(new NiceMock<MockComponent>())));
+  nodes.push_back(Node(0, CowPtr<Component>(composite)));
+  nodes.push_back(Node(0, CowPtr<Component>(std::unique_ptr<DetectorComponent>(
+                                                new DetectorComponent(
+                                                    ComponentIdType(1),
+                                                    DetectorIdType(detector2Id),
+                                                    V3D{1, 1, 1})).release())));
+  nodes[0].addChild(1);
+  nodes[0].addChild(2);
+
+  return InstrumentTree(std::move(nodes), 2);
+}
+
 TEST(instrument_tree_test, test_uptr_constructor) {
 
   Node a(CowPtr<Component>(new NiceMock<MockComponent>()));
@@ -150,15 +183,24 @@ TEST(instrument_tree_test, test_detector_access) {
   EXPECT_THROW(tree.getDetector(3), std::invalid_argument);
 }
 
-TEST(instrument_tree_test, test_fill_map) {
+TEST(instrument_tree_test, test_fill_detector_map_no_detectors) {
   std::vector<Node> nodes;
   nodes.emplace_back(CowPtr<Component>(new NiceMock<MockComponent>()));
 
   InstrumentTree instrument(std::move(nodes), 0);
 
   std::map<DetectorIdType, size_t> container;
-  EXPECT_THROW(instrument.fillDetectorMap(container), std::runtime_error)
-      << "Characterize that this has not been implemented yet";
+  instrument.fillDetectorMap(container);
+  EXPECT_EQ(container.size(), 0) << "No detectors to add";
+}
+
+TEST(instrument_tree_test, test_fill_detector_map){
+
+    auto instrument = make_simple_tree(DetectorIdType(1), DetectorIdType(2));
+    std::map<DetectorIdType, size_t> container;
+    instrument.fillDetectorMap(container);
+    EXPECT_EQ(container.size(), 2) << "Two detectors expected";
+
 }
 
 TEST(instrument_tree_test, test_modify_linear) {
@@ -200,18 +242,18 @@ TEST(instrument_tree_test, test_modify_linear) {
   auto newTree = instrument.modify(2, command);
 
   // Check that our tree has an incremented version
-  EXPECT_EQ(newTree.version(), instrument.version() + 1);
+  EXPECT_EQ(newTree->version(), instrument.version() + 1);
   // And check further down in the tree too. The version should be the same
   // across the whole tree.
-  EXPECT_EQ((newTree.begin() + 1)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 1)->version(), instrument.version() + 1);
   // And bottom of tree too. The version should be the same across the whole
   // tree.
-  EXPECT_EQ((newTree.begin() + 2)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 2)->version(), instrument.version() + 1);
 
   // However, only the contents of one component should be different.
-  EXPECT_EQ(&(newTree.begin() + 0)->const_ref(), a_contents);
-  EXPECT_EQ(&(newTree.begin() + 1)->const_ref(), b_contents);
-  EXPECT_NE(&(newTree.begin() + 2)->const_ref(), c_contents);
+  EXPECT_EQ(&(newTree->begin() + 0)->const_ref(), a_contents);
+  EXPECT_EQ(&(newTree->begin() + 1)->const_ref(), b_contents);
+  EXPECT_NE(&(newTree->begin() + 2)->const_ref(), c_contents);
 
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(a_contents));
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(b_contents));
@@ -267,22 +309,21 @@ TEST(instrument_tree_test, test_modify_tree) {
   auto newTree = instrument.modify(2, command);
 
   // Check that our tree has an incremented version
-  EXPECT_EQ(newTree.version(), instrument.version() + 1);
+  EXPECT_EQ(newTree->version(), instrument.version() + 1);
   // And check further down in the tree too. The version should be the same
   // across the whole tree.
-  EXPECT_EQ((newTree.begin() + 1)->version(), instrument.version() + 1);
-  EXPECT_EQ((newTree.begin() + 2)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 1)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 2)->version(), instrument.version() + 1);
 
   EXPECT_TRUE(Mock::VerifyAndClear(a_contents));
   EXPECT_TRUE(Mock::VerifyAndClear(b_contents));
   EXPECT_TRUE(Mock::VerifyAndClear(c_contents));
 
   // However, only the contents of one component should be different.
-  EXPECT_EQ(&(newTree.begin() + 0)->const_ref(), a_contents);
-  EXPECT_EQ(&(newTree.begin() + 1)->const_ref(), b_contents);
-  EXPECT_NE(&(newTree.begin() + 2)->const_ref(), c_contents);
+  EXPECT_EQ(&(newTree->begin() + 0)->const_ref(), a_contents);
+  EXPECT_EQ(&(newTree->begin() + 1)->const_ref(), b_contents);
+  EXPECT_NE(&(newTree->begin() + 2)->const_ref(), c_contents);
 }
-
 
 TEST(node_test, test_tree_cascade) {
 
@@ -308,7 +349,6 @@ TEST(node_test, test_tree_cascade) {
   auto *c_contents = new NiceMock<MockComponent>();
   auto *d_contents = new NiceMock<MockComponent>();
 
-
   std::vector<Node> nodes;
   nodes.emplace_back(CowPtr<Component>(a_contents));
   nodes.emplace_back(0, CowPtr<Component>(b_contents));
@@ -319,7 +359,6 @@ TEST(node_test, test_tree_cascade) {
   nodes[2].addChild(3);
 
   InstrumentTree instrument(std::move(nodes), 0);
-
 
   /*
     we then modify c.
@@ -355,19 +394,19 @@ TEST(node_test, test_tree_cascade) {
   EXPECT_TRUE(Mock::VerifyAndClear(d_contents));
 
   // Check that our tree has an incremented version
-  EXPECT_EQ(newTree.version(), instrument.version() + 1);
+  EXPECT_EQ(newTree->version(), instrument.version() + 1);
   // And check further down in the tree too. The version should be the same
   // across the whole tree.
-  EXPECT_EQ((newTree.begin() + 1)->version(), instrument.version() + 1);
-  EXPECT_EQ((newTree.begin() + 2)->version(), instrument.version() + 1);
-  EXPECT_EQ((newTree.begin() + 3)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 1)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 2)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 3)->version(), instrument.version() + 1);
 
   // These contents should be the same
-  EXPECT_EQ(&(newTree.begin() + 0)->const_ref(), a_contents);
-  EXPECT_EQ(&(newTree.begin() + 1)->const_ref(), b_contents);
-   // These should not
-  EXPECT_NE(&(newTree.begin() + 2)->const_ref(), c_contents);
-  EXPECT_NE(&(newTree.begin() + 3)->const_ref(), d_contents);
+  EXPECT_EQ(&(newTree->begin() + 0)->const_ref(), a_contents);
+  EXPECT_EQ(&(newTree->begin() + 1)->const_ref(), b_contents);
+  // These should not
+  EXPECT_NE(&(newTree->begin() + 2)->const_ref(), c_contents);
+  EXPECT_NE(&(newTree->begin() + 3)->const_ref(), d_contents);
 }
 
 TEST(node_test, test_tree_no_cascade) {
@@ -403,7 +442,6 @@ TEST(node_test, test_tree_no_cascade) {
 
   InstrumentTree instrument(std::move(nodes), 0);
 
-
   /*
     we then modify c.
     so we should now have a shallow copied node tree.
@@ -438,21 +476,18 @@ TEST(node_test, test_tree_no_cascade) {
   EXPECT_TRUE(Mock::VerifyAndClear(d_contents));
 
   // Check that our tree has an incremented version
-  EXPECT_EQ(newTree.version(), instrument.version() + 1);
+  EXPECT_EQ(newTree->version(), instrument.version() + 1);
   // And check further down in the tree too. The version should be the same
   // across the whole tree.
-  EXPECT_EQ((newTree.begin() + 1)->version(), instrument.version() + 1);
-  EXPECT_EQ((newTree.begin() + 2)->version(), instrument.version() + 1);
-  EXPECT_EQ((newTree.begin() + 3)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 1)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 2)->version(), instrument.version() + 1);
+  EXPECT_EQ((newTree->begin() + 3)->version(), instrument.version() + 1);
 
   // These contents should be the same
-  EXPECT_EQ(&(newTree.begin() + 0)->const_ref(), a_contents);
-  EXPECT_EQ(&(newTree.begin() + 1)->const_ref(), b_contents);
-  EXPECT_EQ(&(newTree.begin() + 3)->const_ref(), d_contents);
-   // These should not
-  EXPECT_NE(&(newTree.begin() + 2)->const_ref(), c_contents);
-
+  EXPECT_EQ(&(newTree->begin() + 0)->const_ref(), a_contents);
+  EXPECT_EQ(&(newTree->begin() + 1)->const_ref(), b_contents);
+  EXPECT_EQ(&(newTree->begin() + 3)->const_ref(), d_contents);
+  // These should not
+  EXPECT_NE(&(newTree->begin() + 2)->const_ref(), c_contents);
 }
-
-
 }
