@@ -32,7 +32,7 @@ private:
 // TODO: Spectra may not have a fixed length.
 class Spectra : public FixedLengthVector<Spectra, Spectrum> {
 public:
-    using FixedLengthVector<Spectra, Spectrum>::FixedLengthVector;
+  using FixedLengthVector<Spectra, Spectrum>::FixedLengthVector;
 };
 
 #endif
