@@ -60,21 +60,6 @@ public:
     initL2();
   }
 
-  // template <typename V>
-  // DetectorInfo(const DetectorInfo<V> &other) = default;
-
-  template <typename V>
-  std::unique_ptr<DetectorInfo> cloneWithInstrumentTree(V &&instrumentTree) {
-
-    if (instrumentTree.nDetectors() != m_instrumentTree.nDetectors()) {
-      throw std::invalid_argument("The new InstrumentTree does not look the "
-                                  "same as the existing InstrumentTree");
-    }
-
-    return std::unique_ptr<DetectorInfo>{
-        new DetectorInfo(instrumentTree, *this)};
-  }
-
   void setMasked(size_t detectorIndex) {
     detectorRangeCheck(detectorIndex, *m_isMasked);
     (*m_isMasked)[detectorIndex] = true;
@@ -82,7 +67,7 @@ public:
 
   bool isMasked(size_t detectorIndex) const {
     detectorRangeCheck(detectorIndex, *m_isMasked);
-    return (*m_isMasked)[detectorIndex];
+    return m_isMasked->operator [](detectorIndex);
   }
 
   void setMonitor(size_t detectorIndex) {
@@ -96,7 +81,7 @@ public:
    */
   bool isMonitor(size_t detectorIndex) const {
     detectorRangeCheck(detectorIndex, *m_isMonitor);
-    return (*m_isMonitor)[detectorIndex];
+    return m_isMonitor->operator [](detectorIndex);
   }
 
   void initL2() {
@@ -117,7 +102,7 @@ public:
 
   double l2(size_t detectorIndex) const {
     detectorRangeCheck(detectorIndex, *m_l2);
-    return (*m_l2)[detectorIndex];
+    return m_l2->operator[](detectorIndex);
   }
 
   V3D position(size_t detectorIndex) const {
@@ -167,7 +152,7 @@ private:
         m_isMonitor(metaDataSource.m_isMonitor), m_l2(m_nDetectors),
         m_sourcePos(instrumentTree->sourcePos()),
         m_samplePos(instrumentTree->samplePos()),
-        m_instrumentTree(instrumentTree) {
+        m_instrumentTree(std::forward<V>(instrumentTree)) {
 
     m_l1 = distance(m_sourcePos, m_samplePos);
   }
