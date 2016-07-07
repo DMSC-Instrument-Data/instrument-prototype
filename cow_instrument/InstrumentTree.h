@@ -4,9 +4,8 @@
 #include <memory>
 #include <vector>
 #include <map>
+#include "cow_ptr.h"
 #include "IdType.h"
-
-
 #include "V3D.h"
 
 class Node;
@@ -19,7 +18,10 @@ class Detector;
  */
 class InstrumentTree {
 public:
+
   InstrumentTree(std::vector<Node> &&nodes, size_t nDetectors);
+
+  InstrumentTree(CowPtr<std::vector<Node>> nodes, size_t nDetectors);
 
   const Node &root() const;
 
@@ -41,21 +43,22 @@ public:
   Node const *const nodeAt(size_t index) const;
   V3D sourcePos() const;
 
-  std::vector<Node>::const_iterator begin() const { return m_nodes.begin(); }
-  std::vector<Node>::const_iterator end() const { return m_nodes.end(); }
-  std::vector<Node>::const_iterator cbegin() const { return m_nodes.cbegin(); }
-  std::vector<Node>::const_iterator cend() const { return m_nodes.cend(); }
+  std::vector<Node>::const_iterator begin() const { return m_nodes.const_ref().begin(); }
+  std::vector<Node>::const_iterator end() const { return m_nodes.const_ref().end(); }
+  std::vector<Node>::const_iterator cbegin() const { return m_nodes.const_ref().cbegin(); }
+  std::vector<Node>::const_iterator cend() const { return m_nodes.const_ref().cend(); }
   V3D samplePos() const;
 
 private:
-  std::vector<Detector const *> m_detectorVec;
 
-  // This should never change. This defines the instrument.
-  const std::vector<Node> m_nodes;
+  void init(size_t nDetectors);
 
-public:
+  CowPtr<std::vector<Detector const *> > m_detectorVec;
+  CowPtr<std::vector<Node> > m_nodes;
+
 };
 
 using InstrumentTree_const_uptr = std::unique_ptr<const InstrumentTree>;
+using InstrumentTree_uptr = std::unique_ptr<const InstrumentTree>;
 
 #endif

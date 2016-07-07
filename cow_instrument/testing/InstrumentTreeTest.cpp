@@ -102,7 +102,8 @@ TEST(instrument_tree_test, test_copy) {
     auto nodeOrig = itOrig++;
     auto nodeCopy = itCopy++;
 
-    EXPECT_NE(&(*nodeOrig), &(*nodeCopy)) << "All Nodes should be copies";
+    EXPECT_EQ(&(*nodeOrig), &(*nodeCopy))
+        << "Node vector should be shared directly after a copy";
     EXPECT_EQ(nodeOrig->version(), nodeCopy->version());
 
     EXPECT_EQ(&nodeOrig->const_ref(), &nodeCopy->const_ref())
@@ -194,13 +195,12 @@ TEST(instrument_tree_test, test_fill_detector_map_no_detectors) {
   EXPECT_EQ(container.size(), 0) << "No detectors to add";
 }
 
-TEST(instrument_tree_test, test_fill_detector_map){
+TEST(instrument_tree_test, test_fill_detector_map) {
 
-    auto instrument = make_simple_tree(DetectorIdType(1), DetectorIdType(2));
-    std::map<DetectorIdType, size_t> container;
-    instrument.fillDetectorMap(container);
-    EXPECT_EQ(container.size(), 2) << "Two detectors expected";
-
+  auto instrument = make_simple_tree(DetectorIdType(1), DetectorIdType(2));
+  std::map<DetectorIdType, size_t> container;
+  instrument.fillDetectorMap(container);
+  EXPECT_EQ(container.size(), 2) << "Two detectors expected";
 }
 
 TEST(instrument_tree_test, test_modify_linear) {

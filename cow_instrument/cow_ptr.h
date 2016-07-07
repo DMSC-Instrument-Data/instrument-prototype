@@ -2,6 +2,7 @@
 #define COWPTR_H
 
 #include <memory>
+#include <type_traits>
 
 template <class T> class CowPtr {
 public:
@@ -10,13 +11,37 @@ public:
 private:
   RefPtr m_sp;
 
-public:
+  /**
+   * Prefer to use Clone if that's available so that COW ptrs
+   * can be built around base class types, but support construction
+   * via derived types.
+   */
+  template <typename U>
+  typename std::enable_if<
+      std::is_member_function_pointer<decltype(&U::clone)>::value, void>::type
+  doCopy(U *arg) {
 
+    if (!(arg == 0 || m_sp.unique())) {
+      m_sp = RefPtr(arg->clone());
+    }
+  }
+
+  /**
+   * Fall back to do copy via a copy constructor if the type does
+   * not support clone.
+   */
+  void doCopy(...) {
+
+    T *arg = m_sp.get();
+    if (!(arg == 0 || m_sp.unique())) {
+      m_sp = RefPtr(new typename RefPtr::element_type(*arg));
+    }
+  }
+
+public:
   void copy() {
     T *tmp = m_sp.get();
-    if (!(tmp == 0 || m_sp.unique())) {
-      m_sp = RefPtr(tmp->clone());
-    }
+    doCopy(tmp);
   }
 
   CowPtr(T *t) : m_sp(t) {}
@@ -31,10 +56,7 @@ public:
     copy();
     return m_sp.operator->();
   }
-  const T& const_ref() const {
-      return *m_sp;
-  }
-
+  const T &const_ref() const { return *m_sp; }
 };
 
 #endif
