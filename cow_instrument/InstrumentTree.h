@@ -18,7 +18,6 @@ class Detector;
  */
 class InstrumentTree {
 public:
-
   InstrumentTree(std::vector<Node> &&nodes, size_t nDetectors);
 
   InstrumentTree(CowPtr<std::vector<Node>> nodes, size_t nDetectors);
@@ -29,10 +28,8 @@ public:
 
   unsigned int version() const;
 
-  std::unique_ptr<const InstrumentTree> modify(size_t node,
-                                               const Command &command) const;
-  std::unique_ptr<const InstrumentTree> modify(const Node *node,
-                                               const Command &command) const;
+  void modify(size_t node, const Command &command);
+  void modify(const Node *node, const Command &command);
 
   // This is how we help the client out when they want to work with detector
   // ids.
@@ -43,19 +40,25 @@ public:
   Node const *const nodeAt(size_t index) const;
   V3D sourcePos() const;
 
-  std::vector<Node>::const_iterator begin() const { return m_nodes.const_ref().begin(); }
-  std::vector<Node>::const_iterator end() const { return m_nodes.const_ref().end(); }
-  std::vector<Node>::const_iterator cbegin() const { return m_nodes.const_ref().cbegin(); }
-  std::vector<Node>::const_iterator cend() const { return m_nodes.const_ref().cend(); }
+  std::vector<Node>::const_iterator begin() const {
+    return m_nodes.const_ref().begin();
+  }
+  std::vector<Node>::const_iterator end() const {
+    return m_nodes.const_ref().end();
+  }
+  std::vector<Node>::const_iterator cbegin() const {
+    return m_nodes.const_ref().cbegin();
+  }
+  std::vector<Node>::const_iterator cend() const {
+    return m_nodes.const_ref().cend();
+  }
   V3D samplePos() const;
 
 private:
-
   void init(size_t nDetectors);
 
-  CowPtr<std::vector<Detector const *> > m_detectorVec;
-  CowPtr<std::vector<Node> > m_nodes;
-
+  CowPtr<std::vector<Detector const *>> m_detectorVec;
+  CowPtr<std::vector<Node>> m_nodes;
 };
 
 using InstrumentTree_const_uptr = std::unique_ptr<const InstrumentTree>;

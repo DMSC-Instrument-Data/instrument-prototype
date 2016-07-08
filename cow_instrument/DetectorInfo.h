@@ -183,7 +183,8 @@ const InstTree &DetectorInfo<InstTree>::const_instrumentTree() const {
 
 template <typename InstTree>
 void DetectorInfo<InstTree>::modify(size_t nodeIndex, Command &command) {
-  m_instrumentTree = m_instrumentTree->modify(command);
+
+  m_instrumentTree->modify(command);
 
   // All other geometry-derived information is now also invalid. Very
   // important!

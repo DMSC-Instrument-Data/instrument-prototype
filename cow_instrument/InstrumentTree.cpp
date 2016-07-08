@@ -18,7 +18,7 @@ void findDetectors(const Component &component,
 }
 
 /*
- * Derived, detector vector is always recreated.
+ * Derived, detector vector is always recreated. Except on a plain-old copy.
 */
 void InstrumentTree::init(size_t nDetectors) {
   // This will make the push_backs faster
@@ -50,9 +50,10 @@ InstrumentTree::InstrumentTree(std::vector<Node> &&nodes, size_t nDetectors)
   init(nDetectors);
 }
 
-InstrumentTree::InstrumentTree(CowPtr<std::vector<Node>> nodes, size_t nDetectors)
-    : m_nodes(nodes), m_detectorVec(
-                          std::make_shared<std::vector<Detector const *>>()) {
+InstrumentTree::InstrumentTree(CowPtr<std::vector<Node>> nodes,
+                               size_t nDetectors)
+    : m_nodes(nodes),
+      m_detectorVec(std::make_shared<std::vector<Detector const *>>()) {
 
   init(nDetectors);
 }
@@ -92,8 +93,7 @@ V3D InstrumentTree::samplePos() const {
 
 size_t InstrumentTree::nDetectors() const { return m_detectorVec->size(); }
 
-std::unique_ptr<const InstrumentTree>
-InstrumentTree::modify(size_t node, const Command &command) const {
+void InstrumentTree::modify(size_t nodeIndex, const Command &command) {
 
   CowPtr<std::vector<Node>> newNodes(m_nodes);
   std::for_each(newNodes->begin(), newNodes->end(),
@@ -101,32 +101,32 @@ InstrumentTree::modify(size_t node, const Command &command) const {
 
   if (command.isMetaDataCommand()) {
     // No cascading behaviour.
-    Node &currentNode = newNodes->operator[](node);
+    auto &currentNode = newNodes->operator[](nodeIndex);
     currentNode.doModify(command);
 
   } else {
     // Cascading behaviour
-    std::vector<size_t> toModify = {node};
+    std::vector<size_t> toModify = {nodeIndex};
     for (size_t index = 0; index < toModify.size(); ++index) {
-      Node &currentNode = newNodes->operator[](toModify[index]);
+      auto &currentNode = newNodes->operator[](toModify[index]);
       currentNode.doModify(command);
       const auto &currentChildren = currentNode.children();
       toModify.insert(toModify.end(), currentChildren.begin(),
                       currentChildren.end());
     }
   }
-  /* It's likely that components have been move, we have therefore
-   * new components and detectors generated as part of the cow_ptr Node
-   * behaviour, so we pass the size of the detector pointer vector,
-   * rather than the detector pointer vector itself. The detector pointer
-   * vector will have to be rebuilt.
+
+  m_nodes = newNodes;
+  /*
+   * At present. We have to assume that the detector* vector will need
+   * to be rebuilt on any Command.
    */
-  return std::unique_ptr<const InstrumentTree>(
-      new InstrumentTree(newNodes, m_detectorVec->size()));
+  const size_t nDetectors = m_detectorVec->size();
+  m_detectorVec->clear();
+  init(nDetectors);
 }
 
-std::unique_ptr<const InstrumentTree>
-InstrumentTree::modify(const Node *node, const Command &command) const {
+void InstrumentTree::modify(const Node *node, const Command &command) {
   for (size_t index = 0; index < m_nodes->size(); ++index) {
     if (&m_nodes.const_ref()[index] == node) {
       return modify(index, command);
