@@ -2,11 +2,14 @@
 #define SPECTRUMINFO_H
 
 #include <vector>
-#include "Spectrum.h"
+#include <memory>
+
+#include "Command.h"
+#include "cow_ptr.h"
 #include "DetectorInfo.h"
 #include "InstrumentTree.h"
 #include "L2s.h"
-#include "cow_ptr.h"
+#include "Spectrum.h"
 
 /**
  * SpectrumInfo. Provides a spectrum centric Facade over DetectorInfo.
@@ -16,6 +19,7 @@
 template <typename InstTree> class SpectrumInfo {
 public:
   SpectrumInfo(const DetectorInfo<InstTree> &detectorInfo);
+  SpectrumInfo(DetectorInfo<InstTree> &&detectorInfo);
 
   SpectrumInfo(const std::vector<Spectrum> &spectra,
                const DetectorInfo<InstTree> &detectorInfo);
@@ -31,6 +35,8 @@ public:
   double l2(size_t index) const;
 
   CowPtr<L2s> l2s() const;
+
+  void modify(size_t nodeIndex, Command &command);
 
 private:
   DetectorInfo<InstTree> m_detectorInfo;
@@ -59,7 +65,18 @@ template <typename InstTree>
 SpectrumInfo<InstTree>::SpectrumInfo(const DetectorInfo<InstTree> &detectorInfo)
     : m_detectorInfo(detectorInfo), m_l2(detectorInfo.l2s()),
       m_spectra(
-          std::make_shared<Spectra>(std::move(detectorInfo.makeSpectra()))) {
+          std::make_shared<Spectra>(std::move(m_detectorInfo.makeSpectra()))) {
+
+  /* 1:1 mapping. Meta-data arrays can be
+   * referenced directly from DetectorInfo via COW mechanism.
+   */
+}
+
+template <typename InstTree>
+SpectrumInfo<InstTree>::SpectrumInfo(DetectorInfo<InstTree> &&detectorInfo)
+    : m_detectorInfo(std::move(detectorInfo)), m_l2(m_detectorInfo.l2s()),
+      m_spectra(
+          std::make_shared<Spectra>(std::move(m_detectorInfo.makeSpectra()))) {
 
   /* 1:1 mapping. Meta-data arrays can be
    * referenced directly from DetectorInfo via COW mechanism.
@@ -122,6 +139,11 @@ double SpectrumInfo<InstTree>::l2(size_t index) const {
 
 template <typename InstTree> CowPtr<L2s> SpectrumInfo<InstTree>::l2s() const {
   return m_l2;
+}
+
+template <typename InstTree>
+void SpectrumInfo<InstTree>::modify(size_t nodeIndex, Command &command) {
+  m_detectorInfo.modify(nodeIndex, command);
 }
 
 #endif

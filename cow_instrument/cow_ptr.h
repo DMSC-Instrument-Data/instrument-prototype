@@ -33,29 +33,43 @@ private:
   }
 
 public:
-  void copy() {
-    T *tmp = m_sp.get();
-    if (!(tmp == 0 || m_sp.unique())) {
-      doCopy(tmp);
-    }
-  }
-
-  CowPtr(T *t) : m_sp(t) {}
-  CowPtr(const RefPtr &refptr) : m_sp(refptr) {}
-  const T &operator*() const { return *m_sp; }
-  T &operator*() {
-    copy();
-    return *m_sp;
-  }
-  const T *operator->() const { return m_sp.operator->(); }
-  T *operator->() {
-    copy();
-    return m_sp.operator->();
-  }
-
-  // CowPtr &operator=(const CowPtr<T> &) = default;
-
-  const T &const_ref() const { return *m_sp; }
+  void copy();
+  CowPtr(T *t);
+  CowPtr(const RefPtr &refptr);
+  const T &operator*() const;
+  T &operator*();
+  const T *operator->() const;
+  T *operator->();
+  const T &const_ref() const;
 };
+
+template <typename T> void CowPtr<T>::copy() {
+  T *tmp = m_sp.get();
+  if (!(tmp == 0 || m_sp.unique())) {
+    doCopy(tmp);
+  }
+}
+
+template <typename T> CowPtr<T>::CowPtr(T *t) : m_sp(t) {}
+
+template <typename T> CowPtr<T>::CowPtr(const RefPtr &refptr) : m_sp(refptr) {}
+
+template <typename T> const T &CowPtr<T>::operator*() const { return *m_sp; }
+
+template <typename T> T &CowPtr<T>::operator*() {
+  copy();
+  return *m_sp;
+}
+
+template <typename T> const T *CowPtr<T>::operator->() const {
+  return m_sp.operator->();
+}
+
+template <typename T> T *CowPtr<T>::operator->() {
+  copy();
+  return m_sp.operator->();
+}
+
+template <typename T> const T &CowPtr<T>::const_ref() const { return *m_sp; }
 
 #endif
