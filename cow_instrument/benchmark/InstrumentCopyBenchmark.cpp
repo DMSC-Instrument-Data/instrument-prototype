@@ -1,6 +1,7 @@
 #include "StandardInstrument.h"
 #include "InstrumentTree.h"
 #include "Node.h"
+#include "Command.h"
 #include "Detector.h"
 #include "MoveCommand.h"
 #include <iostream>
@@ -8,6 +9,15 @@
 #include "IdType.h"
 
 namespace {
+
+class NullCommand : public Command {
+public:
+  bool execute(CowPtr<Component> &) const {
+    return false; // Writes nothing
+  }
+  bool isMetaDataCommand() const { return false; /*keep cascading*/ }
+  virtual ~NullCommand() = default;
+};
 
 /*
  * Templated CopyFixture
@@ -71,6 +81,17 @@ BENCHMARK_F(CopyAtBankLevel, BM_copy_move_one_bank)(benchmark::State &state) {
   while (state.KeepRunning()) {
     // Then modify that node
     m_instrument.modify(2, moveIt);
+  }
+  // For statistics. Mark the number of itertions
+  state.SetItemsProcessed(state.iterations() * 1);
+}
+
+BENCHMARK_F(CopyAtRootLevel,
+            BM_copy_null_command_root)(benchmark::State &state) {
+  NullCommand null;
+  while (state.KeepRunning()) {
+    // Then modify that node
+    m_instrument.modify(size_t(0), null);
   }
   // For statistics. Mark the number of itertions
   state.SetItemsProcessed(state.iterations() * 1);
