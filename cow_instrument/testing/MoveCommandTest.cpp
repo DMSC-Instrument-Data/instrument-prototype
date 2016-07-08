@@ -9,9 +9,9 @@ namespace {
 
 TEST(move_component_test, test_execute) {
 
-  MockComponent component;
-  EXPECT_CALL(component, deltaPos(_)).Times(1);
-
+  auto mockComponent = new MockComponent;
+  EXPECT_CALL(*mockComponent, deltaPos(_)).Times(1);
+  CowPtr<Component> component(mockComponent);
 
   MoveCommand command(V3D{1, 2, 3});
   command.execute(component);

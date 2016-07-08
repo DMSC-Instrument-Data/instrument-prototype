@@ -41,6 +41,7 @@ public:
   const T *operator->() const;
   T *operator->();
   const T &const_ref() const;
+  bool operator==(const CowPtr<T> &other) const;
 };
 
 template <typename T> void CowPtr<T>::copy() {
@@ -71,5 +72,9 @@ template <typename T> T *CowPtr<T>::operator->() {
 }
 
 template <typename T> const T &CowPtr<T>::const_ref() const { return *m_sp; }
+
+template <typename T> bool CowPtr<T>::operator==(const CowPtr<T> &other) const {
+  return m_sp.get() == &other.const_ref();
+}
 
 #endif

@@ -210,14 +210,14 @@ TEST(instrument_tree_test, test_modify_linear) {
     a -> b -> c
   */
 
-  auto *a_contents = new NiceMock<MockComponent>();
-  auto *b_contents = new NiceMock<MockComponent>();
-  auto *c_contents = new NiceMock<MockComponent>();
+  auto a = CowPtr<Component>(new NiceMock<MockComponent>());
+  auto b = CowPtr<Component>(new NiceMock<MockComponent>());
+  auto c = CowPtr<Component>(new NiceMock<MockComponent>());
 
   std::vector<Node> nodes;
-  nodes.emplace_back(CowPtr<Component>(a_contents));
-  nodes.emplace_back(0, CowPtr<Component>(b_contents));
-  nodes.emplace_back(1, CowPtr<Component>(c_contents));
+  nodes.emplace_back(a);
+  nodes.emplace_back(0, b);
+  nodes.emplace_back(1, c);
   nodes[1].addChild(2);
   nodes[0].addChild(1);
 
@@ -232,16 +232,16 @@ TEST(instrument_tree_test, test_modify_linear) {
 
   // We would therefore expect the command to be executed on c_contents
   NiceMock<MockCommand> command;
-  EXPECT_CALL(command, execute(_)).Times(1);
-
-  // We would also expect that the contents of c are deep copied.
-  EXPECT_CALL(*c_contents, clone())
-      .WillOnce(Return(new NiceMock<MockComponent>()));
+  EXPECT_CALL(command, execute(c)).Times(1).WillRepeatedly(Return(true));
+  EXPECT_CALL(command, execute(a)).Times(0);
+  EXPECT_CALL(command, execute(b)).Times(0);
 
   // Go from a to be to c, and modify that.
   auto newTree = instrument;
 
-  newTree.modify(2, command);
+  EXPECT_TRUE(newTree.modify(2, command)) << "Modify should return true since "
+                                             "Commands were executed that are "
+                                             "defined as writeable";
 
   // Check that our tree has an incremented version
   EXPECT_EQ(newTree.version(), instrument.version() + 1);
@@ -251,15 +251,59 @@ TEST(instrument_tree_test, test_modify_linear) {
   // And bottom of tree too. The version should be the same across the whole
   // tree.
   EXPECT_EQ((newTree.begin() + 2)->version(), instrument.version() + 1);
+}
 
-  // However, only the contents of one component should be different.
-  EXPECT_EQ(&(newTree.begin() + 0)->const_ref(), a_contents);
-  EXPECT_EQ(&(newTree.begin() + 1)->const_ref(), b_contents);
-  EXPECT_NE(&(newTree.begin() + 2)->const_ref(), c_contents);
+TEST(instrument_tree_test, test_no_modify_linear) {
 
-  EXPECT_TRUE(Mock::VerifyAndClearExpectations(a_contents));
-  EXPECT_TRUE(Mock::VerifyAndClearExpectations(b_contents));
-  EXPECT_TRUE(Mock::VerifyAndClearExpectations(c_contents));
+  /*
+    we start like this
+    a -> b -> c
+  */
+
+  auto a = CowPtr<Component>(new NiceMock<MockComponent>());
+  auto b = CowPtr<Component>(new NiceMock<MockComponent>());
+  auto c = CowPtr<Component>(new NiceMock<MockComponent>());
+
+  std::vector<Node> nodes;
+  nodes.emplace_back(a);
+  nodes.emplace_back(0, b);
+  nodes.emplace_back(1, c);
+  nodes[1].addChild(2);
+  nodes[0].addChild(1);
+
+  InstrumentTree instrument(std::move(nodes), 0);
+
+  /*
+    we then modify b.
+    so we should now have a shallow copied node tree,
+
+    a`-> | b` | -> |c`|
+  */
+
+  // We would therefore expect the command to be executed on b_contents and
+  // c_contents
+  NiceMock<MockCommand> command;
+  // We make our command non-writable. They return false.
+  // Command is cascading, so se expect to see b` and c` passed to Command.
+  EXPECT_CALL(command, execute(b)).Times(1).WillOnce(Return(false));
+  EXPECT_CALL(command, execute(c)).Times(1).WillOnce(Return(false));
+  // We do not expect any other cow component to go to execute.
+  EXPECT_CALL(command, execute(a)).Times(0);
+
+  // Go from a to be to c, and modify that.
+  auto newTree = instrument;
+
+  EXPECT_FALSE(newTree.modify(1, command))
+      << "Modify should return false, since Command is set to be non-writeable";
+
+  // Check that our tree has an incremented version
+  EXPECT_EQ(newTree.version(), instrument.version() + 1);
+  // And check further down in the tree too. The version should be the same
+  // across the whole tree.
+  EXPECT_EQ((newTree.begin() + 1)->version(), instrument.version() + 1);
+  // And bottom of tree too. The version should be the same across the whole
+  // tree.
+  EXPECT_EQ((newTree.begin() + 2)->version(), instrument.version() + 1);
 }
 
 TEST(instrument_tree_test, test_modify_tree) {
@@ -275,14 +319,14 @@ TEST(instrument_tree_test, test_modify_tree) {
 
   */
 
-  MockComponent *a_contents = new NiceMock<MockComponent>();
-  MockComponent *b_contents = new NiceMock<MockComponent>();
-  MockComponent *c_contents = new NiceMock<MockComponent>();
+  auto a = CowPtr<Component>(new NiceMock<MockComponent>());
+  auto b = CowPtr<Component>(new NiceMock<MockComponent>());
+  auto c = CowPtr<Component>(new NiceMock<MockComponent>());
 
   std::vector<Node> nodes;
-  nodes.emplace_back(CowPtr<Component>(a_contents));
-  nodes.emplace_back(0, CowPtr<Component>(b_contents));
-  nodes.emplace_back(0, CowPtr<Component>(c_contents));
+  nodes.emplace_back(a);
+  nodes.emplace_back(0, b);
+  nodes.emplace_back(0, c);
   nodes[0].addChild(1);
   nodes[0].addChild(2);
 
@@ -301,15 +345,16 @@ TEST(instrument_tree_test, test_modify_tree) {
 
   // We would therefore expect the command to be executed on c_contents
   NiceMock<MockCommand> command;
-  EXPECT_CALL(command, execute(_)).Times(1);
-
-  // We would also expect that the contents of c are deep copied.
-  EXPECT_CALL(*c_contents, clone())
-      .WillOnce(Return(new NiceMock<MockComponent>()));
+  // Only C` should be passed to the Command.
+  EXPECT_CALL(command, execute(c)).Times(1).WillRepeatedly(Return(true));
+  // We do not expect any other cow component to go to execute.
+  EXPECT_CALL(command, execute(a)).Times(0);
+  EXPECT_CALL(command, execute(b)).Times(0);
 
   // Get to c via a, and modify c
   auto newTree = instrument;
-  newTree.modify(2, command);
+  EXPECT_TRUE(newTree.modify(2, command))
+      << "Modify should return true to indicate that the Command was writeable";
 
   // Check that our tree has an incremented version
   EXPECT_EQ(newTree.version(), instrument.version() + 1);
@@ -317,15 +362,6 @@ TEST(instrument_tree_test, test_modify_tree) {
   // across the whole tree.
   EXPECT_EQ((newTree.begin() + 1)->version(), instrument.version() + 1);
   EXPECT_EQ((newTree.begin() + 2)->version(), instrument.version() + 1);
-
-  EXPECT_TRUE(Mock::VerifyAndClear(a_contents));
-  EXPECT_TRUE(Mock::VerifyAndClear(b_contents));
-  EXPECT_TRUE(Mock::VerifyAndClear(c_contents));
-
-  // However, only the contents of one component should be different.
-  EXPECT_EQ(&(newTree.begin() + 0)->const_ref(), a_contents);
-  EXPECT_EQ(&(newTree.begin() + 1)->const_ref(), b_contents);
-  EXPECT_NE(&(newTree.begin() + 2)->const_ref(), c_contents);
 }
 
 TEST(node_test, test_tree_cascade) {
@@ -347,16 +383,16 @@ TEST(node_test, test_tree_cascade) {
 
   */
 
-  auto *a_contents = new NiceMock<MockComponent>();
-  auto *b_contents = new NiceMock<MockComponent>();
-  auto *c_contents = new NiceMock<MockComponent>();
-  auto *d_contents = new NiceMock<MockComponent>();
+  auto a = CowPtr<Component>(new NiceMock<MockComponent>());
+  auto b = CowPtr<Component>(new NiceMock<MockComponent>());
+  auto c = CowPtr<Component>(new NiceMock<MockComponent>());
+  auto d = CowPtr<Component>(new NiceMock<MockComponent>());
 
   std::vector<Node> nodes;
-  nodes.emplace_back(CowPtr<Component>(a_contents));
-  nodes.emplace_back(0, CowPtr<Component>(b_contents));
-  nodes.emplace_back(0, CowPtr<Component>(c_contents));
-  nodes.emplace_back(2, CowPtr<Component>(d_contents));
+  nodes.emplace_back(a);
+  nodes.emplace_back(0, b);
+  nodes.emplace_back(0, c);
+  nodes.emplace_back(2, d);
   nodes[0].addChild(1);
   nodes[0].addChild(2);
   nodes[2].addChild(3);
@@ -381,21 +417,17 @@ TEST(node_test, test_tree_cascade) {
    * but also on d_contents, as we have to cascade all changes during the
    * write*/
   NiceMock<MockCommand> command;
-  EXPECT_CALL(command, execute(_)).Times(2);
-
-  // We would also expect that the contents of c are deep copied.
-  EXPECT_CALL(*c_contents, clone())
-      .WillOnce(Return(new NiceMock<MockComponent>()));
-  EXPECT_CALL(*d_contents, clone())
-      .WillOnce(Return(new NiceMock<MockComponent>()));
+  // Cascading. We expect C` and D` Cow ptrs to go through command.
+  EXPECT_CALL(command, execute(c)).Times(1).WillOnce(Return(true));
+  EXPECT_CALL(command, execute(d)).Times(1).WillOnce(Return(true));
+  // We do not expect any other cow component to go to execute.
+  EXPECT_CALL(command, execute(a)).Times(0);
+  EXPECT_CALL(command, execute(b)).Times(0);
 
   auto newTree = instrument;
-  newTree.modify(2, command);
-
-  EXPECT_TRUE(Mock::VerifyAndClear(a_contents));
-  EXPECT_TRUE(Mock::VerifyAndClear(b_contents));
-  EXPECT_TRUE(Mock::VerifyAndClear(c_contents));
-  EXPECT_TRUE(Mock::VerifyAndClear(d_contents));
+  EXPECT_TRUE(newTree.modify(2, command))
+      << "Modify should return true to indicate that the Command was writeable";
+  ;
 
   // Check that our tree has an incremented version
   EXPECT_EQ(newTree.version(), instrument.version() + 1);
@@ -404,13 +436,6 @@ TEST(node_test, test_tree_cascade) {
   EXPECT_EQ((newTree.begin() + 1)->version(), instrument.version() + 1);
   EXPECT_EQ((newTree.begin() + 2)->version(), instrument.version() + 1);
   EXPECT_EQ((newTree.begin() + 3)->version(), instrument.version() + 1);
-
-  // These contents should be the same
-  EXPECT_EQ(&(newTree.begin() + 0)->const_ref(), a_contents);
-  EXPECT_EQ(&(newTree.begin() + 1)->const_ref(), b_contents);
-  // These should not
-  EXPECT_NE(&(newTree.begin() + 2)->const_ref(), c_contents);
-  EXPECT_NE(&(newTree.begin() + 3)->const_ref(), d_contents);
 }
 
 TEST(node_test, test_tree_no_cascade) {
@@ -430,16 +455,16 @@ TEST(node_test, test_tree_no_cascade) {
 
   */
 
-  auto *a_contents = new NiceMock<MockComponent>();
-  auto *b_contents = new NiceMock<MockComponent>();
-  auto *c_contents = new NiceMock<MockComponent>();
-  auto *d_contents = new NiceMock<MockComponent>();
+  auto a = CowPtr<Component>(new NiceMock<MockComponent>());
+  auto b = CowPtr<Component>(new NiceMock<MockComponent>());
+  auto c = CowPtr<Component>(new NiceMock<MockComponent>());
+  auto d = CowPtr<Component>(new NiceMock<MockComponent>());
 
   std::vector<Node> nodes;
-  nodes.emplace_back(CowPtr<Component>(a_contents));
-  nodes.emplace_back(0, CowPtr<Component>(b_contents));
-  nodes.emplace_back(0, CowPtr<Component>(c_contents));
-  nodes.emplace_back(2, CowPtr<Component>(d_contents));
+  nodes.emplace_back(a);
+  nodes.emplace_back(0, b);
+  nodes.emplace_back(0, c);
+  nodes.emplace_back(2, d);
   nodes[0].addChild(1);
   nodes[0].addChild(2);
   nodes[2].addChild(3);
@@ -466,19 +491,16 @@ TEST(node_test, test_tree_no_cascade) {
   NiceMock<MockCommand> command;
   // We make a command that is meta-data only (i.e. not cascading).
   EXPECT_CALL(command, isMetaDataCommand()).WillRepeatedly(Return(true));
-  EXPECT_CALL(command, execute(_)).Times(1);
-
-  // We would also expect that the contents of c are deep copied.
-  EXPECT_CALL(*c_contents, clone())
-      .WillOnce(Return(new NiceMock<MockComponent>()));
+  // We only espect the cow ptr for c` to go through Command::execute
+  EXPECT_CALL(command, execute(c)).Times(1).WillOnce(Return(true));
+  // We do not expect any other cow component to go to execute.
+  EXPECT_CALL(command, execute(a)).Times(0);
+  EXPECT_CALL(command, execute(b)).Times(0);
+  EXPECT_CALL(command, execute(d)).Times(0);
 
   auto newTree = instrument;
-  newTree.modify(2, command);
-
-  EXPECT_TRUE(Mock::VerifyAndClear(a_contents));
-  EXPECT_TRUE(Mock::VerifyAndClear(b_contents));
-  EXPECT_TRUE(Mock::VerifyAndClear(c_contents));
-  EXPECT_TRUE(Mock::VerifyAndClear(d_contents));
+  EXPECT_TRUE(newTree.modify(2, command))
+      << "Modify should return true to indicate that the Command was writeable";
 
   // Check that our tree has an incremented version
   EXPECT_EQ(newTree.version(), instrument.version() + 1);
@@ -487,12 +509,5 @@ TEST(node_test, test_tree_no_cascade) {
   EXPECT_EQ((newTree.begin() + 1)->version(), instrument.version() + 1);
   EXPECT_EQ((newTree.begin() + 2)->version(), instrument.version() + 1);
   EXPECT_EQ((newTree.begin() + 3)->version(), instrument.version() + 1);
-
-  // These contents should be the same
-  EXPECT_EQ(&(newTree.begin() + 0)->const_ref(), a_contents);
-  EXPECT_EQ(&(newTree.begin() + 1)->const_ref(), b_contents);
-  EXPECT_EQ(&(newTree.begin() + 3)->const_ref(), d_contents);
-  // These should not
-  EXPECT_NE(&(newTree.begin() + 2)->const_ref(), c_contents);
 }
 }

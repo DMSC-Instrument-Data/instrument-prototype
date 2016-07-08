@@ -28,8 +28,8 @@ public:
 
   unsigned int version() const;
 
-  void modify(size_t node, const Command &command);
-  void modify(const Node *node, const Command &command);
+  bool modify(size_t node, const Command &command);
+  bool modify(const Node *node, const Command &command);
 
   // This is how we help the client out when they want to work with detector
   // ids.

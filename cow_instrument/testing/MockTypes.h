@@ -6,6 +6,7 @@
 #include "Detector.h"
 #include "DetectorInfo.h"
 #include "gmock/gmock.h"
+#include <cow_ptr.h>
 
 class MockComponent : public Component {
 public:
@@ -25,7 +26,7 @@ public:
       using namespace testing;
       ON_CALL(*this, isMetaDataCommand()).WillByDefault(Return(false));
   }
-  MOCK_CONST_METHOD1(execute, void(Component &));
+  MOCK_CONST_METHOD1(execute, bool(CowPtr<Component> &));
   MOCK_CONST_METHOD0(isMetaDataCommand, bool());
   ~MockCommand() {}
 };

@@ -93,23 +93,24 @@ V3D InstrumentTree::samplePos() const {
 
 size_t InstrumentTree::nDetectors() const { return m_detectorVec->size(); }
 
-void InstrumentTree::modify(size_t nodeIndex, const Command &command) {
+bool InstrumentTree::modify(size_t nodeIndex, const Command &command) {
 
   CowPtr<std::vector<Node>> newNodes(m_nodes);
   std::for_each(newNodes->begin(), newNodes->end(),
                 [](Node &node) { node.incrementVersion(); });
 
+  bool newDetectors = false;
   if (command.isMetaDataCommand()) {
     // No cascading behaviour.
     auto &currentNode = newNodes->operator[](nodeIndex);
-    currentNode.doModify(command);
+    newDetectors |= currentNode.modify(command);
 
   } else {
     // Cascading behaviour
     std::vector<size_t> toModify = {nodeIndex};
     for (size_t index = 0; index < toModify.size(); ++index) {
       auto &currentNode = newNodes->operator[](toModify[index]);
-      currentNode.doModify(command);
+      newDetectors |= currentNode.modify(command);
       const auto &currentChildren = currentNode.children();
       toModify.insert(toModify.end(), currentChildren.begin(),
                       currentChildren.end());
@@ -118,15 +119,18 @@ void InstrumentTree::modify(size_t nodeIndex, const Command &command) {
 
   m_nodes = newNodes;
   /*
-   * At present. We have to assume that the detector* vector will need
-   * to be rebuilt on any Command.
+   * We only rebuild our Detector* vector if the modifications
+   * indicate that such action is required.
    */
-  const size_t nDetectors = m_detectorVec->size();
-  m_detectorVec->clear();
-  init(nDetectors);
+  if (newDetectors) {
+    const size_t nDetectors = m_detectorVec->size();
+    m_detectorVec->clear();
+    init(nDetectors);
+  }
+  return newDetectors;
 }
 
-void InstrumentTree::modify(const Node *node, const Command &command) {
+bool InstrumentTree::modify(const Node *node, const Command &command) {
   for (size_t index = 0; index < m_nodes->size(); ++index) {
     if (&m_nodes.const_ref()[index] == node) {
       return modify(index, command);

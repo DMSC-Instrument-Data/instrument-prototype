@@ -12,10 +12,14 @@ Node::Node(CowPtr<Component> contents, std::string name, unsigned int version)
 
 Node::~Node() {}
 
-void Node::doModify(const Command &command) {
-  // Running the command on the cow component, will automatically cause a deep
-  // copy of that component
-  command.execute(*m_contents);
+bool Node::modify(const Command &command) {
+  /*
+   * We pass in the cow_ptr<Component> by lvalue ref.
+   * It is therefore up to the Command whether it invokes a non-const
+   * method call on the cow_ptr. The Command::execute() MUST correctly
+   * indicate whether a writeable opeation was performed by returning true.
+   */
+  return command.execute(m_contents);
 }
 
 void Node::addChild(size_t child) { m_next.push_back(child); }
