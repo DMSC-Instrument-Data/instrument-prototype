@@ -40,7 +40,7 @@ InstrumentTree make_simple_tree(DetectorIdType detector1Id,
   nodes[0].addChild(1);
   nodes[0].addChild(2);
 
-  return InstrumentTree(std::move(nodes), 2);
+  return InstrumentTree(std::move(nodes));
 }
 
 TEST(instrument_tree_test, test_uptr_constructor) {
@@ -48,14 +48,14 @@ TEST(instrument_tree_test, test_uptr_constructor) {
   Node a(CowPtr<Component>(new NiceMock<MockComponent>()));
 
   // Calls std::shared_ptr<T>(std::unique_ptr<T>&&) constructor
-  InstrumentTree instrument({a}, 0);
+  InstrumentTree instrument({a});
 
   EXPECT_EQ(0, instrument.version());
 }
 
 TEST(instrument_tree_test, test_root_node_must_be_valid) {
 
-  EXPECT_THROW(InstrumentTree({}, 0), std::invalid_argument);
+  EXPECT_THROW(InstrumentTree({}), std::invalid_argument);
 }
 
 TEST(instrument_tree_test, test_version_check_on_constructor) {
@@ -69,7 +69,7 @@ TEST(instrument_tree_test, test_version_check_on_constructor) {
                          1 /*version number incremented. This is bad*/);
   nodes[0].addChild(1);
 
-  EXPECT_THROW(InstrumentTree(std::move(nodes), 0), std::invalid_argument);
+  EXPECT_THROW(InstrumentTree(std::move(nodes)), std::invalid_argument);
 }
 
 TEST(instrument_tree_test, test_copy) {
@@ -87,7 +87,7 @@ TEST(instrument_tree_test, test_copy) {
                      versionNumber);
   nodes[0].addChild(1);
 
-  InstrumentTree original(std::move(nodes), 0);
+  InstrumentTree original(std::move(nodes));
 
   // Perform copy.
   auto copy = original;
@@ -134,7 +134,7 @@ TEST(instrument_tree_test, test_constructor) {
   nodes[0].addChild(1);
   nodes[0].addChild(2);
 
-  InstrumentTree instrument(std::move(nodes), 0);
+  InstrumentTree instrument(std::move(nodes));
   EXPECT_EQ(&instrument.root().const_ref(), a_contents);
   EXPECT_NE(instrument.cbegin(), instrument.cend());
 }
@@ -172,7 +172,7 @@ TEST(instrument_tree_test, test_detector_access) {
   nodes[0].addChild(1);
   nodes[0].addChild(2);
 
-  InstrumentTree tree(std::move(nodes), 2);
+  InstrumentTree tree(std::move(nodes));
 
   const Detector &det1 = tree.getDetector(0);
   EXPECT_EQ(det1.detectorId(), detector1Id);
@@ -188,7 +188,7 @@ TEST(instrument_tree_test, test_fill_detector_map_no_detectors) {
   std::vector<Node> nodes;
   nodes.emplace_back(CowPtr<Component>(new NiceMock<MockComponent>()));
 
-  InstrumentTree instrument(std::move(nodes), 0);
+  InstrumentTree instrument(std::move(nodes));
 
   std::map<DetectorIdType, size_t> container;
   instrument.fillDetectorMap(container);
@@ -221,7 +221,7 @@ TEST(instrument_tree_test, test_modify_linear) {
   nodes[1].addChild(2);
   nodes[0].addChild(1);
 
-  InstrumentTree instrument(std::move(nodes), 0);
+  InstrumentTree instrument(std::move(nodes));
 
   /*
     we then modify c.
@@ -271,7 +271,7 @@ TEST(instrument_tree_test, test_no_modify_linear) {
   nodes[1].addChild(2);
   nodes[0].addChild(1);
 
-  InstrumentTree instrument(std::move(nodes), 0);
+  InstrumentTree instrument(std::move(nodes));
 
   /*
     we then modify b.
@@ -330,7 +330,7 @@ TEST(instrument_tree_test, test_modify_tree) {
   nodes[0].addChild(1);
   nodes[0].addChild(2);
 
-  InstrumentTree instrument(std::move(nodes), 0);
+  InstrumentTree instrument(std::move(nodes));
 
   /*
     we then modify c.
@@ -397,7 +397,7 @@ TEST(node_test, test_tree_cascade) {
   nodes[0].addChild(2);
   nodes[2].addChild(3);
 
-  InstrumentTree instrument(std::move(nodes), 0);
+  InstrumentTree instrument(std::move(nodes));
 
   /*
     we then modify c.
@@ -469,7 +469,7 @@ TEST(node_test, test_tree_no_cascade) {
   nodes[0].addChild(2);
   nodes[2].addChild(3);
 
-  InstrumentTree instrument(std::move(nodes), 0);
+  InstrumentTree instrument(std::move(nodes));
 
   /*
     we then modify c.

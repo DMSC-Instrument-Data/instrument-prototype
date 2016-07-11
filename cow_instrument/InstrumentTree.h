@@ -18,9 +18,9 @@ class Detector;
  */
 class InstrumentTree {
 public:
-  InstrumentTree(std::vector<Node> &&nodes, size_t nDetectors);
+  InstrumentTree(std::vector<Node> &&nodes);
 
-  InstrumentTree(CowPtr<std::vector<Node>> nodes, size_t nDetectors);
+  InstrumentTree(CowPtr<std::vector<Node>> nodes);
 
   const Node &root() const;
 
@@ -55,7 +55,7 @@ public:
   V3D samplePos() const;
 
 private:
-  void init(size_t nDetectors);
+  void init();
 
   CowPtr<std::vector<Detector const *>> m_detectorVec;
   CowPtr<std::vector<Node>> m_nodes;

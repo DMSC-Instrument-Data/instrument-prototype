@@ -17,12 +17,7 @@ void findDetectors(const Component &component,
 }
 }
 
-/*
- * Derived, detector vector is always recreated. Except on a plain-old copy.
-*/
-void InstrumentTree::init(size_t nDetectors) {
-  // This will make the push_backs faster
-  m_detectorVec->reserve(nDetectors);
+void InstrumentTree::init() {
 
   if (m_nodes->empty()) {
     throw std::invalid_argument(
@@ -43,19 +38,18 @@ void InstrumentTree::init(size_t nDetectors) {
   // m_detectorVec.shrink_to_fit(); This could be costly
 }
 
-InstrumentTree::InstrumentTree(std::vector<Node> &&nodes, size_t nDetectors)
+InstrumentTree::InstrumentTree(std::vector<Node> &&nodes)
     : m_nodes(std::make_shared<std::vector<Node>>(std::move(nodes))),
       m_detectorVec(std::make_shared<std::vector<Detector const *>>()) {
 
-  init(nDetectors);
+  init();
 }
 
-InstrumentTree::InstrumentTree(CowPtr<std::vector<Node>> nodes,
-                               size_t nDetectors)
+InstrumentTree::InstrumentTree(CowPtr<std::vector<Node>> nodes)
     : m_nodes(nodes),
       m_detectorVec(std::make_shared<std::vector<Detector const *>>()) {
 
-  init(nDetectors);
+  init();
 }
 
 const Node &InstrumentTree::root() const { return m_nodes.const_ref()[0]; }
@@ -128,7 +122,7 @@ bool InstrumentTree::modify(size_t nodeIndex, const Command &command) {
   if (newDetectors) {
     const size_t nDetectors = m_detectorVec->size();
     m_detectorVec->clear();
-    init(nDetectors);
+    init();
   }
   return newDetectors;
 }

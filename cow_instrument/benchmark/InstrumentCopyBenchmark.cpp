@@ -30,8 +30,7 @@ public:
 
   CopyFixture()
       : benchmark::Fixture(),
-        m_instrument(std_instrument::construct_root_node(), 60000),
-        m_nodeIndex(0) {
+        m_instrument(std_instrument::construct_root_node()), m_nodeIndex(0) {
 
     // Walk down the tree to depth
     const Node *node = &m_instrument.root();

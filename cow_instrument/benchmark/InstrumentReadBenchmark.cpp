@@ -13,7 +13,7 @@ public:
 
   ReadFixture()
       : benchmark::Fixture(),
-        m_instrument(std_instrument::construct_root_node(), 60000) {}
+        m_instrument(std_instrument::construct_root_node()) {}
 };
 
 void BM_InstrumentTreeConstruction(benchmark::State &state) {
@@ -22,7 +22,7 @@ void BM_InstrumentTreeConstruction(benchmark::State &state) {
     auto flattenedNodeTree = std_instrument::construct_root_node();
     state.ResumeTiming();
 
-    InstrumentTree instrument(std::move(flattenedNodeTree), 60000);
+    InstrumentTree instrument(std::move(flattenedNodeTree));
   }
   state.SetItemsProcessed(state.iterations() * 1);
 }

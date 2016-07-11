@@ -75,11 +75,13 @@ public:
   MOCK_CONST_METHOD0(samplePos, V3D());
   MOCK_CONST_METHOD1(getDetector, const Detector &(size_t));
 
-  std::unique_ptr<MockInstrumentTree> modify(size_t nodeIndex, const Command &command) const {
+  std::unique_ptr<MockInstrumentTree> modify(size_t nodeIndex,
+                                             const Command &command) const {
     return std::unique_ptr<MockInstrumentTree>(modifyProxy(nodeIndex, command));
   }
 
-  MOCK_CONST_METHOD2(modifyProxy, MockInstrumentTree *(size_t, const Command &));
+  MOCK_CONST_METHOD2(modifyProxy,
+                     MockInstrumentTree *(size_t, const Command &));
 
   virtual ~MockInstrumentTree() {}
 private:
