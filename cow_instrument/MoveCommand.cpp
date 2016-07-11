@@ -3,8 +3,11 @@
 
 MoveCommand::MoveCommand(V3D offset) : m_offset(offset) {}
 
-void MoveCommand::execute(Component &component) const {
-  component.deltaPos(m_offset);
+bool MoveCommand::execute(CowPtr<Component> &component) const {
+  // TODO. This is not thread safe.
+  const bool pendingCopy = component.copyable();
+  component->deltaPos(m_offset);
+  return pendingCopy;
 }
 
 bool MoveCommand::isMetaDataCommand() const { /*Moving is recursive*/

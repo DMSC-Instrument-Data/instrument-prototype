@@ -16,7 +16,7 @@ public:
       : benchmark::Fixture(),
         m_spectrumInfo(
             DetectorInfo<InstrumentTree>(std::make_shared<InstrumentTree>(
-                std_instrument::construct_root_node(), 6000))) {}
+                std_instrument::construct_root_node()))) {}
 };
 
 BENCHMARK_F(SpectrumInfoFixture, BM_l2_access)(benchmark::State &state) {

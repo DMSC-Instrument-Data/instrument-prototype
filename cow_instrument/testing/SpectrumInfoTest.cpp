@@ -126,3 +126,23 @@ TEST(spectrum_info_test, test_l2_mapped) {
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(&detectorInfo))
       << "Mock DetectorInfo used incorrectly";
 }
+
+TEST(spectrum_info_test, test_modify) {
+
+  using namespace testing;
+  auto *pMockInstrumentTree = new NiceMockInstrumentTree{};
+
+  // We expect that the modify method of the existing instrument tree gets
+  // called
+  EXPECT_CALL(*pMockInstrumentTree, modifyProxy(testing::_, testing::_))
+      .Times(1);
+
+  SpectrumInfo<MockInstrumentTree> spectrumInfo(DetectorInfoWithMockInstrument{
+      std::shared_ptr<MockInstrumentTree>{pMockInstrumentTree}});
+
+  MockCommand command;
+  spectrumInfo.modify(0, command);
+
+  // test modify called on instrument.
+  EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree));
+}

@@ -114,22 +114,11 @@ TEST(detector_info_test, test_modify) {
 
   using namespace testing;
   auto *pMockInstrumentTree = new NiceMockInstrumentTree{};
-  auto *pMockInstrumentTreeNew = new NiceMockInstrumentTree{};
 
   // We expect that the modify method of the existing instrument tree gets
   // called
-  EXPECT_CALL(*pMockInstrumentTree, modifyProxy(testing::_))
-      .Times(1)
-      .WillOnce(Return(pMockInstrumentTreeNew));
-
-  // We expect that the source position of the new instrument is required
-  EXPECT_CALL(*pMockInstrumentTreeNew, sourcePos())
-      .Times(1)
-      .WillOnce(Return(V3D{0, 0, 0}));
-  // We expect that the sample position of the new instrument is required
-  EXPECT_CALL(*pMockInstrumentTreeNew, samplePos())
-      .Times(1)
-      .WillOnce(Return(V3D{1, 1, 1}));
+  EXPECT_CALL(*pMockInstrumentTree, modifyProxy(testing::_, testing::_))
+      .Times(1);
 
   DetectorInfoWithMockInstrument detectorInfo{
       std::shared_ptr<MockInstrumentTree>(pMockInstrumentTree)};
@@ -139,7 +128,6 @@ TEST(detector_info_test, test_modify) {
 
   // test modify called on instrument.
   EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree));
-  EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTreeNew));
 }
 
 TEST(detector_info_test, test_copy) {

@@ -55,7 +55,7 @@ public:
   friend class InstrumentTree;
 
 private:
-  void doModify(const Command &command);
+  bool modify(const Command &command);
 
   /// Parent node, negative index indicates no parent.
   int64_t m_previous;
