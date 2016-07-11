@@ -42,6 +42,8 @@ public:
   T *operator->();
   const T &const_ref() const;
   bool operator==(const CowPtr<T> &other) const;
+  bool unique() const;
+  bool copyable() const;
 };
 
 template <typename T> void CowPtr<T>::copy() {
@@ -76,5 +78,9 @@ template <typename T> const T &CowPtr<T>::const_ref() const { return *m_sp; }
 template <typename T> bool CowPtr<T>::operator==(const CowPtr<T> &other) const {
   return m_sp.get() == &other.const_ref();
 }
+
+template <typename T> bool CowPtr<T>::unique() const { return m_sp.unique(); }
+
+template <typename T> bool CowPtr<T>::copyable() const { return !unique(); }
 
 #endif
