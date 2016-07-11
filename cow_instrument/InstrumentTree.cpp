@@ -95,21 +95,25 @@ size_t InstrumentTree::nDetectors() const { return m_detectorVec->size(); }
 
 bool InstrumentTree::modify(size_t nodeIndex, const Command &command) {
 
-  CowPtr<std::vector<Node>> newNodes(m_nodes);
-  std::for_each(newNodes->begin(), newNodes->end(),
+  /* We increment the version number of the Nodes. Consider removing the Node
+   * Version Number. It has no practicle use-case other than diagnostics, and
+   * the increemnt
+   * is a writeable operation on the COW ptr.
+   */
+  std::for_each(m_nodes->begin(), m_nodes->end(),
                 [](Node &node) { node.incrementVersion(); });
 
   bool newDetectors = false;
   if (command.isMetaDataCommand()) {
     // No cascading behaviour.
-    auto &currentNode = newNodes->operator[](nodeIndex);
+    auto &currentNode = m_nodes->operator[](nodeIndex);
     newDetectors |= currentNode.modify(command);
 
   } else {
     // Cascading behaviour
     std::vector<size_t> toModify = {nodeIndex};
     for (size_t index = 0; index < toModify.size(); ++index) {
-      auto &currentNode = newNodes->operator[](toModify[index]);
+      auto &currentNode = m_nodes->operator[](toModify[index]);
       newDetectors |= currentNode.modify(command);
       const auto &currentChildren = currentNode.children();
       toModify.insert(toModify.end(), currentChildren.begin(),
@@ -117,7 +121,6 @@ bool InstrumentTree::modify(size_t nodeIndex, const Command &command) {
     }
   }
 
-  m_nodes = newNodes;
   /*
    * We only rebuild our Detector* vector if the modifications
    * indicate that such action is required.
