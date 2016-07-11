@@ -134,7 +134,7 @@ TEST(spectrum_info_test, test_modify) {
 
   // We expect that the modify method of the existing instrument tree gets
   // called
-  EXPECT_CALL(*pMockInstrumentTree, modifyProxy(testing::_)).Times(1);
+  EXPECT_CALL(*pMockInstrumentTree, modifyProxy(testing::_, testing::_)).Times(1);
 
   SpectrumInfo<MockInstrumentTree> spectrumInfo(DetectorInfoWithMockInstrument{
       std::shared_ptr<MockInstrumentTree>{pMockInstrumentTree}});

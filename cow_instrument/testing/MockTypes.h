@@ -50,7 +50,7 @@ public:
   virtual V3D sourcePos() const = 0;
   virtual V3D samplePos() const = 0;
   virtual const Detector &getDetector(size_t detectorIndex) const = 0;
-  virtual std::unique_ptr<T> modify(const Command &command) const = 0;
+  virtual std::unique_ptr<T> modify(size_t, const Command &command) const = 0;
   virtual ~PolymorphicInstrumentTree() {}
 };
 
@@ -75,11 +75,11 @@ public:
   MOCK_CONST_METHOD0(samplePos, V3D());
   MOCK_CONST_METHOD1(getDetector, const Detector &(size_t));
 
-  std::unique_ptr<MockInstrumentTree> modify(const Command &command) const {
-    return std::unique_ptr<MockInstrumentTree>(modifyProxy(command));
+  std::unique_ptr<MockInstrumentTree> modify(size_t nodeIndex, const Command &command) const {
+    return std::unique_ptr<MockInstrumentTree>(modifyProxy(nodeIndex, command));
   }
 
-  MOCK_CONST_METHOD1(modifyProxy, MockInstrumentTree *(const Command &));
+  MOCK_CONST_METHOD2(modifyProxy, MockInstrumentTree *(size_t, const Command &));
 
   virtual ~MockInstrumentTree() {}
 private:
