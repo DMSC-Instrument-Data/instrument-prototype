@@ -39,6 +39,7 @@ set ( TEST_FILES
                  InstrumentTreeTest.cpp
                  MoveCommandTest.cpp
                  NodeTest.cpp
+                 PathComponentTest.cpp
                  SpectrumInfoTest.cpp
                  SpectrumTest.cpp
 )
