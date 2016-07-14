@@ -8,6 +8,7 @@ set ( SOURCE_FILES
                    MoveCommand.cpp
                    Node.cpp
                    NullComponent.cpp
+                   ParabolicGuide.cpp
                    PathComponent.cpp
                    Spectrum.cpp
 )
@@ -31,6 +32,7 @@ set ( INCLUDE_FILES
                    MoveCommand.h
                    Node.h
                    NullComponent.h
+                   ParabolicGuide.h
                    PathComponent.h
                    SpectrumInfo.h
                    Spectrum.h
