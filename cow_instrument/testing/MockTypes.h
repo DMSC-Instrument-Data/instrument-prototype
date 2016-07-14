@@ -5,6 +5,7 @@
 #include "Command.h"
 #include "Detector.h"
 #include "DetectorInfo.h"
+#include "PathComponent.h"
 #include "gmock/gmock.h"
 #include <cow_ptr.h>
 
@@ -14,7 +15,9 @@ public:
   MOCK_METHOD1(deltaPos, void(const V3D &));
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
-  MOCK_CONST_METHOD1(registerContents, void(std::vector<const Detector *> &));
+  MOCK_CONST_METHOD2(registerContents,
+                     void(std::vector<const Detector *> &,
+                          std::vector<const PathComponent *> &));
   ~MockComponent() {}
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
   MOCK_CONST_METHOD0(name, std::string());
@@ -38,7 +41,9 @@ public:
   MOCK_METHOD1(deltaPos, void(const V3D &));
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
-  MOCK_CONST_METHOD1(registerContents, void(std::vector<const Detector *> &));
+  MOCK_CONST_METHOD2(registerContents,
+                     void(std::vector<const Detector *> &,
+                          std::vector<const PathComponent *> &));
   ~MockDetector() {}
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
   MOCK_CONST_METHOD0(name, std::string());

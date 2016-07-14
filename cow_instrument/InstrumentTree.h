@@ -12,6 +12,7 @@ class Node;
 class NodeIterator;
 class Command;
 class Detector;
+class PathComponent;
 
 /*
  The instrument is nothing more than syntatic sugar over the root Node.
@@ -57,7 +58,10 @@ public:
 private:
   void init();
 
+  /// Pointers to all known detectors in the instrument tree
   CowPtr<std::vector<Detector const *>> m_detectorVec;
+  /// Pointers to all known path components in the instrument tree
+  CowPtr<std::vector<PathComponent const *>> m_pathVec;
   CowPtr<std::vector<Node>> m_nodes;
 };
 

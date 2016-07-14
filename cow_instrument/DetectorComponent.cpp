@@ -27,8 +27,9 @@ bool DetectorComponent::equals(const Component &other) const {
 }
 
 void DetectorComponent::registerContents(
-    std::vector<const Detector *> &lookup) const {
-    lookup.push_back(this);
+    std::vector<const Detector *> &lookupDetectors,
+    std::vector<const PathComponent *> &) const {
+  lookupDetectors.push_back(this);
 }
 
 std::string DetectorComponent::name() const {

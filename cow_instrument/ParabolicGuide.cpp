@@ -69,10 +69,11 @@ bool ParabolicGuide::equals(const Component &other) const {
   return equals;
 }
 
-void
-ParabolicGuide::registerContents(std::vector<const Detector *> &lookup) const {
-  // Do nothing. ParabolicGuids are NOT detectors, and must not register
-  // contents.
+void ParabolicGuide::registerContents(
+    std::vector<const Detector *> &,
+    std::vector<const PathComponent *> &pathComponents) const {
+  // Register this as a path component. It is not a detector.
+  pathComponents.push_back(this);
 }
 
 ComponentIdType ParabolicGuide::componentId() const { return m_componentId; }

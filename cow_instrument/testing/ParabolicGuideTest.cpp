@@ -102,14 +102,20 @@ TEST(parabolic_guide_test, test_entry_exit_points) {
   EXPECT_EQ(guide.exitPoint(), V3D({pos[0] + a, pos[1], pos[2]}));
 }
 
-TEST(parabolic_guide_test, test_do_not_register_contents) {
+TEST(parabolic_guide_test, test_register_only_path_components) {
 
   ParabolicGuide guide(ComponentIdType(1), 1.0, 1.0, V3D{1.0, 1.0, 1.0});
 
   std::vector<const Detector *> detectorVec;
-  size_t startSize = detectorVec.size();
-  guide.registerContents(detectorVec);
-  EXPECT_EQ(detectorVec.size(), startSize) << "Do not register PathComponents";
+  std::vector<const PathComponent *> pathComponentVec;
+  size_t detectorVecStartSize = detectorVec.size();
+  size_t pathComponentVecSize = pathComponentVec.size();
+  // Perform registration
+  guide.registerContents(detectorVec, pathComponentVec);
+  EXPECT_EQ(detectorVec.size(), detectorVecStartSize)
+      << "Do not register ParabolicGuide as a Detector";
+  EXPECT_EQ(pathComponentVec.size(), pathComponentVecSize + 1)
+      << "ParabolicGuide should be registered as a PathComponent";
 }
 
 TEST(parabolic_guide_test, test_clone) {

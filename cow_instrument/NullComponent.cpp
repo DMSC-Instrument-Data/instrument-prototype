@@ -12,8 +12,10 @@ bool NullComponent::equals(const Component& other) const{
     return dynamic_cast<const NullComponent*>(&other) != nullptr;
 }
 
-void NullComponent::registerContents(std::vector<const Detector *> &) const
-{
+void
+NullComponent::registerContents(std::vector<const Detector *> &,
+                                std::vector<const PathComponent *> &) const {
+  // Do nothing.
 }
 
 ComponentIdType NullComponent::componentId() const

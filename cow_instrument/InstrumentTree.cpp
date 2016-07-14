@@ -9,11 +9,18 @@
 
 namespace {
 
-void findDetectors(const Component &component,
-                   std::vector<const Detector *> &store) {
+/**
+ * @brief findKeyComponents
+ * @param component
+ * @param detectorStore
+ * @param pathStore
+ */
+void findKeyComponents(const Component &component,
+                       std::vector<const Detector *> &detectorStore,
+                       std::vector<const PathComponent *> &pathStore) {
 
   // Walk through and register all detectors on the store.
-  component.registerContents(store);
+  component.registerContents(detectorStore, pathStore);
 }
 }
 
@@ -28,7 +35,7 @@ void InstrumentTree::init() {
   for (const auto &node : m_nodes.const_ref()) {
     const auto &component = node.const_ref();
     // Put all detectors into a flat map.
-    findDetectors(component, *m_detectorVec);
+    findKeyComponents(component, *m_detectorVec, *m_pathVec);
     if (node.version() != expectedVersion) {
       throw std::invalid_argument(
           "Cannot make an Instrument tree around Nodes of differing version");
@@ -40,14 +47,16 @@ void InstrumentTree::init() {
 
 InstrumentTree::InstrumentTree(std::vector<Node> &&nodes)
     : m_nodes(std::make_shared<std::vector<Node>>(std::move(nodes))),
-      m_detectorVec(std::make_shared<std::vector<Detector const *>>()) {
+      m_detectorVec(std::make_shared<std::vector<Detector const *>>()),
+      m_pathVec(std::make_shared<std::vector<PathComponent const *>>()) {
 
   init();
 }
 
 InstrumentTree::InstrumentTree(CowPtr<std::vector<Node>> nodes)
     : m_nodes(nodes),
-      m_detectorVec(std::make_shared<std::vector<Detector const *>>()) {
+      m_detectorVec(std::make_shared<std::vector<Detector const *>>()),
+      m_pathVec(std::make_shared<std::vector<PathComponent const *>>()) {
 
   init();
 }

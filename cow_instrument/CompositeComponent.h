@@ -20,7 +20,8 @@ public:
   void addComponent(std::unique_ptr<Component>&& child);
   size_t size() const {return m_children.size();}
   const Component& getChild(size_t index) const;
-  void registerContents(std::vector<const Detector*>& lookup) const override;
+  void registerContents(std::vector<const Detector *> &lookup,
+                        std::vector<const PathComponent *> &) const override;
   ComponentIdType componentId() const override;
   std::string name() const override;
 

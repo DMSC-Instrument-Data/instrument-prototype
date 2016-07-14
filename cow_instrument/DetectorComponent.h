@@ -20,8 +20,9 @@ public:
   bool equals(const Component &other) const override;
   DetectorIdType detectorId() const override;
   ComponentIdType componentId() const override;
-  void
-  registerContents(std::vector<const Detector *> &lookup) const override;
+  void registerContents(
+      std::vector<const Detector *> &lookup,
+      std::vector<const PathComponent *> &pathComponents) const override;
   std::string name() const override;
 
 private:

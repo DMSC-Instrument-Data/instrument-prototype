@@ -20,7 +20,8 @@ public:
   void deltaPos(const V3D &){};
   Component *clone() const { return new FakePathComponent{m_position}; };
   bool equals(const Component &other) const { return false; };
-  void registerContents(std::vector<const Detector *> &) const {}
+  void registerContents(std::vector<const Detector *> &,
+                        std::vector<const PathComponent *> &) const {}
   ComponentIdType componentId() const { return ComponentIdType{1}; }
   std::string name() const { return ""; };
 };

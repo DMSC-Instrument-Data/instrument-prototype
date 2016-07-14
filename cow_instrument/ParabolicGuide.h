@@ -14,7 +14,9 @@ public:
   void deltaPos(const V3D &pos);
   ParabolicGuide *clone() const;
   bool equals(const Component &other) const;
-  void registerContents(std::vector<const Detector *> &lookup) const;
+  void registerContents(
+      std::vector<const Detector *> &lookupDetectors,
+      std::vector<const PathComponent *> &lookupPathComponents) const;
   ComponentIdType componentId() const;
   std::string name() const;
 
