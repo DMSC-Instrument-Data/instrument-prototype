@@ -10,7 +10,6 @@ set ( SOURCE_FILES
                    NullComponent.cpp
                    ParabolicGuide.cpp
                    PathComponent.cpp
-                   Spectrum.cpp
 )
 
 set ( INCLUDE_FILES
@@ -33,9 +32,11 @@ set ( INCLUDE_FILES
                    Node.h
                    NullComponent.h
                    ParabolicGuide.h
+                   Path.h
                    PathComponent.h
                    SpectrumInfo.h
                    Spectrum.h
+                   VectorOf.h
                    V3D.h
 )
 

@@ -7,17 +7,16 @@
 #include <string>
 #include <sstream>
 #include <cmath>
-#include <boost/optional.hpp>
+
+#include "Command.h"
+#include "cow_ptr.h"
 #include "Detector.h"
 #include "IdType.h"
+#include "L2s.h"
 #include "MaskFlags.h"
 #include "MonitorFlags.h"
-#include "L2s.h"
-#include "Command.h"
+#include "Path.h"
 #include "Spectrum.h"
-#include "cow_ptr.h"
-#include <mutex>
-#include <thread>
 
 /**
  * DetectorInfo type. Provides Meta-data context to an InstrumentTree
@@ -66,10 +65,10 @@ private:
       m_isMonitor; // This could be copied upon instrument change
 
   //------------------- DerivedInfo
-  double m_l1;      // This can't be copied upon instrument change
-  V3D m_sourcePos;  // This can't be copied upon instrument change
-  V3D m_samplePos;  // This can't be copied upon instrument change
-  CowPtr<L2s> m_l2; // This can't be copied upon instrument change
+  double m_l1;
+  V3D m_sourcePos;
+  V3D m_samplePos;
+  CowPtr<L2s> m_l2;
 };
 
 namespace {
@@ -148,7 +147,7 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL2() {
     auto detPos = det.getPos();
 
     /*
-     * Long-term is is not right. We cannot assume that the L2 path is simply
+     * Long-term this is not right. We cannot assume that the L2 path is simply
      * sample
      * to detector.
      */

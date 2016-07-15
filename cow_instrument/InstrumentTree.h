@@ -27,6 +27,8 @@ public:
 
   const Detector &getDetector(size_t detectorIndex) const;
 
+  const PathComponent &getPathComponent(size_t pathComponentIndex) const;
+
   unsigned int version() const;
 
   bool modify(size_t node, const Command &command);
@@ -37,6 +39,7 @@ public:
   void fillDetectorMap(std::map<DetectorIdType, size_t> &toFill) const;
 
   size_t nDetectors() const;
+  size_t nPathComponents() const;
 
   Node const *const nodeAt(size_t index) const;
   V3D sourcePos() const;

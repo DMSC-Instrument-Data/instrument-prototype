@@ -1,6 +1,11 @@
 #include "Node.h"
 #include "Command.h"
 #include "Component.h"
+#include "NullComponent.h"
+
+Node::Node()
+    : m_previous(-1), m_contents(CowPtr<Component>(new NullComponent)),
+      m_name(""), m_version(0) {}
 
 Node::Node(size_t previous, CowPtr<Component> contents, std::string name,
            unsigned int version)

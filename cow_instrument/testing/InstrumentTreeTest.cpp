@@ -5,6 +5,9 @@
 #include "MockTypes.h"
 #include "DetectorComponent.h"
 #include "CompositeComponent.h"
+#include "ParabolicGuide.h"
+#include "NullComponent.h"
+#include "ParabolicGuide.h"
 
 using namespace testing;
 
@@ -40,6 +43,33 @@ InstrumentTree make_simple_tree(DetectorIdType detector1Id,
   nodes[0].addChild(1);
   nodes[0].addChild(2);
 
+  return InstrumentTree(std::move(nodes));
+}
+
+InstrumentTree make_mixed_tree(ComponentIdType idForDetector,
+                               ComponentIdType idForGuide) {
+
+  /*
+
+        Root Node A
+        |
+ -------------------------------------------------
+ |                                               |
+ B (Detector)               C (PathComponent)
+
+  */
+
+  std::vector<Node> nodes;
+  nodes.push_back(Node{});
+  nodes.push_back(
+      Node(0, CowPtr<Component>(new DetectorComponent(
+                  idForDetector, DetectorIdType(1), V3D{1, 1, 1}))));
+
+  nodes.push_back(Node(0, CowPtr<Component>(new ParabolicGuide(idForGuide, 1, 1,
+                                                               V3D{0, 1, 1}))));
+
+  nodes[0].addChild(1);
+  nodes[0].addChild(2);
   return InstrumentTree(std::move(nodes));
 }
 
@@ -201,6 +231,20 @@ TEST(instrument_tree_test, test_fill_detector_map) {
   std::map<DetectorIdType, size_t> container;
   instrument.fillDetectorMap(container);
   EXPECT_EQ(container.size(), 2) << "Two detectors expected";
+}
+
+TEST(instrument_tree_test,
+     test_get_detector_and_path_from_mixed_component_instrument) {
+
+  const ComponentIdType idForDetector(1);
+  const ComponentIdType idForGuide(2);
+
+  auto instrument = make_mixed_tree(idForDetector, idForGuide);
+  const auto &detectorComponent = instrument.getDetector(0);
+  const auto &pathComponent = instrument.getPathComponent(0);
+
+  EXPECT_EQ(detectorComponent.componentId(), idForDetector);
+  EXPECT_EQ(pathComponent.componentId(), idForGuide);
 }
 
 TEST(instrument_tree_test, test_modify_linear) {

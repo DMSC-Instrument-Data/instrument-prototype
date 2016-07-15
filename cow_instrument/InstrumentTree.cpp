@@ -22,6 +22,24 @@ void findKeyComponents(const Component &component,
   // Walk through and register all detectors on the store.
   component.registerContents(detectorStore, pathStore);
 }
+
+void checkDetectorRange(size_t detectorIndex,
+                        const std::vector<Detector const *> &detectorVec) {
+  if (detectorIndex >= detectorVec.size()) {
+    throw std::invalid_argument(
+        "Detector Index is outside range of indexes. Index is: " +
+        std::to_string(detectorIndex));
+  }
+}
+
+void checkPathRange(size_t pathIndex,
+                    const std::vector<PathComponent const *> &pathVec) {
+  if (pathIndex >= pathVec.size()) {
+    throw std::invalid_argument(
+        "PathComponent Index is outside range of indexes. Index is: " +
+        std::to_string(pathIndex));
+  }
+}
 }
 
 void InstrumentTree::init() {
@@ -65,14 +83,18 @@ const Node &InstrumentTree::root() const { return m_nodes.const_ref()[0]; }
 
 const Detector &InstrumentTree::getDetector(size_t detectorIndex) const {
 
-  if (detectorIndex >= m_detectorVec->size()) {
-    throw std::invalid_argument(
-        "Index is outside range of detector ids. Index is: " +
-        std::to_string(detectorIndex));
-  }
+  checkDetectorRange(detectorIndex, m_detectorVec.const_ref());
 
   return *m_detectorVec.const_ref()[detectorIndex];
 }
+
+const PathComponent &
+InstrumentTree::getPathComponent(size_t pathComponentIndex) const {
+
+  checkPathRange(pathComponentIndex, m_pathVec.const_ref());
+
+  return *m_pathVec.const_ref()[pathComponentIndex];
+};
 
 unsigned int InstrumentTree::version() const {
   return m_nodes.const_ref()[0].version();
@@ -95,6 +117,8 @@ V3D InstrumentTree::samplePos() const {
 }
 
 size_t InstrumentTree::nDetectors() const { return m_detectorVec->size(); }
+
+size_t InstrumentTree::nPathComponents() const { return m_pathVec->size(); }
 
 bool InstrumentTree::modify(size_t nodeIndex, const Command &command) {
 
