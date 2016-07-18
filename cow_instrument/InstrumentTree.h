@@ -48,6 +48,9 @@ public:
   V3D sourcePos() const; // TODO REMOVE!
   V3D samplePos() const; // TODO REMOVE!
 
+  size_t samplePathIndex() const;
+  size_t sourcePathIndex() const;
+
   std::vector<Node>::const_iterator begin() const {
     return m_nodes.const_ref().begin();
   }

@@ -143,6 +143,10 @@ const PathComponent &InstrumentTree::sample() const {
   return *m_pathVec.const_ref()[m_sampleIndex];
 }
 
+size_t InstrumentTree::samplePathIndex() const { return m_sampleIndex; }
+
+size_t InstrumentTree::sourcePathIndex() const { return m_sourceIndex; }
+
 size_t InstrumentTree::nDetectors() const { return m_detectorVec->size(); }
 
 size_t InstrumentTree::nPathComponents() const { return m_pathVec->size(); }

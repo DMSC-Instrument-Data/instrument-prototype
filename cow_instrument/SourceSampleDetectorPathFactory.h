@@ -11,7 +11,9 @@
 class SourceSampleDetectorPathFactory : public PathFactory {
 
 public:
-  Paths create(const InstrumentTree &instrument) const;
+  Paths createL2(const InstrumentTree &instrument) const;
+
+  Paths createL1(const InstrumentTree &instrument) const;
 };
 
 #endif

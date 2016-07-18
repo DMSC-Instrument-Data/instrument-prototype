@@ -11,7 +11,8 @@ class InstrumentTree;
  */
 class PathFactory {
 public:
-  virtual Paths create(const InstrumentTree &instrument) const = 0;
+  virtual Paths createL2(const InstrumentTree &instrument) const = 0;
+  virtual Paths createL1(const InstrumentTree &instrument) const = 0;
   virtual ~PathFactory() {}
 };
 

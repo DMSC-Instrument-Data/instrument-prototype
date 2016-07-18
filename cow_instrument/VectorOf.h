@@ -15,8 +15,8 @@ public:
   VectorOf(std::initializer_list<size_t> init);
   VectorOf(const VectorOf<T> &) = default;
   VectorOf(VectorOf<T> &&) = default;
-  VectorOf(const std::vector<size_t> &detectorIndexes);
-  VectorOf(std::vector<size_t> &&detectorIndexes);
+  VectorOf(const std::vector<size_t> &indexes);
+  VectorOf(std::vector<size_t> &&indexes);
 
   VectorOf &operator=(const VectorOf<T> &rhs) = default;
   VectorOf &operator=(VectorOf<T> &&rhs) = default;
@@ -42,11 +42,11 @@ template <typename T>
 VectorOf<T>::VectorOf(std::initializer_list<size_t> init)
     : m_indexes(init) {}
 template <typename T>
-VectorOf<T>::VectorOf(const std::vector<size_t> &detectorIndexes)
-    : m_indexes(detectorIndexes) {}
+VectorOf<T>::VectorOf(const std::vector<size_t> &indexes)
+    : m_indexes(indexes) {}
 template <typename T>
-VectorOf<T>::VectorOf(std::vector<size_t> &&detectorIndexes)
-    : m_indexes(std::move(detectorIndexes)) {}
+VectorOf<T>::VectorOf(std::vector<size_t> &&indexes)
+    : m_indexes(std::move(indexes)) {}
 template <typename T>
 VectorOf<T> &VectorOf<T>::operator=(const std::vector<size_t> &rhs) {
   m_indexes = rhs;
