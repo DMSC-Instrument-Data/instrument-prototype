@@ -34,6 +34,7 @@ set ( INCLUDE_FILES
                    ParabolicGuide.h
                    Path.h
                    PathComponent.h
+                   PathFactory.h
                    SpectrumInfo.h
                    Spectrum.h
                    VectorOf.h

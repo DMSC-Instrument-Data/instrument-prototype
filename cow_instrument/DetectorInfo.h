@@ -69,6 +69,7 @@ private:
   V3D m_sourcePos;
   V3D m_samplePos;
   CowPtr<L2s> m_l2;
+  // CowPtr<Paths> m_paths;
 };
 
 namespace {

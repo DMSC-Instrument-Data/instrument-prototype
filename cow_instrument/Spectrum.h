@@ -3,6 +3,13 @@
 #include "FixedLengthVector.h"
 #include "VectorOf.h"
 
+/**
+ * Spectrum is a vector of detector indexes.
+ *
+ * One Spectrum per spectrum index in the SpectrumInfo.
+ *
+ * Stored indexes are the detector indexes in the instrument tree.
+ */
 class Spectrum : public VectorOf<Spectrum> {
 public:
   using VectorOf<Spectrum>::VectorOf;

@@ -5,7 +5,8 @@
 #include "Command.h"
 #include "Detector.h"
 #include "DetectorInfo.h"
-#include "PathComponent.h"
+#include "InstrumentTree.h"
+#include "PathFactory.h"
 #include "gmock/gmock.h"
 #include <cow_ptr.h>
 
@@ -91,6 +92,13 @@ public:
   virtual ~MockInstrumentTree() {}
 private:
   testing::NiceMock<MockDetector> m_detector;
+};
+
+class MockPathFactory : public PathFactory {
+
+public:
+  MOCK_CONST_METHOD1(create, Paths(const InstrumentTree &instrument));
+  virtual ~MockPathFactory() {}
 };
 
 using NiceMockInstrumentTree = testing::NiceMock<MockInstrumentTree>;

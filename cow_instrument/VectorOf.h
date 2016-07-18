@@ -32,55 +32,55 @@ public:
   size_t &operator[](size_t pos);
 
 private:
-  std::vector<size_t> m_detectorIndexes;
+  std::vector<size_t> m_indexes;
 };
 
 template <typename T>
 VectorOf<T>::VectorOf(size_t detectorIndex)
-    : m_detectorIndexes(1, detectorIndex) {}
+    : m_indexes(1, detectorIndex) {}
 template <typename T>
 VectorOf<T>::VectorOf(std::initializer_list<size_t> init)
-    : m_detectorIndexes(init) {}
+    : m_indexes(init) {}
 template <typename T>
 VectorOf<T>::VectorOf(const std::vector<size_t> &detectorIndexes)
-    : m_detectorIndexes(detectorIndexes) {}
+    : m_indexes(detectorIndexes) {}
 template <typename T>
 VectorOf<T>::VectorOf(std::vector<size_t> &&detectorIndexes)
-    : m_detectorIndexes(std::move(detectorIndexes)) {}
+    : m_indexes(std::move(detectorIndexes)) {}
 template <typename T>
 VectorOf<T> &VectorOf<T>::operator=(const std::vector<size_t> &rhs) {
-  m_detectorIndexes = rhs;
+  m_indexes = rhs;
   return *this;
 }
 template <typename T>
 VectorOf<T> &VectorOf<T>::operator=(std::vector<size_t> &&rhs) {
-  m_detectorIndexes = std::move(rhs);
+  m_indexes = std::move(rhs);
   return *this;
 }
 template <typename T>
 VectorOf<T> &VectorOf<T>::operator=(std::initializer_list<size_t> ilist) {
-  m_detectorIndexes = ilist;
+  m_indexes = ilist;
   return *this;
 }
 template <typename T>
 bool VectorOf<T>::operator==(const VectorOf<T> &other) const {
-  return m_detectorIndexes == other.m_detectorIndexes;
+  return m_indexes == other.m_indexes;
 }
 template <typename T>
 bool VectorOf<T>::operator!=(const VectorOf<T> &other) const {
-  return m_detectorIndexes != other.m_detectorIndexes;
+  return m_indexes != other.m_indexes;
 }
 template <typename T> const std::vector<size_t> &VectorOf<T>::indexes() const {
-  return m_detectorIndexes;
+  return m_indexes;
 }
 template <typename T> size_t VectorOf<T>::size() const {
-  return m_detectorIndexes.size();
+  return m_indexes.size();
 }
 template <typename T> const size_t &VectorOf<T>::operator[](size_t pos) const {
-  return m_detectorIndexes[pos];
+  return m_indexes[pos];
 }
 template <typename T> size_t &VectorOf<T>::operator[](size_t pos) {
-  return m_detectorIndexes[pos];
+  return m_indexes[pos];
 }
 
 #endif
