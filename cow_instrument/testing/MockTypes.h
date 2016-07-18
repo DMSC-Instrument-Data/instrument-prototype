@@ -6,6 +6,7 @@
 #include "Detector.h"
 #include "DetectorInfo.h"
 #include "InstrumentTree.h"
+#include "PathComponent.h"
 #include "PathFactory.h"
 #include "gmock/gmock.h"
 #include <cow_ptr.h>
@@ -22,6 +23,30 @@ public:
   ~MockComponent() {}
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
   MOCK_CONST_METHOD0(name, std::string());
+};
+
+class MockPathComponent : public PathComponent {
+public:
+  MOCK_CONST_METHOD0(getPos, V3D());
+  MOCK_METHOD1(deltaPos, void(const V3D &));
+  MOCK_CONST_METHOD0(clone, Component *());
+  MOCK_CONST_METHOD1(equals, bool(const Component &));
+
+  void
+  registerContents(std::vector<const Detector *> &,
+                   std::vector<const PathComponent *> &pathComponents) const {
+    pathComponents.push_back(this);
+  }
+
+  MOCK_CONST_METHOD0(componentId, ComponentIdType());
+  MOCK_CONST_METHOD0(name, std::string());
+
+  MOCK_CONST_METHOD0(length, double());
+  MOCK_CONST_METHOD0(entryPoint, V3D());
+  MOCK_CONST_METHOD0(exitPoint, V3D());
+  MOCK_CONST_METHOD0(isSource, bool());
+  MOCK_CONST_METHOD0(isSample, bool());
+  ~MockPathComponent() {}
 };
 
 class MockCommand : public Command {

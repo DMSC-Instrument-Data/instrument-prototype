@@ -41,6 +41,8 @@ set ( TEST_FILES
                  NodeTest.cpp
                  ParabolicGuideTest.cpp
                  PathComponentTest.cpp
+                 PointPathComponentTest.cpp
+                 SourceSampleDetectorPathFactoryTest.cpp
                  SpectrumInfoTest.cpp
                  SpectrumTest.cpp
 )

@@ -4,6 +4,8 @@
 #include "DetectorComponent.h"
 #include "Node.h"
 #include "NullComponent.h"
+#include "PointSample.h"
+#include "PointSource.h"
 
 namespace {
 
@@ -31,9 +33,9 @@ std::vector<Node> construct_root_node() {
   /*
           instrument
           |
-   --------------------------------------------
-                      |                      |
-                front_trolley           rear_trolley
+   -----------------------------------------------------------------------
+                      |                      |                |         |
+                front_trolley           rear_trolley        source    sample
                           |                       |
                ________________________       ________________________
               |       |       |       |       |                     |
@@ -70,10 +72,16 @@ std::vector<Node> construct_root_node() {
   nodes.emplace_back(CowPtr<Component>(new NullComponent), "Rear trolley node");
   nodes.emplace_back(CowPtr<Component>(l_curtain), "Left curtain node");
   nodes.emplace_back(CowPtr<Component>(l_curtain), "Left curtain node");
+  nodes.emplace_back(
+      CowPtr<Component>(new PointSource(V3D{0, 0, 0}, ComponentIdType(100))));
+  nodes.emplace_back(
+      CowPtr<Component>(new PointSample(V3D{0, 0, 10}, ComponentIdType(100))));
 
   // Assemble flattened node node tree
   nodes[0].addChild(1);
   nodes[0].addChild(6);
+  nodes[0].addChild(9);
+  nodes[0].addChild(10);
   nodes[1].addChild(2);
   nodes[1].addChild(3);
   nodes[1].addChild(4);

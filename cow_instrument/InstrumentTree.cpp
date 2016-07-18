@@ -2,10 +2,12 @@
 #include "Node.h"
 #include "Detector.h"
 #include "CompositeComponent.h"
+#include "PathComponent.h"
 #include "Command.h"
 #include <utility>
 #include <string>
 #include <algorithm>
+#include <iterator>
 
 namespace {
 
@@ -40,6 +42,10 @@ void checkPathRange(size_t pathIndex,
         std::to_string(pathIndex));
   }
 }
+
+bool findSource(const PathComponent *item) { return item->isSource(); }
+
+bool findSample(const PathComponent *item) { return item->isSample(); }
 }
 
 void InstrumentTree::init() {
@@ -59,6 +65,19 @@ void InstrumentTree::init() {
           "Cannot make an Instrument tree around Nodes of differing version");
     }
   }
+  const auto begin_pathVec = m_pathVec.const_ref().cbegin();
+  const auto end_pathVec = m_pathVec.const_ref().cend();
+  auto sourceIt = std::find_if(begin_pathVec, end_pathVec, findSource);
+  auto sampleIt = std::find_if(begin_pathVec, end_pathVec, findSample);
+  if (sourceIt == end_pathVec) {
+    throw std::invalid_argument("Instrument has no marked source");
+  }
+  if (sampleIt == end_pathVec) {
+    throw std::invalid_argument("Instrument has no marked sample");
+  }
+  m_sourceIndex = std::distance(begin_pathVec, sourceIt);
+  m_sampleIndex = std::distance(begin_pathVec, sampleIt);
+
   // Should we shrink to fit to reduce excess capacity?
   // m_detectorVec.shrink_to_fit(); This could be costly
 }
@@ -114,6 +133,14 @@ V3D InstrumentTree::sourcePos() const {
 
 V3D InstrumentTree::samplePos() const {
   return V3D{0, 0, 10}; // HACK!
+}
+
+const PathComponent &InstrumentTree::source() const {
+  return *m_pathVec.const_ref()[m_sourceIndex];
+}
+
+const PathComponent &InstrumentTree::sample() const {
+  return *m_pathVec.const_ref()[m_sampleIndex];
 }
 
 size_t InstrumentTree::nDetectors() const { return m_detectorVec->size(); }

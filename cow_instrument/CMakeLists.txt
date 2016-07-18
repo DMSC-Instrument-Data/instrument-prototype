@@ -10,6 +10,7 @@ set ( SOURCE_FILES
                    NullComponent.cpp
                    ParabolicGuide.cpp
                    PathComponent.cpp
+                   SourceSampleDetectorPathFactory.cpp
 )
 
 set ( INCLUDE_FILES
@@ -35,6 +36,10 @@ set ( INCLUDE_FILES
                    Path.h
                    PathComponent.h
                    PathFactory.h
+                   PointPathComponent.h
+                   PointSample.h
+                   PointSource.h
+                   SourceSampleDetectorPathFactory.h
                    SpectrumInfo.h
                    Spectrum.h
                    VectorOf.h

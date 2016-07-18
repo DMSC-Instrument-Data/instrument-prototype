@@ -15,4 +15,14 @@ V3D PathComponent::exitPoint() const {
   return this->getPos();
 }
 
+bool PathComponent::isSource() const {
+  // Treat as something that is not a source by default
+  return false;
+}
+
+bool PathComponent::isSample() const {
+  // Treat as something that is not a sample by default
+  return false;
+}
+
 PathComponent::~PathComponent() {}

@@ -22,6 +22,12 @@ public:
   /// Point at which neutrons exit the component
   virtual V3D exitPoint() const;
 
+  /// Is this the source
+  virtual bool isSource() const;
+
+  /// Is this the sample
+  virtual bool isSample() const;
+
 protected:
   virtual ~PathComponent();
 };
