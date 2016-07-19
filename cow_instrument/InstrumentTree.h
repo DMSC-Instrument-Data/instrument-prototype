@@ -45,8 +45,6 @@ public:
   size_t nPathComponents() const;
 
   Node const *const nodeAt(size_t index) const;
-  V3D sourcePos() const; // TODO REMOVE!
-  V3D samplePos() const; // TODO REMOVE!
 
   size_t samplePathIndex() const;
   size_t sourcePathIndex() const;

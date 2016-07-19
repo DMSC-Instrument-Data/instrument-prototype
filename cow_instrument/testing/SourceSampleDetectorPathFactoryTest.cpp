@@ -50,7 +50,7 @@ make_very_basic_tree(ComponentIdType idForSource = ComponentIdType(0),
 TEST(source_sample_detector_path_factory_test, test_l1_paths) {
 
   auto instrument = make_very_basic_tree();
-  SourceSampleDetectorPathFactory pathFactory{};
+  SourceSampleDetectorPathFactory<InstrumentTree> pathFactory{};
   auto paths = pathFactory.createL1(instrument);
   EXPECT_EQ(paths.size(), instrument.nDetectors())
       << "Wrong number of L1 paths";
@@ -62,11 +62,11 @@ TEST(source_sample_detector_path_factory_test, test_l1_paths) {
 TEST(source_sample_detector_path_factory_test, test_l2_paths) {
 
   auto instrument = make_very_basic_tree();
-  SourceSampleDetectorPathFactory pathFactory{};
+  SourceSampleDetectorPathFactory<InstrumentTree> pathFactory{};
   auto paths = pathFactory.createL2(instrument);
   EXPECT_EQ(paths.size(), instrument.nDetectors())
       << "Wrong number of L2 paths";
   EXPECT_EQ(paths[0][0], instrument.samplePathIndex());
-  EXPECT_EQ(paths[0].size(), 2) << "Should have only 1 path entries for L2. "
+  EXPECT_EQ(paths[0].size(), 1) << "Should have only 1 path entries for L2. "
                                    "Detector indexes are not counted";
 }

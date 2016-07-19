@@ -11,7 +11,8 @@
 
 template <typename T> class VectorOf {
 public:
-  VectorOf(size_t index);
+  VectorOf(size_t size);
+  VectorOf(size_t size, const size_t &value);
   VectorOf(std::initializer_list<size_t> init);
   VectorOf(const VectorOf<T> &) = default;
   VectorOf(VectorOf<T> &&) = default;
@@ -35,9 +36,10 @@ private:
   std::vector<size_t> m_indexes;
 };
 
+template <typename T> VectorOf<T>::VectorOf(size_t size) : m_indexes(size, 0) {}
 template <typename T>
-VectorOf<T>::VectorOf(size_t detectorIndex)
-    : m_indexes(1, detectorIndex) {}
+VectorOf<T>::VectorOf(size_t size, const size_t &value)
+    : m_indexes(size, value) {}
 template <typename T>
 VectorOf<T>::VectorOf(std::initializer_list<size_t> init)
     : m_indexes(init) {}

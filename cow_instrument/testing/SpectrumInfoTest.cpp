@@ -65,9 +65,6 @@ TEST(spectrum_info_test, test_l2) {
   EXPECT_CALL(*instrument.get(), getDetector(_))
       .WillRepeatedly(ReturnRef(detector));
 
-  EXPECT_CALL(*instrument.get(), samplePos()).WillOnce(Return(V3D{0, 0, 20}));
-  MockDetector mockDetector;
-
   // Create a DetectorInfo around the Instrument
   DetectorInfoWithMockInstrument detectorInfo{instrument};
 
@@ -78,7 +75,7 @@ TEST(spectrum_info_test, test_l2) {
 
   // This is the point of the test. Do we calculate L2 correctly for our single
   // spectra.
-  EXPECT_EQ(20.0, spectrumInfo.l2(0));
+  EXPECT_NEAR(40.0, spectrumInfo.l2(0), 1e-6);
 
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(&detector))
       << "Mock Detector used incorrectly";
@@ -105,7 +102,6 @@ TEST(spectrum_info_test, test_l2_mapped) {
   EXPECT_CALL(*instrument.get(), getDetector(_))
       .WillOnce(ReturnRef(detectorA))
       .WillOnce(ReturnRef(detectorB));
-  EXPECT_CALL(*instrument.get(), samplePos()).WillOnce(Return(V3D{0, 0, 20}));
 
   // Create a DetectorInfo around the Instrument
   DetectorInfoWithMockInstrument detectorInfo{instrument};
@@ -118,7 +114,7 @@ TEST(spectrum_info_test, test_l2_mapped) {
   // This is the point of the test. Do we calculate L2 correctly for our dual
   // detector
   // spectra.
-  EXPECT_EQ(15.0, spectrumInfo.l2(0)) << "(40 + 30)/2 - 20";
+  EXPECT_EQ(35.0, spectrumInfo.l2(0)) << "(40 + 30)/2 - 0";
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(&detectorA))
       << "Mock Detector used incorrectly";
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(&detectorB))

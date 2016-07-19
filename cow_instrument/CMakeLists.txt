@@ -10,7 +10,6 @@ set ( SOURCE_FILES
                    NullComponent.cpp
                    ParabolicGuide.cpp
                    PathComponent.cpp
-                   SourceSampleDetectorPathFactory.cpp
 )
 
 set ( INCLUDE_FILES

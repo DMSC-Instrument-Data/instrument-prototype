@@ -127,14 +127,6 @@ void InstrumentTree::fillDetectorMap(
   }
 }
 
-V3D InstrumentTree::sourcePos() const {
-  return V3D{0, 0, 0}; // HACK!
-}
-
-V3D InstrumentTree::samplePos() const {
-  return V3D{0, 0, 10}; // HACK!
-}
-
 const PathComponent &InstrumentTree::source() const {
   return *m_pathVec.const_ref()[m_sourceIndex];
 }
