@@ -2,6 +2,7 @@
 #include "InstrumentTree.h"
 #include "SpectrumInfo.h"
 #include "StandardInstrument.h"
+#include "SourceSampleDetectorPathFactory.h"
 #include "Node.h"
 #include <memory.h>
 
@@ -14,9 +15,10 @@ public:
 
   SpectrumInfoFixture()
       : benchmark::Fixture(),
-        m_spectrumInfo(
-            DetectorInfo<InstrumentTree>(std::make_shared<InstrumentTree>(
-                std_instrument::construct_root_node()))) {}
+        m_spectrumInfo(DetectorInfo<InstrumentTree>(
+            std::make_shared<InstrumentTree>(
+                std_instrument::construct_root_node()),
+            SourceSampleDetectorPathFactory<InstrumentTree>{})) {}
 };
 
 BENCHMARK_F(SpectrumInfoFixture, BM_l2_access)(benchmark::State &state) {

@@ -8,6 +8,7 @@
 #include <memory>
 #include "IdType.h"
 #include "Command.h"
+#include "SourceSampleDetectorPathFactory.h"
 
 namespace {
 
@@ -25,7 +26,9 @@ TEST(detector_info_test, test_construct) {
 
   std::shared_ptr<MockInstrumentTree> mockInstrumentTree{pMockInstrumentTree};
 
-  DetectorInfoWithMockInstrument detectorInfo{mockInstrumentTree};
+  DetectorInfoWithMockInstrument detectorInfo(
+      mockInstrumentTree,
+      SourceSampleDetectorPathFactory<MockInstrumentTree>{});
   EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree))
       << "InstrumentTree used incorrectly";
 }
@@ -34,8 +37,9 @@ TEST(detector_info_test, test_masking) {
 
   size_t nDetectors = 3;
 
-  DetectorInfoWithNiceMockInstrument detectorInfo{
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors)};
+  DetectorInfoWithNiceMockInstrument detectorInfo(
+      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
+      SourceSampleDetectorPathFactory<testing::NiceMock<MockInstrumentTree>>{});
 
   EXPECT_FALSE(detectorInfo.isMasked(0));
   detectorInfo.setMasked(0);
@@ -50,7 +54,8 @@ TEST(detector_info_test, test_get_l2s) {
   size_t nDetectors = 3;
 
   DetectorInfoWithNiceMockInstrument detectorInfo{
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors)};
+      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
+      SourceSampleDetectorPathFactory<testing::NiceMock<MockInstrumentTree>>{}};
 
   auto l2s = detectorInfo.l2s();
 
@@ -62,7 +67,8 @@ TEST(detector_info_test, test_monitors) {
   size_t nDetectors = 3;
 
   DetectorInfoWithMockInstrument detectorInfo{
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors)};
+      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
+      SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
 
   EXPECT_FALSE(detectorInfo.isMonitor(0));
   detectorInfo.setMonitor(0);
@@ -76,8 +82,9 @@ TEST(detector_info_test, test_calculate_l2_throw_out_of_range) {
 
   size_t nDetectors = 1;
 
-  DetectorInfoWithMockInstrument detectorInfo{
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors)};
+  DetectorInfoWithNiceMockInstrument detectorInfo{
+      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
+      SourceSampleDetectorPathFactory<testing::NiceMock<MockInstrumentTree>>{}};
 
   EXPECT_THROW(detectorInfo.l2(nDetectors), std::out_of_range);
 }
@@ -135,7 +142,8 @@ TEST(detector_info_test, test_calculate_l2) {
   addMockSourceSampleToInstrument(pMockInstrumentTree, source, sample);
 
   DetectorInfoWithNiceMockInstrument detectorInfo{
-      std::shared_ptr<NiceMockInstrumentTree>(pMockInstrumentTree)};
+      std::shared_ptr<NiceMockInstrumentTree>(pMockInstrumentTree),
+      SourceSampleDetectorPathFactory<NiceMockInstrumentTree>{}};
 
   auto l2 = detectorInfo.l2(0);
   EXPECT_EQ(l2, 20) << "sqrt((40 - 20)^2)";
@@ -152,6 +160,10 @@ TEST(detector_info_test, test_calculate_l1) {
   MockPathComponent source;
   MockPathComponent sample;
 
+  // This is where I place the detector
+  EXPECT_CALL(detector, getPos())
+      .WillRepeatedly(testing::Return(V3D{0, 0, 40}));
+
   auto *pMockInstrumentTree =
       new testing::NiceMock<MockInstrumentTree>(nDetectors);
 
@@ -162,7 +174,8 @@ TEST(detector_info_test, test_calculate_l1) {
                                   V3D{0, 0, 3}, V3D{0, 0, 5});
 
   DetectorInfoWithNiceMockInstrument detectorInfo{
-      std::shared_ptr<NiceMockInstrumentTree>(pMockInstrumentTree)};
+      std::shared_ptr<NiceMockInstrumentTree>(pMockInstrumentTree),
+      SourceSampleDetectorPathFactory<NiceMockInstrumentTree>{}};
 
   auto l1 = detectorInfo.l1(0);
   EXPECT_EQ(l1, 2) << "sqrt((5 - 3)^2)";
@@ -182,7 +195,8 @@ TEST(detector_info_test, test_modify) {
       .Times(1);
 
   DetectorInfoWithMockInstrument detectorInfo{
-      std::shared_ptr<MockInstrumentTree>(pMockInstrumentTree)};
+      std::shared_ptr<MockInstrumentTree>(pMockInstrumentTree),
+      SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
 
   MockCommand command;
   detectorInfo.modify(0, command);
@@ -198,7 +212,8 @@ TEST(detector_info_test, test_copy) {
       .WillRepeatedly(testing::Return(2));
 
   DetectorInfoWithMockInstrument original{
-      std::move(std::shared_ptr<NiceMockInstrumentTree>(pMockInstrumentTree))};
+      std::shared_ptr<MockInstrumentTree>(pMockInstrumentTree),
+      SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
 
   // Set some arbitrary meta-data properties
   original.setMasked(0);

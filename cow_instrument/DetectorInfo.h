@@ -18,7 +18,6 @@
 #include "Path.h"
 #include "PathFactory.h"
 #include "Spectrum.h"
-#include "SourceSampleDetectorPathFactory.h" // TODO remove
 #include "PathComponent.h"
 
 /**
@@ -28,7 +27,10 @@
  */
 template <typename InstTree> class DetectorInfo {
 public:
-  template <typename V> explicit DetectorInfo(V &&instrumentTree);
+  explicit DetectorInfo(std::shared_ptr<InstTree> &&instrumentTree,
+                        PathFactory<InstTree> &&pathFactory);
+  explicit DetectorInfo(const std::shared_ptr<InstTree> &instrumentTree,
+                        PathFactory<InstTree> &&pathFactory);
 
   void setMasked(size_t detectorIndex);
 
@@ -93,12 +95,27 @@ double distance(const V3D &a, const V3D &b) {
 }
 
 template <typename InstTree>
-template <typename V>
-DetectorInfo<InstTree>::DetectorInfo(V &&instrumentTree)
-    : m_l2Paths((SourceSampleDetectorPathFactory<InstTree>{})
-                    .createL2(*instrumentTree)),
-      m_l1Paths((SourceSampleDetectorPathFactory<InstTree>{})
-                    .createL1(*instrumentTree)),
+DetectorInfo<InstTree>::DetectorInfo(
+    const std::shared_ptr<InstTree> &instrumentTree,
+    PathFactory<InstTree> &&pathFactory)
+    : m_l2Paths(pathFactory.createL2(*instrumentTree)),
+      m_l1Paths(pathFactory.createL1(*instrumentTree)),
+      m_nDetectors(instrumentTree->nDetectors()),
+      m_isMasked(std::make_shared<MaskFlags>(m_nDetectors, Bool(false))),
+      m_isMonitor(std::make_shared<MonitorFlags>(m_nDetectors, Bool(false))),
+      m_l1(std::make_shared<L2s>(m_nDetectors)),
+      m_l2(std::make_shared<L2s>(m_nDetectors)),
+      m_instrumentTree(instrumentTree) {
+
+  initL1();
+  initL2();
+}
+
+template <typename InstTree>
+DetectorInfo<InstTree>::DetectorInfo(std::shared_ptr<InstTree> &&instrumentTree,
+                                     PathFactory<InstTree> &&pathFactory)
+    : m_l2Paths(pathFactory.createL2(*instrumentTree)),
+      m_l1Paths(pathFactory.createL1(*instrumentTree)),
       m_nDetectors(instrumentTree->nDetectors()),
       m_isMasked(std::make_shared<MaskFlags>(m_nDetectors, Bool(false))),
       m_isMonitor(std::make_shared<MonitorFlags>(m_nDetectors, Bool(false))),

@@ -2,12 +2,14 @@
 #include "gtest/gtest.h"
 #include "DetectorInfo.h"
 #include "MockTypes.h"
+#include "SourceSampleDetectorPathFactory.h"
 
 TEST(spectrum_info_test, test_constructor_lhr) {
   std::vector<Spectrum> spectra{{0}, {1}, {2}};
   size_t nDetectors = 3;
   auto instrument = std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors);
-  DetectorInfoWithMockInstrument detectorInfo{instrument};
+  DetectorInfoWithMockInstrument detectorInfo{
+      instrument, SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
   SpectrumInfo<MockInstrumentTree> spectrumInfo(spectra, detectorInfo);
 
   EXPECT_EQ(3, spectrumInfo.size());
@@ -18,7 +20,8 @@ TEST(spectrum_info_test, test_constructor_one_to_one) {
   size_t nDetectors = 3;
   auto instrument =
       std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors);
-  DetectorInfoWithMockInstrument detectorInfo{instrument};
+  DetectorInfoWithMockInstrument detectorInfo{
+      instrument, SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
   SpectrumInfo<MockInstrumentTree> spectrumInfo(detectorInfo);
 
   EXPECT_EQ(3, spectrumInfo.size());
@@ -32,7 +35,8 @@ TEST(spectrum_info_test, test_spectra_fetch) {
   std::vector<Spectrum> spectra{{0}, {1, 2}, {3, 4, 5}};
   size_t nDetectors = 6;
   DetectorInfoWithMockInstrument tree{
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors)};
+      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
+      SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
   SpectrumInfo<MockInstrumentTree> spectrumInfo(spectra, tree);
 
   EXPECT_EQ(3, spectrumInfo.size());
@@ -66,7 +70,8 @@ TEST(spectrum_info_test, test_l2) {
       .WillRepeatedly(ReturnRef(detector));
 
   // Create a DetectorInfo around the Instrument
-  DetectorInfoWithMockInstrument detectorInfo{instrument};
+  DetectorInfoWithMockInstrument detectorInfo{
+      instrument, SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
 
   // Create a SpectrumInfo around the DetectorInfo
   // Single detector in single spectra
@@ -104,7 +109,8 @@ TEST(spectrum_info_test, test_l2_mapped) {
       .WillOnce(ReturnRef(detectorB));
 
   // Create a DetectorInfo around the Instrument
-  DetectorInfoWithMockInstrument detectorInfo{instrument};
+  DetectorInfoWithMockInstrument detectorInfo{
+      instrument, SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
 
   // Create a SpectrumInfo around the DetectorInfo
   // Two detectors in single spectra
@@ -134,7 +140,8 @@ TEST(spectrum_info_test, test_modify) {
       .Times(1);
 
   SpectrumInfo<MockInstrumentTree> spectrumInfo(DetectorInfoWithMockInstrument{
-      std::shared_ptr<MockInstrumentTree>{pMockInstrumentTree}});
+      std::shared_ptr<MockInstrumentTree>{pMockInstrumentTree},
+      SourceSampleDetectorPathFactory<MockInstrumentTree>{}});
 
   MockCommand command;
   spectrumInfo.modify(0, command);
