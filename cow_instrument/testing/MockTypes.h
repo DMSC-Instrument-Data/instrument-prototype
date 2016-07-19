@@ -136,7 +136,8 @@ private:
 class MockPathFactory : public PathFactory<InstrumentTree> {
 
 public:
-  MOCK_CONST_METHOD1(createL2, Paths(const InstrumentTree &instrument));
+  MOCK_CONST_METHOD1(createL2, Paths *(const InstrumentTree &instrument));
+  MOCK_CONST_METHOD1(createL1, Paths *(const InstrumentTree &instrument));
   virtual ~MockPathFactory() {}
 };
 

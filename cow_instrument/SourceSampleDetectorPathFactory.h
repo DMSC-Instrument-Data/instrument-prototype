@@ -13,13 +13,13 @@ template <typename InstTree>
 class SourceSampleDetectorPathFactory : public PathFactory<InstTree> {
 
 public:
-  Paths createL2(const InstTree &instrument) const;
+  Paths *createL2(const InstTree &instrument) const;
 
-  Paths createL1(const InstTree &instrument) const;
+  Paths *createL1(const InstTree &instrument) const;
 };
 
 template <typename InstTree>
-Paths SourceSampleDetectorPathFactory<InstTree>::createL2(
+Paths *SourceSampleDetectorPathFactory<InstTree>::createL2(
     const InstTree &instrument) const {
 
   const size_t sampleIndex = instrument.samplePathIndex();
@@ -29,15 +29,15 @@ Paths SourceSampleDetectorPathFactory<InstTree>::createL2(
   for (size_t i = 0; i < instrument.nDetectors(); ++i) {
     paths.emplace_back(Path(1, sampleIndex));
   }
-  return Paths(std::move(paths));
+  return new Paths(std::move(paths));
 }
 
 template <typename InstTree>
-Paths SourceSampleDetectorPathFactory<InstTree>::createL1(
+Paths *SourceSampleDetectorPathFactory<InstTree>::createL1(
     const InstTree &instrument) const {
   const size_t sampleIndex = instrument.samplePathIndex();
   const size_t sourceIndex = instrument.sourcePathIndex();
-  return Paths(instrument.nDetectors(), Path{sourceIndex, sampleIndex});
+  return new Paths(instrument.nDetectors(), Path{sourceIndex, sampleIndex});
 }
 
 #endif

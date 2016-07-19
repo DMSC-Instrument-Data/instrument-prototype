@@ -60,7 +60,8 @@ public:
 
 private:
   std::shared_ptr<const InstTree> m_instrumentTree;
-  std::shared_ptr<const PathFactory<InstTree>> m_pathFactory;
+  std::shared_ptr<const Paths> m_l2Paths;
+  std::shared_ptr<const Paths> m_l1Paths;
 
   //------------------- MetaData -------------
   const size_t m_nDetectors;
@@ -94,7 +95,10 @@ double distance(const V3D &a, const V3D &b) {
 template <typename InstTree>
 template <typename V>
 DetectorInfo<InstTree>::DetectorInfo(V &&instrumentTree)
-    : m_pathFactory(new SourceSampleDetectorPathFactory<InstTree>{}),
+    : m_l2Paths((SourceSampleDetectorPathFactory<InstTree>{})
+                    .createL2(*instrumentTree)),
+      m_l1Paths((SourceSampleDetectorPathFactory<InstTree>{})
+                    .createL1(*instrumentTree)),
       m_nDetectors(instrumentTree->nDetectors()),
       m_isMasked(std::make_shared<MaskFlags>(m_nDetectors, Bool(false))),
       m_isMonitor(std::make_shared<MonitorFlags>(m_nDetectors, Bool(false))),
@@ -137,13 +141,12 @@ bool DetectorInfo<InstTree>::isMonitor(size_t detectorIndex) const {
 
 template <typename InstTree> void DetectorInfo<InstTree>::initL1() {
 
-  auto l1Paths = m_pathFactory->createL1(*m_instrumentTree);
   // Loop over all detector indexes. We will have a path for each.
   for (size_t detectorIndex = 0; detectorIndex < m_nDetectors;
        ++detectorIndex) {
 
     size_t i = 0;
-    const Path &path = l1Paths[detectorIndex];
+    const Path &path = (*m_l1Paths)[detectorIndex];
     double l1 = 0;
     // For each detector-l1-path calculate the total neutronic length
     if (path.size() > 0) {
@@ -164,7 +167,6 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL1() {
 
 template <typename InstTree> void DetectorInfo<InstTree>::initL2() {
 
-  auto l2Paths = m_pathFactory->createL2(*m_instrumentTree);
   // Loop over all detector indexes. We will have a path for each.
   for (size_t detectorIndex = 0; detectorIndex < m_nDetectors;
        ++detectorIndex) {
@@ -172,7 +174,7 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL2() {
     const Detector &det = m_instrumentTree->getDetector(detectorIndex);
     auto detectorPos = det.getPos();
     size_t i = 0;
-    const Path &path = l2Paths[detectorIndex];
+    const Path &path = (*m_l2Paths)[detectorIndex];
     double l2 = 0;
     if (path.size() > 0) {
       l2 += m_instrumentTree->getPathComponent(path[i]).length();
