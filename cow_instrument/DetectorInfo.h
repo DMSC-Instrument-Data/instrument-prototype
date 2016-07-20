@@ -28,10 +28,9 @@
  */
 template <typename InstTree> class DetectorInfo {
 public:
-  explicit DetectorInfo(std::shared_ptr<InstTree> &&instrumentTree,
-                        PathFactory<InstTree> &&pathFactory);
-  explicit DetectorInfo(const std::shared_ptr<InstTree> &instrumentTree,
-                        PathFactory<InstTree> &&pathFactory);
+  template <typename InstSptrType, typename PathFactoryType>
+  explicit DetectorInfo(InstSptrType &&instrumentTree,
+                        PathFactoryType &&pathFactory);
 
   void setMasked(size_t detectorIndex);
 
@@ -96,25 +95,9 @@ double distance(const V3D &a, const V3D &b) {
 }
 
 template <typename InstTree>
-DetectorInfo<InstTree>::DetectorInfo(
-    const std::shared_ptr<InstTree> &instrumentTree,
-    PathFactory<InstTree> &&pathFactory)
-    : m_l2Paths(pathFactory.createL2(*instrumentTree)),
-      m_l1Paths(pathFactory.createL1(*instrumentTree)),
-      m_nDetectors(instrumentTree->nDetectors()),
-      m_isMasked(std::make_shared<MaskFlags>(m_nDetectors, Bool(false))),
-      m_isMonitor(std::make_shared<MonitorFlags>(m_nDetectors, Bool(false))),
-      m_l1(std::make_shared<L1s>(m_nDetectors)),
-      m_l2(std::make_shared<L2s>(m_nDetectors)),
-      m_instrumentTree(instrumentTree) {
-
-  initL1();
-  initL2();
-}
-
-template <typename InstTree>
-DetectorInfo<InstTree>::DetectorInfo(std::shared_ptr<InstTree> &&instrumentTree,
-                                     PathFactory<InstTree> &&pathFactory)
+template <typename InstSptrType, typename PathFactoryType>
+DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
+                                     PathFactoryType &&pathFactory)
     : m_l2Paths(pathFactory.createL2(*instrumentTree)),
       m_l1Paths(pathFactory.createL1(*instrumentTree)),
       m_nDetectors(instrumentTree->nDetectors()),
@@ -165,18 +148,22 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL1() {
 
     size_t i = 0;
     const Path &path = (*m_l1Paths)[detectorIndex];
+    if (path.size() < 2) {
+      throw std::logic_error("Cannot have a L1 specified with less than 2 path "
+                             "components (sample + source).");
+    }
+
     double l1 = 0;
     // For each detector-l1-path calculate the total neutronic length
-    if (path.size() > 0) {
-      l1 += m_instrumentTree->getPathComponent(path[i]).length();
-      for (i = 1; i < path.size(); ++i) {
-        const PathComponent &current =
-            m_instrumentTree->getPathComponent(path[i]);
-        const PathComponent &previous =
-            m_instrumentTree->getPathComponent(path[i - 1]);
-        l1 += distance(current.entryPoint(), previous.exitPoint());
-        l1 += current.length();
-      }
+
+    l1 += m_instrumentTree->getPathComponent(path[i]).length();
+    for (i = 1; i < path.size(); ++i) {
+      const PathComponent &current =
+          m_instrumentTree->getPathComponent(path[i]);
+      const PathComponent &previous =
+          m_instrumentTree->getPathComponent(path[i - 1]);
+      l1 += distance(current.entryPoint(), previous.exitPoint());
+      l1 += current.length();
     }
 
     (*m_l1)[detectorIndex] = l1;
@@ -193,22 +180,24 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL2() {
     auto detectorPos = det.getPos();
     size_t i = 0;
     const Path &path = (*m_l2Paths)[detectorIndex];
-    double l2 = 0;
-    if (path.size() > 0) {
-      l2 += m_instrumentTree->getPathComponent(path[i]).length();
-      // For each detector-l2-path calculate the total neutronic length
-      for (i = 1; i < path.size(); ++i) {
-        const PathComponent &current =
-            m_instrumentTree->getPathComponent(path[i]);
-        const PathComponent &previous =
-            m_instrumentTree->getPathComponent(path[i - 1]);
-        l2 += distance(current.entryPoint(), previous.exitPoint());
-        l2 += current.length();
-      }
-      l2 +=
-          distance(m_instrumentTree->getPathComponent(path[i - 1]).exitPoint(),
-                   detectorPos);
+    if (path.size() < 1) {
+      throw std::logic_error("Cannot have a L2 specified with less than 1 path "
+                             "components (sample).");
     }
+    double l2 = 0;
+
+    l2 += m_instrumentTree->getPathComponent(path[i]).length();
+    // For each detector-l2-path calculate the total neutronic length
+    for (i = 1; i < path.size(); ++i) {
+      const PathComponent &current =
+          m_instrumentTree->getPathComponent(path[i]);
+      const PathComponent &previous =
+          m_instrumentTree->getPathComponent(path[i - 1]);
+      l2 += distance(current.entryPoint(), previous.exitPoint());
+      l2 += current.length();
+    }
+    l2 += distance(m_instrumentTree->getPathComponent(path[i - 1]).exitPoint(),
+                   detectorPos);
 
     (*m_l2)[detectorIndex] = l2;
   }

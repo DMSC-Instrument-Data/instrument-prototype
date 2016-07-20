@@ -12,83 +12,6 @@
 
 namespace {
 
-TEST(detector_info_test, test_construct) {
-
-  using namespace testing;
-  MockInstrumentTree *pMockInstrumentTree =
-      new testing::NiceMock<MockInstrumentTree>{};
-  EXPECT_CALL(*pMockInstrumentTree, nDetectors())
-      .WillRepeatedly(testing::Return(1));
-  NiceMock<MockDetector> mockDetector;
-  EXPECT_CALL(*pMockInstrumentTree, getDetector(_))
-      .Times(1)
-      .WillOnce(ReturnRef(mockDetector));
-
-  std::shared_ptr<MockInstrumentTree> mockInstrumentTree{pMockInstrumentTree};
-
-  DetectorInfoWithMockInstrument detectorInfo(
-      mockInstrumentTree,
-      SourceSampleDetectorPathFactory<MockInstrumentTree>{});
-  EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree))
-      << "InstrumentTree used incorrectly";
-}
-
-TEST(detector_info_test, test_masking) {
-
-  size_t nDetectors = 3;
-
-  DetectorInfoWithNiceMockInstrument detectorInfo(
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
-      SourceSampleDetectorPathFactory<testing::NiceMock<MockInstrumentTree>>{});
-
-  EXPECT_FALSE(detectorInfo.isMasked(0));
-  detectorInfo.setMasked(0);
-  EXPECT_TRUE(detectorInfo.isMasked(0));
-
-  EXPECT_THROW(detectorInfo.setMasked(nDetectors), std::out_of_range);
-  EXPECT_THROW(detectorInfo.isMasked(nDetectors), std::out_of_range);
-}
-
-TEST(detector_info_test, test_get_l2s) {
-
-  size_t nDetectors = 3;
-
-  DetectorInfoWithNiceMockInstrument detectorInfo{
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
-      SourceSampleDetectorPathFactory<testing::NiceMock<MockInstrumentTree>>{}};
-
-  auto l2s = detectorInfo.l2s();
-
-  EXPECT_EQ(l2s->size(), nDetectors);
-}
-
-TEST(detector_info_test, test_monitors) {
-
-  size_t nDetectors = 3;
-
-  DetectorInfoWithMockInstrument detectorInfo{
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
-      SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
-
-  EXPECT_FALSE(detectorInfo.isMonitor(0));
-  detectorInfo.setMonitor(0);
-  EXPECT_TRUE(detectorInfo.isMonitor(0));
-
-  EXPECT_THROW(detectorInfo.setMonitor(nDetectors), std::out_of_range);
-  EXPECT_THROW(detectorInfo.isMonitor(nDetectors), std::out_of_range);
-}
-
-TEST(detector_info_test, test_calculate_l2_throw_out_of_range) {
-
-  size_t nDetectors = 1;
-
-  DetectorInfoWithNiceMockInstrument detectorInfo{
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
-      SourceSampleDetectorPathFactory<testing::NiceMock<MockInstrumentTree>>{}};
-
-  EXPECT_THROW(detectorInfo.l2(nDetectors), std::out_of_range);
-}
-
 void addMockSourceSampleToInstrument(
     testing::NiceMock<MockInstrumentTree> *pMockInstrumentTree,
     MockPathComponent &source, MockPathComponent &sample,
@@ -119,6 +42,175 @@ void addMockSourceSampleToInstrument(
       .WillRepeatedly(testing::ReturnRef(source));
   EXPECT_CALL(*pMockInstrumentTree, getPathComponent(sampleIndex))
       .WillRepeatedly(testing::ReturnRef(sample));
+}
+
+TEST(detector_info_test, test_construct) {
+
+  using namespace testing;
+  MockInstrumentTree *pMockInstrumentTree =
+      new testing::NiceMock<MockInstrumentTree>{};
+  EXPECT_CALL(*pMockInstrumentTree, nDetectors())
+      .WillRepeatedly(testing::Return(1));
+  NiceMock<MockDetector> mockDetector;
+  EXPECT_CALL(*pMockInstrumentTree, getDetector(_))
+      .Times(1)
+      .WillOnce(ReturnRef(mockDetector));
+
+  std::shared_ptr<MockInstrumentTree> mockInstrumentTree{pMockInstrumentTree};
+
+  MockPathFactory mockPathFactory;
+  EXPECT_CALL(mockPathFactory, createL1(testing::_))
+      .WillOnce(testing::Return(new Paths(1, Path{0, 0})));
+  EXPECT_CALL(mockPathFactory, createL2(testing::_))
+      .WillOnce(testing::Return(new Paths(1, Path{0})));
+
+  DetectorInfoWithMockInstrument detectorInfo(mockInstrumentTree,
+                                              mockPathFactory);
+
+  EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree))
+      << "InstrumentTree used incorrectly";
+  EXPECT_TRUE(testing::Mock::VerifyAndClear(&mockPathFactory))
+      << "PathFactory used incorrectly";
+}
+
+TEST(detector_info_test, test_construct_with_bad_l2_paths_throws) {
+
+  using namespace testing;
+
+  const size_t nDetectors = 1;
+
+  MockInstrumentTree *pMockInstrumentTree =
+      new testing::NiceMock<MockInstrumentTree>{};
+  EXPECT_CALL(*pMockInstrumentTree, nDetectors())
+      .WillRepeatedly(testing::Return(nDetectors));
+
+  NiceMock<MockDetector> mockDetector;
+  EXPECT_CALL(*pMockInstrumentTree, getDetector(_))
+      .Times(1)
+      .WillOnce(ReturnRef(mockDetector));
+
+  std::shared_ptr<MockInstrumentTree> mockInstrumentTree{pMockInstrumentTree};
+
+  MockPathFactory mockPathFactory;
+  // L1 is OK, contains source and sample possibilities.
+  EXPECT_CALL(mockPathFactory, createL1(testing::_))
+      .WillOnce(testing::Return(new Paths(1, Path{0, 0})));
+  // Empty path is illegal for l2 calculations.
+  Path emptyPath(0);
+  EXPECT_CALL(mockPathFactory, createL2(testing::_))
+      .WillOnce(testing::Return(new Paths(1, emptyPath)));
+
+  EXPECT_THROW(
+      DetectorInfoWithMockInstrument(mockInstrumentTree, mockPathFactory),
+      std::logic_error);
+}
+
+TEST(detector_info_test, test_construct_with_bad_l1_paths_throws) {
+
+  using namespace testing;
+
+  const size_t nDetectors = 1;
+
+  MockInstrumentTree *pMockInstrumentTree =
+      new testing::NiceMock<MockInstrumentTree>{};
+  EXPECT_CALL(*pMockInstrumentTree, nDetectors())
+      .WillRepeatedly(testing::Return(nDetectors));
+
+  std::shared_ptr<MockInstrumentTree> mockInstrumentTree{pMockInstrumentTree};
+
+  MockPathFactory mockPathFactory;
+  // Single path entry for single detector. Not OK. L1 needs at least source +
+  // sample paths defined.
+  Path singleEntryPath(1, 0);
+  EXPECT_CALL(mockPathFactory, createL1(testing::_))
+      .WillOnce(testing::Return(new Paths(1, singleEntryPath)));
+  // Single path entry for single detector. Fine for L2 calculations.
+  EXPECT_CALL(mockPathFactory, createL2(testing::_))
+      .WillOnce(testing::Return(new Paths(1, Path(1, 0))));
+
+  EXPECT_THROW(
+      DetectorInfoWithMockInstrument(mockInstrumentTree, mockPathFactory),
+      std::logic_error);
+}
+
+TEST(detector_info_test, test_masking) {
+
+  size_t nDetectors = 3;
+
+  MockPathFactory mockPathFactory;
+  EXPECT_CALL(mockPathFactory, createL1(testing::_))
+      .WillOnce(testing::Return(new Paths(nDetectors, Path{0, 0})));
+  EXPECT_CALL(mockPathFactory, createL2(testing::_))
+      .WillOnce(testing::Return(new Paths(nDetectors, Path{0})));
+
+  DetectorInfoWithNiceMockInstrument detectorInfo(
+      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
+      mockPathFactory);
+
+  EXPECT_FALSE(detectorInfo.isMasked(0));
+  detectorInfo.setMasked(0);
+  EXPECT_TRUE(detectorInfo.isMasked(0));
+
+  EXPECT_THROW(detectorInfo.setMasked(nDetectors), std::out_of_range);
+  EXPECT_THROW(detectorInfo.isMasked(nDetectors), std::out_of_range);
+}
+
+TEST(detector_info_test, test_get_l2s) {
+
+  size_t nDetectors = 3;
+
+  MockPathFactory mockPathFactory;
+  EXPECT_CALL(mockPathFactory, createL1(testing::_))
+      .WillOnce(testing::Return(new Paths(nDetectors, Path{0, 0})));
+  EXPECT_CALL(mockPathFactory, createL2(testing::_))
+      .WillOnce(testing::Return(new Paths(nDetectors, Path{0})));
+
+  DetectorInfoWithNiceMockInstrument detectorInfo{
+      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
+      mockPathFactory};
+
+  auto l2s = detectorInfo.l2s();
+
+  EXPECT_EQ(l2s->size(), nDetectors);
+}
+
+TEST(detector_info_test, test_monitors) {
+
+  size_t nDetectors = 3;
+
+  MockPathFactory mockPathFactory;
+  EXPECT_CALL(mockPathFactory, createL1(testing::_))
+      .WillOnce(testing::Return(new Paths(nDetectors, Path{0, 0})));
+  EXPECT_CALL(mockPathFactory, createL2(testing::_))
+      .WillOnce(testing::Return(new Paths(nDetectors, Path{0})));
+
+  DetectorInfoWithMockInstrument detectorInfo{
+      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
+      mockPathFactory};
+
+  EXPECT_FALSE(detectorInfo.isMonitor(0));
+  detectorInfo.setMonitor(0);
+  EXPECT_TRUE(detectorInfo.isMonitor(0));
+
+  EXPECT_THROW(detectorInfo.setMonitor(nDetectors), std::out_of_range);
+  EXPECT_THROW(detectorInfo.isMonitor(nDetectors), std::out_of_range);
+}
+
+TEST(detector_info_test, test_calculate_l2_throw_out_of_range) {
+
+  size_t nDetectors = 1;
+
+  MockPathFactory mockPathFactory;
+  EXPECT_CALL(mockPathFactory, createL1(testing::_))
+      .WillOnce(testing::Return(new Paths(nDetectors, Path{0, 0})));
+  EXPECT_CALL(mockPathFactory, createL2(testing::_))
+      .WillOnce(testing::Return(new Paths(nDetectors, Path{0})));
+
+  DetectorInfoWithNiceMockInstrument detectorInfo{
+      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
+      mockPathFactory};
+
+  EXPECT_THROW(detectorInfo.l2(nDetectors), std::out_of_range);
 }
 
 TEST(detector_info_test, test_calculate_l2) {

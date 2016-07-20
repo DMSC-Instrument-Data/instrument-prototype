@@ -133,11 +133,11 @@ private:
   testing::NiceMock<MockPathComponent> m_mockPathComponent;
 };
 
-class MockPathFactory : public PathFactory<InstrumentTree> {
+class MockPathFactory : public PathFactory<MockInstrumentTree> {
 
 public:
-  MOCK_CONST_METHOD1(createL2, Paths *(const InstrumentTree &instrument));
-  MOCK_CONST_METHOD1(createL1, Paths *(const InstrumentTree &instrument));
+  MOCK_CONST_METHOD1(createL2, Paths *(const MockInstrumentTree &instrument));
+  MOCK_CONST_METHOD1(createL1, Paths *(const MockInstrumentTree &instrument));
   virtual ~MockPathFactory() {}
 };
 
