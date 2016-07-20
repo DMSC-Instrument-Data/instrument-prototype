@@ -2,7 +2,7 @@
 
 V3D NullComponent::getPos() const { return V3D{0, 0, 0}; }
 
-void NullComponent::deltaPos(const V3D &) {}
+void NullComponent::shiftPositionBy(const V3D &) {}
 
 NullComponent::~NullComponent() {}
 

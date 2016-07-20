@@ -11,7 +11,7 @@ public:
   ParabolicGuide(ComponentIdType componentId, double a, double h, V3D position);
 
   V3D getPos() const;
-  void deltaPos(const V3D &pos);
+  void shiftPositionBy(const V3D &pos);
   ParabolicGuide *clone() const;
   bool equals(const Component &other) const;
   void registerContents(

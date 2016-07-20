@@ -14,7 +14,7 @@ public:
   DetectorComponent &operator=(const DetectorComponent &) = default;
 
   V3D getPos() const override;
-  void deltaPos(const V3D &pos) override;
+  void shiftPositionBy(const V3D &pos) override;
   virtual ~DetectorComponent();
   DetectorComponent *clone() const override;
   bool equals(const Component &other) const override;

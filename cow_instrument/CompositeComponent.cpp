@@ -24,9 +24,9 @@ V3D CompositeComponent::getPos() const {
   return pos;
 }
 
-void CompositeComponent::deltaPos(const V3D &delta) {
+void CompositeComponent::shiftPositionBy(const V3D &delta) {
   for (size_t i = 0; i < m_children.size(); ++i) {
-    m_children[i]->deltaPos(delta);
+    m_children[i]->shiftPositionBy(delta);
   }
 }
 

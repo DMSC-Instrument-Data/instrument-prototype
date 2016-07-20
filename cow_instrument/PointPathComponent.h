@@ -15,7 +15,7 @@ template <typename T> class PointPathComponent : public PathComponent {
 public:
   PointPathComponent(V3D pos, ComponentIdType id);
   virtual V3D getPos() const override;
-  virtual void deltaPos(const V3D &pos) override;
+  virtual void shiftPositionBy(const V3D &pos) override;
 
   virtual bool equals(const Component &other) const override;
   virtual void registerContents(
@@ -46,7 +46,8 @@ template <typename T> V3D PointPathComponent<T>::getPos() const {
   return m_pos;
 }
 
-template <typename T> void PointPathComponent<T>::deltaPos(const V3D &pos) {
+template <typename T>
+void PointPathComponent<T>::shiftPositionBy(const V3D &pos) {
   m_pos[0] += pos[0];
   m_pos[1] += pos[1];
   m_pos[2] += pos[2];
@@ -54,7 +55,7 @@ template <typename T> void PointPathComponent<T>::deltaPos(const V3D &pos) {
 
 template <typename T>
 PointPathComponent<T> *PointPathComponent<T>::clone() const {
-  return new PointPathComponent<T>(*this);
+  return new T(*static_cast<const T *>(this));
 }
 
 template <typename T> std::string PointPathComponent<T>::name() const {

@@ -22,7 +22,8 @@ make_square_bank(size_t width, size_t height, std::string name) {
                                 V3D{double(i), double(j), double(0)})));
     }
   }
-  bank->deltaPos(V3D{-double(width) / 2, -double(height) / 2, 0}); // Center it
+  bank->shiftPositionBy(
+      V3D{-double(width) / 2, -double(height) / 2, 0}); // Center it
   return bank;
 }
 }
@@ -48,18 +49,18 @@ std::vector<Node> construct_root_node() {
   const double height_d = double(height);
 
   auto N = make_square_bank(width, height, "North");
-  N->deltaPos(V3D{0, height_d, 3});
+  N->shiftPositionBy(V3D{0, height_d, 3});
   auto E = make_square_bank(width, height, "South");
-  E->deltaPos(V3D{-width_d, 0, 3});
+  E->shiftPositionBy(V3D{-width_d, 0, 3});
   auto S = make_square_bank(width, height, "East");
-  S->deltaPos(V3D{0, -height_d, 3});
+  S->shiftPositionBy(V3D{0, -height_d, 3});
   auto W = make_square_bank(width, height, "West");
-  E->deltaPos(V3D{width_d, 0, 3});
+  E->shiftPositionBy(V3D{width_d, 0, 3});
 
   auto l_curtain = make_square_bank(width, height, "Left curtain");
-  l_curtain->deltaPos(V3D{-width_d, 0, 6});
+  l_curtain->shiftPositionBy(V3D{-width_d, 0, 6});
   auto r_curtain = make_square_bank(width, height, "Right curtain");
-  r_curtain->deltaPos(V3D{width_d, 0, 6});
+  r_curtain->shiftPositionBy(V3D{width_d, 0, 6});
 
   std::vector<Node> nodes;
   nodes.emplace_back(CowPtr<Component>(new NullComponent), "Root node");

@@ -15,6 +15,8 @@ public:
   virtual bool isSource() const override { return true; }
 
   virtual bool isSample() const override { return false; }
+
+  virtual ~PointSource(){};
 };
 
 #endif

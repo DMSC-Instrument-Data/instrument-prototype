@@ -54,7 +54,7 @@ ParabolicGuide::ParabolicGuide(ComponentIdType componentId, double a, double h,
 
 V3D ParabolicGuide::getPos() const { return m_position; }
 
-void ParabolicGuide::deltaPos(const V3D &pos) { m_position = pos; }
+void ParabolicGuide::shiftPositionBy(const V3D &pos) { m_position = pos; }
 
 ParabolicGuide *ParabolicGuide::clone() const {
   return new ParabolicGuide(m_componentId, m_a, m_h, m_position);
