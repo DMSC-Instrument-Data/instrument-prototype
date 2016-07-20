@@ -25,6 +25,7 @@ set ( INCLUDE_FILES
                    IdType.h
                    InstrumentTree.h
                    IntToType.h
+                   L1s.h
                    L2s.h
                    MaskFlags.h
                    MonitorFlags.h

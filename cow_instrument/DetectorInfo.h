@@ -12,6 +12,7 @@
 #include "cow_ptr.h"
 #include "Detector.h"
 #include "IdType.h"
+#include "L1s.h"
 #include "L2s.h"
 #include "MaskFlags.h"
 #include "MonitorFlags.h"
@@ -72,7 +73,7 @@ private:
       m_isMonitor; // This could be copied upon instrument change
 
   //------------------- DerivedInfo
-  CowPtr<L2s> m_l1;
+  CowPtr<L1s> m_l1;
   CowPtr<L2s> m_l2;
 };
 
@@ -103,7 +104,7 @@ DetectorInfo<InstTree>::DetectorInfo(
       m_nDetectors(instrumentTree->nDetectors()),
       m_isMasked(std::make_shared<MaskFlags>(m_nDetectors, Bool(false))),
       m_isMonitor(std::make_shared<MonitorFlags>(m_nDetectors, Bool(false))),
-      m_l1(std::make_shared<L2s>(m_nDetectors)),
+      m_l1(std::make_shared<L1s>(m_nDetectors)),
       m_l2(std::make_shared<L2s>(m_nDetectors)),
       m_instrumentTree(instrumentTree) {
 
@@ -119,7 +120,7 @@ DetectorInfo<InstTree>::DetectorInfo(std::shared_ptr<InstTree> &&instrumentTree,
       m_nDetectors(instrumentTree->nDetectors()),
       m_isMasked(std::make_shared<MaskFlags>(m_nDetectors, Bool(false))),
       m_isMonitor(std::make_shared<MonitorFlags>(m_nDetectors, Bool(false))),
-      m_l1(std::make_shared<L2s>(m_nDetectors)),
+      m_l1(std::make_shared<L1s>(m_nDetectors)),
       m_l2(std::make_shared<L2s>(m_nDetectors)),
       m_instrumentTree(instrumentTree) {
 
