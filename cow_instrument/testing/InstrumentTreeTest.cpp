@@ -5,6 +5,10 @@
 #include "MockTypes.h"
 #include "DetectorComponent.h"
 #include "CompositeComponent.h"
+#include "ParabolicGuide.h"
+#include "NullComponent.h"
+#include "PointSource.h"
+#include "PointSample.h"
 
 using namespace testing;
 
@@ -17,9 +21,9 @@ InstrumentTree make_simple_tree(DetectorIdType detector1Id,
 
         A (not a detector)
         |
- -------------------------------------------------
- |                                               |
- B (Composite containing Detector)               C (Detector)
+ ---------------------------------------------------------------------
+ |                                    |                 |            |
+ B (Composite containing Detector)    C (Detector)    D (source)     E(Sample)
 
   */
 
@@ -34,11 +38,71 @@ InstrumentTree make_simple_tree(DetectorIdType detector1Id,
   nodes.push_back(Node(0, CowPtr<Component>(composite)));
   nodes.push_back(Node(0, CowPtr<Component>(std::unique_ptr<DetectorComponent>(
                                                 new DetectorComponent(
-                                                    ComponentIdType(1),
+                                                    ComponentIdType(2),
                                                     DetectorIdType(detector2Id),
                                                     V3D{1, 1, 1})).release())));
+
+  nodes.push_back(Node(
+      0, CowPtr<Component>(new PointSource(V3D{0, 0, 0}, ComponentIdType(3)))));
+  nodes.push_back(Node(0, CowPtr<Component>(new PointSample(
+                              V3D{0, 0, 10}, ComponentIdType(4)))));
+
+  nodes[0].addChild(1); // add composite
+  nodes[0].addChild(2); // add detector
+  nodes[0].addChild(3); // add source
+  nodes[0].addChild(4); // add sample
+
+  return InstrumentTree(std::move(nodes));
+}
+
+InstrumentTree
+make_very_basic_tree(ComponentIdType idForSource = ComponentIdType(0),
+                     ComponentIdType idForSample = ComponentIdType(1),
+                     ComponentIdType idForDetector = ComponentIdType(2)) {
+
+  /*
+
+        Root Node A
+        |
+ -------------------------------------------------
+ |                            |                   |
+ B (Detector)            C (Source)          D (Sample)
+
+  */
+
+  std::vector<Node> nodes;
+  nodes.push_back(Node{});
+  nodes.push_back(
+      Node(0, CowPtr<Component>(new DetectorComponent(
+                  idForDetector, DetectorIdType(1), V3D{1, 1, 1}))));
+
+  nodes.push_back(
+      Node(0, CowPtr<Component>(new PointSource(V3D{0, 0, 0}, idForSource))));
+  nodes.push_back(
+      Node(0, CowPtr<Component>(new PointSample(V3D{0, 0, 10}, idForSample))));
+
   nodes[0].addChild(1);
   nodes[0].addChild(2);
+  nodes[0].addChild(3);
+  return InstrumentTree(std::move(nodes));
+}
+
+/**
+Test helper method. Adds a source and sample node to an existing node vector
+and creates an instrument tree from it.
+ */
+InstrumentTree makeRegularInstrument(std::vector<Node> &&nodes,
+                                     int versionNumber = 0) {
+  const size_t originalSize = nodes.size();
+  nodes.push_back(Node(
+      0, CowPtr<Component>(new PointSource(V3D{0, 0, 0}, ComponentIdType(100))),
+      "Source", versionNumber));
+  nodes.push_back(Node(0, CowPtr<Component>(new PointSample(
+                              V3D{0, 0, 10}, ComponentIdType(101))),
+                       "Sample", versionNumber));
+
+  nodes[0].addChild(originalSize + 1);
+  nodes[1].addChild(originalSize + 2);
 
   return InstrumentTree(std::move(nodes));
 }
@@ -48,7 +112,7 @@ TEST(instrument_tree_test, test_uptr_constructor) {
   Node a(CowPtr<Component>(new NiceMock<MockComponent>()));
 
   // Calls std::shared_ptr<T>(std::unique_ptr<T>&&) constructor
-  InstrumentTree instrument({a});
+  InstrumentTree instrument = makeRegularInstrument({a});
 
   EXPECT_EQ(0, instrument.version());
 }
@@ -69,7 +133,50 @@ TEST(instrument_tree_test, test_version_check_on_constructor) {
                          1 /*version number incremented. This is bad*/);
   nodes[0].addChild(1);
 
-  EXPECT_THROW(InstrumentTree(std::move(nodes)), std::invalid_argument);
+  EXPECT_THROW(makeRegularInstrument(std::move(nodes)), std::invalid_argument);
+}
+
+TEST(instrument_tree_test, test_cannot_construct_without_sample) {
+
+  auto source_ptr = new NiceMock<MockPathComponent>();
+  auto source = CowPtr<Component>(source_ptr);
+
+  // Make a the source
+  EXPECT_CALL(*source_ptr, isSource()).WillRepeatedly(Return(true));
+  EXPECT_CALL(*source_ptr, isSample()).WillRepeatedly(Return(false));
+
+  std::vector<Node> nodes;
+  nodes.emplace_back(source);
+
+  EXPECT_THROW(InstrumentTree(std::move(nodes)), std::invalid_argument)
+      << "Should throw, there is no sample";
+}
+
+TEST(instrument_tree_test, test_cannot_construct_without_source) {
+  auto sample_ptr = new NiceMock<MockPathComponent>();
+  auto sample = CowPtr<Component>(sample_ptr);
+
+  // Make a the source
+  EXPECT_CALL(*sample_ptr, isSource()).WillRepeatedly(Return(false));
+  EXPECT_CALL(*sample_ptr, isSample()).WillRepeatedly(Return(true));
+
+  std::vector<Node> nodes;
+  nodes.emplace_back(sample);
+
+  EXPECT_THROW(InstrumentTree(std::move(nodes)), std::invalid_argument)
+      << "Should throw, there is not source";
+}
+
+TEST(instrument_tree_test, test_find_source_sample) {
+  /*
+   * One source, one sample, one detector
+   */
+  auto instrument = make_very_basic_tree();
+
+  const PathComponent &source = instrument.source();
+  EXPECT_TRUE(dynamic_cast<const PointSource *>(&source) != NULL);
+  const PathComponent &sample = instrument.sample();
+  EXPECT_TRUE(dynamic_cast<const PointSample *>(&sample) != NULL);
 }
 
 TEST(instrument_tree_test, test_copy) {
@@ -87,7 +194,8 @@ TEST(instrument_tree_test, test_copy) {
                      versionNumber);
   nodes[0].addChild(1);
 
-  InstrumentTree original(std::move(nodes));
+  InstrumentTree original =
+      makeRegularInstrument(std::move(nodes), versionNumber);
 
   // Perform copy.
   auto copy = original;
@@ -134,7 +242,7 @@ TEST(instrument_tree_test, test_constructor) {
   nodes[0].addChild(1);
   nodes[0].addChild(2);
 
-  InstrumentTree instrument(std::move(nodes));
+  InstrumentTree instrument = makeRegularInstrument(std::move(nodes));
   EXPECT_EQ(&instrument.root().const_ref(), a_contents);
   EXPECT_NE(instrument.cbegin(), instrument.cend());
 }
@@ -172,7 +280,7 @@ TEST(instrument_tree_test, test_detector_access) {
   nodes[0].addChild(1);
   nodes[0].addChild(2);
 
-  InstrumentTree tree(std::move(nodes));
+  InstrumentTree tree = makeRegularInstrument(std::move(nodes));
 
   const Detector &det1 = tree.getDetector(0);
   EXPECT_EQ(det1.detectorId(), detector1Id);
@@ -188,7 +296,7 @@ TEST(instrument_tree_test, test_fill_detector_map_no_detectors) {
   std::vector<Node> nodes;
   nodes.emplace_back(CowPtr<Component>(new NiceMock<MockComponent>()));
 
-  InstrumentTree instrument(std::move(nodes));
+  InstrumentTree instrument = makeRegularInstrument(std::move(nodes));
 
   std::map<DetectorIdType, size_t> container;
   instrument.fillDetectorMap(container);
@@ -201,6 +309,24 @@ TEST(instrument_tree_test, test_fill_detector_map) {
   std::map<DetectorIdType, size_t> container;
   instrument.fillDetectorMap(container);
   EXPECT_EQ(container.size(), 2) << "Two detectors expected";
+}
+
+TEST(instrument_tree_test,
+     test_get_detector_and_path_from_mixed_component_instrument) {
+
+  const ComponentIdType idForSource(1);
+  const ComponentIdType idForSample(2);
+  const ComponentIdType idForDetector(3);
+
+  auto instrument =
+      make_very_basic_tree(idForSource, idForSample, idForDetector);
+  const auto &detectorComponent = instrument.getDetector(0);
+  const auto &pathComponent1 = instrument.getPathComponent(0);
+  const auto &pathComponent2 = instrument.getPathComponent(1);
+
+  EXPECT_EQ(detectorComponent.componentId(), idForDetector);
+  EXPECT_EQ(pathComponent1.componentId(), idForSource);
+  EXPECT_EQ(pathComponent2.componentId(), idForSample);
 }
 
 TEST(instrument_tree_test, test_modify_linear) {
@@ -221,7 +347,7 @@ TEST(instrument_tree_test, test_modify_linear) {
   nodes[1].addChild(2);
   nodes[0].addChild(1);
 
-  InstrumentTree instrument(std::move(nodes));
+  InstrumentTree instrument = makeRegularInstrument(std::move(nodes));
 
   /*
     we then modify c.
@@ -253,7 +379,7 @@ TEST(instrument_tree_test, test_modify_linear) {
   EXPECT_EQ((newTree.begin() + 2)->version(), instrument.version() + 1);
 }
 
-TEST(instrument_tree_test, test_no_modify_linear) {
+TEST(instrument_tree_test, test_copy_no_modify_linear) {
 
   /*
     we start like this
@@ -261,8 +387,17 @@ TEST(instrument_tree_test, test_no_modify_linear) {
   */
 
   auto a = CowPtr<Component>(new NiceMock<MockComponent>());
-  auto b = CowPtr<Component>(new NiceMock<MockComponent>());
-  auto c = CowPtr<Component>(new NiceMock<MockComponent>());
+  auto b_ptr = new NiceMock<MockPathComponent>();
+  auto b = CowPtr<Component>(b_ptr);
+  auto c_ptr = new NiceMock<MockPathComponent>();
+  auto c = CowPtr<Component>(c_ptr);
+
+  // Make b the source
+  EXPECT_CALL(*b_ptr, isSource()).WillRepeatedly(Return(true));
+  EXPECT_CALL(*b_ptr, isSample()).WillRepeatedly(Return(false));
+  // Make c the sample
+  EXPECT_CALL(*c_ptr, isSample()).WillRepeatedly(Return(true));
+  EXPECT_CALL(*c_ptr, isSource()).WillRepeatedly(Return(false));
 
   std::vector<Node> nodes;
   nodes.emplace_back(a);
@@ -319,9 +454,18 @@ TEST(instrument_tree_test, test_modify_tree) {
 
   */
 
-  auto a = CowPtr<Component>(new NiceMock<MockComponent>());
-  auto b = CowPtr<Component>(new NiceMock<MockComponent>());
-  auto c = CowPtr<Component>(new NiceMock<MockComponent>());
+  auto a_ptr = new NiceMock<MockPathComponent>();
+  auto a = CowPtr<Component>(a_ptr);
+  auto b_ptr = new NiceMock<MockPathComponent>();
+  auto b = CowPtr<Component>(b_ptr);
+  auto c = CowPtr<Component>(new NiceMock<MockPathComponent>());
+
+  // Make a the source
+  EXPECT_CALL(*a_ptr, isSource()).WillRepeatedly(Return(true));
+  EXPECT_CALL(*a_ptr, isSample()).WillRepeatedly(Return(false));
+  // Make b the sample
+  EXPECT_CALL(*b_ptr, isSample()).WillRepeatedly(Return(true));
+  EXPECT_CALL(*b_ptr, isSource()).WillRepeatedly(Return(false));
 
   std::vector<Node> nodes;
   nodes.emplace_back(a);
@@ -364,7 +508,7 @@ TEST(instrument_tree_test, test_modify_tree) {
   EXPECT_EQ((newTree.begin() + 2)->version(), instrument.version() + 1);
 }
 
-TEST(node_test, test_tree_cascade) {
+TEST(instrument_tree_test, test_tree_cascade) {
 
   /*
    We are making writes more expensive, but critically reads
@@ -383,10 +527,19 @@ TEST(node_test, test_tree_cascade) {
 
   */
 
-  auto a = CowPtr<Component>(new NiceMock<MockComponent>());
-  auto b = CowPtr<Component>(new NiceMock<MockComponent>());
+  auto a_ptr = new NiceMock<MockPathComponent>();
+  auto a = CowPtr<Component>(a_ptr);
+  auto b_ptr = new NiceMock<MockPathComponent>();
+  auto b = CowPtr<Component>(b_ptr);
   auto c = CowPtr<Component>(new NiceMock<MockComponent>());
   auto d = CowPtr<Component>(new NiceMock<MockComponent>());
+
+  // Make a the source
+  EXPECT_CALL(*a_ptr, isSource()).WillRepeatedly(Return(true));
+  EXPECT_CALL(*a_ptr, isSample()).WillRepeatedly(Return(false));
+  // Make b the sample
+  EXPECT_CALL(*b_ptr, isSample()).WillRepeatedly(Return(true));
+  EXPECT_CALL(*b_ptr, isSource()).WillRepeatedly(Return(false));
 
   std::vector<Node> nodes;
   nodes.emplace_back(a);
@@ -438,7 +591,7 @@ TEST(node_test, test_tree_cascade) {
   EXPECT_EQ((newTree.begin() + 3)->version(), instrument.version() + 1);
 }
 
-TEST(node_test, test_tree_no_cascade) {
+TEST(instrument_tree_test, test_tree_no_cascade) {
 
   /*
 
@@ -455,10 +608,19 @@ TEST(node_test, test_tree_no_cascade) {
 
   */
 
-  auto a = CowPtr<Component>(new NiceMock<MockComponent>());
-  auto b = CowPtr<Component>(new NiceMock<MockComponent>());
+  auto a_ptr = new NiceMock<MockPathComponent>();
+  auto a = CowPtr<Component>(a_ptr);
+  auto b_ptr = new NiceMock<MockPathComponent>();
+  auto b = CowPtr<Component>(b_ptr);
   auto c = CowPtr<Component>(new NiceMock<MockComponent>());
   auto d = CowPtr<Component>(new NiceMock<MockComponent>());
+
+  // Make a the source
+  EXPECT_CALL(*a_ptr, isSource()).WillRepeatedly(Return(true));
+  EXPECT_CALL(*a_ptr, isSample()).WillRepeatedly(Return(false));
+  // Make b the sample
+  EXPECT_CALL(*b_ptr, isSample()).WillRepeatedly(Return(true));
+  EXPECT_CALL(*b_ptr, isSource()).WillRepeatedly(Return(false));
 
   std::vector<Node> nodes;
   nodes.emplace_back(a);

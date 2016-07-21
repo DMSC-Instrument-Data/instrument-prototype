@@ -14,14 +14,15 @@ public:
   DetectorComponent &operator=(const DetectorComponent &) = default;
 
   V3D getPos() const override;
-  void deltaPos(const V3D &pos) override;
+  void shiftPositionBy(const V3D &pos) override;
   virtual ~DetectorComponent();
   DetectorComponent *clone() const override;
   bool equals(const Component &other) const override;
   DetectorIdType detectorId() const override;
   ComponentIdType componentId() const override;
-  void
-  registerContents(std::vector<const Detector *> &lookup) const override;
+  void registerContents(
+      std::vector<const Detector *> &lookup,
+      std::vector<const PathComponent *> &pathComponents) const override;
   std::string name() const override;
 
 private:

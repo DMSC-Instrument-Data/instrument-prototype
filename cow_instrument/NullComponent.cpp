@@ -2,7 +2,7 @@
 
 V3D NullComponent::getPos() const { return V3D{0, 0, 0}; }
 
-void NullComponent::deltaPos(const V3D &) {}
+void NullComponent::shiftPositionBy(const V3D &) {}
 
 NullComponent::~NullComponent() {}
 
@@ -12,8 +12,10 @@ bool NullComponent::equals(const Component& other) const{
     return dynamic_cast<const NullComponent*>(&other) != nullptr;
 }
 
-void NullComponent::registerContents(std::vector<const Detector *> &) const
-{
+void
+NullComponent::registerContents(std::vector<const Detector *> &,
+                                std::vector<const PathComponent *> &) const {
+  // Do nothing.
 }
 
 ComponentIdType NullComponent::componentId() const

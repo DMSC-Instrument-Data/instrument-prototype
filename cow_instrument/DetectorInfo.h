@@ -7,17 +7,19 @@
 #include <string>
 #include <sstream>
 #include <cmath>
-#include <boost/optional.hpp>
+
+#include "Command.h"
+#include "cow_ptr.h"
 #include "Detector.h"
 #include "IdType.h"
+#include "L1s.h"
+#include "L2s.h"
 #include "MaskFlags.h"
 #include "MonitorFlags.h"
-#include "L2s.h"
-#include "Command.h"
+#include "Path.h"
+#include "PathComponent.h"
+#include "PathFactory.h"
 #include "Spectrum.h"
-#include "cow_ptr.h"
-#include <mutex>
-#include <thread>
 
 /**
  * DetectorInfo type. Provides Meta-data context to an InstrumentTree
@@ -26,7 +28,9 @@
  */
 template <typename InstTree> class DetectorInfo {
 public:
-  template <typename V> explicit DetectorInfo(V &&instrumentTree);
+  template <typename InstSptrType, typename PathFactoryType>
+  explicit DetectorInfo(InstSptrType &&instrumentTree,
+                        PathFactoryType &&pathFactory);
 
   void setMasked(size_t detectorIndex);
 
@@ -38,11 +42,13 @@ public:
 
   void initL2();
 
+  void initL1();
+
   double l2(size_t detectorIndex) const;
 
   V3D position(size_t detectorIndex) const;
 
-  double l1() const;
+  double l1(size_t detectorIndex) const;
 
   size_t size() const;
 
@@ -50,14 +56,14 @@ public:
 
   void modify(size_t nodeIndex, Command &command);
 
-  double distanceToSample(const V3D &item) const;
-
   std::vector<Spectrum> makeSpectra() const;
 
   CowPtr<L2s> l2s() const;
 
 private:
   std::shared_ptr<const InstTree> m_instrumentTree;
+  std::shared_ptr<const Paths> m_l2Paths;
+  std::shared_ptr<const Paths> m_l1Paths;
 
   //------------------- MetaData -------------
   const size_t m_nDetectors;
@@ -66,10 +72,8 @@ private:
       m_isMonitor; // This could be copied upon instrument change
 
   //------------------- DerivedInfo
-  double m_l1;      // This can't be copied upon instrument change
-  V3D m_sourcePos;  // This can't be copied upon instrument change
-  V3D m_samplePos;  // This can't be copied upon instrument change
-  CowPtr<L2s> m_l2; // This can't be copied upon instrument change
+  CowPtr<L1s> m_l1;
+  CowPtr<L2s> m_l2;
 };
 
 namespace {
@@ -91,24 +95,19 @@ double distance(const V3D &a, const V3D &b) {
 }
 
 template <typename InstTree>
-template <typename V>
-DetectorInfo<InstTree>::DetectorInfo(V &&instrumentTree)
-    : m_nDetectors(instrumentTree->nDetectors()),
+template <typename InstSptrType, typename PathFactoryType>
+DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
+                                     PathFactoryType &&pathFactory)
+    : m_l2Paths(pathFactory.createL2(*instrumentTree)),
+      m_l1Paths(pathFactory.createL1(*instrumentTree)),
+      m_nDetectors(instrumentTree->nDetectors()),
       m_isMasked(std::make_shared<MaskFlags>(m_nDetectors, Bool(false))),
       m_isMonitor(std::make_shared<MonitorFlags>(m_nDetectors, Bool(false))),
+      m_l1(std::make_shared<L1s>(m_nDetectors)),
       m_l2(std::make_shared<L2s>(m_nDetectors)),
-      m_sourcePos(instrumentTree->sourcePos()),
-      m_samplePos(instrumentTree->samplePos()),
       m_instrumentTree(instrumentTree) {
 
-  /* The lifetime of the DetectorInfo is tied to the lifetime of the
-     InstrumentTree (see constructor). So no danger that instrument movement
-     gets
-     out of step with this. InstrumentTrees are immutable.
-   */
-
-  // Calculate this once.
-  m_l1 = distance(m_sourcePos, m_samplePos);
+  initL1();
   initL2();
 }
 
@@ -130,30 +129,80 @@ void DetectorInfo<InstTree>::setMonitor(size_t detectorIndex) {
   (*m_isMonitor)[detectorIndex] = true;
 }
 
-/* In some use cases scientists decide to use arbitrary
- * detectors or groups of detectors as monitors
- * so lets have the client code tell us which ones are monitors.
- */
-
 template <typename InstTree>
 bool DetectorInfo<InstTree>::isMonitor(size_t detectorIndex) const {
   detectorRangeCheck(detectorIndex, m_isMonitor.const_ref());
   return m_isMonitor.const_ref()[detectorIndex];
 }
 
-template <typename InstTree> void DetectorInfo<InstTree>::initL2() {
+template <typename InstTree> void DetectorInfo<InstTree>::initL1() {
+
+  /*
+   * Caution for future extension of this: We must not double count the
+   * length() of the Source PathComponent, as this Component will appear in both
+   * the L1 and L2 calculation. Implementations of PathComponent, where
+   * isSource() is set to true, should therefore provide the scattering
+   * internal length as length/2.
+  */
+
+  // Loop over all detector indexes. We will have a path for each.
   for (size_t detectorIndex = 0; detectorIndex < m_nDetectors;
        ++detectorIndex) {
+
+    size_t i = 0;
+    const Path &path = (*m_l1Paths)[detectorIndex];
+    if (path.size() < 2) {
+      throw std::logic_error("Cannot have a L1 specified with less than 2 path "
+                             "components (sample + source).");
+    }
+
+    double l1 = 0;
+    // For each detector-l1-path calculate the total neutronic length
+
+    l1 += m_instrumentTree->getPathComponent(path[i]).length();
+    for (i = 1; i < path.size(); ++i) {
+      const PathComponent &current =
+          m_instrumentTree->getPathComponent(path[i]);
+      const PathComponent &previous =
+          m_instrumentTree->getPathComponent(path[i - 1]);
+      l1 += distance(current.entryPoint(), previous.exitPoint());
+      l1 += current.length();
+    }
+
+    (*m_l1)[detectorIndex] = l1;
+  }
+}
+
+template <typename InstTree> void DetectorInfo<InstTree>::initL2() {
+
+  // Loop over all detector indexes. We will have a path for each.
+  for (size_t detectorIndex = 0; detectorIndex < m_nDetectors;
+       ++detectorIndex) {
+
     const Detector &det = m_instrumentTree->getDetector(detectorIndex);
-    auto detPos = det.getPos();
+    auto detectorPos = det.getPos();
+    size_t i = 0;
+    const Path &path = (*m_l2Paths)[detectorIndex];
+    if (path.size() < 1) {
+      throw std::logic_error("Cannot have a L2 specified with less than 1 path "
+                             "components (sample).");
+    }
+    double l2 = 0;
 
-    /*
-     * Long-term is is not right. We cannot assume that the L2 path is simply
-     * sample
-     * to detector.
-     */
+    l2 += m_instrumentTree->getPathComponent(path[i]).length();
+    // For each detector-l2-path calculate the total neutronic length
+    for (i = 1; i < path.size(); ++i) {
+      const PathComponent &current =
+          m_instrumentTree->getPathComponent(path[i]);
+      const PathComponent &previous =
+          m_instrumentTree->getPathComponent(path[i - 1]);
+      l2 += distance(current.entryPoint(), previous.exitPoint());
+      l2 += current.length();
+    }
+    l2 += distance(m_instrumentTree->getPathComponent(path[i - 1]).exitPoint(),
+                   detectorPos);
 
-    (*m_l2)[detectorIndex] = distanceToSample(detPos);
+    (*m_l2)[detectorIndex] = l2;
   }
 }
 
@@ -168,8 +217,10 @@ V3D DetectorInfo<InstTree>::position(size_t detectorIndex) const {
   return m_instrumentTree->getDetector(detectorIndex).getPos();
 }
 
-template <typename InstTree> double DetectorInfo<InstTree>::l1() const {
-  return m_l1;
+template <typename InstTree>
+double DetectorInfo<InstTree>::l1(size_t detectorIndex) const {
+  detectorRangeCheck(detectorIndex, m_l1.const_ref());
+  return m_l1.const_ref()[detectorIndex];
 }
 
 template <typename InstTree> size_t DetectorInfo<InstTree>::size() const {
@@ -188,17 +239,10 @@ void DetectorInfo<InstTree>::modify(size_t nodeIndex, Command &command) {
 
   // All other geometry-derived information is now also invalid. Very
   // important!
-  m_sourcePos = m_instrumentTree->sourcePos();
-  m_samplePos = m_instrumentTree->samplePos();
-  m_l1 = distance(m_sourcePos, m_samplePos);
+  initL1();
   initL2();
 
   // Meta-data should all still be valid.
-}
-
-template <typename InstTree>
-double DetectorInfo<InstTree>::distanceToSample(const V3D &item) const {
-  return distance(item, m_samplePos);
 }
 
 template <typename InstTree>

@@ -8,7 +8,8 @@ set ( SOURCE_FILES
                    MoveCommand.cpp
                    Node.cpp
                    NullComponent.cpp
-                   Spectrum.cpp
+                   ParabolicGuide.cpp
+                   PathComponent.cpp
 )
 
 set ( INCLUDE_FILES
@@ -23,15 +24,25 @@ set ( INCLUDE_FILES
                    FixedLengthVector.h
                    IdType.h
                    InstrumentTree.h
+                   IntToType.h
+                   L1s.h
                    L2s.h
                    MaskFlags.h
                    MonitorFlags.h
                    MoveCommand.h
                    Node.h
                    NullComponent.h
-                   IntToType.h
+                   ParabolicGuide.h
+                   Path.h
+                   PathComponent.h
+                   PathFactory.h
+                   PointPathComponent.h
+                   PointSample.h
+                   PointSource.h
+                   SourceSampleDetectorPathFactory.h
                    SpectrumInfo.h
                    Spectrum.h
+                   VectorOf.h
                    V3D.h
 )
 

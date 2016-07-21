@@ -6,7 +6,7 @@ DetectorComponent::DetectorComponent(ComponentIdType componentId,
 
 V3D DetectorComponent::getPos() const { return m_pos; }
 
-void DetectorComponent::deltaPos(const V3D &delta) {
+void DetectorComponent::shiftPositionBy(const V3D &delta) {
   m_pos[0] += delta[0];
   m_pos[1] += delta[1];
   m_pos[2] += delta[2];
@@ -27,8 +27,9 @@ bool DetectorComponent::equals(const Component &other) const {
 }
 
 void DetectorComponent::registerContents(
-    std::vector<const Detector *> &lookup) const {
-    lookup.push_back(this);
+    std::vector<const Detector *> &lookupDetectors,
+    std::vector<const PathComponent *> &) const {
+  lookupDetectors.push_back(this);
 }
 
 std::string DetectorComponent::name() const {

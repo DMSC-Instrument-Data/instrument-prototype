@@ -39,6 +39,10 @@ set ( TEST_FILES
                  InstrumentTreeTest.cpp
                  MoveCommandTest.cpp
                  NodeTest.cpp
+                 ParabolicGuideTest.cpp
+                 PathComponentTest.cpp
+                 PointPathComponentTest.cpp
+                 SourceSampleDetectorPathFactoryTest.cpp
                  SpectrumInfoTest.cpp
                  SpectrumTest.cpp
 )

@@ -12,6 +12,9 @@ class Node;
 class NodeIterator;
 class Command;
 class Detector;
+class PathComponent;
+class PointSource;
+class PointSample;
 
 /*
  The instrument is nothing more than syntatic sugar over the root Node.
@@ -26,6 +29,9 @@ public:
 
   const Detector &getDetector(size_t detectorIndex) const;
 
+  const PathComponent &getPathComponent(size_t pathComponentIndex) const;
+  const PathComponent &source() const;
+  const PathComponent &sample() const;
   unsigned int version() const;
 
   bool modify(size_t node, const Command &command);
@@ -36,9 +42,12 @@ public:
   void fillDetectorMap(std::map<DetectorIdType, size_t> &toFill) const;
 
   size_t nDetectors() const;
+  size_t nPathComponents() const;
 
   Node const *const nodeAt(size_t index) const;
-  V3D sourcePos() const;
+
+  size_t samplePathIndex() const;
+  size_t sourcePathIndex() const;
 
   std::vector<Node>::const_iterator begin() const {
     return m_nodes.const_ref().begin();
@@ -52,13 +61,19 @@ public:
   std::vector<Node>::const_iterator cend() const {
     return m_nodes.const_ref().cend();
   }
-  V3D samplePos() const;
 
 private:
   void init();
 
+  /// Pointers to all known detectors in the instrument tree
   CowPtr<std::vector<Detector const *>> m_detectorVec;
+  /// Pointers to all known path components in the instrument tree
+  CowPtr<std::vector<PathComponent const *>> m_pathVec;
   CowPtr<std::vector<Node>> m_nodes;
+  /// PathComponent vector index of the source
+  size_t m_sourceIndex;
+  /// PathComponent vector index of the sample
+  size_t m_sampleIndex;
 };
 
 using InstrumentTree_const_uptr = std::unique_ptr<const InstrumentTree>;

@@ -21,6 +21,8 @@ class InstrumentTree;
 
 class Node {
 public:
+  Node();
+
   Node(size_t previous, CowPtr<Component> contents,
        std::string name = "", unsigned int version = 0);
 

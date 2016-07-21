@@ -4,6 +4,7 @@
 #include "gmock/gmock.h"
 #include <array>
 #include "MockTypes.h"
+#include "PathComponent.h"
 
 using namespace testing;
 
@@ -56,6 +57,13 @@ TEST(detector_component_test, test_copy) {
   EXPECT_EQ(det.detectorId(), copy.detectorId());
   EXPECT_EQ(det.componentId(), copy.componentId());
   EXPECT_EQ(det.getPos(), copy.getPos());
+}
+
+TEST(detector_component_test, test_not_path_component) {
+  DetectorComponent detector(ComponentIdType{1}, DetectorIdType{1},
+                             V3D{1, 1, 1});
+  EXPECT_EQ(dynamic_cast<PathComponent *>(&detector), nullptr)
+      << "DetectorComponent should not have public base PathComponent";
 }
 
 } // namespace

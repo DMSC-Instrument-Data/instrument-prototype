@@ -103,8 +103,7 @@ template <typename InstTree> void SpectrumInfo<InstTree>::initL2() {
        ++spectrumIndex) {
 
     double l2Temp = 0;
-    for (auto detectorIndex :
-         m_spectra.const_ref()[spectrumIndex].detectorIndexes()) {
+    for (auto detectorIndex : m_spectra.const_ref()[spectrumIndex].indexes()) {
       l2Temp += m_detectorInfo.l2(detectorIndex);
     }
     // Divide through by number of detectors
