@@ -17,9 +17,9 @@
 #include "MaskFlags.h"
 #include "MonitorFlags.h"
 #include "Path.h"
+#include "PathComponent.h"
 #include "PathFactory.h"
 #include "Spectrum.h"
-#include "PathComponent.h"
 
 /**
  * DetectorInfo type. Provides Meta-data context to an InstrumentTree
@@ -129,11 +129,6 @@ void DetectorInfo<InstTree>::setMonitor(size_t detectorIndex) {
   (*m_isMonitor)[detectorIndex] = true;
 }
 
-/* In some use cases scientists decide to use arbitrary
- * detectors or groups of detectors as monitors
- * so lets have the client code tell us which ones are monitors.
- */
-
 template <typename InstTree>
 bool DetectorInfo<InstTree>::isMonitor(size_t detectorIndex) const {
   detectorRangeCheck(detectorIndex, m_isMonitor.const_ref());
@@ -141,6 +136,14 @@ bool DetectorInfo<InstTree>::isMonitor(size_t detectorIndex) const {
 }
 
 template <typename InstTree> void DetectorInfo<InstTree>::initL1() {
+
+  /*
+   * Caution for future extension of this: We must not double count the
+   * length() of the Source PathComponent, as this Component will appear in both
+   * the L1 and L2 calculation. Implementations of PathComponent, where
+   * isSource() is set to true, should therefore provide the scattering
+   * internal length as length/2.
+  */
 
   // Loop over all detector indexes. We will have a path for each.
   for (size_t detectorIndex = 0; detectorIndex < m_nDetectors;
