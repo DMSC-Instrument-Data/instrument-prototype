@@ -61,9 +61,6 @@ public:
   CowPtr<L2s> l2s() const;
 
 private:
-  std::shared_ptr<const InstTree> m_instrumentTree;
-  std::shared_ptr<const Paths> m_l2Paths;
-  std::shared_ptr<const Paths> m_l1Paths;
 
   //------------------- MetaData -------------
   const size_t m_nDetectors;
@@ -74,6 +71,13 @@ private:
   //------------------- DerivedInfo
   CowPtr<L1s> m_l1;
   CowPtr<L2s> m_l2;
+
+
+  std::shared_ptr<const Paths> m_l2Paths;
+  std::shared_ptr<const Paths> m_l1Paths;
+
+  // Instrument
+  std::shared_ptr<const InstTree> m_instrumentTree;
 };
 
 namespace {
@@ -105,7 +109,7 @@ DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
       m_isMonitor(std::make_shared<MonitorFlags>(m_nDetectors, Bool(false))),
       m_l1(std::make_shared<L1s>(m_nDetectors)),
       m_l2(std::make_shared<L2s>(m_nDetectors)),
-      m_instrumentTree(instrumentTree) {
+      m_instrumentTree(std::forward<InstSptrType>(instrumentTree)) {
 
   initL1();
   initL2();
