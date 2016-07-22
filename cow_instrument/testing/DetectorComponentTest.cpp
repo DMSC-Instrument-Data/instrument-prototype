@@ -1,10 +1,13 @@
-#include "DetectorComponent.h"
+
 #include "cow_ptr.h"
+#include "DetectorComponent.h"
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
-#include <array>
 #include "MockTypes.h"
 #include "PathComponent.h"
+
+#include <array>
+#include <type_traits>
 
 using namespace testing;
 
@@ -62,7 +65,8 @@ TEST(detector_component_test, test_copy) {
 TEST(detector_component_test, test_not_path_component) {
   DetectorComponent detector(ComponentIdType{1}, DetectorIdType{1},
                              V3D{1, 1, 1});
-  EXPECT_EQ(dynamic_cast<PathComponent *>(&detector), nullptr)
+  bool isPathComponent = std::is_base_of<PathComponent, DetectorComponent>::value;
+  EXPECT_FALSE(isPathComponent)
       << "DetectorComponent should not have public base PathComponent";
 }
 
