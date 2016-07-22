@@ -1,11 +1,17 @@
-sudo: required
+opsudo: required
 
 dist: trusty
 
 language: cpp
 
-before_install:
-  - sudo apt-get install -y cmake
+install: ./install_script.sh
+
+before_script:  
+    - mkdir build
+    - cd build
+    - cmake ..
+
+script: make 
 
 
 
