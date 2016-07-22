@@ -1,0 +1,12 @@
+sudo: required
+
+dist: trusty
+
+language: cpp
+
+before_install:
+  - sudo apt-get install -y cmake
+
+
+
+
