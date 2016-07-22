@@ -1,4 +1,4 @@
-opsudo: required
+sudo: required
 
 dist: trusty
 
