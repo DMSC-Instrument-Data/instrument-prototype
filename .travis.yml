@@ -4,22 +4,15 @@ dist: trusty
 
 language: cpp
 
-env:
-- SOURCE_PATH=~/dependency_source
-- BUILD_PATH=~/dependency_build
-- GTEST=gtest
-- GBENCH=gbench
-
-# Build the dependencies. 
-install: ./install_script.sh $SOURCE_PATH $GTEST $GBENCH $BUILD_PATH $GTEST $GBENCH 
+install: ./install_script.sh ~/dependency_source gtest gbench ~/dependency_build gtest gbench
 
 before_script:  
     - mkdir build
     - cd build
-    - cmake -DGTEST_BUILD_DIR=$BUILD_PATH/$GTEST -DGBENCH_BUILD_DIR=$BUILD_PATH/$GBENCH -DGTEST_SOURCE_DIR=$SOURCE_PATH/$GTEST -DGBENCH_SOURCE_DIR=$SOURCE_PATH/$GBENCH -DCMAKE_BUILD_TYPE=Release ..
+    - cmake -DGTEST_BUILD_DIR=~/dependency_build/gtest -DGBENCH_BUILD_DIR=~/dependency_build/gbench -DGTEST_SOURCE_DIR=~/dependency_source/gtest -DGBENCH_SOURCE_DIR=~/dependency_source/gbench -DCMAKE_BUILD_TYPE=Release ..
 
 script: 
-    - cmake --build
+    - make -j
     - ctest -VV
 
 
