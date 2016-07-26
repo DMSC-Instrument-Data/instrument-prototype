@@ -1,5 +1,3 @@
-enable_testing()
-
 # Auto-find correct threading library
 find_package(Threads)
 

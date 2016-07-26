@@ -11,9 +11,9 @@ before_script:
     - cd build
     - cmake -DGTEST_BUILD_DIR=~/dependency_build/gtest -DGBENCH_BUILD_DIR=~/dependency_build/gbench -DGTEST_SOURCE_DIR=~/dependency_source/gtest -DGBENCH_SOURCE_DIR=~/dependency_source/gbench -DCMAKE_BUILD_TYPE=Release ..
 
-script: make -j
-
-after_success: ./cow_instrument/testing/cow_instrument_test
+script: 
+    - make -j
+    - ctest -VV
 
 
 
