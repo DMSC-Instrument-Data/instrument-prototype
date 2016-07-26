@@ -16,7 +16,7 @@ TEST(node_test, test_construction_isolated) {
 
   EXPECT_FALSE(node.hasParent());
   EXPECT_FALSE(node.hasChildren());
-  EXPECT_EQ(node.version(), 0);
+  EXPECT_EQ(node.version(), 1);
   EXPECT_EQ(node.name(), nodeName);
 }
 
