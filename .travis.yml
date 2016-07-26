@@ -14,7 +14,7 @@ before_script:
     - cmake -DGTEST_BUILD_DIR=~/dependency_build/gtest -DGBENCH_BUILD_DIR=~/dependency_build/gbench -DGTEST_SOURCE_DIR=~/dependency_source/gtest -DGBENCH_SOURCE_DIR=~/dependency_source/gbench -DCMAKE_BUILD_TYPE=Release ..
 
 script: 
-    - cmake --build 
+    - cmake --build .
     - ctest -VV
 
 
