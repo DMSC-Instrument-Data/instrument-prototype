@@ -4,8 +4,6 @@ dist: trusty
 
 language: cpp
 
-compiler: gcc
-
 env:
     - SOURCE_PATH=~/dependency_source
     - BUILD_PATH=~/dependency_build
