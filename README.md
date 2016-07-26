@@ -24,7 +24,16 @@ CMake is required to configure the prototype.
 $ git clone https://github.com/google/googletest.git
 $ cd googletest
 $ cmake .
-$ make
+$ cmake --build
+```
+
+[GoogleBench](https://github.com/google/benchmark) is also required, and should be built in a similar way to googletest:
+
+```
+$ git clone https://github.com/google/benchmark.git
+$ cd benchmark
+$ cmake .
+$ cmake --build
 ```
 
 There are four variables that may need to be set when configuring the prototype: `GTEST_SOURCE_DIR`, `GTEST_BUILD_DIR`, `GBENCH_BUILD_DIR`, `GBENCH_SOURCE_DIR`.
@@ -53,4 +62,6 @@ $ make
 ```
 
 CMake will issue an error if the directories are incorrect (if it cannot find the include/library files required).
+
+You may also inspect the [.travis.yml](.travis.yml) file associated with this prototype to see individual steps for the build.
 
