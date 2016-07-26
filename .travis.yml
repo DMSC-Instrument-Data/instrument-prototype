@@ -5,10 +5,10 @@ dist: trusty
 language: cpp
 
 env:
-    - SOURCE_PATH=~/dependency_source
-    - BUILD_PATH=~/dependency_build
-    - GTEST=gtest
-    - GBENCH=gbench
+- SOURCE_PATH=~/dependency_source
+- BUILD_PATH=~/dependency_build
+- GTEST=gtest
+- GBENCH=gbench
 
 # Build the dependencies. 
 install: ./install_script.sh $SOURCE_PATH $GTEST $GBENCH $BUILD_PATH $GTEST $GBENCH 
