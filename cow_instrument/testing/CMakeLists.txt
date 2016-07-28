@@ -27,13 +27,15 @@ if( NOT EXISTS "${GTEST_LIBRARY}" OR NOT EXISTS "${GTEST_MAIN_LIBRARY}" OR NOT E
 endif()
 
 # Set include directories
-include_directories(${GTEST_INCLUDE_DIR} ${GMOCK_INCLUDE_DIR})
+include_directories(${GTEST_INCLUDE_DIR} ${GMOCK_INCLUDE_DIR} ${Boost_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH})
 
 set ( TEST_FILES
                  CompositeComponentTest.cpp
                  DetectorComponentTest.cpp
                  DetectorInfoTest.cpp
+                 DetectorInfoFactoryTest.cpp
                  FixedLengthVectorTest.cpp
+                 InstrumentTreeFactoryTest.cpp
                  InstrumentTreeTest.cpp
                  MoveCommandTest.cpp
                  NodeTest.cpp
@@ -41,13 +43,18 @@ set ( TEST_FILES
                  PathComponentTest.cpp
                  PointPathComponentTest.cpp
                  SourceSampleDetectorPathFactoryTest.cpp
+                 SpectrumInfoFactoryTest.cpp
                  SpectrumInfoTest.cpp
                  SpectrumTest.cpp
+                 MPITest.cpp
 )
+
+set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" ${MPI_CXX_COMPILE_FLAGS} )
+set ( CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS} )
 
 add_executable(cow_instrument_test runner.cpp MockTypes.h ${TEST_FILES})
 
-target_link_libraries(cow_instrument_test LINK_PUBLIC cow_instrument ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} ${GMOCK_LIBRARY} ${GMOCK_MAIN_LIBRARY} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(cow_instrument_test LINK_PUBLIC cow_instrument ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} ${GMOCK_LIBRARY} ${GMOCK_MAIN_LIBRARY} ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES})
 
 add_test(cow_instrument_test cow_instrument_test)
 

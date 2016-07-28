@@ -1,4 +1,4 @@
-find_package ( Boost 1.54.0 REQUIRED )
+find_package ( Boost 1.54.0 COMPONENTS mpi REQUIRED )
 
 find_package(MPI REQUIRED)
 
