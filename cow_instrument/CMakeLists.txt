@@ -1,5 +1,12 @@
+find_package ( Boost 1.54.0 REQUIRED )
+
+find_package(MPI REQUIRED)
+
 add_subdirectory(testing)
+
 add_subdirectory(benchmark)
+
+include_directories(${Boost_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH})
 
 set ( SOURCE_FILES
                    CompositeComponent.cpp
@@ -48,5 +55,5 @@ set ( INCLUDE_FILES
 
 add_library (cow_instrument SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
 
-target_include_directories (cow_instrument PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories (cow_instrument PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} )
 
