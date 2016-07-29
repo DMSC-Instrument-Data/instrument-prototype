@@ -6,6 +6,14 @@ language: cpp
 
 compiler: gcc
 
+before_install:
+    - sudo apt-get -qq update
+    - sudo apt-get install -y libboost-dev
+    - sudo apt-get install -y mpi-default-dev
+    - sudo apt-get install -y libboost-mpi-dev
+    - sudo apt-get install -y openmpi-bin
+
+
 install: ./install_script.sh ~/dependency_source gtest gbench ~/dependency_build gtest gbench
 
 before_script:  
@@ -16,7 +24,4 @@ before_script:
 script: 
     - cmake --build .
     - ctest -VV
-
-
-
 

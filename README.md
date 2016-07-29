@@ -67,3 +67,19 @@ CMake will issue an error if the directories are incorrect (if it cannot find th
 
 You may also inspect the [.travis.yml](.travis.yml) file associated with this prototype to see individual steps for the build.
 
+# Homebrew #
+
+If you are using homebrew on OSX
+```
+brew install gcc
+brew install boost --with-mpi --without-single --c++11
+brew install mpi
+```
+prior to running cmake.
+
+
+# Trusty #
+```
+For required trusty pacakges see *before_install* in [.travis.yml](.travis.yml)
+```
+

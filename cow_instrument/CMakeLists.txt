@@ -1,4 +1,9 @@
+find_package ( Boost 1.54.0 COMPONENTS mpi REQUIRED )
+
+find_package(MPI REQUIRED)
+
 add_subdirectory(testing)
+
 add_subdirectory(benchmark)
 
 set ( SOURCE_FILES
@@ -48,5 +53,5 @@ set ( INCLUDE_FILES
 
 add_library (cow_instrument SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
 
-target_include_directories (cow_instrument PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories (cow_instrument PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} )
 
