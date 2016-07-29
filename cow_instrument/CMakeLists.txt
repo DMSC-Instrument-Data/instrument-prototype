@@ -6,8 +6,6 @@ add_subdirectory(testing)
 
 add_subdirectory(benchmark)
 
-include_directories(${Boost_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH})
-
 set ( SOURCE_FILES
                    CompositeComponent.cpp
                    DetectorComponent.cpp
