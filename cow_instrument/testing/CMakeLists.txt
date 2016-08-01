@@ -43,15 +43,19 @@ set ( TEST_FILES
                  SourceSampleDetectorPathFactoryTest.cpp                 
                  SpectrumInfoTest.cpp
                  SpectrumTest.cpp
-                 MPITest.cpp
+                 MPITest.cpp               
+)
+
+set ( TEST_FILES_MAPPERS
+                DetectorComponentMapperTest.cpp
 )
 
 set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" ${MPI_CXX_COMPILE_FLAGS} )
 set ( CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS} )
 
-add_executable(cow_instrument_test runner.cpp MockTypes.h ${TEST_FILES})
+add_executable(cow_instrument_test runner.cpp MockTypes.h ${TEST_FILES} ${TEST_FILES_MAPPERS})
 
-target_link_libraries(cow_instrument_test LINK_PUBLIC cow_instrument ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} ${GMOCK_LIBRARY} ${GMOCK_MAIN_LIBRARY} ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} ${MPI_CXX_LIBRARIES})
+target_link_libraries(cow_instrument_test LINK_PRIVATE cow_instrument ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} ${GMOCK_LIBRARY} ${GMOCK_MAIN_LIBRARY} ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} ${MPI_CXX_LIBRARIES})
 
 add_test(cow_instrument_test cow_instrument_test)
 
