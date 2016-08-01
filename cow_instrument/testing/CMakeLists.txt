@@ -48,6 +48,7 @@ set ( TEST_FILES
 
 set ( TEST_FILES_MAPPERS
                 DetectorComponentMapperTest.cpp
+                IntToTypeMapperTest.cpp
 )
 
 set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" ${MPI_CXX_COMPILE_FLAGS} )

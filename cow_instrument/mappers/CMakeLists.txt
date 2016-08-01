@@ -1,12 +1,17 @@
 
+#add_definitions(-DBOOST_NO_CXX11_HDR_ARRAY)
+
 set ( SOURCE_FILES
                    DetectorComponentMapper.cpp
 )
 
 
 set ( INCLUDE_FILES
+                   ComponentIdTypeMapper.h
                    DetectorComponentMapper.h
+                   DetectorIdTypeMapper.h
                    IntToTypeMapper.h
+                   V3DMapper.h
 )
 
 # Make mappers a static library

@@ -1,44 +1,40 @@
 #ifndef _INTTOTYPEMAPPER_H
 #define _INTTOTYPEMAPPER_H
 
-#include "IdType.h"
-//#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/serialization.hpp>
 #include <boost/serialization/optional.hpp>
 #include <boost/optional.hpp>
 
 template <typename T> class IntToTypeMapper {
 
 public:
-  IntToTypeMapper(const T &value) : heldValue(value), m_initialized(true){};
-  IntToTypeMapper() : heldValue(0), m_initialized(false){};
+  IntToTypeMapper(const T &value) : heldValue(value.value) {}
 
-  T heldValue;
+  IntToTypeMapper() = default;
 
-  T create() { return heldValue; }
+  boost::optional<typename T::StorageType> heldValue;
 
-  void store(const T &source) {
-    heldValue = source;
-    m_initialized = true;
+  T create() {
+    if (heldValue.is_initialized()) {
+      return T(heldValue.get());
+    } else {
+      throw std::runtime_error("Not initialized;");
+    }
   }
 
-  bool initalized() const { return m_initialized; }
+  void store(const T &source) { heldValue = source.value; }
 
-  template <class Archive> void load(Archive &ar, const unsigned int version) {
-    ar &heldValue.value;
-    m_initialized = true;
-  }
+  bool initalized() const { return heldValue.is_initialized(); }
 
+protected:
+  friend class boost::serialization::access;
   template <class Archive>
-  void save(Archive &ar, const unsigned int version) const {
-    ar &heldValue.value;
+  void serialize(Archive &ar, const unsigned int version) {
+    // Use overloaded serialization for optional bools.
+    boost::serialization::serialize<Archive, typename T::StorageType>(
+        ar, heldValue, version);
   }
-  BOOST_SERIALIZATION_SPLIT_MEMBER()
 
-private:
-  bool m_initialized;
 };
-
-using ComponentIdTypeMapper = IntToTypeMapper<ComponentIdType>;
-using DetectorIdTypeMapper = IntToTypeMapper<DetectorIdType>;
 
 #endif

@@ -2,15 +2,10 @@
 #define _DETECTORCOMPONENTMAPPER_H
 
 #include <boost/serialization/serialization.hpp>
-#include <boost/optional.hpp>
-
-#include "IdType.h"
 #include "DetectorComponent.h"
-#include "V3D.h"
-
-// TODO change header
-#include "IntToTypeMapper.h"
-#include "boost/serialization/optional.hpp"
+#include "ComponentIdTypeMapper.h"
+#include "DetectorIdTypeMapper.h"
+#include "V3DMapper.h"
 
 /**
  * Abstraction for serialization/deserialization using
@@ -26,16 +21,20 @@ class DetectorComponentMapper {
 public:
   ComponentIdTypeMapper componentIdMapper;
   DetectorIdTypeMapper detectorIdMapper;
-  boost::optional<V3D> pos;
+  V3DMapper posMapper;
 
   DetectorComponent create();
+
   void store(const DetectorComponent &source);
 
+private:
+  friend class boost::serialization::access;
   template <class Archive>
   void serialize(Archive &ar, const unsigned int version) {
-    componentIdMapper.serialize(ar, version);
-    detectorIdMapper.serialize(ar, version);
-    boost::serialization::serialize(ar, pos, version);
+    using namespace boost::serialization;
+    boost::serialization::serialize(ar, componentIdMapper, version);
+    boost::serialization::serialize(ar, detectorIdMapper, version);
+    boost::serialization::serialize(ar, posMapper, version);
   }
 };
 
