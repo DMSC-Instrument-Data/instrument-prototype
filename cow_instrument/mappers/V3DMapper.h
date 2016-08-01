@@ -45,7 +45,7 @@ protected:
 
 namespace boost {
 namespace serialization {
-#ifdef BOOST_NO_CXX11_HDR_ARRAY
+#ifdef CUSTOM_STD_ARRAY_SERIALIZATION
 template <class Archive, class T, size_t N>
 void serialize(Archive &ar, std::array<T, N> &a, const unsigned int) {
   ar &boost::serialization::make_array(a.data(), a.size());
