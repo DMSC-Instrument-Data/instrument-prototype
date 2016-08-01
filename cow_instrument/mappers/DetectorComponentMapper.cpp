@@ -8,7 +8,7 @@ DetectorComponent DetectorComponentMapper::create() {
     // Make the item we want.
 
     return DetectorComponent(componentIdMapper.create(),
-                             detectorIdMapper.create(), pos.value());
+                             detectorIdMapper.create(), pos.get());
   } else {
     throw std::invalid_argument("Cannot be deserialized. Not all mandatory "
                                 "construction fields have been provided for "
