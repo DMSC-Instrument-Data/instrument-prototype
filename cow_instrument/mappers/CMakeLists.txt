@@ -1,5 +1,5 @@
 
-#add_definitions(-DBOOST_NO_CXX11_HDR_ARRAY)
+add_definitions(-DBOOST_NO_CXX11_HDR_ARRAY)
 
 set ( SOURCE_FILES
                    DetectorComponentMapper.cpp
