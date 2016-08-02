@@ -1,8 +1,3 @@
-if(${Boost_VERSION} LESS 105700)
-    message(STATUS "Add serialization std::array overload. Boost version ${Boost_VERSION}")
-    add_definitions(-DCUSTOM_STD_ARRAY_SERIALIZATION)
-endif()
-
 set ( SOURCE_FILES
                    DetectorComponentMapper.cpp
 )

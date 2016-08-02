@@ -1,5 +1,10 @@
 find_package ( Boost 1.54.0 COMPONENTS mpi serialization REQUIRED )
 
+if(${Boost_VERSION} LESS 105700)
+    message(STATUS "Add serialization std::array overload. Boost version ${Boost_VERSION}")
+    add_definitions(-DCUSTOM_STD_ARRAY_SERIALIZATION)
+endif()
+
 find_package(MPI REQUIRED)
 
 add_subdirectory(testing)
