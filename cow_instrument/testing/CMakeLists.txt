@@ -49,6 +49,7 @@ set ( TEST_FILES
 set ( TEST_FILES_MAPPERS
                 DetectorComponentMapperTest.cpp
                 IntToTypeMapperTest.cpp
+                ParabolicGuideMapperTest.cpp
                 PointPathComponentMapperTest.cpp
 )
 

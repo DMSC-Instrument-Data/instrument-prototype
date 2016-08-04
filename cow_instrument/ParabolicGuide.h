@@ -21,6 +21,8 @@ public:
   std::string name() const;
 
   double length() const;
+  double a() const;
+  double h() const;
   V3D entryPoint() const;
   V3D exitPoint() const;
 

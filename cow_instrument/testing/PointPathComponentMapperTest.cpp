@@ -14,7 +14,7 @@ public:
   using MapeeType = typename T::MapeeType;
 };
 
-// Register PointPathComponentMapper subtypes for individual testing
+// Register PointPathComponentMapper sub types for individual testing
 typedef ::testing::Types<PointSourceMapper, PointSampleMapper> AllTypes;
 TYPED_TEST_CASE(PointPathComponentMapperTest, AllTypes);
 

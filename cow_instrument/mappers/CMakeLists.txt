@@ -1,5 +1,6 @@
 set ( SOURCE_FILES
                    DetectorComponentMapper.cpp
+                   ParabolicGuideMapper.cpp
 )
 
 
@@ -8,6 +9,7 @@ set ( INCLUDE_FILES
                    DetectorComponentMapper.h
                    DetectorIdTypeMapper.h
                    IntToTypeMapper.h
+                   ParabolicGuideMapper.h
                    PointPathComponentMapper.h
                    PointSourceMapper.h
                    PointSampleMapper.h

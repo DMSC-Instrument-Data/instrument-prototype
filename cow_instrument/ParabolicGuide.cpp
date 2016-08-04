@@ -82,6 +82,10 @@ std::string ParabolicGuide::name() const { return "Parbolic guide"; }
 
 double ParabolicGuide::length() const { return m_length; }
 
+double ParabolicGuide::a() const { return m_a; }
+
+double ParabolicGuide::h() const { return m_h; }
+
 V3D ParabolicGuide::entryPoint() const {
   // TODO This is a little hacky. We are assuming beam down x.
   // Would be better to use the reference frame for this.
