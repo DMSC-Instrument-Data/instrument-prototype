@@ -4,6 +4,7 @@
 #include <boost/serialization/serialization.hpp>
 #include <boost/serialization/optional.hpp>
 #include <boost/optional.hpp>
+#include <stdexcept>
 
 /**
  Single simple Mapper templated class. Creates simple mappers
@@ -23,7 +24,8 @@ public:
     if (heldValue.is_initialized()) {
       return heldValue.get();
     } else {
-      throw std::runtime_error("Not implemented");
+      throw std::invalid_argument("SingleItemMapper::create failed. Mapper not "
+                                  "provided with a serialization item");
     }
   }
 

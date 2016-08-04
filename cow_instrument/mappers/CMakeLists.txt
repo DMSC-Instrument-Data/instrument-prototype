@@ -15,6 +15,7 @@ set ( INCLUDE_FILES
                    PointSampleMapper.h
                    SingleItemMapper.h
                    V3DMapper.h
+                   VectorOfMapper.h
 )
 
 # Make mappers a static library

@@ -1,4 +1,5 @@
 #include "ParabolicGuideMapper.h"
+#include <stdexcept>
 
 void ParabolicGuideMapper::store(const ParabolicGuide &source) {
   componentIdMapper.store(source.componentId());

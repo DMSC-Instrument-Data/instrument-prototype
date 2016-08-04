@@ -1,4 +1,5 @@
 #include "DetectorComponentMapper.h"
+#include <stdexcept>
 
 DetectorComponentMapper::DetectorComponentMapper(
     const DetectorComponent &source) {

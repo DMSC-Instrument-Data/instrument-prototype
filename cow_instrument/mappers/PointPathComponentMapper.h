@@ -3,6 +3,7 @@
 
 #include "ComponentIdTypeMapper.h"
 #include "V3DMapper.h"
+#include <stdexcept>
 
 template <typename Mapee> class PointPathComponentMapper {
 public:
