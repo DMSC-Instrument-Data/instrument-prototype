@@ -19,6 +19,9 @@
  */
 class DetectorComponentMapper {
 public:
+  DetectorComponentMapper(const DetectorComponent &source);
+  DetectorComponentMapper() = default;
+
   ComponentIdTypeMapper componentIdMapper;
   DetectorIdTypeMapper detectorIdMapper;
   V3DMapper posMapper;

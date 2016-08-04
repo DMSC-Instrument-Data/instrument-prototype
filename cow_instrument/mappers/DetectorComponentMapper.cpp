@@ -1,5 +1,10 @@
 #include "DetectorComponentMapper.h"
 
+DetectorComponentMapper::DetectorComponentMapper(
+    const DetectorComponent &source) {
+  store(source);
+}
+
 DetectorComponent DetectorComponentMapper::create() {
 
   // Check that everything required has been specified.

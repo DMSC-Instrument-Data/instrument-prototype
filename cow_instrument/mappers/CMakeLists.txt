@@ -8,6 +8,10 @@ set ( INCLUDE_FILES
                    DetectorComponentMapper.h
                    DetectorIdTypeMapper.h
                    IntToTypeMapper.h
+                   PointPathComponentMapper.h
+                   PointSourceMapper.h
+                   PointSampleMapper.h
+                   SingleItemMapper.h
                    V3DMapper.h
 )
 
