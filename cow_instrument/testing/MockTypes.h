@@ -23,6 +23,7 @@ public:
   ~MockComponent() {}
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
   MOCK_CONST_METHOD0(name, std::string());
+  MOCK_CONST_METHOD1(accept, void(ComponentVisitor *));
 };
 
 class MockPathComponent : public PathComponent {
@@ -40,6 +41,7 @@ public:
 
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
   MOCK_CONST_METHOD0(name, std::string());
+  MOCK_CONST_METHOD1(accept, void(ComponentVisitor *));
 
   MOCK_CONST_METHOD0(length, double());
   MOCK_CONST_METHOD0(entryPoint, V3D());
@@ -73,6 +75,7 @@ public:
   ~MockDetector() {}
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
   MOCK_CONST_METHOD0(name, std::string());
+  MOCK_CONST_METHOD1(accept, void(ComponentVisitor *));
 };
 
 template <typename T> class PolymorphicInstrumentTree {

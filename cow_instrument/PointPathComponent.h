@@ -23,6 +23,7 @@ public:
       std::vector<const PathComponent *> &pathLookup) const override;
   virtual ComponentIdType componentId() const override;
   virtual std::string name() const override;
+  virtual void accept(ComponentVisitor *visitor) const override{};
 
   double length() const override;
   V3D entryPoint() const override;

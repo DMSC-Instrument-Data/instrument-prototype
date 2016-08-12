@@ -28,3 +28,7 @@ void DetectorComponentMapper::store(const DetectorComponent &source) {
   componentIdMapper.store(source.componentId());
   posMapper.store(source.getPos());
 }
+
+void DetectorComponentMapper::visit(DetectorComponent const *const component) {
+  store(*component);
+}

@@ -16,6 +16,7 @@ public:
   ComponentIdType componentId() const override;
   std::string name() const override;
   static const std::string TypeName;
+  virtual void accept(ComponentVisitor *visitor) const override{};
 };
 
 #endif

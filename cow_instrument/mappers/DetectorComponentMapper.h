@@ -6,6 +6,7 @@
 #include "ComponentIdTypeMapper.h"
 #include "DetectorIdTypeMapper.h"
 #include "V3DMapper.h"
+#include "ComponentVisitor.h"
 
 /**
  * Abstraction for serialization/deserialization using
@@ -17,7 +18,7 @@
  * is convoluted in boost serialization. Those aspects go away when we use
  *mappers (Default constructable)
  */
-class DetectorComponentMapper {
+class DetectorComponentMapper : public ComponentVisitor {
 public:
   DetectorComponentMapper(const DetectorComponent &source);
   DetectorComponentMapper() = default;
@@ -29,6 +30,8 @@ public:
   DetectorComponent create();
 
   void store(const DetectorComponent &source);
+
+  virtual void visit(DetectorComponent const *const component);
 
 private:
   friend class boost::serialization::access;

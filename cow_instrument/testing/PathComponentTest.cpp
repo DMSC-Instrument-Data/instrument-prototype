@@ -23,7 +23,8 @@ public:
   void registerContents(std::vector<const Detector *> &,
                         std::vector<const PathComponent *> &) const {}
   ComponentIdType componentId() const { return ComponentIdType{1}; }
-  std::string name() const { return ""; };
+  std::string name() const { return ""; }
+  void accept(ComponentVisitor *) const {}
 };
 
 TEST(path_component_test, test_default_length) {

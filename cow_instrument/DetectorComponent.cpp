@@ -1,4 +1,5 @@
 #include "DetectorComponent.h"
+#include "ComponentVisitor.h"
 
 DetectorComponent::DetectorComponent(ComponentIdType componentId,
                                      DetectorIdType detectorId, const V3D &pos)
@@ -34,6 +35,10 @@ void DetectorComponent::registerContents(
 
 std::string DetectorComponent::name() const {
   return ""; // Not implmented (yet) for detector component.
+}
+
+void DetectorComponent::accept(ComponentVisitor *visitor) const {
+  visitor->visit(this);
 }
 
 DetectorComponent::~DetectorComponent() {}

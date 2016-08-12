@@ -24,6 +24,7 @@ public:
       std::vector<const Detector *> &lookup,
       std::vector<const PathComponent *> &pathComponents) const override;
   std::string name() const override;
+  virtual void accept(ComponentVisitor *visitor) const override;
 
 private:
   const DetectorIdType m_detectorId;

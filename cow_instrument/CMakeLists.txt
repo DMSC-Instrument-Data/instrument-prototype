@@ -29,6 +29,7 @@ set ( INCLUDE_FILES
                    Bool.h
                    Command.h
                    Component.h
+                   ComponentVisitor.h
                    CompositeComponent.h
                    cow_ptr.h
                    Detector.h

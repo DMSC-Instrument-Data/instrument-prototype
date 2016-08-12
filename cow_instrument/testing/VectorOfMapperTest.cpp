@@ -15,7 +15,7 @@ using VectorOfIntsMapper = VectorOfMapper<int>;
 TEST(vector_of_mapper_test, test_mapper_create_throws_without_vector) {
   VectorOfIntsMapper mapper;
   EXPECT_THROW(mapper.create(), std::invalid_argument)
-      << "No vector provides. VectorOfMapper should throw.";
+      << "No vector provided. VectorOfMapper should throw.";
 }
 
 TEST(vector_of_mapper_test, test_non_default_constructor) {

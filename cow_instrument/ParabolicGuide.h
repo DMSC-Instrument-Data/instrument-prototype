@@ -19,6 +19,7 @@ public:
       std::vector<const PathComponent *> &lookupPathComponents) const;
   ComponentIdType componentId() const;
   std::string name() const;
+  virtual void accept(ComponentVisitor *visitor) const override{};
 
   double length() const;
   double a() const;

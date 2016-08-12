@@ -1,4 +1,5 @@
 set ( SOURCE_FILES
+                   CompositeComponentMapper.cpp
                    DetectorComponentMapper.cpp
                    ParabolicGuideMapper.cpp
 )
@@ -6,6 +7,8 @@ set ( SOURCE_FILES
 
 set ( INCLUDE_FILES
                    ComponentIdTypeMapper.h
+                   ComponentMapper.h
+                   CompositeComponentMapper.h
                    DetectorComponentMapper.h
                    DetectorIdTypeMapper.h
                    IntToTypeMapper.h
@@ -16,6 +19,7 @@ set ( INCLUDE_FILES
                    SingleItemMapper.h
                    V3DMapper.h
                    VectorOfMapper.h
+                   VectorOfComponentMapper.h
 )
 
 # Make mappers a static library
