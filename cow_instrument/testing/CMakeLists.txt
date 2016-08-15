@@ -30,6 +30,7 @@ endif()
 include_directories(${GTEST_INCLUDE_DIR} ${GMOCK_INCLUDE_DIR} ${Boost_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH})
 
 set ( TEST_FILES
+                 ComponentVisitorTest.cpp
                  CompositeComponentTest.cpp
                  DetectorComponentTest.cpp
                  DetectorInfoTest.cpp                 
@@ -47,7 +48,7 @@ set ( TEST_FILES
 )
 
 set ( TEST_FILES_MAPPERS
-                CompositeComponentMapperTest.cpp
+                #CompositeComponentMapperTest.cpp
                 DetectorComponentMapperTest.cpp
                 IntToTypeMapperTest.cpp
                 ParabolicGuideMapperTest.cpp
