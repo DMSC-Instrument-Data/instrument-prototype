@@ -1,3 +1,7 @@
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
+find_package(Eigen3 3.1.2 REQUIRED)
+
 find_package ( Boost 1.54.0 COMPONENTS mpi REQUIRED )
 
 find_package(MPI REQUIRED)
@@ -53,5 +57,7 @@ set ( INCLUDE_FILES
 
 add_library (cow_instrument SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
 
-target_include_directories (cow_instrument PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} )
+target_include_directories (cow_instrument PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${EIGEN3_INCLUDE_DIR})
+
+
 
