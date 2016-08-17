@@ -36,13 +36,14 @@ public:
   bool operator!=(const PointPathComponent<T> &other) const;
 
 private:
-  V3D m_pos;
+  Eigen::Vector3d m_pos;
+  Eigen::Quaterniond m_rotation;
   ComponentIdType m_componentId;
 };
 
 template <typename T>
 PointPathComponent<T>::PointPathComponent(V3D pos, ComponentIdType id)
-    : m_pos(pos), m_componentId(id) {}
+    : m_pos(pos), m_rotation(Eigen::Quaterniond::Identity()), m_componentId(id) {}
 
 template <typename T> V3D PointPathComponent<T>::getPos() const {
   return m_pos;
@@ -50,7 +51,7 @@ template <typename T> V3D PointPathComponent<T>::getPos() const {
 
 template <typename T>
 Eigen::Quaterniond PointPathComponent<T>::getRotation() const {
-  throw std::runtime_error("Not yet implemented");
+  return m_rotation;
 }
 
 template <typename T>
@@ -62,7 +63,11 @@ void PointPathComponent<T>::shiftPositionBy(const V3D &pos) {
 
 template <typename T>
 void PointPathComponent<T>::rotate(const Eigen::Vector3d& axis, const double& theta, const Eigen::Vector3d& center) {
-    throw std::runtime_error("rotatePositionBy not implemented");
+    using namespace Eigen;
+    Affine3d A = Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
+    m_pos = A * m_pos;
+    // Update the absolute rotation of this detector around it's center.
+    m_rotation = A.rotation() * m_rotation;
 }
 
 

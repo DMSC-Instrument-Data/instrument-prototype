@@ -1,7 +1,6 @@
 #include "StandardInstrument.h"
 #include "InstrumentTree.h"
 #include "Node.h"
-#include "Command.h"
 #include "Detector.h"
 #include "MoveCommand.h"
 #include <iostream>
@@ -10,39 +9,59 @@
 
 namespace {
 
-BENCHMARK_F(StandardInstrumentFixture, BM_cow_translate_root)(benchmark::State &state) {
-  MoveCommand moveIt{V3D{1, 0, 0}};
-  auto temp = m_instrument;
-  while (state.KeepRunning()) {
-    // Then modify that node
-    temp.modify(size_t(0), moveIt);
+class WriteTranslateFixture : public StandardInstrumentFixture {
+
+public:
+  void translateOnNode(size_t nodeIndex, benchmark::State &state) {
+    MoveCommand moveIt{V3D{1, 0, 0}};
+    while (state.KeepRunning()) {
+      // Then modify that node
+      m_instrument.modify(nodeIndex, moveIt);
+    }
+    // For statistics. Mark the number of itertions
+    state.SetItemsProcessed(state.iterations() * 1);
   }
-  // For statistics. Mark the number of itertions
-  state.SetItemsProcessed(state.iterations() * 1);
+
+  void translateOnNodeWithCopy(size_t nodeIndex, benchmark::State &state) {
+    MoveCommand moveIt{V3D{1, 0, 0}};
+    while (state.KeepRunning()) {
+          // increase reference count on components
+      auto temp = m_instrument;
+      // Then modify that node
+      temp.modify(nodeIndex, moveIt);
+    }
+    // For statistics. Mark the number of itertions
+    state.SetItemsProcessed(state.iterations() * 1);
+  }
+};
+
+BENCHMARK_F(WriteTranslateFixture,
+            BM_cow_translate_root)(benchmark::State &state) {
+  this->translateOnNodeWithCopy(0, state);
 }
 
-BENCHMARK_F(StandardInstrumentFixture,
+BENCHMARK_F(WriteTranslateFixture,
             BM_cow_translate_one_trolley)(benchmark::State &state) {
-    auto temp = m_instrument;
-  MoveCommand moveIt{V3D{1, 0, 0}};
-  while (state.KeepRunning()) {
-    // Then modify that node
-    temp.modify(1, moveIt);
-  }
-  // For statistics. Mark the number of itertions
-  state.SetItemsProcessed(state.iterations() * 1);
+  this->translateOnNodeWithCopy(1, state);
 }
 
-BENCHMARK_F(StandardInstrumentFixture, BM_cow_translate_one_bank)(benchmark::State &state) {
-  auto temp = m_instrument;
-  MoveCommand moveIt{V3D{1, 0, 0}};
-  while (state.KeepRunning()) {
-    // Then modify that node
-    temp.modify(2, moveIt);
-  }
-  // For statistics. Mark the number of itertions
-  state.SetItemsProcessed(state.iterations() * 1);
+BENCHMARK_F(WriteTranslateFixture,
+            BM_cow_translate_one_bank)(benchmark::State &state) {
+  this->translateOnNodeWithCopy(2, state);
+}
+
+BENCHMARK_F(WriteTranslateFixture, BM_translate_root)(benchmark::State &state) {
+  this->translateOnNode(0, state);
+}
+
+BENCHMARK_F(WriteTranslateFixture,
+            BM_translate_one_trolley)(benchmark::State &state) {
+  this->translateOnNode(1, state);
+}
+
+BENCHMARK_F(WriteTranslateFixture,
+            BM_translate_one_bank)(benchmark::State &state) {
+  this->translateOnNode(2, state);
 }
 
 } // namespace
-
