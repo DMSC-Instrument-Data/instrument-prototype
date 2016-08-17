@@ -8,6 +8,7 @@ public:
   NullComponent() = default;
   V3D getPos() const override;
   void shiftPositionBy(const V3D &delta) override;
+  void rotate(const Eigen::Vector3d& axis, const double& theta, const Eigen::Vector3d& center) override;
   virtual ~NullComponent();
   NullComponent *clone() const override;
   bool equals(const Component &other) const override;

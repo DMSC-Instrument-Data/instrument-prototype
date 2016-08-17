@@ -56,6 +56,11 @@ V3D ParabolicGuide::getPos() const { return m_position; }
 
 void ParabolicGuide::shiftPositionBy(const V3D &pos) { m_position = pos; }
 
+void ParabolicGuide::rotate(const Eigen::Vector3d &axis, const double &theta, const Eigen::Vector3d &center)
+{
+    throw std::runtime_error("rotatePositionBy not implemented");
+}
+
 ParabolicGuide *ParabolicGuide::clone() const {
   return new ParabolicGuide(m_componentId, m_a, m_h, m_position);
 }

@@ -16,6 +16,7 @@ public:
   PointPathComponent(V3D pos, ComponentIdType id);
   virtual V3D getPos() const override;
   virtual void shiftPositionBy(const V3D &pos) override;
+  void rotate(const Eigen::Vector3d& axis, const double& theta, const Eigen::Vector3d& center) override;
 
   virtual bool equals(const Component &other) const override;
   virtual void registerContents(
@@ -52,6 +53,13 @@ void PointPathComponent<T>::shiftPositionBy(const V3D &pos) {
   m_pos[1] += pos[1];
   m_pos[2] += pos[2];
 }
+
+template <typename T>
+void PointPathComponent<T>::rotate(const Eigen::Vector3d& axis, const double& theta, const Eigen::Vector3d& center) {
+    throw std::runtime_error("rotatePositionBy not implemented");
+}
+
+
 
 template <typename T>
 PointPathComponent<T> *PointPathComponent<T>::clone() const {

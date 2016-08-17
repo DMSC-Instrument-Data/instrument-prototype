@@ -17,13 +17,14 @@ private:
 public:
   FakePathComponent(const V3D &position) : m_position(position) {}
   V3D getPos() const { return m_position; }
-  void shiftPositionBy(const V3D &){};
-  Component *clone() const { return new FakePathComponent{m_position}; };
-  bool equals(const Component &other) const { return false; };
+  void shiftPositionBy(const V3D &){}
+  void rotate(const Eigen::Vector3d&, const double&, const Eigen::Vector3d&){}
+  Component *clone() const { return new FakePathComponent{m_position}; }
+  bool equals(const Component &other) const { return false; }
   void registerContents(std::vector<const Detector *> &,
                         std::vector<const PathComponent *> &) const {}
   ComponentIdType componentId() const { return ComponentIdType{1}; }
-  std::string name() const { return ""; };
+  std::string name() const { return ""; }
 };
 
 TEST(path_component_test, test_default_length) {

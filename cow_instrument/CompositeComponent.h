@@ -15,6 +15,7 @@ public:
   ~CompositeComponent() = default;
   V3D getPos() const override;
   void shiftPositionBy(const V3D &pos) override;
+  void rotate(const Eigen::Vector3d& axis, const double& theta, const Eigen::Vector3d& center) override;
   CompositeComponent *clone() const override;
   bool equals(const Component &other) const override;
   void addComponent(std::unique_ptr<Component>&& child);

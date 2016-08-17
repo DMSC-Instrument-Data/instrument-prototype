@@ -1,16 +1,31 @@
 #include "DetectorComponent.h"
+#include <Eigen/Geometry>
 
 DetectorComponent::DetectorComponent(ComponentIdType componentId,
                                      DetectorIdType detectorId, const V3D &pos)
-    : m_componentId(componentId), m_pos(pos), m_detectorId(detectorId) {}
+    : m_componentId(componentId), m_pos(pos), m_detectorId(detectorId), m_rotation(Eigen::Quaterniond::Identity()) {}
 
 V3D DetectorComponent::getPos() const { return m_pos; }
 
-void DetectorComponent::shiftPositionBy(const V3D &delta) {
-  m_pos[0] += delta[0];
-  m_pos[1] += delta[1];
-  m_pos[2] += delta[2];
+Eigen::Quaterniond DetectorComponent::getRotation() const
+{
+    return m_rotation;
 }
+
+void DetectorComponent::shiftPositionBy(const V3D &delta) {
+  m_pos += delta;
+}
+
+void DetectorComponent::rotate(const Eigen::Vector3d &axis, const double &theta, const Eigen::Vector3d &center)
+{
+    using namespace Eigen;
+    Affine3d A = Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
+    m_pos = A * m_pos;
+    // Update the absolute rotation of this detector around it's center.
+    m_rotation = A.rotation() * m_rotation;
+}
+
+
 
 DetectorComponent *DetectorComponent::clone() const {
 

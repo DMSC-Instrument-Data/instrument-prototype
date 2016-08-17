@@ -30,6 +30,11 @@ void CompositeComponent::shiftPositionBy(const V3D &delta) {
   }
 }
 
+void CompositeComponent::rotate(const Eigen::Vector3d &axis, const double &theta, const Eigen::Vector3d &center)
+{
+    throw std::runtime_error("rotatePositionBy not implemented");
+}
+
 CompositeComponent *CompositeComponent::clone() const {
   CompositeComponent *product = new CompositeComponent{m_componentId};
   for (size_t i = 0; i < this->size(); ++i) {
@@ -78,3 +83,4 @@ ComponentIdType CompositeComponent::componentId() const {
 }
 
 std::string CompositeComponent::name() const { return m_name; }
+
