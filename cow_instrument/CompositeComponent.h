@@ -13,7 +13,8 @@ public:
   CompositeComponent(ComponentIdType componentId,
                      std::string name = std::string(""));
   ~CompositeComponent() = default;
-  V3D getPos() const override;
+  virtual V3D getPos() const override;
+  virtual Eigen::Quaterniond getRotation() const override;
   void shiftPositionBy(const V3D &pos) override;
   void rotate(const Eigen::Vector3d& axis, const double& theta, const Eigen::Vector3d& center) override;
   CompositeComponent *clone() const override;

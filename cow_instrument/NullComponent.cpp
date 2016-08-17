@@ -31,3 +31,7 @@ ComponentIdType NullComponent::componentId() const
 std::string NullComponent::name() const { return NullComponent::TypeName; }
 
 const std::string NullComponent::TypeName = "NullComponent";
+
+Eigen::Quaterniond NullComponent::getRotation() const {
+  return Eigen::Quaterniond::Identity();
+}

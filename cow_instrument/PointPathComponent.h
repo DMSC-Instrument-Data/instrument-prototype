@@ -15,6 +15,7 @@ template <typename T> class PointPathComponent : public PathComponent {
 public:
   PointPathComponent(V3D pos, ComponentIdType id);
   virtual V3D getPos() const override;
+  virtual Eigen::Quaterniond getRotation() const override;
   virtual void shiftPositionBy(const V3D &pos) override;
   void rotate(const Eigen::Vector3d& axis, const double& theta, const Eigen::Vector3d& center) override;
 
@@ -45,6 +46,11 @@ PointPathComponent<T>::PointPathComponent(V3D pos, ComponentIdType id)
 
 template <typename T> V3D PointPathComponent<T>::getPos() const {
   return m_pos;
+}
+
+template <typename T>
+Eigen::Quaterniond PointPathComponent<T>::getRotation() const {
+  throw std::runtime_error("Not yet implemented");
 }
 
 template <typename T>

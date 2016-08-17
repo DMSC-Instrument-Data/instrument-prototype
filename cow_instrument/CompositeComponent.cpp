@@ -82,3 +82,7 @@ ComponentIdType CompositeComponent::componentId() const {
 }
 
 std::string CompositeComponent::name() const { return m_name; }
+
+Eigen::Quaterniond CompositeComponent::getRotation() const {
+  throw std::runtime_error("Not implemented");
+}

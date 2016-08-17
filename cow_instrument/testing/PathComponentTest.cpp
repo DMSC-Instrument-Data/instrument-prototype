@@ -17,6 +17,9 @@ private:
 public:
   FakePathComponent(const V3D &position) : m_position(position) {}
   V3D getPos() const { return m_position; }
+  virtual Eigen::Quaterniond getRotation() const override {
+    return Eigen::Quaterniond::Identity();
+  }
   void shiftPositionBy(const V3D &){}
   void rotate(const Eigen::Vector3d&, const double&, const Eigen::Vector3d&){}
   Component *clone() const { return new FakePathComponent{m_position}; }

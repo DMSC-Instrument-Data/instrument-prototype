@@ -54,6 +54,10 @@ ParabolicGuide::ParabolicGuide(ComponentIdType componentId, double a, double h,
 
 V3D ParabolicGuide::getPos() const { return m_position; }
 
+Eigen::Quaterniond ParabolicGuide::getRotation() const {
+  throw std::runtime_error("Not implemented yet");
+}
+
 void ParabolicGuide::shiftPositionBy(const V3D &pos) { m_position = pos; }
 
 void ParabolicGuide::rotate(const Eigen::Vector3d &axis, const double &theta, const Eigen::Vector3d &center)
@@ -107,3 +111,5 @@ bool ParabolicGuide::operator==(const ParabolicGuide &other) const {
   return m_componentId == other.m_componentId && m_a == other.m_a &&
          m_h == other.m_h && m_position == other.m_position;
 }
+
+

@@ -14,6 +14,7 @@
 class MockComponent : public Component {
 public:
   MOCK_CONST_METHOD0(getPos, V3D());
+  MOCK_CONST_METHOD0(getRotation, Eigen::Quaterniond());
   MOCK_METHOD1(shiftPositionBy, void(const V3D &));
   MOCK_METHOD3(rotate, void(const Eigen::Vector3d&, const double&, const Eigen::Vector3d&));
   MOCK_CONST_METHOD0(clone, Component *());
@@ -29,6 +30,7 @@ public:
 class MockPathComponent : public PathComponent {
 public:
   MOCK_CONST_METHOD0(getPos, V3D());
+  MOCK_CONST_METHOD0(getRotation, Eigen::Quaterniond());
   MOCK_METHOD1(shiftPositionBy, void(const V3D &));
   MOCK_METHOD3(rotate, void(const Eigen::Vector3d&, const double&, const Eigen::Vector3d&));
   MOCK_CONST_METHOD0(clone, Component *());
@@ -66,6 +68,7 @@ class MockDetector : public Detector {
 public:
   MOCK_CONST_METHOD0(detectorId, DetectorIdType());
   MOCK_CONST_METHOD0(getPos, V3D());
+  MOCK_CONST_METHOD0(getRotation, Eigen::Quaterniond());
   MOCK_METHOD1(shiftPositionBy, void(const V3D &));
   MOCK_METHOD3(rotate, void(const Eigen::Vector3d&, const double&, const Eigen::Vector3d&));
   MOCK_CONST_METHOD0(clone, Component *());

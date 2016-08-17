@@ -8,7 +8,7 @@ void BM_instrument_node_tree_construction(benchmark::State &state) {
   unsigned int size = 0;
   while (state.KeepRunning()) {
     auto flattenedNodeTree = std_instrument::construct_root_node();
-    size += flattenedNodeTree.size();
+    benchmark::DoNotOptimize(size += flattenedNodeTree.size());
   }
   state.SetItemsProcessed(state.iterations() * 1);
 }
@@ -19,7 +19,7 @@ void BM_instrument_tree_construction(benchmark::State &state) {
   while (state.KeepRunning()) {
     auto flattenedNodeTree = std_instrument::construct_root_node();
     InstrumentTree instrumentTree(std::move(flattenedNodeTree));
-    version+=instrumentTree.version();
+    benchmark::DoNotOptimize(version += instrumentTree.version());
   }
   state.SetItemsProcessed(state.iterations() * 1);
 }

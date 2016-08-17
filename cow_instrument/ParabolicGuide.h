@@ -11,6 +11,7 @@ public:
   ParabolicGuide(ComponentIdType componentId, double a, double h, V3D position);
 
   V3D getPos() const override;
+  virtual Eigen::Quaterniond getRotation() const override;
   void shiftPositionBy(const V3D &pos) override;
   void rotate(const Eigen::Vector3d& axis, const double& theta, const Eigen::Vector3d& center) override;
   ParabolicGuide *clone() const override;
