@@ -54,9 +54,29 @@ TEST(composite_component_test, test_get_pos){
     EXPECT_EQ(pos[2],2);
 }
 
+TEST(composite_component_test, test_shiftPos) {
+  using namespace testing;
+  MockComponent *child = new MockComponent;
+  EXPECT_CALL(*child, shiftPositionBy(_)).Times(1);
 
+  CompositeComponent composite{ComponentIdType(1)};
+  composite.addComponent(std::unique_ptr<MockComponent>(child));
 
+  composite.shiftPositionBy(Eigen::Vector3d{1, 1, 1});
+  EXPECT_TRUE(Mock::VerifyAndClearExpectations(child));
+}
 
+TEST(composite_component_test, test_rotate) {
+  using namespace testing;
+  MockComponent *child = new MockComponent;
+  EXPECT_CALL(*child, rotate(_, _, _)).Times(1);
 
+  CompositeComponent composite{ComponentIdType(1)};
+  composite.addComponent(std::unique_ptr<MockComponent>(child));
+
+  composite.rotate(Eigen::Vector3d{1, 1, 1}, M_PI / 2,
+                   Eigen::Vector3d{1, 1, 1});
+  EXPECT_TRUE(Mock::VerifyAndClearExpectations(child));
+}
 
 } // namespace

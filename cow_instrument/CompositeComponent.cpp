@@ -11,16 +11,12 @@ V3D CompositeComponent::getPos() const {
    An expensive operation on a composite component, but I don't think this
    is commonly
    */
-  V3D pos{0, 0, 0};
+  Eigen::Vector3d pos{0, 0, 0};
   for (size_t i = 0; i < m_children.size(); ++i) {
     auto childPos = m_children[i]->getPos();
-    pos[0] += childPos[0];
-    pos[1] += childPos[1];
-    pos[2] += childPos[2];
+    pos += childPos;
   }
-  pos[0] /= m_children.size();
-  pos[1] /= m_children.size();
-  pos[2] /= m_children.size();
+  pos /= m_children.size();
   return pos;
 }
 
@@ -30,9 +26,12 @@ void CompositeComponent::shiftPositionBy(const V3D &delta) {
   }
 }
 
-void CompositeComponent::rotate(const Eigen::Vector3d &axis, const double &theta, const Eigen::Vector3d &center)
-{
-    throw std::runtime_error("rotatePositionBy not implemented");
+void CompositeComponent::rotate(const Eigen::Vector3d &axis,
+                                const double &theta,
+                                const Eigen::Vector3d &center) {
+  for (size_t i = 0; i < m_children.size(); ++i) {
+    m_children[i]->rotate(axis, theta, center);
+  }
 }
 
 CompositeComponent *CompositeComponent::clone() const {
@@ -83,4 +82,3 @@ ComponentIdType CompositeComponent::componentId() const {
 }
 
 std::string CompositeComponent::name() const { return m_name; }
-

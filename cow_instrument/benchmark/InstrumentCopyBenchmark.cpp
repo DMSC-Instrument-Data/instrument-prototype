@@ -56,6 +56,7 @@ BENCHMARK_F(CopyAtRootLevel, BM_copy_unmodified)(benchmark::State &state) {
 
 BENCHMARK_F(CopyAtRootLevel, BM_copy_move_root)(benchmark::State &state) {
   MoveCommand moveIt{V3D{1, 0, 0}};
+  auto temp = m_instrument;
   while (state.KeepRunning()) {
     // Then modify that node
     m_instrument.modify(size_t(0), moveIt);
@@ -66,6 +67,7 @@ BENCHMARK_F(CopyAtRootLevel, BM_copy_move_root)(benchmark::State &state) {
 
 BENCHMARK_F(CopyAtTrolleyLevel,
             BM_copy_move_one_trolley)(benchmark::State &state) {
+    auto temp = m_instrument;
   MoveCommand moveIt{V3D{1, 0, 0}};
   while (state.KeepRunning()) {
     // Then modify that node
@@ -76,6 +78,7 @@ BENCHMARK_F(CopyAtTrolleyLevel,
 }
 
 BENCHMARK_F(CopyAtBankLevel, BM_copy_move_one_bank)(benchmark::State &state) {
+    auto temp = m_instrument;
   MoveCommand moveIt{V3D{1, 0, 0}};
   while (state.KeepRunning()) {
     // Then modify that node
@@ -87,6 +90,7 @@ BENCHMARK_F(CopyAtBankLevel, BM_copy_move_one_bank)(benchmark::State &state) {
 
 BENCHMARK_F(CopyAtRootLevel,
             BM_copy_null_command_root)(benchmark::State &state) {
+    auto temp = m_instrument;
   NullCommand null;
   while (state.KeepRunning()) {
     // Then modify that node
