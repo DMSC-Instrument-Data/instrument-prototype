@@ -143,6 +143,12 @@ size_t InstrumentTree::nDetectors() const { return m_detectorVec->size(); }
 
 size_t InstrumentTree::nPathComponents() const { return m_pathVec->size(); }
 
+/*
+ * Modify is not thread-safe owing to the fact that the vector of detector
+ * and vector of path component pointers is potentially corruptable between
+ * the time that the cow occurs in the Command::Modify and the
+ * InstrumentTree::init().
+ */
 bool InstrumentTree::modify(size_t nodeIndex, const Command &command) {
 
   /* We increment the version number of the Nodes. Consider removing the Node
@@ -153,18 +159,18 @@ bool InstrumentTree::modify(size_t nodeIndex, const Command &command) {
   std::for_each(m_nodes->begin(), m_nodes->end(),
                 [](Node &node) { node.incrementVersion(); });
 
-  bool newDetectors = false;
+  bool cowTriggered = false;
   if (command.isMetaDataCommand()) {
     // No cascading behaviour.
     auto &currentNode = m_nodes->operator[](nodeIndex);
-    newDetectors |= currentNode.modify(command);
+    cowTriggered |= currentNode.modify(command);
 
   } else {
     // Cascading behaviour
     std::vector<size_t> toModify = {nodeIndex};
     for (size_t index = 0; index < toModify.size(); ++index) {
       auto &currentNode = m_nodes->operator[](toModify[index]);
-      newDetectors |= currentNode.modify(command);
+      cowTriggered |= currentNode.modify(command);
       const auto &currentChildren = currentNode.children();
       toModify.insert(toModify.end(), currentChildren.begin(),
                       currentChildren.end());
@@ -175,12 +181,12 @@ bool InstrumentTree::modify(size_t nodeIndex, const Command &command) {
    * We only rebuild our Detector* vector if the modifications
    * indicate that such action is required.
    */
-  if (newDetectors) {
-    const size_t nDetectors = m_detectorVec->size();
+  if (cowTriggered) {
     m_detectorVec->clear();
+    m_pathVec->clear();
     init();
   }
-  return newDetectors;
+  return cowTriggered;
 }
 
 bool InstrumentTree::modify(const Node *node, const Command &command) {

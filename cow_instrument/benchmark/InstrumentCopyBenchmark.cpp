@@ -59,7 +59,7 @@ BENCHMARK_F(CopyAtRootLevel, BM_copy_move_root)(benchmark::State &state) {
   auto temp = m_instrument;
   while (state.KeepRunning()) {
     // Then modify that node
-    m_instrument.modify(size_t(0), moveIt);
+    temp.modify(size_t(0), moveIt);
   }
   // For statistics. Mark the number of itertions
   state.SetItemsProcessed(state.iterations() * 1);
@@ -71,7 +71,7 @@ BENCHMARK_F(CopyAtTrolleyLevel,
   MoveCommand moveIt{V3D{1, 0, 0}};
   while (state.KeepRunning()) {
     // Then modify that node
-    m_instrument.modify(1, moveIt);
+    temp.modify(1, moveIt);
   }
   // For statistics. Mark the number of itertions
   state.SetItemsProcessed(state.iterations() * 1);
@@ -82,7 +82,7 @@ BENCHMARK_F(CopyAtBankLevel, BM_copy_move_one_bank)(benchmark::State &state) {
   MoveCommand moveIt{V3D{1, 0, 0}};
   while (state.KeepRunning()) {
     // Then modify that node
-    m_instrument.modify(2, moveIt);
+    temp.modify(2, moveIt);
   }
   // For statistics. Mark the number of itertions
   state.SetItemsProcessed(state.iterations() * 1);
@@ -94,7 +94,7 @@ BENCHMARK_F(CopyAtRootLevel,
   NullCommand null;
   while (state.KeepRunning()) {
     // Then modify that node
-    m_instrument.modify(size_t(0), null);
+    temp.modify(size_t(0), null);
   }
   // For statistics. Mark the number of itertions
   state.SetItemsProcessed(state.iterations() * 1);
