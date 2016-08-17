@@ -93,3 +93,7 @@ std::vector<Node> construct_root_node() {
   return nodes;
 }
 }
+
+StandardInstrumentFixture::StandardInstrumentFixture()
+    : benchmark::Fixture(),
+      m_instrument(std_instrument::construct_root_node()) {}

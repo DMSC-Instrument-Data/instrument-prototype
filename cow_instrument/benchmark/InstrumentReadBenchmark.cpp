@@ -7,28 +7,8 @@
 
 namespace {
 
-class ReadFixture : public benchmark::Fixture {
-public:
-  InstrumentTree m_instrument;
 
-  ReadFixture()
-      : benchmark::Fixture(),
-        m_instrument(std_instrument::construct_root_node()) {}
-};
-
-void BM_InstrumentTreeConstruction(benchmark::State &state) {
-  while (state.KeepRunning()) {
-    state.PauseTiming();
-    auto flattenedNodeTree = std_instrument::construct_root_node();
-    state.ResumeTiming();
-
-    InstrumentTree instrument(std::move(flattenedNodeTree));
-  }
-  state.SetItemsProcessed(state.iterations() * 1);
-}
-BENCHMARK(BM_InstrumentTreeConstruction);
-
-BENCHMARK_F(ReadFixture, BM_SingleAccessMetric)(benchmark::State &state) {
+BENCHMARK_F(StandardInstrumentFixture, BM_read_single_position)(benchmark::State &state) {
   while (state.KeepRunning()) {
     size_t max = 100 * 100 * 6;
     double pos_x = 0;
