@@ -87,6 +87,6 @@ void BM_rotation_one_bank_math(benchmark::State &state) {
   // compare against a single bank.
   state.SetItemsProcessed(state.iterations() * 1);
 }
-BENCHMARK(test_rotation_math);
+BENCHMARK(BM_rotation_one_bank_math);
 
 } // namespace

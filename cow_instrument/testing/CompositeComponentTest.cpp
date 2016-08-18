@@ -69,7 +69,7 @@ TEST(composite_component_test, test_shiftPos) {
 TEST(composite_component_test, test_rotate) {
   using namespace testing;
   MockComponent *child = new MockComponent;
-  EXPECT_CALL(*child, rotate(_, _, _)).Times(1);
+  EXPECT_CALL(*child, rotate(_, _)).Times(1);
 
   CompositeComponent composite{ComponentIdType(1)};
   composite.addComponent(std::unique_ptr<MockComponent>(child));
