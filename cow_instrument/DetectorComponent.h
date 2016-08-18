@@ -18,6 +18,8 @@ public:
   Eigen::Quaterniond getRotation() const;
   void shiftPositionBy(const V3D &pos) override;
   void rotate(const Eigen::Vector3d& axis, const double& theta, const Eigen::Vector3d& center) override;
+  virtual void rotate(const Eigen::Affine3d &transform,
+                      const Eigen::Quaterniond &rotationPart) override;
   virtual ~DetectorComponent();
   DetectorComponent *clone() const override;
   bool equals(const Component &other) const override;

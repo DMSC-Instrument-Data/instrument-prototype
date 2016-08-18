@@ -25,7 +25,11 @@ void DetectorComponent::rotate(const Eigen::Vector3d &axis, const double &theta,
     m_rotation = A.rotation() * m_rotation;
 }
 
-
+void DetectorComponent::rotate(const Eigen::Affine3d &transform,
+                               const Eigen::Quaterniond &rotationPart) {
+  m_pos = transform * m_pos;
+  m_rotation = rotationPart * m_rotation;
+}
 
 DetectorComponent *DetectorComponent::clone() const {
 
