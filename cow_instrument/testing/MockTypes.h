@@ -17,7 +17,8 @@ public:
   MOCK_CONST_METHOD0(getRotation, Eigen::Quaterniond());
   MOCK_METHOD1(shiftPositionBy, void(const V3D &));
   MOCK_METHOD3(rotate, void(const Eigen::Vector3d&, const double&, const Eigen::Vector3d&));
-   MOCK_METHOD2(rotate, void(const Eigen::Affine3d&, const Eigen::Quaterniond&));
+  MOCK_METHOD2(rotate,
+               void(const Eigen::Affine3d &, const Eigen::Quaterniond &));
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
   MOCK_CONST_METHOD2(registerContents,
@@ -34,6 +35,8 @@ public:
   MOCK_CONST_METHOD0(getRotation, Eigen::Quaterniond());
   MOCK_METHOD1(shiftPositionBy, void(const V3D &));
   MOCK_METHOD3(rotate, void(const Eigen::Vector3d&, const double&, const Eigen::Vector3d&));
+  MOCK_METHOD2(rotate,
+               void(const Eigen::Affine3d &, const Eigen::Quaterniond &));
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
 
@@ -70,6 +73,8 @@ public:
   MOCK_CONST_METHOD0(detectorId, DetectorIdType());
   MOCK_CONST_METHOD0(getPos, V3D());
   MOCK_CONST_METHOD0(getRotation, Eigen::Quaterniond());
+  MOCK_METHOD2(rotate,
+               void(const Eigen::Affine3d &, const Eigen::Quaterniond &));
   MOCK_METHOD1(shiftPositionBy, void(const V3D &));
   MOCK_METHOD3(rotate, void(const Eigen::Vector3d&, const double&, const Eigen::Vector3d&));
   MOCK_CONST_METHOD0(clone, Component *());

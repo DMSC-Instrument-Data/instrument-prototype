@@ -168,17 +168,6 @@ TEST(detector_component_test, test_multiple_rotation_arbitrary_center) {
       << "Internal detector rotation not updated correctly";
 }
 
-TEST(detector_component_test, test_compound_rotations) {
-
-  const Eigen::Vector3d rotationAxis{0, 0, 1};
-  const double rotationAngle = M_PI / 2;
-  const Eigen::Vector3d rotationCenter{0, 0, 0};
-
-  DetectorComponent detector(ComponentIdType(1), DetectorIdType{1},
-                             Eigen::Vector3d{1, 0, 0});
-  detector.rotate(rotationAxis, rotationAngle, rotationCenter);
-}
-
 TEST(detector_component_test, test_shift_position_by) {
   const Eigen::Vector3d position{1, 2, 3};
   const Eigen::Vector3d offset{1, 1, 1};

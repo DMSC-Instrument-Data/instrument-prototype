@@ -33,7 +33,8 @@
 
 ParabolicGuide::ParabolicGuide(ComponentIdType componentId, double a, double h,
                                V3D position)
-    : m_componentId(componentId), m_a(a), m_h(h), m_position(position) {
+    : m_componentId(componentId), m_a(a), m_h(h), m_position(position),
+      m_rotation(Eigen::Quaterniond::Identity()) {
   if (a < 0) {
     throw std::invalid_argument("Parabola 'a' must be >= 0");
   }
@@ -54,15 +55,25 @@ ParabolicGuide::ParabolicGuide(ComponentIdType componentId, double a, double h,
 
 V3D ParabolicGuide::getPos() const { return m_position; }
 
-Eigen::Quaterniond ParabolicGuide::getRotation() const {
-  throw std::runtime_error("Not implemented yet");
-}
+Eigen::Quaterniond ParabolicGuide::getRotation() const { return m_rotation; }
 
 void ParabolicGuide::shiftPositionBy(const V3D &pos) { m_position = pos; }
 
 void ParabolicGuide::rotate(const Eigen::Vector3d &axis, const double &theta, const Eigen::Vector3d &center)
 {
-    throw std::runtime_error("rotatePositionBy not implemented");
+  using namespace Eigen;
+  const Affine3d transform =
+      Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
+  m_position = transform * m_position;
+  // Update the absolute rotation of this detector around own center.
+  m_rotation = transform.rotation() * m_rotation;
+}
+
+void ParabolicGuide::rotate(const Eigen::Affine3d &transform,
+                            const Eigen::Quaterniond &rotationPart) {
+  m_position = transform * m_position;
+  // Update the absolute rotation of this detector around own center.
+  m_rotation = rotationPart * m_rotation;
 }
 
 ParabolicGuide *ParabolicGuide::clone() const {

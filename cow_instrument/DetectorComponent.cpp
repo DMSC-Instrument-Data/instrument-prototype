@@ -19,15 +19,17 @@ void DetectorComponent::shiftPositionBy(const V3D &delta) {
 void DetectorComponent::rotate(const Eigen::Vector3d &axis, const double &theta, const Eigen::Vector3d &center)
 {
     using namespace Eigen;
-    Affine3d A = Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
-    m_pos = A * m_pos;
-    // Update the absolute rotation of this detector around it's center.
-    m_rotation = A.rotation() * m_rotation;
+    const Affine3d transform = Translation3d(center) * AngleAxisd(theta, axis) *
+                               Translation3d(-center);
+    m_pos = transform * m_pos;
+    // Update the absolute rotation of this detector around own center.
+    m_rotation = transform.rotation() * m_rotation;
 }
 
 void DetectorComponent::rotate(const Eigen::Affine3d &transform,
                                const Eigen::Quaterniond &rotationPart) {
   m_pos = transform * m_pos;
+  // Update the absolute rotation of this detector around own center.
   m_rotation = rotationPart * m_rotation;
 }
 

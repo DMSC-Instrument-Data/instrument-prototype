@@ -17,8 +17,10 @@ public:
   virtual V3D getPos() const override;
   virtual Eigen::Quaterniond getRotation() const override;
   virtual void shiftPositionBy(const V3D &pos) override;
-  void rotate(const Eigen::Vector3d& axis, const double& theta, const Eigen::Vector3d& center) override;
-
+  virtual void rotate(const Eigen::Vector3d &axis, const double &theta,
+                      const Eigen::Vector3d &center) override;
+  virtual void rotate(const Eigen::Affine3d &transform,
+                      const Eigen::Quaterniond &rotationPart) override;
   virtual bool equals(const Component &other) const override;
   virtual void registerContents(
       std::vector<const Detector *> &detectorLookup,
@@ -66,11 +68,17 @@ void PointPathComponent<T>::rotate(const Eigen::Vector3d& axis, const double& th
     using namespace Eigen;
     Affine3d A = Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
     m_pos = A * m_pos;
-    // Update the absolute rotation of this detector around it's center.
+    // Update the absolute rotation of this detector around own center.
     m_rotation = A.rotation() * m_rotation;
 }
 
-
+template <typename T>
+void PointPathComponent<T>::rotate(const Eigen::Affine3d &transform,
+                                   const Eigen::Quaterniond &rotationPart) {
+  m_pos = transform * m_pos;
+  // Update the absolute rotation of this detector around own center.
+  m_rotation = rotationPart * m_rotation;
+}
 
 template <typename T>
 PointPathComponent<T> *PointPathComponent<T>::clone() const {

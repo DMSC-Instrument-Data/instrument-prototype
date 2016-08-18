@@ -30,12 +30,20 @@ void CompositeComponent::rotate(const Eigen::Vector3d &axis,
                                 const double &theta,
                                 const Eigen::Vector3d &center) {
   using namespace Eigen;
-  Affine3d A =
+  Affine3d transform =
       Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
-  Quaterniond rotationPart(A.rotation());
+  Quaterniond rotationPart(transform.rotation());
   for (size_t i = 0; i < m_children.size(); ++i) {
 
-    m_children[i]->rotate(A, rotationPart);
+    m_children[i]->rotate(transform, rotationPart);
+  }
+}
+
+void CompositeComponent::rotate(const Eigen::Affine3d &transform,
+                                const Eigen::Quaterniond &rotationPart) {
+  for (size_t i = 0; i < m_children.size(); ++i) {
+
+    m_children[i]->rotate(transform, rotationPart);
   }
 }
 

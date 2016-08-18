@@ -22,6 +22,7 @@ public:
   }
   void shiftPositionBy(const V3D &){}
   void rotate(const Eigen::Vector3d&, const double&, const Eigen::Vector3d&){}
+  void rotate(const Eigen::Affine3d &, const Eigen::Quaterniond &){};
   Component *clone() const { return new FakePathComponent{m_position}; }
   bool equals(const Component &other) const { return false; }
   void registerContents(std::vector<const Detector *> &,

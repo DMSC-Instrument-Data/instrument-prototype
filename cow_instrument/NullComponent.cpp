@@ -9,6 +9,11 @@ void NullComponent::rotate(const Eigen::Vector3d &axis, const double &theta, con
     // Do nothing
 }
 
+void NullComponent::rotate(const Eigen::Affine3d &transform,
+                           const Eigen::Quaterniond &rotationPart) {
+  // Do nothing
+}
+
 NullComponent::~NullComponent() {}
 
 NullComponent *NullComponent::clone() const { return new NullComponent{}; }

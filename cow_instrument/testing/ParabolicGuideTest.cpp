@@ -176,3 +176,54 @@ TEST(parabolic_guide_test, test_not_equals) {
     EXPECT_FALSE(reference.equals(different_v3d));
   }
 }
+
+TEST(parabolic_guide_test, test_rotate) {
+  const ComponentIdType id(1);
+  const double a = 1.0;
+  const double h = 1.0;
+  const Eigen::Vector3d position{1.0, 0.0, 0.0};
+  const Eigen::Vector3d axis{0.0, 0.0, 1.0};
+  const Eigen::Vector3d center{0.0, 0.0, 0.0};
+  const double theta = M_PI / 2;
+
+  ParabolicGuide guide(id, a, h, position);
+  // Rotate it 90 degrees around z.
+  guide.rotate(axis, theta, center);
+
+  EXPECT_TRUE(guide.getPos().isApprox(Eigen::Vector3d{0, 1, 0}, 1e-14));
+
+  Eigen::Vector3d rotatedVector =
+      guide.getRotation().toRotationMatrix() * Eigen::Vector3d{1, 0, 0};
+  EXPECT_TRUE(rotatedVector.isApprox(Eigen::Vector3d{0, 1, 0}, 1e-14))
+      << "Internal guide rotation not updated correctly";
+}
+
+TEST(parabolic_guide_test, test_rotate_fast) {
+  const ComponentIdType id(1);
+  const double a = 1.0;
+  const double h = 1.0;
+  const Eigen::Vector3d position{1.0, 0.0, 0.0};
+
+  Eigen::Affine3d transform;
+  Eigen::Quaterniond rotationPart;
+  {
+    using namespace Eigen;
+    const Vector3d axis{0.0, 0.0, 1.0};
+    const Vector3d center{0.0, 0.0, 0.0};
+    const double theta = M_PI / 2;
+    // Rotate it 90 degrees around z.
+    transform = Translation3d(center) * AngleAxisd(theta, axis) *
+                Translation3d(-center);
+    rotationPart = transform.rotation();
+  }
+
+  ParabolicGuide guide(id, a, h, position);
+  // Rotate it 90 degrees around z.
+  guide.rotate(transform, rotationPart);
+
+  EXPECT_TRUE(guide.getPos().isApprox(Eigen::Vector3d{0, 1, 0}, 1e-14));
+  Eigen::Vector3d rotatedVector =
+      guide.getRotation().toRotationMatrix() * Eigen::Vector3d{1, 0, 0};
+  EXPECT_TRUE(rotatedVector.isApprox(Eigen::Vector3d{0, 1, 0}, 1e-14))
+      << "Internal guide rotation not updated correctly";
+}
