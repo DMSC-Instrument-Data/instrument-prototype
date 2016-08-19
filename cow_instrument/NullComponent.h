@@ -6,9 +6,9 @@
 class NullComponent : public Component {
 public:
   NullComponent() = default;
-  virtual V3D getPos() const override;
+  virtual Eigen::Vector3d getPos() const override;
   virtual Eigen::Quaterniond getRotation() const override;
-  void shiftPositionBy(const V3D &delta) override;
+  void shiftPositionBy(const Eigen::Vector3d &delta) override;
   void rotate(const Eigen::Vector3d& axis, const double& theta, const Eigen::Vector3d& center) override;
   void rotate(const Eigen::Affine3d &transform,
               const Eigen::Quaterniond &rotationPart) override;

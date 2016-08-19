@@ -13,9 +13,9 @@ public:
   CompositeComponent(ComponentIdType componentId,
                      std::string name = std::string(""));
   ~CompositeComponent() = default;
-  virtual V3D getPos() const override;
+  virtual Eigen::Vector3d getPos() const override;
   virtual Eigen::Quaterniond getRotation() const override;
-  void shiftPositionBy(const V3D &pos) override;
+  void shiftPositionBy(const Eigen::Vector3d &pos) override;
   void rotate(const Eigen::Vector3d& axis, const double& theta, const Eigen::Vector3d& center) override;
   void rotate(const Eigen::Affine3d &transform,
               const Eigen::Quaterniond &rotationPart) override;

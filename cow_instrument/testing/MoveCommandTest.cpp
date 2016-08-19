@@ -18,7 +18,7 @@ TEST(move_component_test, test_execute_when_MockComponent_unique) {
   // Cow make around a single reference count to the component
   CowPtr<Component> component(mockComponent);
 
-  MoveCommand command(V3D{1, 2, 3});
+  MoveCommand command(Eigen::Vector3d{1, 2, 3});
   EXPECT_FALSE(command.execute(component))
       << "MoveCommand should indicate NO copy made";
 
@@ -39,7 +39,7 @@ TEST(move_component_test, test_execute_when_MockComponent_copyable) {
   // take place
   auto originalReference = component;
 
-  MoveCommand command(V3D{1, 2, 3});
+  MoveCommand command(Eigen::Vector3d{1, 2, 3});
   EXPECT_TRUE(command.execute(component))
       << "MoveCommand should indicate copy made";
 

@@ -2,17 +2,17 @@
 #include <Eigen/Geometry>
 
 DetectorComponent::DetectorComponent(ComponentIdType componentId,
-                                     DetectorIdType detectorId, const V3D &pos)
+                                     DetectorIdType detectorId, const Eigen::Vector3d &pos)
     : m_componentId(componentId), m_pos(pos), m_detectorId(detectorId), m_rotation(Eigen::Quaterniond::Identity()) {}
 
-V3D DetectorComponent::getPos() const { return m_pos; }
+Eigen::Vector3d DetectorComponent::getPos() const { return m_pos; }
 
 Eigen::Quaterniond DetectorComponent::getRotation() const
 {
     return m_rotation;
 }
 
-void DetectorComponent::shiftPositionBy(const V3D &delta) {
+void DetectorComponent::shiftPositionBy(const Eigen::Vector3d &delta) {
   m_pos += delta;
 }
 

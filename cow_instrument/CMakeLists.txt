@@ -54,7 +54,6 @@ set ( INCLUDE_FILES
                    SpectrumInfo.h
                    Spectrum.h
                    VectorOf.h
-                   V3D.h
 )
 
 add_library (cow_instrument SHARED ${SOURCE_FILES} ${INCLUDE_FILES})

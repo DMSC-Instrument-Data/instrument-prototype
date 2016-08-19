@@ -13,7 +13,7 @@ class WriteTranslateFixture : public StandardInstrumentFixture {
 
 public:
   void translateOnNode(size_t nodeIndex, benchmark::State &state) {
-    MoveCommand moveIt{V3D{1, 0, 0}};
+    MoveCommand moveIt{Eigen::Vector3d{1, 0, 0}};
     while (state.KeepRunning()) {
       // Then modify that node
       m_instrument.modify(nodeIndex, moveIt);
@@ -23,7 +23,7 @@ public:
   }
 
   void translateOnNodeWithCopy(size_t nodeIndex, benchmark::State &state) {
-    MoveCommand moveIt{V3D{1, 0, 0}};
+    MoveCommand moveIt{Eigen::Vector3d{1, 0, 0}};
     while (state.KeepRunning()) {
           // increase reference count on components
       auto temp = m_instrument;

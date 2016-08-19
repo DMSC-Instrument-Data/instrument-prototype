@@ -9,14 +9,14 @@ class DetectorComponent : public Detector {
 
 public:
   DetectorComponent(ComponentIdType componentId, DetectorIdType detectorId,
-                    const V3D &pos);
+                    const Eigen::Vector3d &pos);
 
   DetectorComponent(const DetectorComponent &) = default;
   DetectorComponent &operator=(const DetectorComponent &) = default;
 
-  V3D getPos() const override;
+  Eigen::Vector3d getPos() const override;
   Eigen::Quaterniond getRotation() const;
-  void shiftPositionBy(const V3D &pos) override;
+  void shiftPositionBy(const Eigen::Vector3d &pos) override;
   void rotate(const Eigen::Vector3d& axis, const double& theta, const Eigen::Vector3d& center) override;
   virtual void rotate(const Eigen::Affine3d &transform,
                       const Eigen::Quaterniond &rotationPart) override;

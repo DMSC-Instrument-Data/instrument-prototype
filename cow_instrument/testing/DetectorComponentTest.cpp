@@ -15,7 +15,7 @@ namespace {
 
 TEST(detector_component_test, test_construction) {
 
-  V3D input{1, 2, 3};
+  Eigen::Vector3d input{1, 2, 3};
   DetectorIdType det_id(1);
   ComponentIdType comp_id(1);
   DetectorComponent det(comp_id, det_id, input);
@@ -26,7 +26,7 @@ TEST(detector_component_test, test_construction) {
 
 TEST(detector_component_test, test_equals) {
 
-  V3D input{1, 2, 3};
+  Eigen::Vector3d input{1, 2, 3};
   DetectorComponent a(ComponentIdType(1), DetectorIdType(1), input);
   DetectorComponent b(ComponentIdType(2), DetectorIdType(2),
                       input); // Different id.
@@ -41,7 +41,7 @@ TEST(detector_component_test, test_equals) {
 }
 
 TEST(detector_component_test, test_clone) {
-  V3D input{1, 2, 3};
+  Eigen::Vector3d input{1, 2, 3};
   DetectorComponent det(ComponentIdType(1), DetectorIdType(1), input);
   DetectorComponent *clone = det.clone();
 
@@ -53,7 +53,7 @@ TEST(detector_component_test, test_clone) {
 TEST(detector_component_test, test_copy) {
   ComponentIdType compId(1);
   DetectorIdType detId(2);
-  V3D pos{1, 2, 3};
+  Eigen::Vector3d pos{1, 2, 3};
   DetectorComponent det(compId, detId, pos);
   DetectorComponent copy(det);
 
@@ -64,7 +64,7 @@ TEST(detector_component_test, test_copy) {
 
 TEST(detector_component_test, test_not_path_component) {
   DetectorComponent detector(ComponentIdType{1}, DetectorIdType{1},
-                             V3D{1, 1, 1});
+                             Eigen::Vector3d{1, 1, 1});
   bool isPathComponent =
       std::is_base_of<PathComponent, DetectorComponent>::value;
   EXPECT_FALSE(isPathComponent)

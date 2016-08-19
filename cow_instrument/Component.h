@@ -4,7 +4,6 @@
 #include <vector>
 #include <string>
 #include "IdType.h"
-#include "V3D.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
 
@@ -13,9 +12,9 @@ class PathComponent;
 
 class Component {
 public:
-  virtual V3D getPos() const = 0;
+  virtual Eigen::Vector3d getPos() const = 0;
   virtual Eigen::Quaterniond getRotation() const = 0;
-  virtual void shiftPositionBy(const V3D &pos) = 0;
+  virtual void shiftPositionBy(const Eigen::Vector3d &pos) = 0;
   virtual void rotate(const Eigen::Vector3d& axis, const double& theta, const Eigen::Vector3d& center) = 0;
   virtual void rotate(const Eigen::Affine3d &transform,
                       const Eigen::Quaterniond &rotationPart) = 0;

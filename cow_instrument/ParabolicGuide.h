@@ -3,7 +3,7 @@
 
 #include "PathComponent.h"
 #include "IdType.h"
-#include "V3D.h"
+#include <Eigen/Core>
 
 class ParabolicGuide : public PathComponent {
 
@@ -13,7 +13,7 @@ public:
 
   Eigen::Vector3d getPos() const override;
   virtual Eigen::Quaterniond getRotation() const override;
-  virtual void shiftPositionBy(const V3D &pos) override;
+  virtual void shiftPositionBy(const Eigen::Vector3d &pos) override;
   virtual void rotate(const Eigen::Vector3d &axis, const double &theta,
                       const Eigen::Vector3d &center) override;
   virtual void rotate(const Eigen::Affine3d &transform,
@@ -27,8 +27,8 @@ public:
   virtual std::string name() const override;
 
   virtual double length() const override;
-  virtual V3D entryPoint() const override;
-  virtual V3D exitPoint() const override;
+  virtual Eigen::Vector3d entryPoint() const override;
+  virtual Eigen::Vector3d exitPoint() const override;
 
   bool operator==(const ParabolicGuide &other) const;
 

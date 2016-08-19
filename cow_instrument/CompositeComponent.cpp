@@ -5,7 +5,7 @@ CompositeComponent::CompositeComponent(ComponentIdType componentId,
                                        std::string name)
     : m_componentId(componentId), m_name(name) {}
 
-V3D CompositeComponent::getPos() const {
+Eigen::Vector3d CompositeComponent::getPos() const {
 
   /*
    An expensive operation on a composite component, but I don't think this
@@ -20,7 +20,7 @@ V3D CompositeComponent::getPos() const {
   return pos;
 }
 
-void CompositeComponent::shiftPositionBy(const V3D &delta) {
+void CompositeComponent::shiftPositionBy(const Eigen::Vector3d &delta) {
   for (size_t i = 0; i < m_children.size(); ++i) {
     m_children[i]->shiftPositionBy(delta);
   }

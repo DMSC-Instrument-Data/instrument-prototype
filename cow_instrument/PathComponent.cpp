@@ -5,12 +5,12 @@ double PathComponent::length() const {
   return 0;
 }
 
-V3D PathComponent::entryPoint() const {
+Eigen::Vector3d PathComponent::entryPoint() const {
   // Treat as a point.
   return this->getPos();
 }
 
-V3D PathComponent::exitPoint() const {
+Eigen::Vector3d PathComponent::exitPoint() const {
   // Treat as a point.
   return this->getPos();
 }
