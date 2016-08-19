@@ -61,7 +61,7 @@ TEST(spectrum_info_test, test_l2) {
   MockDetector detector;
   // This is where I place the detector
   EXPECT_CALL(detector, getPos())
-      .WillRepeatedly(testing::Return(V3D{0, 0, 40}));
+      .WillRepeatedly(testing::Return(Eigen::Vector3d{0, 0, 40}));
 
   // Create an Instrument around the Detector
   auto instrument =
@@ -97,10 +97,10 @@ TEST(spectrum_info_test, test_l2_mapped) {
   MockDetector detectorA, detectorB;
   // This is where I place one of the the detectors
   EXPECT_CALL(detectorA, getPos())
-      .WillRepeatedly(testing::Return(V3D{0, 0, 40}));
+      .WillRepeatedly(testing::Return(Eigen::Vector3d{0, 0, 40}));
   // This is where I place the other of the the detectors
   EXPECT_CALL(detectorB, getPos())
-      .WillRepeatedly(testing::Return(V3D{0, 0, 30}));
+      .WillRepeatedly(testing::Return(Eigen::Vector3d{0, 0, 30}));
 
   auto instrument =
       std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors);

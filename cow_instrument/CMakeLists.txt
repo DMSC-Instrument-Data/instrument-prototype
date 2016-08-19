@@ -1,4 +1,8 @@
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 find_package ( Boost 1.54.0 COMPONENTS mpi serialization REQUIRED )
+
+find_package(Eigen3 3.1.2 REQUIRED)
+
 
 if(${Boost_VERSION} LESS 105700)
     message(STATUS "Add serialization std::array overload. Boost version ${Boost_VERSION}")
@@ -22,6 +26,7 @@ set ( SOURCE_FILES
                    NullComponent.cpp
                    ParabolicGuide.cpp
                    PathComponent.cpp
+                   RotateCommand.cpp
 )
 
 
@@ -53,18 +58,16 @@ set ( INCLUDE_FILES
                    PointPathComponent.h
                    PointSample.h
                    PointSource.h
+                   RotateCommand.h
                    SourceSampleDetectorPathFactory.h
                    SpectrumInfo.h
                    Spectrum.h
                    VectorOf.h
-                   V3D.h
 )
 
 
 
 add_library (cow_instrument SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
 
-target_link_libraries(cow_instrument LINK_PUBLIC cow_mappers)
-
-target_include_directories (cow_instrument PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/mappers )
+target_include_directories (cow_instrument PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} )
 

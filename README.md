@@ -2,7 +2,7 @@
 
 ##Repository Purpose##
 
-For comparitive designs of different approaches to intrument geometry for version 2. This repository specifically looks at fresh approaches to instrument representation. A major requirement is the ability to rapidly extract key detector information required for data reduction. See [requirements](https://github.com/mantidproject/documents/blob/master/Design/Instrument-2.0/requirements-v2.md) for more context.
+For comparitive designs of different approaches to intrument designs for version 2. This repository specifically looks at novel approaches to instrument representation. A major requirement is the ability to rapidly extract key detector information required for data reduction. See [requirements](https://github.com/mantidproject/documents/blob/master/Design/Instrument-2.0/requirements-v2.md) for more context.
 
 This repository is designed to host several prototypes aiming for the same purposes.
 
@@ -29,7 +29,7 @@ $ cmake .
 $ cmake --build
 ```
 
-[GoogleBench](https://github.com/google/benchmark) is also required, and should be built in a similar way to googletest:
+[GoogleBench](https://github.com/google/benchmark) is required, and should be built in a similar way to googletest:
 
 ```
 $ git clone https://github.com/google/benchmark.git
@@ -38,12 +38,18 @@ $ cmake .
 $ cmake --build
 ```
 
-There are four variables that may need to be set when configuring the prototype: `GTEST_SOURCE_DIR`, `GTEST_BUILD_DIR`, `GBENCH_BUILD_DIR`, `GBENCH_SOURCE_DIR`.
+[Eigen](http://eigen.tuxfamily.org) is required, but is header only, so no build is necessary.
+
+```
+$ hg clone http://bitbucket.org/eigen/eigen
+```
+
+There are several variables that may need to be set when configuring the prototype: `GTEST_SOURCE_DIR`, `GTEST_BUILD_DIR`, `GBENCH_BUILD_DIR`, `GBENCH_SOURCE_DIR`, `EIGEN_ADDITIONAL_SEARCH_PATHS`.
 
 `GTEST_SOURCE_DIR` should be the path to the googletest topmost directory.
-`GTEST_BUILD_DIR` should be the path to the googletest build directory (will be the same as `GTEST_SOURCE_DIR` in case of in-source builds). `GBENCH_SOURCE_DIR` should be the path to the googlebenchmark topmost directory containing the toplevel CMakeLists.txt. `GBENCH_BUILD_DIR` should be the path to the googlebench build directory, containing CMakeCache.txt. The respective projects are located [here for googletest](https://github.com/google/googletest) and [here for google benchmark](https://github.com/google/benchmark).  
+`GTEST_BUILD_DIR` should be the path to the googletest build directory (will be the same as `GTEST_SOURCE_DIR` in case of in-source builds). `GBENCH_SOURCE_DIR` should be the path to the googlebenchmark topmost directory containing the toplevel CMakeLists.txt. `GBENCH_BUILD_DIR` should be the path to the googlebench build directory, containing CMakeCache.txt. `EIGEN_ADDITIONAL_SEARCH_PATHS` should be the path to the topmost eigen source directory. The respective projects are located [here for googletest](https://github.com/google/googletest), [here for google benchmark](https://github.com/google/benchmark), [here for eigen](http://eigen.tuxfamily.org).  
 
-Variables mentioned above have defaults that assume googletest was built in-source (as shown above) and is adjacent to instrument-prototype. How instrument-prototype is built doesn't matter. For example:
+GBench and GTest Variables mentioned above have defaults that assume googletest was built in-source (as shown above) and is adjacent to instrument-prototype. For example:
 
 ```
 - Dev
@@ -59,7 +65,7 @@ $ git clone https://github.com/DMSC-Instrument-Data/instrument-prototype.git
 $ cd instrument-prototype
 $ mkdir build
 $ cd build
-$ cmake -DGTEST_SOURCE_DIR="{path_to_gtest_source}" -DGTEST_BUILD_DIR="{path_to_gtest_build}" -DGBENCH_SOURCE_DIR={path_to_gbench_source} -DGBENCH_BUILD_DIR="{path_to_gbench_build}"
+$ cmake -DGTEST_SOURCE_DIR="{path_to_gtest_source}" -DGTEST_BUILD_DIR="{path_to_gtest_build}" -DGBENCH_SOURCE_DIR={path_to_gbench_source} -DGBENCH_BUILD_DIR="{path_to_gbench_build}" -DEIGEN_ADDITIONAL_SEARCH_PATHS="{path_to_eigen_source}"
 $ make
 ```
 

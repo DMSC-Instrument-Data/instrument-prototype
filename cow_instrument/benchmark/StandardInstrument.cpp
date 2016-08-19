@@ -19,11 +19,11 @@ make_square_bank(size_t width, size_t height, std::string name) {
     for (size_t j = 0; j < height; ++j) {
       bank->addComponent(std::unique_ptr<DetectorComponent>(
           new DetectorComponent(componentId++, detectorId++,
-                                V3D{double(i), double(j), double(0)})));
+                                Eigen::Vector3d{double(i), double(j), double(0)})));
     }
   }
   bank->shiftPositionBy(
-      V3D{-double(width) / 2, -double(height) / 2, 0}); // Center it
+      Eigen::Vector3d{-double(width) / 2, -double(height) / 2, 0}); // Center it
   return bank;
 }
 }
@@ -49,18 +49,18 @@ std::vector<Node> construct_root_node() {
   const double height_d = double(height);
 
   auto N = make_square_bank(width, height, "North");
-  N->shiftPositionBy(V3D{0, height_d, 3});
+  N->shiftPositionBy(Eigen::Vector3d{0, height_d, 3});
   auto E = make_square_bank(width, height, "South");
-  E->shiftPositionBy(V3D{-width_d, 0, 3});
+  E->shiftPositionBy(Eigen::Vector3d{-width_d, 0, 3});
   auto S = make_square_bank(width, height, "East");
-  S->shiftPositionBy(V3D{0, -height_d, 3});
+  S->shiftPositionBy(Eigen::Vector3d{0, -height_d, 3});
   auto W = make_square_bank(width, height, "West");
-  E->shiftPositionBy(V3D{width_d, 0, 3});
+  E->shiftPositionBy(Eigen::Vector3d{width_d, 0, 3});
 
   auto l_curtain = make_square_bank(width, height, "Left curtain");
-  l_curtain->shiftPositionBy(V3D{-width_d, 0, 6});
+  l_curtain->shiftPositionBy(Eigen::Vector3d{-width_d, 0, 6});
   auto r_curtain = make_square_bank(width, height, "Right curtain");
-  r_curtain->shiftPositionBy(V3D{width_d, 0, 6});
+  r_curtain->shiftPositionBy(Eigen::Vector3d{width_d, 0, 6});
 
   std::vector<Node> nodes;
   nodes.emplace_back(CowPtr<Component>(new NullComponent), "Root node");
@@ -74,9 +74,9 @@ std::vector<Node> construct_root_node() {
   nodes.emplace_back(CowPtr<Component>(l_curtain), "Left curtain node");
   nodes.emplace_back(CowPtr<Component>(l_curtain), "Left curtain node");
   nodes.emplace_back(
-      CowPtr<Component>(new PointSource(V3D{0, 0, 0}, ComponentIdType(100))));
+      CowPtr<Component>(new PointSource(Eigen::Vector3d{0, 0, 0}, ComponentIdType(100))));
   nodes.emplace_back(
-      CowPtr<Component>(new PointSample(V3D{0, 0, 10}, ComponentIdType(100))));
+      CowPtr<Component>(new PointSample(Eigen::Vector3d{0, 0, 10}, ComponentIdType(100))));
 
   // Assemble flattened node node tree
   nodes[0].addChild(1);
@@ -93,3 +93,7 @@ std::vector<Node> construct_root_node() {
   return nodes;
 }
 }
+
+StandardInstrumentFixture::StandardInstrumentFixture()
+    : benchmark::Fixture(),
+      m_instrument(std_instrument::construct_root_node()) {}

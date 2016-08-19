@@ -4,9 +4,10 @@
 #include <memory>
 #include <vector>
 #include <map>
+#include <Eigen/Core>
 #include "cow_ptr.h"
 #include "IdType.h"
-#include "V3D.h"
+
 
 class Node;
 class NodeIterator;

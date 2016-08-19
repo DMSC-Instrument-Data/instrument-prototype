@@ -46,7 +46,7 @@ public:
 
   double l2(size_t detectorIndex) const;
 
-  V3D position(size_t detectorIndex) const;
+  Eigen::Vector3d position(size_t detectorIndex) const;
 
   double l1(size_t detectorIndex) const;
 
@@ -91,7 +91,7 @@ void detectorRangeCheck(size_t detectorIndex, const U &container) {
   }
 }
 
-double distance(const V3D &a, const V3D &b) {
+double distance(const Eigen::Vector3d &a, const Eigen::Vector3d &b) {
   return std::sqrt(((a[0] - b[0]) * (a[0] - b[0])) +
                    ((a[1] - b[1]) * (a[1] - b[1])) +
                    ((a[2] - b[2]) * (a[2] - b[2])));
@@ -217,7 +217,7 @@ double DetectorInfo<InstTree>::l2(size_t detectorIndex) const {
 }
 
 template <typename InstTree>
-V3D DetectorInfo<InstTree>::position(size_t detectorIndex) const {
+Eigen::Vector3d DetectorInfo<InstTree>::position(size_t detectorIndex) const {
   return m_instrumentTree->getDetector(detectorIndex).getPos();
 }
 

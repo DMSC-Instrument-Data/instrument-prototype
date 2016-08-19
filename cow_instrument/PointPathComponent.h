@@ -2,7 +2,7 @@
 #define POINT_PATH_COMPONENT_H
 
 #include "PathComponent.h"
-#include "V3D.h"
+#include <Eigen/Core>
 #include "Component.h"
 #include "IdType.h"
 
@@ -13,10 +13,14 @@
 template <typename T> class PointPathComponent : public PathComponent {
 
 public:
-  PointPathComponent(V3D pos, ComponentIdType id);
-  virtual V3D getPos() const override;
-  virtual void shiftPositionBy(const V3D &pos) override;
-
+  PointPathComponent(Eigen::Vector3d pos, ComponentIdType id);
+  virtual Eigen::Vector3d getPos() const override;
+  virtual Eigen::Quaterniond getRotation() const override;
+  virtual void shiftPositionBy(const Eigen::Vector3d &pos) override;
+  virtual void rotate(const Eigen::Vector3d &axis, const double &theta,
+                      const Eigen::Vector3d &center) override;
+  virtual void rotate(const Eigen::Affine3d &transform,
+                      const Eigen::Quaterniond &rotationPart) override;
   virtual bool equals(const Component &other) const override;
   virtual void registerContents(
       std::vector<const Detector *> &detectorLookup,
@@ -26,8 +30,8 @@ public:
   virtual void accept(ComponentVisitor *visitor) const override{};
 
   double length() const override;
-  V3D entryPoint() const override;
-  V3D exitPoint() const override;
+  Eigen::Vector3d entryPoint() const override;
+  Eigen::Vector3d exitPoint() const override;
   virtual ~PointPathComponent() {}
   virtual PointPathComponent<T> *clone() const override;
 
@@ -35,23 +39,46 @@ public:
   bool operator!=(const PointPathComponent<T> &other) const;
 
 private:
-  V3D m_pos;
+  Eigen::Vector3d m_pos;
+  Eigen::Quaterniond m_rotation;
   ComponentIdType m_componentId;
 };
 
 template <typename T>
-PointPathComponent<T>::PointPathComponent(V3D pos, ComponentIdType id)
-    : m_pos(pos), m_componentId(id) {}
+PointPathComponent<T>::PointPathComponent(Eigen::Vector3d pos, ComponentIdType id)
+    : m_pos(pos), m_rotation(Eigen::Quaterniond::Identity()), m_componentId(id) {}
 
-template <typename T> V3D PointPathComponent<T>::getPos() const {
+template <typename T> Eigen::Vector3d PointPathComponent<T>::getPos() const {
   return m_pos;
 }
 
 template <typename T>
-void PointPathComponent<T>::shiftPositionBy(const V3D &pos) {
+Eigen::Quaterniond PointPathComponent<T>::getRotation() const {
+  return m_rotation;
+}
+
+template <typename T>
+void PointPathComponent<T>::shiftPositionBy(const Eigen::Vector3d &pos) {
   m_pos[0] += pos[0];
   m_pos[1] += pos[1];
   m_pos[2] += pos[2];
+}
+
+template <typename T>
+void PointPathComponent<T>::rotate(const Eigen::Vector3d& axis, const double& theta, const Eigen::Vector3d& center) {
+    using namespace Eigen;
+    Affine3d A = Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
+    m_pos = A * m_pos;
+    // Update the absolute rotation of this detector around own center.
+    m_rotation = A.rotation() * m_rotation;
+}
+
+template <typename T>
+void PointPathComponent<T>::rotate(const Eigen::Affine3d &transform,
+                                   const Eigen::Quaterniond &rotationPart) {
+  m_pos = transform * m_pos;
+  // Update the absolute rotation of this detector around own center.
+  m_rotation = rotationPart * m_rotation;
 }
 
 template <typename T>
@@ -102,11 +129,11 @@ template <typename T> double PointPathComponent<T>::length() const {
   return 0; // This is a point component.
 }
 
-template <typename T> V3D PointPathComponent<T>::entryPoint() const {
+template <typename T> Eigen::Vector3d PointPathComponent<T>::entryPoint() const {
   return getPos(); // This is a point component
 }
 
-template <typename T> V3D PointPathComponent<T>::exitPoint() const {
+template <typename T> Eigen::Vector3d PointPathComponent<T>::exitPoint() const {
   return getPos(); // This is a point component
 }
 

@@ -37,26 +37,64 @@ TEST(composite_component_test, test_clone){
 TEST(composite_component_test, test_get_pos){
 
     MockComponent* childA = new MockComponent;
-    EXPECT_CALL(*childA, getPos()).WillRepeatedly(Return(V3D{1,1,1}));
+    EXPECT_CALL(*childA, getPos()).WillRepeatedly(Return(Eigen::Vector3d{1,1,1}));
     MockComponent* childB = new MockComponent;
-    EXPECT_CALL(*childB, getPos()).WillRepeatedly(Return(V3D{2,2,2}));
+    EXPECT_CALL(*childB, getPos()).WillRepeatedly(Return(Eigen::Vector3d{2,2,2}));
     MockComponent* childC = new MockComponent;
-    EXPECT_CALL(*childC, getPos()).WillRepeatedly(Return(V3D{3,3,3}));
+    EXPECT_CALL(*childC, getPos()).WillRepeatedly(Return(Eigen::Vector3d{3,3,3}));
 
     CompositeComponent composite{ComponentIdType(1)};
     composite.addComponent(std::unique_ptr<MockComponent>(childA));
     composite.addComponent(std::unique_ptr<MockComponent>(childB));
     composite.addComponent(std::unique_ptr<MockComponent>(childC));
 
-    V3D pos = composite.getPos();
+    Eigen::Vector3d pos = composite.getPos();
     EXPECT_EQ(pos[0],2);
     EXPECT_EQ(pos[1],2);
     EXPECT_EQ(pos[2],2);
 }
 
+TEST(composite_component_test, test_shiftPos) {
+  using namespace testing;
+  MockComponent *child = new MockComponent;
+  EXPECT_CALL(*child, shiftPositionBy(_)).Times(1);
 
+  CompositeComponent composite{ComponentIdType(1)};
+  composite.addComponent(std::unique_ptr<MockComponent>(child));
 
+  composite.shiftPositionBy(Eigen::Vector3d{1, 1, 1});
+  EXPECT_TRUE(Mock::VerifyAndClearExpectations(child));
+}
 
+TEST(composite_component_test, test_rotate) {
+  using namespace testing;
+  MockComponent *child = new MockComponent;
+  EXPECT_CALL(*child, rotate(_, _)).Times(1);
 
+  CompositeComponent composite{ComponentIdType(1)};
+  composite.addComponent(std::unique_ptr<MockComponent>(child));
+
+  const Eigen::Vector3d axis{1, 1, 1};
+  const auto theta = M_PI / 2;
+  const Eigen::Vector3d center{1, 1, 1};
+
+  composite.rotate(axis, theta, center);
+  EXPECT_TRUE(Mock::VerifyAndClearExpectations(child));
+}
+
+TEST(composite_component_test, test_rotate_fast) {
+  using namespace testing;
+  MockComponent *child = new MockComponent;
+  EXPECT_CALL(*child, rotate(_, _)).Times(1);
+
+  CompositeComponent composite{ComponentIdType(1)};
+  composite.addComponent(std::unique_ptr<MockComponent>(child));
+
+  Eigen::Affine3d transform = Eigen::Affine3d::Identity();
+  Eigen::Quaterniond rotation(transform.rotation());
+  // Overload for fast rotations
+  composite.rotate(transform, rotation);
+  EXPECT_TRUE(Mock::VerifyAndClearExpectations(child));
+}
 
 } // namespace

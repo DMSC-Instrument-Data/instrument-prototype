@@ -41,10 +41,11 @@ set ( TEST_FILES
                  ParabolicGuideTest.cpp
                  PathComponentTest.cpp
                  PointPathComponentTest.cpp
+                 RotateCommandTest.cpp
                  SourceSampleDetectorPathFactoryTest.cpp                 
                  SpectrumInfoTest.cpp
                  SpectrumTest.cpp
-                 MPITest.cpp               
+                 #MPITest.cpp
 )
 
 set ( TEST_FILES_MAPPERS

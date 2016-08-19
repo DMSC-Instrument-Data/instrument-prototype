@@ -7,7 +7,7 @@
 #include "DetectorComponent.h"
 #include "PointSample.h"
 #include "PointSource.h"
-#include "V3D.h"
+#include <Eigen/Core>
 
 InstrumentTree
 make_very_basic_tree(ComponentIdType idForSource = ComponentIdType(0),
@@ -29,16 +29,16 @@ make_very_basic_tree(ComponentIdType idForSource = ComponentIdType(0),
   nodes.push_back(Node{});
   nodes.push_back(
       Node(0, CowPtr<Component>(new DetectorComponent(
-                  idForDetector1, DetectorIdType(1), V3D{1, 1, 1}))));
+                  idForDetector1, DetectorIdType(1), Eigen::Vector3d{1, 1, 1}))));
 
   nodes.push_back(
       Node(0, CowPtr<Component>(new DetectorComponent(
-                  idForDetector2, DetectorIdType(1), V3D{1, 1, 1}))));
+                  idForDetector2, DetectorIdType(1), Eigen::Vector3d{1, 1, 1}))));
 
   nodes.push_back(
-      Node(0, CowPtr<Component>(new PointSource(V3D{0, 0, 0}, idForSource))));
+      Node(0, CowPtr<Component>(new PointSource(Eigen::Vector3d{0, 0, 0}, idForSource))));
   nodes.push_back(
-      Node(0, CowPtr<Component>(new PointSample(V3D{0, 0, 10}, idForSample))));
+      Node(0, CowPtr<Component>(new PointSample(Eigen::Vector3d{0, 0, 10}, idForSample))));
 
   nodes[0].addChild(1);
   nodes[0].addChild(2);

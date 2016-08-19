@@ -30,7 +30,7 @@ InstrumentTree make_simple_tree(DetectorIdType detector1Id,
   auto composite = std::make_shared<CompositeComponent>(ComponentIdType(1));
   composite->addComponent(
       std::unique_ptr<DetectorComponent>(new DetectorComponent(
-          ComponentIdType(1), DetectorIdType(detector1Id), V3D{1, 1, 1})));
+          ComponentIdType(1), DetectorIdType(detector1Id), Eigen::Vector3d{1, 1, 1})));
 
   std::vector<Node> nodes;
 
@@ -40,12 +40,12 @@ InstrumentTree make_simple_tree(DetectorIdType detector1Id,
                                                 new DetectorComponent(
                                                     ComponentIdType(2),
                                                     DetectorIdType(detector2Id),
-                                                    V3D{1, 1, 1})).release())));
+                                                    Eigen::Vector3d{1, 1, 1})).release())));
 
   nodes.push_back(Node(
-      0, CowPtr<Component>(new PointSource(V3D{0, 0, 0}, ComponentIdType(3)))));
+      0, CowPtr<Component>(new PointSource(Eigen::Vector3d{0, 0, 0}, ComponentIdType(3)))));
   nodes.push_back(Node(0, CowPtr<Component>(new PointSample(
-                              V3D{0, 0, 10}, ComponentIdType(4)))));
+                              Eigen::Vector3d{0, 0, 10}, ComponentIdType(4)))));
 
   nodes[0].addChild(1); // add composite
   nodes[0].addChild(2); // add detector
@@ -74,12 +74,12 @@ make_very_basic_tree(ComponentIdType idForSource = ComponentIdType(0),
   nodes.push_back(Node{});
   nodes.push_back(
       Node(0, CowPtr<Component>(new DetectorComponent(
-                  idForDetector, DetectorIdType(1), V3D{1, 1, 1}))));
+                  idForDetector, DetectorIdType(1), Eigen::Vector3d{1, 1, 1}))));
 
   nodes.push_back(
-      Node(0, CowPtr<Component>(new PointSource(V3D{0, 0, 0}, idForSource))));
+      Node(0, CowPtr<Component>(new PointSource(Eigen::Vector3d{0, 0, 0}, idForSource))));
   nodes.push_back(
-      Node(0, CowPtr<Component>(new PointSample(V3D{0, 0, 10}, idForSample))));
+      Node(0, CowPtr<Component>(new PointSample(Eigen::Vector3d{0, 0, 10}, idForSample))));
 
   nodes[0].addChild(1);
   nodes[0].addChild(2);
@@ -95,10 +95,10 @@ InstrumentTree makeRegularInstrument(std::vector<Node> &&nodes,
                                      int versionNumber = 0) {
   const size_t originalSize = nodes.size();
   nodes.push_back(Node(
-      0, CowPtr<Component>(new PointSource(V3D{0, 0, 0}, ComponentIdType(100))),
+      0, CowPtr<Component>(new PointSource(Eigen::Vector3d{0, 0, 0}, ComponentIdType(100))),
       "Source", versionNumber));
   nodes.push_back(Node(0, CowPtr<Component>(new PointSample(
-                              V3D{0, 0, 10}, ComponentIdType(101))),
+                              Eigen::Vector3d{0, 0, 10}, ComponentIdType(101))),
                        "Sample", versionNumber));
 
   nodes[0].addChild(originalSize + 1);
@@ -265,7 +265,7 @@ TEST(instrument_tree_test, test_detector_access) {
   auto composite = std::make_shared<CompositeComponent>(ComponentIdType(1));
   composite->addComponent(
       std::unique_ptr<DetectorComponent>(new DetectorComponent(
-          ComponentIdType(1), DetectorIdType(detector1Id), V3D{1, 1, 1})));
+          ComponentIdType(1), DetectorIdType(detector1Id), Eigen::Vector3d{1, 1, 1})));
 
   nodes.emplace_back(0, CowPtr<Component>(composite));
 
@@ -275,7 +275,7 @@ TEST(instrument_tree_test, test_detector_access) {
       CowPtr<Component>(std::unique_ptr<DetectorComponent>(
                             new DetectorComponent(ComponentIdType(1),
                                                   DetectorIdType(detector2Id),
-                                                  V3D{1, 1, 1})).release()));
+                                                  Eigen::Vector3d{1, 1, 1})).release()));
 
   nodes[0].addChild(1);
   nodes[0].addChild(2);
