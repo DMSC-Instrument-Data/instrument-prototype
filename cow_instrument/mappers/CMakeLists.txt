@@ -31,4 +31,4 @@ set_target_properties(cow_mappers PROPERTIES LINKER_LANGUAGE CXX)
 
 target_link_libraries(cow_mappers LINK_PRIVATE ${Boost_LIBRARIES} )
 
-target_include_directories (cow_mappers PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} )
+target_include_directories (cow_mappers PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${EIGEN3_INCLUDE_DIR})

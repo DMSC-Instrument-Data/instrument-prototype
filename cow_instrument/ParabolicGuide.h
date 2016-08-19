@@ -31,7 +31,7 @@ public:
   double h() const;
   virtual Eigen::Vector3d entryPoint() const override;
   virtual Eigen::Vector3d exitPoint() const override;
-
+  virtual void accept(class ComponentVisitor *visitor) const override;
   bool operator==(const ParabolicGuide &other) const;
 
 private:

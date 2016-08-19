@@ -21,7 +21,7 @@ TYPED_TEST_CASE(PointPathComponentMapperTest, AllTypes);
 TYPED_TEST(PointPathComponentMapperTest, cannot_load_without_component_id) {
 
   TypeParam mapper;
-  mapper.posMapper = V3D{1, 1, 1};
+  mapper.posMapper = Eigen::Vector3d{1, 1, 1};
   EXPECT_THROW(mapper.create(), std::invalid_argument)
       << "No component id. Should throw";
 }
@@ -38,7 +38,7 @@ TYPED_TEST(PointPathComponentMapperTest, test_load) {
   using MapeeType = typename TestFixture::MapeeType;
 
   TypeParam mapper;
-  MapeeType source(V3D{1, 1, 1}, ComponentIdType(1));
+  MapeeType source(Eigen::Vector3d{1, 1, 1}, ComponentIdType(1));
 
   mapper.componentIdMapper = source.componentId();
   mapper.posMapper = source.getPos();
@@ -49,7 +49,7 @@ TYPED_TEST(PointPathComponentMapperTest, test_load) {
 TYPED_TEST(PointPathComponentMapperTest, test_sourced_constructor) {
   using MapeeType = typename TestFixture::MapeeType;
 
-  MapeeType source(V3D{1, 1, 1}, ComponentIdType(1));
+  MapeeType source(Eigen::Vector3d{1, 1, 1}, ComponentIdType(1));
   TypeParam mapper(source);
   auto product = mapper.create();
   EXPECT_TRUE(product.equals(source));
@@ -61,7 +61,7 @@ TYPED_TEST(PointPathComponentMapperTest, test_save_load) {
   std::stringstream ss;
   boost::archive::text_oarchive out(ss);
 
-  MapeeType pointComponent(V3D{1, 1, 1}, ComponentIdType{1});
+  MapeeType pointComponent(Eigen::Vector3d{1, 1, 1}, ComponentIdType{1});
 
   {
     TypeParam mapperA;

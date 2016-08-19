@@ -1,4 +1,5 @@
 #include "ParabolicGuide.h"
+#include "ComponentVisitor.h"
 #include <cmath>
 
 /*
@@ -120,6 +121,11 @@ Eigen::Vector3d ParabolicGuide::exitPoint() const {
   auto entry = m_position;
   entry[0] += m_a;
   return entry;
+}
+
+void ParabolicGuide::accept(ComponentVisitor *visitor) const
+{
+    return visitor->visit(this);
 }
 
 bool ParabolicGuide::operator==(const ParabolicGuide &other) const {

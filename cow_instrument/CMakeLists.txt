@@ -69,5 +69,7 @@ set ( INCLUDE_FILES
 
 add_library (cow_instrument SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
 
-target_include_directories (cow_instrument PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} )
+target_link_libraries(cow_instrument LINK_PUBLIC cow_mappers)
+
+target_include_directories (cow_instrument PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/mappers  ${EIGEN3_INCLUDE_DIR})
 

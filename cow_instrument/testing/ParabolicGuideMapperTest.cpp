@@ -8,7 +8,7 @@
 TEST(parabolic_guide_mapper_test, cannot_load_without_component_id) {
 
   ParabolicGuideMapper mapper;
-  mapper.posMapper = V3D{1, 1, 1};
+  mapper.posMapper = Eigen::Vector3d{1, 1, 1};
   mapper.aMapper = 1;
   mapper.hMapper = 2;
   EXPECT_THROW(mapper.create(), std::invalid_argument)
@@ -28,7 +28,7 @@ TEST(parabolic_guide_mapper_test, cannot_load_without_position) {
 TEST(parabolic_guide_mapper_test, cannot_load_without_a_parameter) {
 
   ParabolicGuideMapper mapper;
-  mapper.posMapper = V3D{1, 1, 1};
+  mapper.posMapper = Eigen::Vector3d{1, 1, 1};
   mapper.hMapper = 2;
   mapper.componentIdMapper = ComponentIdType(1);
   EXPECT_THROW(mapper.create(), std::invalid_argument)
@@ -39,7 +39,7 @@ TEST(parabolic_guide_mapper_test, cannot_load_without_h_parameter) {
 
   ParabolicGuideMapper mapper;
   mapper.aMapper = 1;
-  mapper.posMapper = V3D{1, 1, 1};
+  mapper.posMapper = Eigen::Vector3d{1, 1, 1};
   mapper.componentIdMapper = ComponentIdType(1);
   EXPECT_THROW(mapper.create(), std::invalid_argument)
       << "No position. Should throw";
@@ -48,7 +48,7 @@ TEST(parabolic_guide_mapper_test, cannot_load_without_h_parameter) {
 TEST(parabolic_guide_mapper_test, test_load) {
 
   ParabolicGuideMapper mapper;
-  ParabolicGuide component(ComponentIdType(1), 1, 2, V3D{1, 1, 1});
+  ParabolicGuide component(ComponentIdType(1), 1, 2, Eigen::Vector3d{1, 1, 1});
   mapper.componentIdMapper = component.componentId();
   mapper.posMapper = component.getPos();
   mapper.aMapper = component.a();
@@ -62,7 +62,7 @@ TEST(parabolic_guide_mapper_test, test_save_load) {
   std::stringstream s;
   boost::archive::text_oarchive out(s);
 
-  ParabolicGuide guide(ComponentIdType(1), 1, 2, V3D{1, 1, 1});
+  ParabolicGuide guide(ComponentIdType(1), 1, 2, Eigen::Vector3d{1, 1, 1});
 
   {
     ParabolicGuideMapper mapperA;
