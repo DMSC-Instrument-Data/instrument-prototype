@@ -2,7 +2,7 @@
 #define PATHCOMPONENT_H
 
 #include "Component.h"
-#include "V3D.h"
+#include <Eigen/Core>
 
 /**
  * Abstract type for a non-terminating component that can be used to form a
@@ -17,10 +17,10 @@ public:
   virtual double length() const;
 
   /// Point at which neutrons enter the component
-  virtual V3D entryPoint() const;
+  virtual Eigen::Vector3d entryPoint() const;
 
   /// Point at which neutrons exit the component
-  virtual V3D exitPoint() const;
+  virtual Eigen::Vector3d exitPoint() const;
 
   /// Is this the source
   virtual bool isSource() const;

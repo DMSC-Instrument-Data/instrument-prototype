@@ -1,7 +1,7 @@
 #include "MoveCommand.h"
 #include "Component.h"
 
-MoveCommand::MoveCommand(V3D offset) : m_offset(offset) {}
+MoveCommand::MoveCommand(Eigen::Vector3d offset) : m_offset(offset) {}
 
 bool MoveCommand::execute(CowPtr<Component> &component) const {
   // TODO. This is not thread safe.

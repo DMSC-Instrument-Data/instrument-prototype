@@ -1,37 +1,40 @@
-#include "MoveCommand.h"
 #include "gtest/gtest.h"
-#include "gmock/gmock.h"
+#include "RotateCommand.h"
 #include "MockTypes.h"
+#include <Eigen/Geometry>
 
+using Eigen::Vector3d;
 using namespace testing;
 
-namespace {
+TEST(rotate_command_test, test_is_meta_data){
+    RotateCommand rotate(Vector3d{1,0,0}, 0);
+    EXPECT_FALSE(rotate.isMetaDataCommand()) << "Rotations should be recursive";
+}
 
-TEST(move_component_test, test_execute_when_MockComponent_unique) {
 
+TEST(rotate_command_test, test_execute_when_MockComponent_unique) {
   // Our starting component.
   auto mockComponent = new MockComponent;
   // The delta pos method should be called on the orignal/unique component
-  EXPECT_CALL(*mockComponent, shiftPositionBy(_)).Times(1);
+  EXPECT_CALL(*mockComponent, rotate(_,_,_)).Times(1);
   // No copying of the component should be invoked.
   EXPECT_CALL(*mockComponent, clone()).Times(0);
   // Cow make around a single reference count to the component
   CowPtr<Component> component(mockComponent);
-
-  MoveCommand command(Eigen::Vector3d{1, 2, 3});
+  RotateCommand command(Vector3d{1,0,0}, 0, Vector3d{0,0,0});
   EXPECT_FALSE(command.execute(component))
-      << "MoveCommand should indicate NO copy made";
+      << "RotateCommand should indicate NO copy made";
 
   EXPECT_TRUE(Mock::VerifyAndClear(mockComponent));
 }
 
-TEST(move_component_test, test_execute_when_MockComponent_copyable) {
+TEST(rotate_component_test, test_execute_when_MockComponent_copyable) {
 
   // Our starting component.
   auto mockComponent = new MockComponent;
   // The object that we get when the starting component is cloned.
   auto clonedMockComponent = new MockComponent;
-  EXPECT_CALL(*clonedMockComponent, shiftPositionBy(_)).Times(1);
+  EXPECT_CALL(*clonedMockComponent, rotate(_,_,_)).Times(1);
   EXPECT_CALL(*mockComponent, clone()).WillOnce(Return(clonedMockComponent));
 
   CowPtr<Component> component(mockComponent);
@@ -39,13 +42,13 @@ TEST(move_component_test, test_execute_when_MockComponent_copyable) {
   // take place
   auto originalReference = component;
 
-  MoveCommand command(Eigen::Vector3d{1, 2, 3});
+  RotateCommand command(Vector3d{1,0,0}, 0, Vector3d{0,0,0});
   EXPECT_TRUE(command.execute(component))
-      << "MoveCommand should indicate copy made";
+      << "RotateCommand should indicate copy made";
 
   EXPECT_TRUE(originalReference.unique())
       << "Reference count to original should drop to 1";
   EXPECT_TRUE(Mock::VerifyAndClear(mockComponent));
   EXPECT_TRUE(Mock::VerifyAndClear(clonedMockComponent));
 }
-}
+

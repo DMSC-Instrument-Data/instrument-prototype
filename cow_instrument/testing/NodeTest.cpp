@@ -23,7 +23,7 @@ TEST(node_test, test_construction_isolated) {
 TEST(node_test, test_indirection) {
 
   MockComponent *mockComponent = new MockComponent;
-  EXPECT_CALL(*mockComponent, getPos()).WillOnce(Return(V3D{1, 1, 1}));
+  EXPECT_CALL(*mockComponent, getPos()).WillOnce(Return(Eigen::Vector3d{1, 1, 1}));
 
   CowPtr<Component> contents(mockComponent);
   Node node(contents);

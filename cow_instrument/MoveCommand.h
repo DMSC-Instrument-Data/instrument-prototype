@@ -8,7 +8,7 @@ class MoveCommand : public Command {
 
   // Command interface
 public:
-  MoveCommand(V3D pos);
+  MoveCommand(Eigen::Vector3d pos);
   virtual bool execute(CowPtr<Component> &component) const override;
   virtual bool isMetaDataCommand() const override;
   virtual ~MoveCommand() = default;
@@ -16,7 +16,7 @@ public:
 private:
 
   /// Relative offset
-  V3D m_offset;
+  Eigen::Vector3d m_offset;
 };
 
 #endif

@@ -5,28 +5,45 @@ CompositeComponent::CompositeComponent(ComponentIdType componentId,
                                        std::string name)
     : m_componentId(componentId), m_name(name) {}
 
-V3D CompositeComponent::getPos() const {
+Eigen::Vector3d CompositeComponent::getPos() const {
 
   /*
    An expensive operation on a composite component, but I don't think this
    is commonly
    */
-  V3D pos{0, 0, 0};
+  Eigen::Vector3d pos{0, 0, 0};
   for (size_t i = 0; i < m_children.size(); ++i) {
     auto childPos = m_children[i]->getPos();
-    pos[0] += childPos[0];
-    pos[1] += childPos[1];
-    pos[2] += childPos[2];
+    pos += childPos;
   }
-  pos[0] /= m_children.size();
-  pos[1] /= m_children.size();
-  pos[2] /= m_children.size();
+  pos /= m_children.size();
   return pos;
 }
 
-void CompositeComponent::shiftPositionBy(const V3D &delta) {
+void CompositeComponent::shiftPositionBy(const Eigen::Vector3d &delta) {
   for (size_t i = 0; i < m_children.size(); ++i) {
     m_children[i]->shiftPositionBy(delta);
+  }
+}
+
+void CompositeComponent::rotate(const Eigen::Vector3d &axis,
+                                const double &theta,
+                                const Eigen::Vector3d &center) {
+  using namespace Eigen;
+  Affine3d transform =
+      Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
+  Quaterniond rotationPart(transform.rotation());
+  for (size_t i = 0; i < m_children.size(); ++i) {
+
+    m_children[i]->rotate(transform, rotationPart);
+  }
+}
+
+void CompositeComponent::rotate(const Eigen::Affine3d &transform,
+                                const Eigen::Quaterniond &rotationPart) {
+  for (size_t i = 0; i < m_children.size(); ++i) {
+
+    m_children[i]->rotate(transform, rotationPart);
   }
 }
 
@@ -78,3 +95,7 @@ ComponentIdType CompositeComponent::componentId() const {
 }
 
 std::string CompositeComponent::name() const { return m_name; }
+
+Eigen::Quaterniond CompositeComponent::getRotation() const {
+  throw std::runtime_error("Not implemented");
+}

@@ -3,26 +3,32 @@
 
 #include "PathComponent.h"
 #include "IdType.h"
-#include "V3D.h"
+#include <Eigen/Core>
 
 class ParabolicGuide : public PathComponent {
 
 public:
-  ParabolicGuide(ComponentIdType componentId, double a, double h, V3D position);
+  ParabolicGuide(ComponentIdType componentId, double a, double h,
+                 Eigen::Vector3d position);
 
-  V3D getPos() const;
-  void shiftPositionBy(const V3D &pos);
-  ParabolicGuide *clone() const;
-  bool equals(const Component &other) const;
-  void registerContents(
+  Eigen::Vector3d getPos() const override;
+  virtual Eigen::Quaterniond getRotation() const override;
+  virtual void shiftPositionBy(const Eigen::Vector3d &pos) override;
+  virtual void rotate(const Eigen::Vector3d &axis, const double &theta,
+                      const Eigen::Vector3d &center) override;
+  virtual void rotate(const Eigen::Affine3d &transform,
+                      const Eigen::Quaterniond &rotationPart) override;
+  virtual ParabolicGuide *clone() const override;
+  virtual bool equals(const Component &other) const override;
+  virtual void registerContents(
       std::vector<const Detector *> &lookupDetectors,
       std::vector<const PathComponent *> &lookupPathComponents) const;
-  ComponentIdType componentId() const;
-  std::string name() const;
+  virtual ComponentIdType componentId() const override;
+  virtual std::string name() const override;
 
-  double length() const;
-  V3D entryPoint() const;
-  V3D exitPoint() const;
+  virtual double length() const override;
+  virtual Eigen::Vector3d entryPoint() const override;
+  virtual Eigen::Vector3d exitPoint() const override;
 
   bool operator==(const ParabolicGuide &other) const;
 
@@ -30,7 +36,8 @@ private:
   ComponentIdType m_componentId;
   double m_a;
   double m_h;
-  V3D m_position;
+  Eigen::Vector3d m_position;
+  Eigen::Quaterniond m_rotation;
   double m_length;
 };
 

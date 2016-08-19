@@ -3,18 +3,23 @@
 
 #include "Detector.h"
 #include "Component.h"
+#include <Eigen/Geometry>
 
 class DetectorComponent : public Detector {
 
 public:
   DetectorComponent(ComponentIdType componentId, DetectorIdType detectorId,
-                    const V3D &pos);
+                    const Eigen::Vector3d &pos);
 
   DetectorComponent(const DetectorComponent &) = default;
   DetectorComponent &operator=(const DetectorComponent &) = default;
 
-  V3D getPos() const override;
-  void shiftPositionBy(const V3D &pos) override;
+  Eigen::Vector3d getPos() const override;
+  Eigen::Quaterniond getRotation() const;
+  void shiftPositionBy(const Eigen::Vector3d &pos) override;
+  void rotate(const Eigen::Vector3d& axis, const double& theta, const Eigen::Vector3d& center) override;
+  virtual void rotate(const Eigen::Affine3d &transform,
+                      const Eigen::Quaterniond &rotationPart) override;
   virtual ~DetectorComponent();
   DetectorComponent *clone() const override;
   bool equals(const Component &other) const override;
@@ -28,7 +33,8 @@ public:
 private:
   const DetectorIdType m_detectorId;
   const ComponentIdType m_componentId;
-  V3D m_pos;
+  Eigen::Vector3d m_pos;
+  Eigen::Quaterniond m_rotation;
 };
 
 #endif

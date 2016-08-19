@@ -15,17 +15,17 @@ namespace {
 void addMockSourceSampleToInstrument(
     testing::NiceMock<MockInstrumentTree> *pMockInstrumentTree,
     MockPathComponent &source, MockPathComponent &sample,
-    V3D sourcePos = V3D{0, 0, 0}, V3D samplePos = V3D{0, 0, 20}) {
+    Eigen::Vector3d sourcePos = Eigen::Vector3d{0, 0, 0}, Eigen::Vector3d samplePos = Eigen::Vector3d{0, 0, 20}) {
   testing::Action<double()> returnZeroLength = testing::Return(0.0);
 
   // This is where I place the source
-  testing::Action<V3D()> returnSourceCentre = testing::Return(sourcePos);
+  testing::Action<Eigen::Vector3d()> returnSourceCentre = testing::Return(sourcePos);
   EXPECT_CALL(source, length()).WillRepeatedly(returnZeroLength);
   EXPECT_CALL(source, entryPoint()).WillRepeatedly(returnSourceCentre);
   EXPECT_CALL(source, exitPoint()).WillRepeatedly(returnSourceCentre);
 
   // This is where I place the sample
-  testing::Action<V3D()> returnSampleCentre = testing::Return(samplePos);
+  testing::Action<Eigen::Vector3d()> returnSampleCentre = testing::Return(samplePos);
   EXPECT_CALL(sample, length()).WillRepeatedly(returnZeroLength);
   EXPECT_CALL(sample, entryPoint()).WillRepeatedly(returnSampleCentre);
   EXPECT_CALL(sample, exitPoint()).WillRepeatedly(returnSampleCentre);
@@ -223,7 +223,7 @@ TEST(detector_info_test, test_calculate_l2) {
 
   // This is where I place the detector
   EXPECT_CALL(detector, getPos())
-      .WillRepeatedly(testing::Return(V3D{0, 0, 40}));
+      .WillRepeatedly(testing::Return(Eigen::Vector3d{0, 0, 40}));
 
   auto *pMockInstrumentTree =
       new testing::NiceMock<MockInstrumentTree>(nDetectors);
@@ -254,7 +254,7 @@ TEST(detector_info_test, test_calculate_l1) {
 
   // This is where I place the detector
   EXPECT_CALL(detector, getPos())
-      .WillRepeatedly(testing::Return(V3D{0, 0, 40}));
+      .WillRepeatedly(testing::Return(Eigen::Vector3d{0, 0, 40}));
 
   auto *pMockInstrumentTree =
       new testing::NiceMock<MockInstrumentTree>(nDetectors);
@@ -263,7 +263,7 @@ TEST(detector_info_test, test_calculate_l1) {
       .WillRepeatedly(testing::ReturnRef(detector));
 
   addMockSourceSampleToInstrument(pMockInstrumentTree, source, sample,
-                                  V3D{0, 0, 3}, V3D{0, 0, 5});
+                                  Eigen::Vector3d{0, 0, 3}, Eigen::Vector3d{0, 0, 5});
 
   DetectorInfoWithNiceMockInstrument detectorInfo{
       std::shared_ptr<NiceMockInstrumentTree>(pMockInstrumentTree),

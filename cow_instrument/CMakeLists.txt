@@ -1,3 +1,7 @@
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
+
+find_package(Eigen3 3.1.2 REQUIRED)
+
 find_package ( Boost 1.54.0 COMPONENTS mpi REQUIRED )
 
 find_package(MPI REQUIRED)
@@ -15,6 +19,7 @@ set ( SOURCE_FILES
                    NullComponent.cpp
                    ParabolicGuide.cpp
                    PathComponent.cpp
+                   RotateCommand.cpp
 )
 
 set ( INCLUDE_FILES
@@ -44,14 +49,16 @@ set ( INCLUDE_FILES
                    PointPathComponent.h
                    PointSample.h
                    PointSource.h
+                   RotateCommand.h
                    SourceSampleDetectorPathFactory.h
                    SpectrumInfo.h
                    Spectrum.h
                    VectorOf.h
-                   V3D.h
 )
 
 add_library (cow_instrument SHARED ${SOURCE_FILES} ${INCLUDE_FILES})
 
-target_include_directories (cow_instrument PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} )
+target_include_directories (cow_instrument PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${EIGEN3_INCLUDE_DIR})
+
+
 
