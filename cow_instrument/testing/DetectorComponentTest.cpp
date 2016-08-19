@@ -97,16 +97,16 @@ TEST(detector_component_test, test_single_rotation_around_detector_origin) {
 TEST(detector_component_test, test_multiple_rotation_around_detector_origin) {
 
   const Eigen::Vector3d rotationAxis{0, 0, 1};
-  const double rotationAngle = M_PI / 2;
+  const double rotationAngle = M_PI / 4;
   const Eigen::Vector3d rotationCenter{0, 0, 0};
 
   DetectorComponent detector(
       ComponentIdType(1), DetectorIdType{1},
       rotationCenter /*I make this the position of the detector*/);
 
-  // Rotate once by 90 degrees
+  // Rotate once by 45 degrees
   detector.rotate(rotationAxis, rotationAngle, rotationCenter);
-  // Rotate again by 90 degrees
+  // Rotate again by 45 degrees
   detector.rotate(rotationAxis, rotationAngle, rotationCenter);
 
   // Check that the position has the identity rotation applied.
@@ -118,7 +118,7 @@ TEST(detector_component_test, test_multiple_rotation_around_detector_origin) {
   Eigen::Matrix3d rotMatrix = detector.getRotation().toRotationMatrix();
   // Check that some vector I define gets rotated as I would expect
   Eigen::Vector3d rotatedVector = rotMatrix * Eigen::Vector3d{1, 0, 0};
-  EXPECT_TRUE(rotatedVector.isApprox(Eigen::Vector3d{-1, 0, 0}, 1e-14))
+  EXPECT_TRUE(rotatedVector.isApprox(Eigen::Vector3d{0, 1, 0}, 1e-14))
       << "Internal detector rotation not updated correctly";
 }
 
@@ -144,27 +144,28 @@ TEST(detector_component_test, test_single_rotation_around_arbitrary_center) {
 
 TEST(detector_component_test, test_multiple_rotation_arbitrary_center) {
 
-  const Eigen::Vector3d rotationAxis{0, 0, 1};
+  const Eigen::Vector3d rotationAxisZ{0, 0, 1};
+  const Eigen::Vector3d rotationAxisX{1, 0, 0};
   const double rotationAngle = M_PI / 2;
   const Eigen::Vector3d rotationCenter{0, 0, 0};
 
   DetectorComponent detector(ComponentIdType(1), DetectorIdType{1},
                              Eigen::Vector3d{1, 0, 0} /*Detector position*/);
 
-  // Rotate once by 90 degrees
-  detector.rotate(rotationAxis, rotationAngle, rotationCenter);
-  // Rotate again by 90 degrees
-  detector.rotate(rotationAxis, rotationAngle, rotationCenter);
+  // Rotate once by 90 degrees around z should put detector at 0,1,0
+  detector.rotate(rotationAxisZ, rotationAngle, rotationCenter);
+  // Rotate again by 90 degrees around x should put detector at 0,0,1
+  detector.rotate(rotationAxisX, rotationAngle, rotationCenter);
 
-  // Check that the position has the rotation applied.
-  EXPECT_TRUE(detector.getPos().isApprox(Eigen::Vector3d(-1, 0, 0), 1e-14));
+  // Check that the position has the rotations applied.
+  EXPECT_TRUE(detector.getPos().isApprox(Eigen::Vector3d(0, 0, 1), 1e-14));
 
   // Check that the internal rotation gets updated. i.e component is rotated
   // around its own centre.
   Eigen::Matrix3d rotMatrix = detector.getRotation().toRotationMatrix();
   // Check that some vector I define gets rotated as I would expect
   Eigen::Vector3d rotatedVector = rotMatrix * Eigen::Vector3d{1, 0, 0};
-  EXPECT_TRUE(rotatedVector.isApprox(Eigen::Vector3d{-1, 0, 0}, 1e-14))
+  EXPECT_TRUE(rotatedVector.isApprox(Eigen::Vector3d{0, 0, 1}, 1e-14))
       << "Internal detector rotation not updated correctly";
 }
 
