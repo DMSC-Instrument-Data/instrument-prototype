@@ -18,26 +18,18 @@ void serialize(Archive &ar, std::array<T, N> &a, const unsigned int) {
 } // namespace serialization
 } // namespace boost
 
+// Store an array internally but convert to a Eigen::Vector3d on demand
 class V3DMapper : public SingleItemMapper<std::array<double, 3> > {
 
 public:
-
-    V3DMapper(const Eigen::Vector3d &mapee) : SingleItemMapper(std::array<double, 3>{mapee[0],mapee[1],mapee[2]}) {}
+  V3DMapper(const Eigen::Vector3d &mapee);
     V3DMapper() = default;
 
-    Eigen::Vector3d create() const {
-      if (heldValue.is_initialized()) {
-          auto arry = heldValue.value();
-          return Eigen::Vector3d(arry[0], arry[1], arry[2]);
-      } else {
-        throw std::invalid_argument("V3DMapper::create failed. Mapper not "
-                                    "provided with a serialization item");
-      }
-    }
+    Eigen::Vector3d create() const;
 
-    void store(const Eigen::Vector3d &mapee) { heldValue = std::array<double, 3>{mapee[0],mapee[1],mapee[2]}; }
+    void store(const Eigen::Vector3d &mapee);
 
-  virtual ~V3DMapper() {}
+    virtual ~V3DMapper();
 };
 
 #endif

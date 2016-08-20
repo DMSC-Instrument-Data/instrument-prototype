@@ -2,6 +2,7 @@ set ( SOURCE_FILES
                    CompositeComponentMapper.cpp
                    DetectorComponentMapper.cpp
                    ParabolicGuideMapper.cpp
+                   V3DMapper.cpp
 )
 
 

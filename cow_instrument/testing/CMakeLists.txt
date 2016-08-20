@@ -55,6 +55,7 @@ set ( TEST_FILES_MAPPERS
                 ParabolicGuideMapperTest.cpp
                 PointPathComponentMapperTest.cpp
                 VectorOfMapperTest.cpp
+                V3DMapperTest.cpp
 )
 
 set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" ${MPI_CXX_COMPILE_FLAGS} )
