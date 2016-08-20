@@ -23,5 +23,6 @@ before_script:
 
 script: 
     - cmake --build .
+after_success:
     - ctest -VV
 
