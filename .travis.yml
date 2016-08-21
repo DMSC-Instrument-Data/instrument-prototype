@@ -9,6 +9,7 @@ compiler: gcc
 before_install:
     - sudo apt-get -qq update
     - sudo apt-get install -y libboost-dev
+    - sudo apt-get install -y libboost-serialization-dev
     - sudo apt-get install -y mpi-default-dev
     - sudo apt-get install -y libboost-mpi-dev
     - sudo apt-get install -y openmpi-bin
