@@ -6,12 +6,16 @@ language: cpp
 
 compiler: gcc
 
+addons:
+  apt:
+    sources:
+    - boost-latest
+
 before_install:
     - sudo apt-get -qq update
-    - sudo apt-get install -y libboost-dev
-    - sudo apt-get install -y libboost-serialization-dev
+    - sudo apt-get install -y libboost1.55-dev
     - sudo apt-get install -y mpi-default-dev
-    - sudo apt-get install -y libboost-mpi-dev
+    - sudo apt-get install -y libboost-mpi1.55-dev
     - sudo apt-get install -y openmpi-bin
     - uname -a
     - grep "#define BOOST_VERSION " /usr/include/boost/version.hpp
