@@ -33,6 +33,7 @@ set ( INCLUDE_FILES
                    DetectorInfo.h
                    FixedLengthVector.h
                    IdType.h
+                   IndexTranslator.h
                    InstrumentTree.h
                    IntToType.h
                    L1s.h

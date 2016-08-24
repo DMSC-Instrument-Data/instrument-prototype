@@ -34,6 +34,7 @@ set ( TEST_FILES
                  DetectorComponentTest.cpp
                  DetectorInfoTest.cpp                 
                  FixedLengthVectorTest.cpp                 
+                 IndexTranslatorTest.cpp
                  InstrumentTreeTest.cpp
                  MoveCommandTest.cpp
                  NodeTest.cpp
