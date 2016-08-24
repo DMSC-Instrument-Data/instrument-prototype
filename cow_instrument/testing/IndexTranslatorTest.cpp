@@ -98,8 +98,8 @@ TEST(IndexTranslatorTest, test_split_2_to_3_combine_results) {
   // Fake data object, could be anything.
   using Data = size_t;
 
-  // Outermost vector is for target partitioning
-  // Middle vector is for input partitioning
+  // Outermost vector is for target partition
+  // Middle vector is for input partition
   // Innermost vector is spectrum index of input
   std::vector<std::vector<
       std::vector<std::tuple<GlobalSpectrumIndex, SpectrumNumber, Data>>>>
@@ -134,7 +134,7 @@ TEST(IndexTranslatorTest, test_split_2_to_3_combine_results) {
       receiveBuffer[p].push_back(sendBuffer[p]);
   }
 
-  // For-loop mimic MPI ranks *after* redistribution
+  // This for-loop mimics MPI ranks *after* redistribution
   for (const auto partition : {0, 1, 2}) {
     // 5. Merge data from all ranks
     std::vector<std::tuple<GlobalSpectrumIndex, SpectrumNumber, Data>> result;
