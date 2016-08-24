@@ -89,10 +89,10 @@ TEST(IndexTranslatorTest, test_split_2_to_3_combine_results) {
   // This tests mimics what would happen in an MPI redistribution
   Partitioning p2(2);
   std::vector<IndexTranslator> t;
-  t.emplace_back(p2, 0,
-                 std::vector<SpectrumNumber>{1, 2, 4, 5, 6}); // partition 0
-  t.emplace_back(p2, 1,
-                 std::vector<SpectrumNumber>{1, 2, 4, 5, 6}); // partition 1
+  t.emplace_back(
+      p2, 0, std::vector<SpectrumNumber>{1, 2, 4, 5, 6, 8, 9}); // partition 0
+  t.emplace_back(
+      p2, 1, std::vector<SpectrumNumber>{1, 2, 4, 5, 6, 8, 9}); // partition 1
   Partitioning p3(3);
 
   // Fake data object, could be anything.
@@ -150,17 +150,18 @@ TEST(IndexTranslatorTest, test_split_2_to_3_combine_results) {
            const std::tuple<GlobalSpectrumIndex, SpectrumNumber, Data> &t2)
             -> bool { return std::get<0>(t1) < std::get<0>(t2); });
 
-    // SpectrumNumber        1 2 4 5 6
-    // GlobalSpectrumIndex   0 1 2 3 4
-    // Partition (start)     0 1 0 1 0
-    // SpectrumIndex (start) 0 0 1 1 2
-    // Partition (end)       0 1 2 0 1
-    // SpectrumIndex (end)   0 0 0 1 1
+    // SpectrumNumber        1 2 4 5 6 8 9
+    // GlobalSpectrumIndex   0 1 2 3 4 5 6
+    // Partition (start)     0 1 0 1 0 1 0
+    // SpectrumIndex (start) 0 0 1 1 2 2 3
+    // Partition (end)       0 1 2 0 1 2 0
+    // SpectrumIndex (end)   0 0 0 1 1 1 2
     switch (partition) {
     case 0:
-      EXPECT_EQ(result.size(), 2);
+      EXPECT_EQ(result.size(), 3);
       EXPECT_EQ(result[0], std::make_tuple(0, 1, 0));
       EXPECT_EQ(result[1], std::make_tuple(3, 5, 1));
+      EXPECT_EQ(result[2], std::make_tuple(6, 9, 3));
       break;
     case 1:
       EXPECT_EQ(result.size(), 2);
@@ -168,8 +169,9 @@ TEST(IndexTranslatorTest, test_split_2_to_3_combine_results) {
       EXPECT_EQ(result[1], std::make_tuple(4, 6, 2));
       break;
     case 2:
-      EXPECT_EQ(result.size(), 1);
+      EXPECT_EQ(result.size(), 2);
       EXPECT_EQ(result[0], std::make_tuple(2, 4, 1));
+      EXPECT_EQ(result[1], std::make_tuple(5, 8, 2));
       break;
     }
   }
