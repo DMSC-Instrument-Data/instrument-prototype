@@ -10,6 +10,11 @@
 #include <vector>
 #include <initializer_list>
 #include <memory>
+#include <cow_ptr.h>
+
+namespace boost {
+namespace serialization {}
+}
 
 class Item {
 
@@ -51,7 +56,6 @@ public:
 
 private:
 };
-// BOOST_SERIALIZATION_ASSUME_ABSTRACT( ItemVisitor );
 
 class Mapper1 : public ItemVisitor {
 public:
@@ -99,9 +103,6 @@ public:
 };
 BOOST_CLASS_EXPORT(Mapper2);
 
-// BOOST_CLASS_EXPORT_GUID(Mapper1, "derived_one")
-// BOOST_CLASS_EXPORT_GUID(Mapper2, "derived_two")
-
 bool Item1::accept(ItemVisitor *visitor) const { return visitor->visit(this); }
 
 bool Item2::accept(ItemVisitor *visitor) const { return visitor->visit(this); }
@@ -115,7 +116,7 @@ int Item2::getId() const { return m_value; }
 
 template <typename MapperFamily> class PolymorphicSerializer {
 private:
-  std::vector<std::shared_ptr<ItemVisitor>> m_itemVisitors;
+  std::vector<std::shared_ptr<MapperFamily>> m_itemVisitors;
 
 public:
   typename MapperFamily::Family *m_thing;
@@ -126,15 +127,13 @@ public:
 
   PolymorphicSerializer()
       : PolymorphicSerializer(
-            {std::make_shared<Mapper1>(), std::make_shared<Mapper2>()}) {}
+            {std::make_shared<Mapper1>(), std::make_shared<Mapper2>()}) // HACK!
+  {}
 
   void store(typename MapperFamily::Family *thing) { m_thing = thing; }
 
   template <class Archive>
   void save(Archive &ar, const unsigned int version) const {
-
-    // ar.template register_type<Mapper1>();
-    //   ar.template register_type<Mapper2>();
 
     for (auto &visitor : m_itemVisitors) {
       if (m_thing->accept(visitor.get())) {
@@ -144,9 +143,6 @@ public:
   }
 
   template <class Archive> void load(Archive &ar, const unsigned int version) {
-
-    // ar.template register_type<Mapper1>();
-    //   ar.template register_type<Mapper2>();
 
     std::shared_ptr<ItemVisitor> target;
     ar >> target;
@@ -207,25 +203,27 @@ TEST(component_visitor_test, test_serialization_2) {
   EXPECT_EQ(product->getId(), 2);
 }
 
+template <typename A, typename B>
 std::vector<PolymorphicSerializer<ItemVisitor>>
-make_vec_serializers(size_t size) {
+make_vec_serializers_with_2_mappers(size_t size) {
   std::vector<PolymorphicSerializer<ItemVisitor>> serializers;
   for (size_t i = 0; i < size; ++i) {
     serializers.emplace_back(
         std::initializer_list<std::shared_ptr<ItemVisitor>>{
-            std::make_shared<Mapper1>(), std::make_shared<Mapper2>()});
+            std::make_shared<A>(), std::make_shared<B>()});
   }
   return serializers;
 }
 
+template <typename A, typename B>
 std::vector<PolymorphicSerializer<ItemVisitor>>
-make_and_initialize_vec_serializers(
+make_and_initialize_vec_serializers_with_2_mappers(
     const std::vector<std::shared_ptr<Item>> &items) {
   std::vector<PolymorphicSerializer<ItemVisitor>> serializers;
   for (size_t i = 0; i < items.size(); ++i) {
     serializers.emplace_back(
         std::initializer_list<std::shared_ptr<ItemVisitor>>{
-            std::make_shared<Mapper1>(), std::make_shared<Mapper2>()});
+            std::make_shared<A>(), std::make_shared<B>()});
     serializers[i].store(items[i].get());
   }
   return serializers;
@@ -238,7 +236,8 @@ TEST(component_visitor_test, test_vector_items) {
                                            std::make_shared<Item1>(3)};
 
   std::vector<PolymorphicSerializer<ItemVisitor>> serializersIn =
-      make_and_initialize_vec_serializers(items);
+      make_and_initialize_vec_serializers_with_2_mappers<Mapper1, Mapper2>(
+          items);
 
   std::stringstream s;
   boost::archive::text_oarchive out(s);
@@ -248,7 +247,7 @@ TEST(component_visitor_test, test_vector_items) {
   std::cout << s.str() << std::endl;
 
   std::vector<PolymorphicSerializer<ItemVisitor>> serializersOut =
-      make_vec_serializers(items.size());
+      make_vec_serializers_with_2_mappers<Mapper1, Mapper2>(items.size());
   boost::archive::text_iarchive in(s);
 
   in >> serializersOut;
