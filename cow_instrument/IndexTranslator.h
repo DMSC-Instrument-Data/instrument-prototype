@@ -13,7 +13,11 @@ using GlobalSpectrumIndex = size_t;
 class Partitioning {
 public:
   Partitioning(int numberOfPartitions)
-      : m_numberOfPartitions(numberOfPartitions) {}
+      : m_numberOfPartitions(numberOfPartitions) {
+    if (numberOfPartitions < 1) {
+      throw std::invalid_argument("Number of partitions must be >= 1");
+    }
+  }
 
   int size() const { return m_numberOfPartitions; }
 
@@ -27,12 +31,15 @@ private:
 
 class IndexTranslator {
 public:
-  IndexTranslator(const Partitioning &partitioning, int partition,
+  IndexTranslator(const Partitioning &partitioning,
+                  int translatorPartitionIndex,
                   const std::vector<SpectrumNumber> &spectrumNumbers)
-      : m_partitioning(partitioning), m_partition(partition) {
+      : m_partitioning(partitioning),
+        m_partitionIndex(translatorPartitionIndex) {
     for (size_t i = 0; i < spectrumNumbers.size(); ++i) {
-      int partition = m_partitioning.partitionIndexOf(i);
-      if (partition == m_partition) {
+      int partitionIndex = m_partitioning.partitionIndexOf(i);
+      if (partitionIndex == m_partitionIndex) {
+        // Only numbers and indexes relating to the target partition are stored
         m_spectrumNumbers.push_back(spectrumNumbers[i]);
         m_globalSpectrumIndices.push_back(i);
       }
@@ -68,7 +75,7 @@ public:
 
 private:
   Partitioning m_partitioning;
-  int m_partition;
+  int m_partitionIndex;
   std::vector<SpectrumNumber>
       m_spectrumNumbers; // Spectrum numbers of all local spectra
   std::vector<GlobalSpectrumIndex>

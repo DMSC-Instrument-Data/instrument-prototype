@@ -9,7 +9,39 @@ using namespace testing;
 
 namespace {
 
-TEST(IndexTranslatorTest, test_split_1_to_2) {
+TEST(partitioning_test, test_must_have_not_zero_partitions) {
+
+  EXPECT_THROW(Partitioning p(0), std::invalid_argument)
+      << "Cannot have a Partitioning with zero partiions";
+}
+
+TEST(partitioning_test, test_single_partition) {
+  Partitioning p(1 /*single partition only*/);
+  size_t globalSpectrumIndex = 0;
+  EXPECT_EQ(0, p.partitionIndexOf(globalSpectrumIndex))
+      << "Partition should always be zero";
+  globalSpectrumIndex = 2;
+  EXPECT_EQ(0, p.partitionIndexOf(globalSpectrumIndex))
+      << "Partition should always be zero";
+  ;
+  globalSpectrumIndex = 11;
+  EXPECT_EQ(0, p.partitionIndexOf(globalSpectrumIndex))
+      << "Partition should always be zero";
+  ;
+}
+
+TEST(index_translator_test, test_simple_index_translator_partitioning) {
+  Partitioning singlePartition(1 /*Two partitions*/);
+  std::vector<SpectrumNumber> spectrumNumbers = {1, 2, 3};
+  const size_t partitionIndex = 0;
+  IndexTranslator translator(singlePartition, partitionIndex, spectrumNumbers);
+
+  auto spectrumIndexes = translator.spectrumIndices(singlePartition);
+  EXPECT_EQ(spectrumIndexes.size(), 1);
+  EXPECT_EQ(spectrumIndexes[0], std::vector<size_t>({0, 1, 2}));
+}
+
+TEST(index_translator_test, test_split_1_to_2) {
   Partitioning p1(1);
   IndexTranslator t(p1, 0, {1, 2, 4, 5, 6});
   Partitioning p2(2);
@@ -30,15 +62,18 @@ TEST(IndexTranslatorTest, test_split_1_to_2) {
   EXPECT_EQ(spectrumNumbers[1], std::vector<SpectrumNumber>({2, 5}));
 }
 
-TEST(IndexTranslatorTest, test_split_2_to_3_partition_0) {
+TEST(index_translator_test, test_split_2_to_3_partition_0) {
   Partitioning p2(2);
   IndexTranslator t(p2, 0, {1, 2, 4, 5, 6});
   Partitioning p3(3);
 
+  // --- Indexing and resulting partitioning based on p2 ---
   // SpectrumNumber        1 2 4 5 6
   // GlobalSpectrumIndex   0 1 2 3 4
   // Partition (start)     0 1 0 1 0
   // SpectrumIndex (start) 0 0 1 1 2
+
+  // --- Indexing and resulting partitioning based on p3 ---
   // Partition (end)       0 1 2 0 1
   // SpectrumIndex (end)   0 0 0 1 1
 
@@ -61,7 +96,7 @@ TEST(IndexTranslatorTest, test_split_2_to_3_partition_0) {
   EXPECT_EQ(spectrumNumbers[2], std::vector<SpectrumNumber>({4}));
 }
 
-TEST(IndexTranslatorTest, test_split_2_to_3_partition_1) {
+TEST(index_translator_test, test_split_2_to_3_partition_1) {
   Partitioning p2(2);
   IndexTranslator t(p2, 1, {1, 2, 4, 5, 6});
   Partitioning p3(3);
@@ -85,7 +120,7 @@ TEST(IndexTranslatorTest, test_split_2_to_3_partition_1) {
   EXPECT_EQ(spectrumNumbers[2], std::vector<SpectrumNumber>({}));
 }
 
-TEST(IndexTranslatorTest, test_split_2_to_3_combine_results) {
+TEST(index_translator_test, test_split_2_to_3_combine_results) {
   // This tests mimics what would happen in an MPI redistribution
   Partitioning p2(2);
   std::vector<IndexTranslator> t;
