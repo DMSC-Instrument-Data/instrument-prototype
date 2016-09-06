@@ -31,7 +31,10 @@ public:
 
   void store(const DetectorComponent &source);
 
-  virtual void visit(DetectorComponent const *const component);
+  virtual bool visit(DetectorComponent const *const component) override;
+  virtual bool visit(ParabolicGuide const * const) override {/*Do nothing*/return false;}
+  virtual bool visit(PointSample const * const) override {/*Do nothing*/return false;}
+  virtual bool visit(PointSource const * const) override {/*Do nothing*/return false;}
 
 private:
   friend class boost::serialization::access;

@@ -27,7 +27,7 @@ public:
       std::vector<const PathComponent *> &pathLookup) const override;
   virtual ComponentIdType componentId() const override;
   virtual std::string name() const override;
-  virtual void accept(ComponentVisitor *visitor) const override{};
+  virtual bool accept(ComponentVisitor *visitor) const override;
 
   double length() const override;
   Eigen::Vector3d entryPoint() const override;
@@ -59,9 +59,7 @@ Eigen::Quaterniond PointPathComponent<T>::getRotation() const {
 
 template <typename T>
 void PointPathComponent<T>::shiftPositionBy(const Eigen::Vector3d &pos) {
-  m_pos[0] += pos[0];
-  m_pos[1] += pos[1];
-  m_pos[2] += pos[2];
+  m_pos += pos;
 }
 
 template <typename T>
@@ -136,5 +134,8 @@ template <typename T> Eigen::Vector3d PointPathComponent<T>::entryPoint() const 
 template <typename T> Eigen::Vector3d PointPathComponent<T>::exitPoint() const {
   return getPos(); // This is a point component
 }
+
+template <typename T>
+   bool PointPathComponent<T>::accept(ComponentVisitor *visitor) const {return false;}
 
 #endif

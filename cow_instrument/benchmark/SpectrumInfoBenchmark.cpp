@@ -30,6 +30,6 @@ BENCHMARK_F(SpectrumInfoFixture, BM_l2_access)(benchmark::State &state) {
     }
 
   }
-  state.SetItemsProcessed(state.iterations() * m_spectrumInfo.size());
+  state.SetItemsProcessed(state.iterations() * 1);
 }
 }

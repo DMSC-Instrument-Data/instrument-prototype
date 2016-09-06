@@ -58,8 +58,8 @@ std::string DetectorComponent::name() const {
   return ""; // Not implmented (yet) for detector component.
 }
 
-void DetectorComponent::accept(ComponentVisitor *visitor) const {
-  visitor->visit(this);
+bool DetectorComponent::accept(ComponentVisitor *visitor) const {
+  return visitor->visit(this);
 }
 
 DetectorComponent::~DetectorComponent() {}

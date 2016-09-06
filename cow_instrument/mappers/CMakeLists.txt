@@ -8,8 +8,8 @@ set ( SOURCE_FILES
 
 set ( INCLUDE_FILES
                    ComponentIdTypeMapper.h
-                   ComponentMapper.h
                    CompositeComponentMapper.h
+                   ComponentMapperFactory.h
                    DetectorComponentMapper.h
                    DetectorIdTypeMapper.h
                    IntToTypeMapper.h
@@ -17,6 +17,7 @@ set ( INCLUDE_FILES
                    PointPathComponentMapper.h
                    PointSourceMapper.h
                    PointSampleMapper.h
+                   PolymorphicSerializer.h
                    SingleItemMapper.h
                    V3DMapper.h
                    VectorOfMapper.h

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-
+#include "PolymorphicSerializer.h"
 #include <boost/serialization/serialization.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
@@ -46,10 +46,10 @@ private:
 
 class ItemVisitor {
 public:
-  typedef Item Family;
+  typedef Item ProductType;
   virtual bool visit(const Item1 *visitee) = 0;
   virtual bool visit(const Item2 *visitee) = 0;
-  virtual Family *create() const = 0;
+  virtual ProductType *create() const = 0;
   virtual ~ItemVisitor() {}
   template <class Archive>
   void serialize(Archive &ar, const unsigned int version) {}
@@ -93,7 +93,7 @@ public:
   virtual bool visit(const Item1 *visitee) { return false; }
   virtual ~Mapper2() {}
 
-  virtual Family *create() const { return new Item2(m_id); }
+  virtual ProductType *create() const { return new Item2(m_id); }
 
   template <class Archive>
   void serialize(Archive &ar, const unsigned int version) {
@@ -114,51 +114,24 @@ Item2::Item2(int value) : m_value(value) {}
 int Item1::getId() const { return m_value; }
 int Item2::getId() const { return m_value; }
 
-template <typename MapperFamily> class PolymorphicSerializer {
-private:
-  std::vector<std::shared_ptr<MapperFamily>> m_itemVisitors;
+class ItemMapperFactory {
 
 public:
-  typename MapperFamily::Family *m_thing;
 
-  PolymorphicSerializer(
-      std::initializer_list<std::shared_ptr<MapperFamily>> mappers)
-      : m_itemVisitors(mappers) {}
+    using MapperFamily = ItemVisitor;
 
-  PolymorphicSerializer()
-      : PolymorphicSerializer(
-            {std::make_shared<Mapper1>(), std::make_shared<Mapper2>()}) // HACK!
-  {}
+    static std::vector<std::shared_ptr<ItemVisitor>> createMappers()  {
 
-  void store(typename MapperFamily::Family *thing) { m_thing = thing; }
+    return std::vector<std::shared_ptr<ItemVisitor> >{
+            std::make_shared<Mapper1>(), std::make_shared<Mapper2>()};
+}
 
-  template <class Archive>
-  void save(Archive &ar, const unsigned int version) const {
-
-    for (auto &visitor : m_itemVisitors) {
-      if (m_thing->accept(visitor.get())) {
-        ar << visitor;
-      }
-    }
-  }
-
-  template <class Archive> void load(Archive &ar, const unsigned int version) {
-
-    std::shared_ptr<ItemVisitor> target;
-    ar >> target;
-
-    m_thing = target->create();
-  }
-
-  typename MapperFamily::Family *create() const { return m_thing; }
-
-  BOOST_SERIALIZATION_SPLIT_MEMBER()
 };
+
 
 TEST(component_visitor_test, test_serialization_1) {
 
-  PolymorphicSerializer<ItemVisitor> serializerA(
-      {std::make_shared<Mapper1>(), std::make_shared<Mapper2>()});
+  PolymorphicSerializer<ItemMapperFactory> serializerA;
 
   Item1 item(1);
   serializerA.store(&item);
@@ -170,7 +143,8 @@ TEST(component_visitor_test, test_serialization_1) {
 
   boost::archive::text_iarchive in(s);
 
-  PolymorphicSerializer<ItemVisitor> serializerB;
+
+  PolymorphicSerializer<ItemMapperFactory> serializerB;
 
   in >> serializerB;
 
@@ -181,8 +155,7 @@ TEST(component_visitor_test, test_serialization_1) {
 
 TEST(component_visitor_test, test_serialization_2) {
 
-  PolymorphicSerializer<ItemVisitor> serializerA(
-      {std::make_shared<Mapper1>(), std::make_shared<Mapper2>()});
+  PolymorphicSerializer<ItemMapperFactory> serializerA;;
 
   Item2 item(2);
   serializerA.store(&item);
@@ -194,7 +167,7 @@ TEST(component_visitor_test, test_serialization_2) {
 
   boost::archive::text_iarchive in(s);
 
-  PolymorphicSerializer<ItemVisitor> serializerB;
+  PolymorphicSerializer<ItemMapperFactory> serializerB;
 
   in >> serializerB;
 
@@ -203,31 +176,7 @@ TEST(component_visitor_test, test_serialization_2) {
   EXPECT_EQ(product->getId(), 2);
 }
 
-template <typename A, typename B>
-std::vector<PolymorphicSerializer<ItemVisitor>>
-make_vec_serializers_with_2_mappers(size_t size) {
-  std::vector<PolymorphicSerializer<ItemVisitor>> serializers;
-  for (size_t i = 0; i < size; ++i) {
-    serializers.emplace_back(
-        std::initializer_list<std::shared_ptr<ItemVisitor>>{
-            std::make_shared<A>(), std::make_shared<B>()});
-  }
-  return serializers;
-}
 
-template <typename A, typename B>
-std::vector<PolymorphicSerializer<ItemVisitor>>
-make_and_initialize_vec_serializers_with_2_mappers(
-    const std::vector<std::shared_ptr<Item>> &items) {
-  std::vector<PolymorphicSerializer<ItemVisitor>> serializers;
-  for (size_t i = 0; i < items.size(); ++i) {
-    serializers.emplace_back(
-        std::initializer_list<std::shared_ptr<ItemVisitor>>{
-            std::make_shared<A>(), std::make_shared<B>()});
-    serializers[i].store(items[i].get());
-  }
-  return serializers;
-}
 
 TEST(component_visitor_test, test_vector_items) {
 
@@ -235,8 +184,8 @@ TEST(component_visitor_test, test_vector_items) {
                                            std::make_shared<Item2>(2),
                                            std::make_shared<Item1>(3)};
 
-  std::vector<PolymorphicSerializer<ItemVisitor>> serializersIn =
-      make_and_initialize_vec_serializers_with_2_mappers<Mapper1, Mapper2>(
+  std::vector<PolymorphicSerializer<ItemMapperFactory>> serializersIn =
+      make_and_initialize_vec_serializers<ItemMapperFactory>(
           items);
 
   std::stringstream s;
@@ -246,8 +195,8 @@ TEST(component_visitor_test, test_vector_items) {
 
   std::cout << s.str() << std::endl;
 
-  std::vector<PolymorphicSerializer<ItemVisitor>> serializersOut =
-      make_vec_serializers_with_2_mappers<Mapper1, Mapper2>(items.size());
+  auto serializersOut =
+      make_vec_serializers<ItemMapperFactory>(items.size());
   boost::archive::text_iarchive in(s);
 
   in >> serializersOut;
@@ -265,3 +214,4 @@ TEST(component_visitor_test, test_vector_items) {
   EXPECT_EQ(itemB->getId(), 2);
   EXPECT_EQ(itemC->getId(), 3);
 }
+

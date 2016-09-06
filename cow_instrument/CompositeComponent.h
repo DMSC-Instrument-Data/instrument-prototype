@@ -28,7 +28,7 @@ public:
                         std::vector<const PathComponent *> &) const override;
   ComponentIdType componentId() const override;
   std::string name() const override;
-  virtual void accept(class ComponentVisitor *visitor) const override{};
+  virtual bool accept(class ComponentVisitor *visitor) const override{return false;}
 
 private:
   const ComponentIdType m_componentId;

@@ -1,17 +1,21 @@
 #ifndef COMPONENTVISITOR_H
 #define COMPONENTVISITOR_H
 
-#include "DetectorComponent.h"
-#include "ParabolicGuide.h"
-#include "PointSample.h"
-#include "PointSource.h"
+
+class Component;
+class DetectorComponent;
+class ParabolicGuide;
+class PointSample;
+class PointSource;
 
 class ComponentVisitor {
 public:
-  virtual void visit(DetectorComponent const *const component) = 0;
-  virtual void visit(ParabolicGuide const *const component) {}
-  virtual void visit(PointSample const *const component) {}
-  virtual void visit(PointSource const *const component) {}
+  using  ProductType = Component;
+  virtual bool visit(DetectorComponent const *const component) = 0;
+  virtual bool visit(ParabolicGuide const *const component) = 0;
+  virtual bool visit(PointSample const *const component) = 0;
+  virtual bool visit(PointSource const *const component) = 0;
+
   virtual ~ComponentVisitor() {}
 };
 
