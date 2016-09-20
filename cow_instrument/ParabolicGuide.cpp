@@ -123,8 +123,7 @@ Eigen::Vector3d ParabolicGuide::exitPoint() const {
   return entry;
 }
 
-bool ParabolicGuide::accept(ComponentVisitor *visitor) const
-{
+bool ParabolicGuide::accept(ComponentVisitor *visitor) const {
     return visitor->visit(this);
 }
 

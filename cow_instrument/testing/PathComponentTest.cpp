@@ -29,7 +29,7 @@ public:
                         std::vector<const PathComponent *> &) const {}
   ComponentIdType componentId() const { return ComponentIdType{1}; }
   std::string name() const { return ""; }
-  bool accept(ComponentVisitor *) const {return false;}
+  bool accept(ComponentVisitor *) const { return false; }
 };
 
 TEST(path_component_test, test_default_length) {

@@ -50,10 +50,11 @@ set ( TEST_FILES
 
 set ( TEST_FILES_MAPPERS
                 #CompositeComponentMapperTest.cpp
-                DetectorComponentMapperTest.cpp
+                #DetectorComponentMapperTest.cpp
                 IntToTypeMapperTest.cpp
                 ParabolicGuideMapperTest.cpp
                 PointPathComponentMapperTest.cpp
+                VectorOfComponentMapperTest.cpp
                 VectorOfMapperTest.cpp
                 V3DMapperTest.cpp
 )

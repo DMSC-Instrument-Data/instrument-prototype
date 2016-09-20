@@ -41,7 +41,7 @@ TEST(detector_component_mapper_test, test_load) {
   mapper.componentIdMapper = component.componentId();
   mapper.posMapper = component.getPos();
   auto loaded = mapper.create();
-  EXPECT_TRUE(loaded.equals(component));
+  EXPECT_TRUE(loaded->equals(component));
 }
 
 TEST(detector_component_mapper_test, test_save_load) {
@@ -62,6 +62,6 @@ TEST(detector_component_mapper_test, test_save_load) {
     DetectorComponentMapper mapperB;
     in >> mapperB;
 
-    EXPECT_TRUE(detector.equals(mapperB.create()));
+    EXPECT_TRUE(detector.equals(*mapperB.create()));
   }
 }

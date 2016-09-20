@@ -15,7 +15,8 @@
 
 template <typename MapperFactory> class PolymorphicSerializer {
 private:
-  std::vector<std::shared_ptr<typename MapperFactory::MapperFamily>> m_itemVisitors;
+  std::vector<std::shared_ptr<typename MapperFactory::MapperFamily>>
+      m_itemVisitors;
 
 public:
   using MapperFamily = typename MapperFactory::MapperFamily;
@@ -23,8 +24,7 @@ public:
 
   ProductType *m_thing;
 
-  PolymorphicSerializer()
-      : m_itemVisitors(MapperFactory::createMappers()) {}
+  PolymorphicSerializer() : m_itemVisitors(MapperFactory::createMappers()) {}
 
   void store(ProductType *thing) { m_thing = thing; }
 
@@ -59,8 +59,8 @@ make_vec_serializers(size_t size) {
 
 template <typename MapperFactory>
 std::vector<PolymorphicSerializer<MapperFactory>>
-make_and_initialize_vec_serializers(
-    const std::vector<std::shared_ptr<typename MapperFactory::MapperFamily::ProductType>> &items) {
+make_and_initialize_vec_serializers(const std::vector<std::shared_ptr<
+    typename MapperFactory::MapperFamily::ProductType>> &items) {
   std::vector<PolymorphicSerializer<MapperFactory>> serializers(items.size());
   for (size_t i = 0; i < items.size(); ++i) {
     serializers[i].store(items[i].get());

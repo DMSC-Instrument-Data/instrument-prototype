@@ -136,6 +136,8 @@ template <typename T> Eigen::Vector3d PointPathComponent<T>::exitPoint() const {
 }
 
 template <typename T>
-   bool PointPathComponent<T>::accept(ComponentVisitor *visitor) const {return false;}
+bool PointPathComponent<T>::accept(ComponentVisitor *visitor) const {
+  return false;
+}
 
 #endif
