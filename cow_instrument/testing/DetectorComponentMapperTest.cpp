@@ -1,9 +1,12 @@
 #include "gtest/gtest.h"
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/export.hpp>
 #include <sstream>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include "DetectorComponentMapper.h"
+
+BOOST_CLASS_EXPORT(DetectorComponentMapper);
 
 TEST(detector_component_mapper_test, cannot_load_without_detector_id) {
 

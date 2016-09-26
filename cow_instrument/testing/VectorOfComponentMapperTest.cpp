@@ -15,7 +15,8 @@
 #include <vector>
 #include <memory>
 
-BOOST_CLASS_EXPORT(DetectorComponentMapper);
+TEST(vector_of_component_mapper_test,
+     test_mapper_create_throws_without_vector) {}
 
 TEST(vector_of_component_mapper_test, test_vector_items) {
 

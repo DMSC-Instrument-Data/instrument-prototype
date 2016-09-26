@@ -30,9 +30,7 @@ asRawPointers(const std::vector<std::unique_ptr<Component>> &source) {
 
 class VectorOfComponentMapper : public VectorOfMapper<Component *> {
 public:
-  VectorOfComponentMapper() =
-      default; // VectorOfMapper<Component *>::VectorOfMapper;
-
+  VectorOfComponentMapper() = default;
   VectorOfComponentMapper(const std::vector<std::unique_ptr<Component>> &source)
       : VectorOfMapper<Component *>(asRawPointers(source)){
 
