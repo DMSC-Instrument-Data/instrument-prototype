@@ -1,8 +1,5 @@
 #include <gtest/gtest.h>
-#include "Component.h"
-#include "PolymorphicSerializer.h"
-
-#include "ComponentVisitor.h"
+#include "VectorOfComponentMapper.h"
 #include "ComponentMapperFactory.h"
 #include "DetectorComponent.h"
 
@@ -16,7 +13,12 @@
 #include <memory>
 
 TEST(vector_of_component_mapper_test,
-     test_mapper_create_throws_without_vector) {}
+     test_mapper_create_throws_without_vector) {
+
+  VectorOfComponentMapper mapper;
+  EXPECT_THROW(mapper.create(), std::invalid_argument)
+      << "No vector provided. Should throw.";
+}
 
 TEST(vector_of_component_mapper_test, test_vector_items) {
 
@@ -29,7 +31,7 @@ TEST(vector_of_component_mapper_test, test_vector_items) {
 
   std::vector<std::shared_ptr<Component>> inputs{a, b, c};
 
-  std::vector<PolymorphicSerializer<ComponentMapperFactory>> serializersIn =
+  VectorOfComponentMapper serializersIn =
       make_and_initialize_vec_serializers<ComponentMapperFactory>(inputs);
 
   std::stringstream s;
@@ -37,8 +39,8 @@ TEST(vector_of_component_mapper_test, test_vector_items) {
 
   out << serializersIn;
 
-  auto serializersOut =
-      make_vec_serializers<ComponentMapperFactory>(inputs.size());
+  auto serializersOut = VectorOfComponentMapper(
+      make_vec_serializers<ComponentMapperFactory>(inputs.size()));
   boost::archive::text_iarchive in(s);
 
   in >> serializersOut;

@@ -51,6 +51,7 @@ public:
   BOOST_SERIALIZATION_SPLIT_MEMBER()
 };
 
+namespace {
 template <typename MapperFactory>
 std::vector<PolymorphicSerializer<MapperFactory>>
 make_vec_serializers(size_t size) {
@@ -66,6 +67,7 @@ make_and_initialize_vec_serializers(const std::vector<std::shared_ptr<
     serializers[i].store(items[i].get());
   }
   return serializers;
+}
 }
 
 #endif

@@ -18,9 +18,25 @@ TEST(vector_of_mapper_test, test_mapper_create_throws_without_vector) {
       << "No vector provided. VectorOfMapper should throw.";
 }
 
+TEST(vector_of_mapper_test, test_size_without_vector) {
+  VectorOfIntsMapper mapper;
+  EXPECT_THROW(mapper.size(), std::invalid_argument)
+      << "No vector provided. VectorOfMapper should throw.";
+}
+
+TEST(vector_of_mapper_test, test_subscript_without_vector) {
+  VectorOfIntsMapper mapper;
+  EXPECT_THROW(mapper[0], std::invalid_argument)
+      << "No vector provided. VectorOfMapper should throw.";
+}
+
 TEST(vector_of_mapper_test, test_non_default_constructor) {
   auto input = std::vector<int>{1, 2, 3};
   VectorOfIntsMapper mapper(input);
+
+  EXPECT_EQ(mapper.size(), 3);
+  EXPECT_EQ(mapper[0], 1);
+
   auto product = mapper.create();
   EXPECT_EQ(input, product);
 }

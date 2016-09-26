@@ -20,8 +20,10 @@ public:
 
   bool initalized() const { return heldValue.is_initialized(); }
 
+  bool isInitialized() const { return heldValue.is_initialized(); }
+
   Mapee create() const {
-    if (heldValue.is_initialized()) {
+    if (isInitialized()) {
       return heldValue.get();
     } else {
       throw std::invalid_argument("SingleItemMapper::create failed. Mapper not "
