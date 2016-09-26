@@ -189,7 +189,6 @@ TEST(component_visitor_test, test_vector_items) {
 
   out << serializersIn;
 
-  std::cout << s.str() << std::endl;
 
   auto serializersOut = make_vec_serializers<ItemMapperFactory>(items.size());
   boost::archive::text_iarchive in(s);

@@ -15,7 +15,7 @@ public:
   CompositeComponentMapper() = default;
 
   ComponentIdTypeMapper componentIdMapper;
-  VectorOfComponentMapper posMapper;
+  VectorOfComponentMapper itemMapper;
   SingleItemMapper<std::string> nameMapper;
 
   CompositeComponent create();
@@ -28,7 +28,8 @@ private:
   void serialize(Archive &ar, const unsigned int version) {
     using namespace boost::serialization;
     boost::serialization::serialize(ar, componentIdMapper, version);
-    // boost::serialization::serialize(ar, posMapper, version);
+    boost::serialization::serialize(ar, itemMapper, version);
+    boost::serialization::serialize(ar, nameMapper, version);
   }
 };
 

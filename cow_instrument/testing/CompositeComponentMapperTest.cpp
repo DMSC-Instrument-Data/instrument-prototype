@@ -1,52 +1,47 @@
 #include <gtest/gtest.h>
-
 #include <boost/serialization/serialization.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <sstream>
-#include <vector>
-
 #include "CompositeComponentMapper.h"
-#include "MockTypes.h"
 
-TEST(vector_component_mapper_test, test_mapper_create_throws_without_vector) {
+TEST(composite_component_mapper_test,
+     test_mapper_create_throws_without_composite) {
 
-  VectorOfComponentMapper mapper;
+  CompositeComponentMapper mapper;
   EXPECT_THROW(mapper.create(), std::invalid_argument)
       << "No vector provided. Mapper should throw.";
 }
 
-TEST(vector_component_mapper_test, test_non_default_constructor) {
-  auto input = std::vector<std::unique_ptr<Component>>{};
-  input.push_back(std::unique_ptr<Component>(new MockComponent{}));
+TEST(composite_component_mapper_test, test_non_default_constructor) {
 
-  VectorOfComponentMapper mapper(input);
-  std::vector<Component *> product = mapper.create();
-  // EXPECT_EQ(input, product);
+  CompositeComponent original(ComponentIdType(1), "Some component");
+  CompositeComponentMapper mapper(original);
 }
 
-TEST(vector_component_mapper_test, test_load_save) {
+TEST(composite_component_mapper_test, test_load_save) {
 
-  auto values = std::vector<std::unique_ptr<Component>>{};
-  values.push_back(std::unique_ptr<Component>(new MockComponent{}));
-  // values.push_back(std::unique_ptr<Component>(new MockComponent{}));
+  CompositeComponent original(ComponentIdType(1), "Some component");
+  original.addComponent(
+      std::unique_ptr<DetectorComponent>(new DetectorComponent(
+          ComponentIdType(1), DetectorIdType(2), Eigen::Vector3d{0, 0, 0})));
+  original.addComponent(
+      std::unique_ptr<DetectorComponent>(new DetectorComponent(
+          ComponentIdType(2), DetectorIdType(3), Eigen::Vector3d{1, 1, 1})));
 
-  std::stringstream ss;
-  boost::archive::text_oarchive out(ss);
+  CompositeComponentMapper serializerIn(original);
 
-  {
-    VectorOfComponentMapper mapperA;
-    mapperA.store(values);
-    out << mapperA;
-  }
+  std::stringstream s;
+  boost::archive::text_oarchive out(s);
 
-  {
-    boost::archive::text_iarchive in(ss);
-    VectorOfComponentMapper mapperB;
-    in >> mapperB;
+  out << serializerIn;
 
-    auto product = mapperB.create();
-    EXPECT_EQ(3, product.size());
-    EXPECT_TRUE(values[0]->equals(*product[0]));
-  }
+  boost::archive::text_iarchive in(s);
+
+  CompositeComponentMapper serializerOut;
+  in >> serializerOut;
+
+  CompositeComponent created = serializerOut.create();
+
+  EXPECT_TRUE(created.equals(original));
 }

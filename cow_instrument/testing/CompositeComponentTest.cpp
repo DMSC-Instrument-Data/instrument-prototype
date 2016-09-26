@@ -17,6 +17,14 @@ TEST(composite_component_test, test_provide_name) {
   EXPECT_EQ(composite.name(), name);
 }
 
+TEST(composite_component_test, test_one_level_deep_only) {
+  CompositeComponent level1{ComponentIdType(1), "level1"};
+  EXPECT_THROW(level1.addComponent(std::unique_ptr<Component>(
+                   new CompositeComponent{ComponentIdType(2), "level2"})),
+               std::invalid_argument)
+      << "Cannot have multiple levels of composite";
+}
+
 TEST(composite_component_test, test_clone){
     CompositeComponent composite{ComponentIdType(1)};
 

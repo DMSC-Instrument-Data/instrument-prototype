@@ -13,6 +13,8 @@ public:
   CompositeComponent(ComponentIdType componentId,
                      std::string name = std::string(""));
   ~CompositeComponent() = default;
+  CompositeComponent(const CompositeComponent &other);
+  CompositeComponent &operator=(const CompositeComponent &other);
   virtual Eigen::Vector3d getPos() const override;
   virtual Eigen::Quaterniond getRotation() const override;
   void shiftPositionBy(const Eigen::Vector3d &pos) override;
@@ -31,10 +33,11 @@ public:
   virtual bool accept(class ComponentVisitor *visitor) const override {
     return false;
   }
+  std::vector<std::shared_ptr<Component>> children() const;
 
 private:
-  const ComponentIdType m_componentId;
-  std::vector<std::unique_ptr<Component>> m_children;
+  ComponentIdType m_componentId;
+  std::vector<std::shared_ptr<Component>> m_children;
   std::string m_name;
 };
 
