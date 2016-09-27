@@ -7,8 +7,8 @@ language: cpp
 compiler: gcc
 
 before_install:
-    - sudo add-apt-repository ppa:boost-latest/ppa -y
     - sudo apt-get -qq update
+    - sudo add-apt-repository ppa:boost-latest/ppa -y
     - sudo apt-get install -y libboost1.55-dev
     - sudo apt-get install -y mpi-default-dev
     - sudo apt-get install -y libboost-mpi1.55-dev
