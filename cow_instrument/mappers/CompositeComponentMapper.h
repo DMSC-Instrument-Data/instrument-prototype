@@ -4,11 +4,12 @@
 #include <boost/serialization/serialization.hpp>
 #include "CompositeComponent.h"
 #include "ComponentIdTypeMapper.h"
+#include "ComponentVisitor.h"
 #include "SingleItemMapper.h"
 #include "VectorOfComponentMapper.h"
 #include <string>
 
-class CompositeComponentMapper {
+class CompositeComponentMapper : public ComponentVisitor {
 
 public:
   CompositeComponentMapper(const CompositeComponent &source);
@@ -18,19 +19,29 @@ public:
   VectorOfComponentMapper itemMapper;
   SingleItemMapper<std::string> nameMapper;
 
-  CompositeComponent create();
+  CompositeComponent *create();
 
   void store(const CompositeComponent &source);
+
+  virtual bool visit(DetectorComponent const *const) override;
+  virtual bool visit(ParabolicGuide const *const) override;
+  virtual bool visit(PointSample const *const) override;
+  virtual bool visit(PointSource const *const) override;
+  virtual bool visit(CompositeComponent const *const component) override;
 
 private:
   friend class boost::serialization::access;
   template <class Archive>
   void serialize(Archive &ar, const unsigned int version) {
+
     using namespace boost::serialization;
+    ar &BOOST_SERIALIZATION_BASE_OBJECT_NVP(ComponentVisitor);
     boost::serialization::serialize(ar, componentIdMapper, version);
     boost::serialization::serialize(ar, itemMapper, version);
     boost::serialization::serialize(ar, nameMapper, version);
   }
 };
+
+BOOST_CLASS_EXPORT_KEY(CompositeComponentMapper);
 
 #endif

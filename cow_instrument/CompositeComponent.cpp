@@ -1,4 +1,5 @@
 #include "CompositeComponent.h"
+#include "ComponentVisitor.h"
 #include "Detector.h"
 
 CompositeComponent::CompositeComponent(ComponentIdType componentId,
@@ -121,6 +122,10 @@ ComponentIdType CompositeComponent::componentId() const {
 }
 
 std::string CompositeComponent::name() const { return m_name; }
+
+bool CompositeComponent::accept(ComponentVisitor *visitor) const {
+  return visitor->visit(this);
+}
 
 Eigen::Quaterniond CompositeComponent::getRotation() const {
   throw std::runtime_error("Not implemented");

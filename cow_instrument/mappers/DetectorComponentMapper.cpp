@@ -1,5 +1,10 @@
 #include "DetectorComponentMapper.h"
 #include <stdexcept>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/serialization/export.hpp>
+
+BOOST_CLASS_EXPORT_IMPLEMENT(DetectorComponentMapper);
 
 DetectorComponentMapper::DetectorComponentMapper(
     const DetectorComponent &source) {
@@ -31,4 +36,16 @@ void DetectorComponentMapper::store(const DetectorComponent &source) {
 bool DetectorComponentMapper::visit(DetectorComponent const *const component) {
   store(*component);
   return true;
+}
+
+bool DetectorComponentMapper::visit(const ParabolicGuide *const) {
+  return false;
+}
+
+bool DetectorComponentMapper::visit(const PointSample *const) { return false; }
+
+bool DetectorComponentMapper::visit(const PointSource *const) { return false; }
+
+bool DetectorComponentMapper::visit(const CompositeComponent *const) {
+  return false;
 }

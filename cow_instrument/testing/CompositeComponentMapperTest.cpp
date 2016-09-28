@@ -1,5 +1,7 @@
 #include <gtest/gtest.h>
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/type_info_implementation.hpp>
+#include <boost/serialization/shared_ptr.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <sstream>
@@ -41,7 +43,33 @@ TEST(composite_component_mapper_test, test_load_save) {
   CompositeComponentMapper serializerOut;
   in >> serializerOut;
 
-  CompositeComponent created = serializerOut.create();
+  CompositeComponent *created = serializerOut.create();
 
-  EXPECT_TRUE(created.equals(original));
+  EXPECT_TRUE(created->equals(original));
+  delete created;
+}
+
+TEST(composite_component_mapper_test, experiment) {
+
+  CompositeComponent original(ComponentIdType(1), "Some component");
+  original.addComponent(
+      std::unique_ptr<DetectorComponent>(new DetectorComponent(
+          ComponentIdType(1), DetectorIdType(2), Eigen::Vector3d{0, 0, 0})));
+
+  auto serializerIn = std::make_shared<CompositeComponentMapper>(original);
+
+  std::stringstream s;
+  boost::archive::text_oarchive out(s);
+
+  out << serializerIn;
+
+  boost::archive::text_iarchive in(s);
+
+  auto serializerOut = std::make_shared<CompositeComponentMapper>();
+  in >> serializerOut;
+
+  CompositeComponent *created = serializerOut->create();
+
+  EXPECT_TRUE(created->equals(original));
+  delete created;
 }

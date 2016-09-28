@@ -2,6 +2,7 @@
 #define _DETECTORCOMPONENTMAPPER_H
 
 #include <boost/serialization/serialization.hpp>
+#include <boost/serialization/export.hpp>
 #include "DetectorComponent.h"
 #include "ComponentIdTypeMapper.h"
 #include "DetectorIdTypeMapper.h"
@@ -30,16 +31,10 @@ public:
   void store(const DetectorComponent &source);
 
   virtual bool visit(DetectorComponent const *const component) override;
-  virtual bool visit(ParabolicGuide const *const) override { /*Do nothing*/
-    return false;
-  }
-  virtual bool visit(PointSample const *const) override { /*Do nothing*/
-    return false;
-  }
-  virtual bool visit(PointSource const *const) override { /*Do nothing*/
-    return false;
-  }
-
+  virtual bool visit(ParabolicGuide const *const) override;
+  virtual bool visit(PointSample const *const) override;
+  virtual bool visit(PointSource const *const) override;
+  virtual bool visit(CompositeComponent const *const) override;
   virtual DetectorComponent *create() override;
 
 private:
@@ -53,5 +48,7 @@ private:
     boost::serialization::serialize(ar, posMapper, version);
   }
 };
+
+BOOST_CLASS_EXPORT_KEY(DetectorComponentMapper);
 
 #endif

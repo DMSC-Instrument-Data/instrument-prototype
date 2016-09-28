@@ -9,6 +9,7 @@ set ( SOURCE_FILES
 set ( INCLUDE_FILES
                    ComponentIdTypeMapper.h
                    CompositeComponentMapper.h
+                   ComponentMapper.h
                    ComponentMapperFactory.h
                    DetectorComponentMapper.h
                    DetectorIdTypeMapper.h

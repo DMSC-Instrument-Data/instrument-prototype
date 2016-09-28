@@ -3,6 +3,7 @@
 
 #include "ComponentVisitor.h"
 #include "DetectorComponentMapper.h"
+
 #include <vector>
 #include <memory>
 
