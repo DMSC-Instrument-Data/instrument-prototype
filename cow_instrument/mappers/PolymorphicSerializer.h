@@ -13,6 +13,20 @@
 #include <memory>
 #include <cow_ptr.h>
 
+namespace boost {
+namespace serialization {
+#ifdef CUSTOM_STD_ARRAY_SERIALIZATION
+template <class Archive, class T>
+void serialize(Archive &ar, std::shared_ptr<T> &t,
+               const unsigned int /*file_version*/
+               ) {
+  const T *t_ptr = t.get();
+  ar &boost::serialization::make_nvp("px", t_ptr);
+}
+#endif
+}
+}
+
 template <typename MapperFactory> class PolymorphicSerializer {
 private:
   std::vector<std::shared_ptr<typename MapperFactory::MapperFamily>>

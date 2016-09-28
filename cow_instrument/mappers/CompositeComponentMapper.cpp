@@ -55,3 +55,21 @@ CompositeComponentMapper::visit(const CompositeComponent *const component) {
   store(*component);
   return true;
 }
+
+template <class Archive>
+void CompositeComponentMapper::serialize(Archive &ar,
+                                         const unsigned int version) {
+
+  using namespace boost::serialization;
+  ar &BOOST_SERIALIZATION_BASE_OBJECT_NVP(ComponentVisitor);
+  boost::serialization::serialize(ar, componentIdMapper, version);
+  boost::serialization::serialize(ar, itemMapper, version);
+  boost::serialization::serialize(ar, nameMapper, version);
+}
+
+template void
+CompositeComponentMapper::serialize(boost::archive::text_oarchive &ar,
+                                    const unsigned int version);
+template void
+CompositeComponentMapper::serialize(boost::archive::text_iarchive &ar,
+                                    const unsigned int version);

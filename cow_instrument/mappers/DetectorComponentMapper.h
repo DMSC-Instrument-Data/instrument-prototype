@@ -40,13 +40,7 @@ public:
 private:
   friend class boost::serialization::access;
   template <class Archive>
-  void serialize(Archive &ar, const unsigned int version) {
-    using namespace boost::serialization;
-    ar &BOOST_SERIALIZATION_BASE_OBJECT_NVP(ComponentVisitor);
-    boost::serialization::serialize(ar, componentIdMapper, version);
-    boost::serialization::serialize(ar, detectorIdMapper, version);
-    boost::serialization::serialize(ar, posMapper, version);
-  }
+  void serialize(Archive &ar, const unsigned int version);
 };
 
 BOOST_CLASS_EXPORT_KEY(DetectorComponentMapper);

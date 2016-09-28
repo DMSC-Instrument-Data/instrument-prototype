@@ -49,3 +49,20 @@ bool DetectorComponentMapper::visit(const PointSource *const) { return false; }
 bool DetectorComponentMapper::visit(const CompositeComponent *const) {
   return false;
 }
+
+template <class Archive>
+void DetectorComponentMapper::serialize(Archive &ar,
+                                        const unsigned int version) {
+  using namespace boost::serialization;
+  ar &BOOST_SERIALIZATION_BASE_OBJECT_NVP(ComponentVisitor);
+  boost::serialization::serialize(ar, componentIdMapper, version);
+  boost::serialization::serialize(ar, detectorIdMapper, version);
+  boost::serialization::serialize(ar, posMapper, version);
+}
+
+template void
+DetectorComponentMapper::serialize(boost::archive::text_oarchive &ar,
+                                   const unsigned int version);
+template void
+DetectorComponentMapper::serialize(boost::archive::text_iarchive &ar,
+                                   const unsigned int version);
