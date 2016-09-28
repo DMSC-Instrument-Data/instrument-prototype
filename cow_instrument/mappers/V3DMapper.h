@@ -9,7 +9,7 @@
 
 namespace boost {
 namespace serialization {
-#ifdef CUSTOM_STD_ARRAY_SERIALIZATION
+#ifdef LEGACY_BOOST_SERIALIZATION
 template <class Archive, class T, size_t N>
 void serialize(Archive &ar, std::array<T, N> &a, const unsigned int) {
   ar &boost::serialization::make_array(a.data(), a.size());

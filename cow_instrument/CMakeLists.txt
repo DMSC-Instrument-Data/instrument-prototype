@@ -5,8 +5,8 @@ find_package(Eigen3 3.1.2 REQUIRED)
 
 
 if(${Boost_VERSION} LESS 105700)
-    message(STATUS "Add serialization std::array overload. Boost version ${Boost_VERSION}")
-    add_definitions(-DCUSTOM_STD_ARRAY_SERIALIZATION)
+    message(STATUS "Add serialization overloads. Boost version ${Boost_VERSION}")
+    add_definitions(-DLEGACY_BOOST_SERIALIZATION)
 endif()
 
 find_package(MPI REQUIRED)

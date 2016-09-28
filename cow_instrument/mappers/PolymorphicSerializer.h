@@ -15,7 +15,7 @@
 
 namespace boost {
 namespace serialization {
-#ifdef CUSTOM_STD_ARRAY_SERIALIZATION
+#ifdef LEGACY_BOOST_SERIALIZATION
 template<class Archive, class T>
 inline void save(
     Archive & ar,
