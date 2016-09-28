@@ -52,6 +52,7 @@ set ( TEST_FILES_MAPPERS
                 ComponentMapperTest.cpp
                 DetectorComponentMapperTest.cpp
                 IntToTypeMapperTest.cpp
+                NodeMapperTest.cpp
                 ParabolicGuideMapperTest.cpp
                 PointPathComponentMapperTest.cpp
                 VectorOfComponentMapperTest.cpp

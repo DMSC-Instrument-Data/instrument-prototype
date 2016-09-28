@@ -98,12 +98,14 @@ public:
   }
 
   ProductType *create() const {
-    if (m_thing) {
+    if (initialized()) {
       return m_thing;
     } else {
       throw std::invalid_argument("PolymorphicSerializer item never set");
     }
   }
+
+  bool initialized() const { return m_thing != nullptr; }
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
 };

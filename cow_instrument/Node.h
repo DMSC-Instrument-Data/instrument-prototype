@@ -26,6 +26,9 @@ public:
   Node(size_t previous, CowPtr<Component> contents,
        std::string name = "", unsigned int version = 0);
 
+  Node(size_t previous, CowPtr<Component> contents, std::string name,
+       unsigned int version, std::vector<size_t> &&children);
+
   Node(CowPtr<Component> contents, std::string name = "",
        unsigned int version = 0);
 
@@ -55,6 +58,9 @@ public:
   std::string name() const;
 
   friend class InstrumentTree;
+
+  // TODO. Had to add this for serialization. We could do better.
+  CowPtr<Component>::RefPtr unsafeContents() const;
 
 private:
   bool modify(const Command &command);

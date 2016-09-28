@@ -1,6 +1,7 @@
 set ( SOURCE_FILES
                    CompositeComponentMapper.cpp
                    DetectorComponentMapper.cpp
+                   NodeMapper.cpp
                    ParabolicGuideMapper.cpp
                    V3DMapper.cpp
 )
@@ -14,6 +15,7 @@ set ( INCLUDE_FILES
                    DetectorComponentMapper.h
                    DetectorIdTypeMapper.h
                    IntToTypeMapper.h
+                   NodeMapper.h
                    ParabolicGuideMapper.h
                    PointPathComponentMapper.h
                    PointSourceMapper.h

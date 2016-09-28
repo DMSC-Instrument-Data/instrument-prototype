@@ -93,7 +93,7 @@ bool CompositeComponent::equals(const Component &other) const {
 }
 
 void CompositeComponent::addComponent(std::unique_ptr<Component> &&child) {
-  if (dynamic_cast<CompositeComponent *>(child.get())) {
+  if (dynamic_cast<const CompositeComponent *>(child.get())) {
     throw std::invalid_argument(
         "Cannot add a composite component to a composite component");
   }
