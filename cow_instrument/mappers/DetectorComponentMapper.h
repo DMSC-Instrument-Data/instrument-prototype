@@ -35,6 +35,7 @@ public:
   virtual bool visit(PointSample const *const) override;
   virtual bool visit(PointSource const *const) override;
   virtual bool visit(CompositeComponent const *const) override;
+  virtual bool visit(NullComponent const * const component) override;
   virtual DetectorComponent *create() override;
 
 private:

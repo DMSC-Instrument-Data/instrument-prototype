@@ -2,6 +2,7 @@
 #include "ComponentMapper.h"
 #include "CompositeComponent.h"
 #include "DetectorComponent.h"
+#include "NullComponent.h"
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/serialization/vector.hpp>
@@ -42,6 +43,29 @@ TEST(component_mapper_test, test_serialize_deserialize_composite_component) {
   original.addComponent(
       std::unique_ptr<DetectorComponent>(new DetectorComponent(
           ComponentIdType(1), DetectorIdType(2), Eigen::Vector3d{0, 0, 0})));
+
+  ComponentMapper toWrite;
+  toWrite.store(&original);
+
+  std::stringstream s;
+  boost::archive::text_oarchive out(s);
+
+  out << toWrite;
+
+  boost::archive::text_iarchive in(s);
+  ComponentMapper toRead;
+
+  in >> toRead;
+  Component *componentOut = toRead.create();
+
+  EXPECT_TRUE(componentOut->equals(original));
+
+  delete componentOut;
+}
+
+TEST(component_mapper_test, test_serialize_deserialize_null_component) {
+
+  NullComponent original;
 
   ComponentMapper toWrite;
   toWrite.store(&original);

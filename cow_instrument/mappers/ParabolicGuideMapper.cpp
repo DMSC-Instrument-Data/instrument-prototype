@@ -15,8 +15,8 @@ ParabolicGuideMapper::ParabolicGuideMapper(const ParabolicGuide &source) {
 ParabolicGuide ParabolicGuideMapper::create() {
 
   // Check that everything required has been specified. Do not partially create.
-  if (componentIdMapper.initalized() && aMapper.initalized() &&
-      hMapper.initalized() && posMapper.initalized()) {
+  if (componentIdMapper.initalized() && aMapper.initialized() &&
+      hMapper.initialized() && posMapper.initialized()) {
     // Make the item we want.
 
     return ParabolicGuide(componentIdMapper.create(), aMapper.create(),

@@ -5,6 +5,7 @@
 #include "ComponentVisitor.h"
 #include "CompositeComponentMapper.h"
 #include "DetectorComponentMapper.h"
+#include "NullComponentMapper.h"
 
 #include <vector>
 #include <memory>
@@ -19,6 +20,7 @@ public:
     auto mappers = std::vector<std::shared_ptr<ComponentVisitor>>();
     mappers.emplace_back(std::make_shared<DetectorComponentMapper>());
     mappers.emplace_back(std::make_shared<CompositeComponentMapper>());
+    mappers.emplace_back(std::make_shared<NullComponentMapper>());
     return mappers;
   }
 };

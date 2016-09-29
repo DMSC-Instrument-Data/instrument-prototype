@@ -3,6 +3,7 @@ set ( SOURCE_FILES
                    DetectorComponentMapper.cpp
                    InstrumentTreeMapper.cpp
                    NodeMapper.cpp
+                   NullComponentMapper.cpp
                    ParabolicGuideMapper.cpp
                    V3DMapper.cpp
 )
@@ -19,6 +20,7 @@ set ( INCLUDE_FILES
                    InstrumentTreeMapper.h
                    IntToTypeMapper.h
                    NodeMapper.h
+                   NullComponentMapper.h
                    ParabolicGuideMapper.h
                    PointPathComponentMapper.h
                    PointSourceMapper.h

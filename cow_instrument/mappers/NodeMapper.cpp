@@ -23,9 +23,9 @@ NodeMapper::NodeMapper(const Node &source)
 }
 
 Node NodeMapper::create() {
-  if (previousMapper.initalized() && contentsMapper->initialized() &&
-      nameMapper.initalized() && nextIndexMapper.initalized() &&
-      versionMapper.initalized()) {
+  if (previousMapper.initialized() && contentsMapper->initialized() &&
+      nameMapper.initialized() && nextIndexMapper.initialized() &&
+      versionMapper.initialized()) {
     return Node(previousMapper.create(), contentsMapper->create(),
                 nameMapper.create(), versionMapper.create(),
                 nextIndexMapper.create());

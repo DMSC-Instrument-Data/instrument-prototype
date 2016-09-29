@@ -15,7 +15,7 @@ DetectorComponent *DetectorComponentMapper::create() {
 
   // Check that everything required has been specified.
   if (componentIdMapper.initalized() && detectorIdMapper.initalized() &&
-      posMapper.initalized()) {
+      posMapper.initialized()) {
     // Make the item we want.
 
     return new DetectorComponent(componentIdMapper.create(),
@@ -47,7 +47,12 @@ bool DetectorComponentMapper::visit(const PointSample *const) { return false; }
 bool DetectorComponentMapper::visit(const PointSource *const) { return false; }
 
 bool DetectorComponentMapper::visit(const CompositeComponent *const) {
-  return false;
+    return false;
+}
+
+bool DetectorComponentMapper::visit(const NullComponent *)
+{return false;
+
 }
 
 template <class Archive>

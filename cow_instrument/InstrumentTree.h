@@ -63,6 +63,11 @@ public:
     return m_nodes.const_ref().cend();
   }
 
+  // TODO. Had to add this for serialization. We could do better.
+  CowPtr<std::vector<Node>>::RefPtr unsafeContents() const;
+
+  size_t nodeSize() const;
+
 private:
   void init();
 

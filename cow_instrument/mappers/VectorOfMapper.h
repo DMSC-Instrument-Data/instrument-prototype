@@ -32,6 +32,7 @@ public:
       throw std::invalid_argument("VectorOf::operator[] failed. Nothing held.");
     }
   }
+
 };
 
 #endif

@@ -16,7 +16,7 @@ public:
   PointPathComponentMapper() = default;
 
   Mapee create() {
-    if (componentIdMapper.initalized() && posMapper.initalized()) {
+    if (componentIdMapper.initalized() && posMapper.initialized()) {
       return Mapee(posMapper.create(), componentIdMapper.create());
     } else {
       throw std::invalid_argument("Cannot be deserialized. Not all mandatory "

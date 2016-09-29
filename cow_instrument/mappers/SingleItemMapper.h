@@ -18,9 +18,9 @@ public:
 
   virtual ~SingleItemMapper() {}
 
-  bool initalized() const { return heldValue.is_initialized(); }
+  bool initialized() const { return heldValue.is_initialized(); }
 
-  bool isInitialized() const { return heldValue.is_initialized(); }
+  bool isInitialized() const { return initialized(); }
 
   Mapee create() const {
     if (isInitialized()) {

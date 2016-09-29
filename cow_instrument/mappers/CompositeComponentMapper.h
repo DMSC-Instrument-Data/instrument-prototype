@@ -28,6 +28,7 @@ public:
   virtual bool visit(PointSample const *const) override;
   virtual bool visit(PointSource const *const) override;
   virtual bool visit(CompositeComponent const *const component) override;
+  virtual bool visit(NullComponent const * const component) override;
 
 private:
   friend class boost::serialization::access;

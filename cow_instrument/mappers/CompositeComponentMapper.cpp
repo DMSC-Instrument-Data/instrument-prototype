@@ -12,8 +12,8 @@ CompositeComponentMapper::CompositeComponentMapper(
 
 CompositeComponent *CompositeComponentMapper::create() {
   // Check that everything required has been specified.
-  if (componentIdMapper.initalized() && itemMapper.initalized() &&
-      nameMapper.initalized()) {
+  if (componentIdMapper.initalized() && itemMapper.initialized() &&
+      nameMapper.initialized()) {
 
     auto component =
         new CompositeComponent(componentIdMapper.create(), nameMapper.create());
@@ -54,6 +54,11 @@ bool
 CompositeComponentMapper::visit(const CompositeComponent *const component) {
   store(*component);
   return true;
+}
+
+bool CompositeComponentMapper::visit(const NullComponent * const component)
+{
+    return false;
 }
 
 template <class Archive>

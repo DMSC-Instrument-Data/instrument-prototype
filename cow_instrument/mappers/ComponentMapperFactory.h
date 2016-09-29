@@ -3,6 +3,7 @@
 
 #include "ComponentVisitor.h"
 #include "DetectorComponentMapper.h"
+#include "NullComponentMapper.h"
 
 #include <vector>
 #include <memory>
@@ -15,7 +16,9 @@ public:
   static std::vector<std::shared_ptr<ComponentVisitor>> createMappers() {
 
     return std::vector<std::shared_ptr<ComponentVisitor>>{
-        std::make_shared<DetectorComponentMapper>()};
+        std::make_shared<DetectorComponentMapper>(),
+        std::make_shared<NullComponentMapper>()
+  };
   }
 };
 
