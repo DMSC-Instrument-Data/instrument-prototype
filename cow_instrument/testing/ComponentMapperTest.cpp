@@ -2,10 +2,8 @@
 #include "ComponentMapper.h"
 #include "CompositeComponent.h"
 #include "DetectorComponent.h"
-
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
-#include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/vector.hpp>
 
 TEST(component_mapper_test, test_cannot_create_from_empty) {

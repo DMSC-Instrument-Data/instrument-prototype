@@ -1,8 +1,8 @@
 #include "NodeMapper.h"
 #include <boost/serialization/serialization.hpp>
-#include <boost/serialization/shared_ptr.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
+#include "SharedPtrSerialization.h"
 
 template <class Archive>
 void NodeMapper::serialize(Archive &ar, const unsigned int version) {

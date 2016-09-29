@@ -1,6 +1,7 @@
 set ( SOURCE_FILES
                    CompositeComponentMapper.cpp
                    DetectorComponentMapper.cpp
+                   InstrumentTreeMapper.cpp
                    NodeMapper.cpp
                    ParabolicGuideMapper.cpp
                    V3DMapper.cpp
@@ -8,12 +9,14 @@ set ( SOURCE_FILES
 
 
 set ( INCLUDE_FILES
+                   ArraySerialization.h
                    ComponentIdTypeMapper.h
                    CompositeComponentMapper.h
                    ComponentMapper.h
                    ComponentMapperFactory.h
                    DetectorComponentMapper.h
                    DetectorIdTypeMapper.h
+                   InstrumentTreeMapper.h
                    IntToTypeMapper.h
                    NodeMapper.h
                    ParabolicGuideMapper.h
@@ -21,6 +24,7 @@ set ( INCLUDE_FILES
                    PointSourceMapper.h
                    PointSampleMapper.h
                    PolymorphicSerializer.h
+                   SharedPtrSerialization.h
                    SingleItemMapper.h
                    V3DMapper.h
                    VectorOfMapper.h

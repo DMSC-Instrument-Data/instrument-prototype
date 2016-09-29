@@ -1,7 +1,4 @@
 #include <gtest/gtest.h>
-#include <boost/serialization/serialization.hpp>
-#include <boost/serialization/type_info_implementation.hpp>
-#include <boost/serialization/shared_ptr.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <sstream>

@@ -5,13 +5,13 @@
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/serialization/export.hpp>
-#include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/vector.hpp>
 #include <sstream>
 #include <vector>
 #include <initializer_list>
 #include <memory>
-#include <cow_ptr.h>
+#include "cow_ptr.h"
+#include "SharedPtrSerialization.h"
 
 namespace boost {
 namespace serialization {
