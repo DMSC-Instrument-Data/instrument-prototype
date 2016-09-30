@@ -57,7 +57,7 @@ TEST(instrument_tree_mapper_test, test_cannot_create_without_instrument) {
   InstrumentTreeMapper mapper;
   EXPECT_THROW(mapper.create(), std::invalid_argument) << "Should throw. No instrument set.";
 }
-
+/*
 TEST(instrument_tree_mapper_test, test_create) {
   InstrumentTree original = make_instrument();
   InstrumentTreeMapper originalMapper(original);
@@ -68,3 +68,4 @@ TEST(instrument_tree_mapper_test, test_create) {
 
   std::cout << s.str() << std::endl;
 }
+*/

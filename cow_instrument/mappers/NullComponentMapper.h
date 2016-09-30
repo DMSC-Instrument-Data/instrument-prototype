@@ -2,7 +2,6 @@
 #define NULLCOMPONENTMAPPER_H
 
 #include "ComponentVisitor.h"
-#include "boost/serialization/split_member.hpp"
 #include "boost/serialization/export.hpp"
 #include "SingleItemMapper.h"
 #include <string>
@@ -21,11 +20,7 @@ public:
   virtual ~NullComponentMapper() {}
 
   template <class Archive>
-  void save(Archive &ar, const unsigned int version) const;
-  template <class Archive>
-  void load(Archive &ar, const unsigned int version);
-
-  BOOST_SERIALIZATION_SPLIT_MEMBER()
+  void serialize(Archive &ar, const unsigned int version);
 };
 BOOST_CLASS_EXPORT_KEY(NullComponentMapper)
 

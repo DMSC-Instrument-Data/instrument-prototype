@@ -23,14 +23,8 @@ Component *NullComponentMapper::create()
     return new NullComponent;
 }
 
-template <class Archive> void NullComponentMapper::save(Archive &ar, const unsigned int version) const {
-
-  SingleItemMapper<std::string> id("NullComponent");
-  ar &BOOST_SERIALIZATION_BASE_OBJECT_NVP(ComponentVisitor);
-}
-template <class Archive>
-void NullComponentMapper::load(Archive &ar, const unsigned int version) { // Do nothing
-BOOST_SERIALIZATION_BASE_OBJECT_NVP(ComponentVisitor);
+template <class Archive> void NullComponentMapper::serialize(Archive &ar, const unsigned int version) {
+ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(ComponentVisitor);
 }
 
 template void

@@ -37,32 +37,6 @@ TEST(component_mapper_test, test_serialize_deserialize_detector) {
   delete detectorOut;
 }
 
-TEST(component_mapper_test, test_serialize_deserialize_composite_component) {
-
-  CompositeComponent original(ComponentIdType(1), "composite component");
-  original.addComponent(
-      std::unique_ptr<DetectorComponent>(new DetectorComponent(
-          ComponentIdType(1), DetectorIdType(2), Eigen::Vector3d{0, 0, 0})));
-
-  ComponentMapper toWrite;
-  toWrite.store(&original);
-
-  std::stringstream s;
-  boost::archive::text_oarchive out(s);
-
-  out << toWrite;
-
-  boost::archive::text_iarchive in(s);
-  ComponentMapper toRead;
-
-  in >> toRead;
-  Component *componentOut = toRead.create();
-
-  EXPECT_TRUE(componentOut->equals(original));
-
-  delete componentOut;
-}
-
 TEST(component_mapper_test, test_serialize_deserialize_null_component) {
 
   NullComponent original;
@@ -85,3 +59,32 @@ TEST(component_mapper_test, test_serialize_deserialize_null_component) {
 
   delete componentOut;
 }
+
+
+TEST(component_mapper_test, test_serialize_deserialize_composite_component) {
+
+  CompositeComponent original(ComponentIdType(1), "composite component");
+  original.addComponent(
+      std::unique_ptr<DetectorComponent>(new DetectorComponent(
+          ComponentIdType(1), DetectorIdType(2), Eigen::Vector3d{0, 0, 0})));
+  original.addComponent(std::unique_ptr<NullComponent>(new NullComponent));
+
+  ComponentMapper toWrite;
+  toWrite.store(&original);
+
+  std::stringstream s;
+  boost::archive::text_oarchive out(s);
+
+  out << toWrite;
+
+  boost::archive::text_iarchive in(s);
+  ComponentMapper toRead;
+
+  in >> toRead;
+  Component *componentOut = toRead.create();
+
+  EXPECT_TRUE(componentOut->equals(original));
+
+  delete componentOut;
+}
+
