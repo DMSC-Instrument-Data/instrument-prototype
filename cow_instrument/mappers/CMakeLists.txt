@@ -5,6 +5,8 @@ set ( SOURCE_FILES
                    NodeMapper.cpp
                    NullComponentMapper.cpp
                    ParabolicGuideMapper.cpp
+                   PointSampleMapper.cpp
+                   PointSourceMapper.cpp
                    V3DMapper.cpp
 )
 

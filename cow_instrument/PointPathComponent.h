@@ -27,7 +27,6 @@ public:
       std::vector<const PathComponent *> &pathLookup) const override;
   virtual ComponentIdType componentId() const override;
   virtual std::string name() const override;
-  virtual bool accept(ComponentVisitor *visitor) const override;
 
   double length() const override;
   Eigen::Vector3d entryPoint() const override;
@@ -135,9 +134,5 @@ template <typename T> Eigen::Vector3d PointPathComponent<T>::exitPoint() const {
   return getPos(); // This is a point component
 }
 
-template <typename T>
-bool PointPathComponent<T>::accept(ComponentVisitor *visitor) const {
-  return false;
-}
 
 #endif

@@ -6,6 +6,8 @@
 #include "CompositeComponentMapper.h"
 #include "DetectorComponentMapper.h"
 #include "NullComponentMapper.h"
+#include "PointSampleMapper.h"
+#include "PointSourceMapper.h"
 
 #include <vector>
 #include <memory>
@@ -21,6 +23,8 @@ public:
     mappers.emplace_back(std::make_shared<DetectorComponentMapper>());
     mappers.emplace_back(std::make_shared<CompositeComponentMapper>());
     mappers.emplace_back(std::make_shared<NullComponentMapper>());
+    mappers.emplace_back(std::make_shared<PointSampleMapper>());
+    mappers.emplace_back(std::make_shared<PointSourceMapper>());
     return mappers;
   }
 };

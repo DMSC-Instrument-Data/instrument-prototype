@@ -57,7 +57,7 @@ TEST(instrument_tree_mapper_test, test_cannot_create_without_instrument) {
   InstrumentTreeMapper mapper;
   EXPECT_THROW(mapper.create(), std::invalid_argument) << "Should throw. No instrument set.";
 }
-/*
+
 TEST(instrument_tree_mapper_test, test_create) {
   InstrumentTree original = make_instrument();
   InstrumentTreeMapper originalMapper(original);
@@ -66,6 +66,20 @@ TEST(instrument_tree_mapper_test, test_create) {
   boost::archive::text_oarchive out(s);
   out << originalMapper;
 
-  std::cout << s.str() << std::endl;
+  boost::archive::text_iarchive in(s);
+  InstrumentTreeMapper outputMapper;
+  in >> outputMapper;
+
+  InstrumentTree product = outputMapper.create();
+
+  EXPECT_EQ(product.nodeSize(), original.nodeSize());
+  EXPECT_EQ(product.nDetectors(), original.nDetectors());
+  EXPECT_EQ(product.nPathComponents(), original.nPathComponents());
+  EXPECT_TRUE(product.getDetector(0).equals(original.getDetector(0)))
+      << "No detector match. InstrumentTrees look different.";
+  EXPECT_TRUE(product.getPathComponent(0).equals(original.getPathComponent(0)))
+      << "No path component match. InstrumentTrees look different.";
+  EXPECT_TRUE(product.getPathComponent(1).equals(original.getPathComponent(1)))
+      << "No path component match. InstrumentTrees look different.";
 }
-*/
+

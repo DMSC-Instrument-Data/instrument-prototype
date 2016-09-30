@@ -42,8 +42,9 @@ TYPED_TEST(PointPathComponentMapperTest, test_load) {
 
   mapper.componentIdMapper = source.componentId();
   mapper.posMapper = source.getPos();
-  auto product = mapper.create();
-  EXPECT_TRUE(product.equals(source));
+  auto *product = mapper.create();
+  EXPECT_TRUE(product->equals(source));
+  delete product;
 }
 
 TYPED_TEST(PointPathComponentMapperTest, test_sourced_constructor) {
@@ -51,8 +52,9 @@ TYPED_TEST(PointPathComponentMapperTest, test_sourced_constructor) {
 
   MapeeType source(Eigen::Vector3d{1, 1, 1}, ComponentIdType(1));
   TypeParam mapper(source);
-  auto product = mapper.create();
-  EXPECT_TRUE(product.equals(source));
+  auto *product = mapper.create();
+  EXPECT_TRUE(product->equals(source));
+  delete product;
 }
 
 TYPED_TEST(PointPathComponentMapperTest, test_save_load) {
@@ -73,6 +75,8 @@ TYPED_TEST(PointPathComponentMapperTest, test_save_load) {
     TypeParam mapperB;
     in >> mapperB;
 
-    EXPECT_TRUE(pointComponent.equals(mapperB.create()));
+    auto *product = mapperB.create();
+    EXPECT_TRUE(pointComponent.equals(*product));
+    delete product;
   }
 }

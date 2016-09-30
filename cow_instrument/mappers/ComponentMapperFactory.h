@@ -4,7 +4,8 @@
 #include "ComponentVisitor.h"
 #include "DetectorComponentMapper.h"
 #include "NullComponentMapper.h"
-
+#include "PointSampleMapper.h"
+#include "PointSourceMapper.h"
 #include <vector>
 #include <memory>
 
@@ -17,8 +18,9 @@ public:
 
     return std::vector<std::shared_ptr<ComponentVisitor>>{
         std::make_shared<DetectorComponentMapper>(),
-        std::make_shared<NullComponentMapper>()
-  };
+        std::make_shared<NullComponentMapper>(),
+        std::make_shared<PointSampleMapper>(),
+        std::make_shared<PointSourceMapper>()};
   }
 };
 

@@ -8,6 +8,8 @@ class ToyPointPathComponent : public PointPathComponent<ToyPointPathComponent> {
 public:
   using PointPathComponent<ToyPointPathComponent>::PointPathComponent;
   std::string getname() const { return "Toy point path component"; }
+  virtual bool accept(ComponentVisitor *) const override { return false; }
+
   virtual ~ToyPointPathComponent() {}
 };
 

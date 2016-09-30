@@ -2,10 +2,13 @@
 #define _POINTPATHCOMPONENTMAPPER_H
 
 #include "ComponentIdTypeMapper.h"
+#include "ComponentVisitor.h"
 #include "V3DMapper.h"
 #include <stdexcept>
+#include <boost/serialization/serialization.hpp>
 
-template <typename Mapee> class PointPathComponentMapper {
+template <typename Mapee>
+class PointPathComponentMapper : public ComponentVisitor {
 public:
   using MapeeType = Mapee;
 
@@ -15,9 +18,9 @@ public:
   PointPathComponentMapper(const Mapee &source) { store(source); }
   PointPathComponentMapper() = default;
 
-  Mapee create() {
+  Mapee *create() {
     if (componentIdMapper.initalized() && posMapper.initialized()) {
-      return Mapee(posMapper.create(), componentIdMapper.create());
+      return new Mapee(posMapper.create(), componentIdMapper.create());
     } else {
       throw std::invalid_argument("Cannot be deserialized. Not all mandatory "
                                   "construction fields have been provided for "
@@ -30,11 +33,14 @@ public:
     posMapper.store(source.getPos());
   }
 
-private:
-  friend class boost::serialization::access;
+  virtual bool visit(DetectorComponent const *const) override { return false; }
+  virtual bool visit(ParabolicGuide const *const) override { return false; }
+  virtual bool visit(CompositeComponent const *const) override { return false; }
+  virtual bool visit(NullComponent const *const) override { return false; }
+
+protected:
   template <class Archive>
-  void serialize(Archive &ar, const unsigned int version) {
-    using namespace boost::serialization;
+  void base_serialization(Archive &ar, const unsigned int version) {
     boost::serialization::serialize(ar, componentIdMapper, version);
     boost::serialization::serialize(ar, posMapper, version);
   }
