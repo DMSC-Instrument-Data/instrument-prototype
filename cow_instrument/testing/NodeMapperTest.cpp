@@ -11,8 +11,9 @@ TEST(node_mapper_test, test_cannot_load_without_version) {
   mapper.nameMapper = std::string("node");
   mapper.nextIndexMapper = std::vector<size_t>{2, 3, 4};
   mapper.previousMapper = 0;
-  mapper.contentsMapper->store(new DetectorComponent(
-      ComponentIdType(1), DetectorIdType(2), Eigen::Vector3d{0, 0, 0}));
+  auto component = std::make_shared<DetectorComponent>(
+      ComponentIdType(1), DetectorIdType(2), Eigen::Vector3d{0, 0, 0});
+  mapper.contentsMapper->storeSink(component);
   EXPECT_THROW(mapper.create(), std::invalid_argument);
 }
 
@@ -20,8 +21,9 @@ TEST(node_mapper_test, test_cannot_load_without_next_index) {
   NodeMapper mapper;
   mapper.nameMapper = std::string("node");
   mapper.previousMapper = 0;
-  mapper.contentsMapper->store(new DetectorComponent(
-      ComponentIdType(1), DetectorIdType(2), Eigen::Vector3d{0, 0, 0}));
+  auto component = std::make_shared<DetectorComponent>(
+      ComponentIdType(1), DetectorIdType(2), Eigen::Vector3d{0, 0, 0});
+  mapper.contentsMapper->storeSink(component);
   mapper.versionMapper = 1;
   EXPECT_THROW(mapper.create(), std::invalid_argument);
 }
@@ -30,8 +32,9 @@ TEST(node_mapper_test, test_cannot_load_without_name) {
   NodeMapper mapper;
   mapper.nextIndexMapper = std::vector<size_t>{2, 3, 4};
   mapper.previousMapper = 0;
-  mapper.contentsMapper->store(new DetectorComponent(
-      ComponentIdType(1), DetectorIdType(2), Eigen::Vector3d{0, 0, 0}));
+  auto component = std::make_shared<DetectorComponent>(
+      ComponentIdType(1), DetectorIdType(2), Eigen::Vector3d{0, 0, 0});
+  mapper.contentsMapper->storeSink(component);
   mapper.versionMapper = 1;
   EXPECT_THROW(mapper.create(), std::invalid_argument);
 }
@@ -50,7 +53,7 @@ TEST(node_mapper_test, test_create) {
   mapper.nameMapper = std::string("node");
   mapper.nextIndexMapper = std::vector<size_t>{2, 3, 4};
   mapper.previousMapper = 0;
-  mapper.contentsMapper->store(new DetectorComponent(
+  mapper.contentsMapper->storeProduct(new DetectorComponent(
       ComponentIdType(1), DetectorIdType(2), Eigen::Vector3d{0, 0, 0}));
   mapper.versionMapper = 1;
   Node product = mapper.create();

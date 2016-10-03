@@ -23,7 +23,7 @@ NodeMapper::NodeMapper(const Node &source)
 }
 
 Node NodeMapper::create() {
-  if (previousMapper.initialized() && contentsMapper->initialized() &&
+  if (previousMapper.initialized() && contentsMapper->initializedWithSource() &&
       nameMapper.initialized() && nextIndexMapper.initialized() &&
       versionMapper.initialized()) {
     return Node(previousMapper.create(), contentsMapper->create(),
@@ -38,7 +38,7 @@ Node NodeMapper::create() {
 
 void NodeMapper::store(const Node &source) {
   previousMapper = source.parent();
-  contentsMapper->store(source.unsafeContents().get()); // HACK.
+  contentsMapper->storeSink(source.unsafeContents());
   nameMapper = source.name();
   nextIndexMapper = source.children();
   versionMapper = source.version();

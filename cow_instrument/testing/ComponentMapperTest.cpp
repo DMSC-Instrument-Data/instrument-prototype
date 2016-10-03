@@ -15,11 +15,11 @@ TEST(component_mapper_test, test_cannot_create_from_empty) {
 
 TEST(component_mapper_test, test_serialize_deserialize_detector) {
 
-  DetectorComponent detectorIn(ComponentIdType(1), DetectorIdType(2),
-                               Eigen::Vector3d{1, 2, 3});
+  auto detectorIn = std::make_shared<DetectorComponent>(
+      ComponentIdType(1), DetectorIdType(2), Eigen::Vector3d{1, 2, 3});
 
   ComponentMapper toWrite;
-  toWrite.store(&detectorIn);
+  toWrite.storeSink(detectorIn);
 
   std::stringstream s;
   boost::archive::text_oarchive out(s);
@@ -32,17 +32,17 @@ TEST(component_mapper_test, test_serialize_deserialize_detector) {
   in >> toRead;
   Component *detectorOut = toRead.create();
 
-  EXPECT_TRUE(detectorOut->equals(detectorIn));
+  EXPECT_TRUE(detectorOut->equals(*detectorIn));
 
   delete detectorOut;
 }
 
 TEST(component_mapper_test, test_serialize_deserialize_null_component) {
 
-  NullComponent original;
+  auto original = std::make_shared<NullComponent>();
 
   ComponentMapper toWrite;
-  toWrite.store(&original);
+  toWrite.storeSink(original);
 
   std::stringstream s;
   boost::archive::text_oarchive out(s);
@@ -55,7 +55,7 @@ TEST(component_mapper_test, test_serialize_deserialize_null_component) {
   in >> toRead;
   Component *componentOut = toRead.create();
 
-  EXPECT_TRUE(componentOut->equals(original));
+  EXPECT_TRUE(componentOut->equals(*original));
 
   delete componentOut;
 }
@@ -63,14 +63,15 @@ TEST(component_mapper_test, test_serialize_deserialize_null_component) {
 
 TEST(component_mapper_test, test_serialize_deserialize_composite_component) {
 
-  CompositeComponent original(ComponentIdType(1), "composite component");
-  original.addComponent(
+  auto original = std::make_shared<CompositeComponent>(ComponentIdType(1),
+                                                       "composite component");
+  original->addComponent(
       std::unique_ptr<DetectorComponent>(new DetectorComponent(
           ComponentIdType(1), DetectorIdType(2), Eigen::Vector3d{0, 0, 0})));
-  original.addComponent(std::unique_ptr<NullComponent>(new NullComponent));
+  original->addComponent(std::unique_ptr<NullComponent>(new NullComponent));
 
   ComponentMapper toWrite;
-  toWrite.store(&original);
+  toWrite.storeSink(original);
 
   std::stringstream s;
   boost::archive::text_oarchive out(s);
@@ -83,7 +84,7 @@ TEST(component_mapper_test, test_serialize_deserialize_composite_component) {
   in >> toRead;
   Component *componentOut = toRead.create();
 
-  EXPECT_TRUE(componentOut->equals(original));
+  EXPECT_TRUE(componentOut->equals(*original));
 
   delete componentOut;
 }
