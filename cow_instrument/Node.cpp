@@ -15,6 +15,11 @@ Node::Node(size_t previous, CowPtr<Component> contents, std::string name,
 Node::Node(CowPtr<Component> contents, std::string name, unsigned int version)
     : m_previous(-1), m_contents(contents), m_name(name), m_version(version) {}
 
+Node::Node(size_t previous, CowPtr<Component> contents, std::string name,
+           unsigned int version, std::vector<size_t> &&children)
+    : m_previous(previous), m_contents(contents), m_name(name),
+      m_version(version), m_next(std::move(children)) {}
+
 Node::~Node() {}
 
 bool Node::modify(const Command &command) {
@@ -27,7 +32,7 @@ bool Node::modify(const Command &command) {
   return command.execute(m_contents);
 }
 
-void Node::addChild(size_t child) { m_next.push_back(child); }
+void Node::addChild(size_t child) { m_next.emplace_back(child); }
 
 bool Node::hasParent() const { return m_previous >= 0; }
 
@@ -49,6 +54,10 @@ unsigned int Node::version() const { return m_version; }
 unsigned int Node::incrementVersion() { return ++m_version; }
 
 std::string Node::name() const { return m_name; }
+
+CowPtr<Component>::RefPtr Node::unsafeContents() const {
+  return m_contents.heldValue();
+}
 
 const Component &Node::const_ref() const { return m_contents.const_ref(); }
 

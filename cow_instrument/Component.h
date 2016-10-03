@@ -26,6 +26,7 @@ public:
                    std::vector<const PathComponent *> &pathLookup) const = 0;
   virtual ComponentIdType componentId() const = 0;
   virtual std::string name() const = 0;
+  virtual bool accept(class ComponentVisitor *visitor) const = 0;
 };
 
 #endif

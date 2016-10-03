@@ -1,4 +1,5 @@
 #include "DetectorComponent.h"
+#include "ComponentVisitor.h"
 #include <Eigen/Geometry>
 
 DetectorComponent::DetectorComponent(ComponentIdType componentId,
@@ -55,6 +56,10 @@ void DetectorComponent::registerContents(
 
 std::string DetectorComponent::name() const {
   return ""; // Not implmented (yet) for detector component.
+}
+
+bool DetectorComponent::accept(ComponentVisitor *visitor) const {
+  return visitor->visit(this);
 }
 
 DetectorComponent::~DetectorComponent() {}

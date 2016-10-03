@@ -1,7 +1,8 @@
 #ifndef INT_TO_TYPE
 #define INT_TO_TYPE
 
-#include <memory>
+//#include <memory>
+#include <boost/serialization/serialization.hpp>
 
 /**
  This allows us to simply create unique types holding a T. I simply enforces
@@ -12,6 +13,7 @@
  */
 template <int I, typename T> class IntToType {
 public:
+  using StorageType = T;
   explicit IntToType(const T &val) : value(val) {}
   explicit IntToType(T &&val) : value(val) {}
   IntToType(const IntToType<I, T> &other) : value(other.value) {}
@@ -36,15 +38,14 @@ public:
       ++value;
       return temp;
   }
-  const T& const_ref(){
-      return value;
-  }
+  const T &const_ref() const { return value; }
   IntToType<I, T> operator+(const T & increment){
       return IntToType<I,T>(value+increment);
   }
 
-private:
   T value;
+
+private:
   enum { typeValue = I };
 };
 

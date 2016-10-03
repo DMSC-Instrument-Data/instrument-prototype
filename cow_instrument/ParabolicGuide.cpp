@@ -1,4 +1,5 @@
 #include "ParabolicGuide.h"
+#include "ComponentVisitor.h"
 #include <cmath>
 
 /*
@@ -102,6 +103,10 @@ std::string ParabolicGuide::name() const { return "Parbolic guide"; }
 
 double ParabolicGuide::length() const { return m_length; }
 
+double ParabolicGuide::a() const { return m_a; }
+
+double ParabolicGuide::h() const { return m_h; }
+
 Eigen::Vector3d ParabolicGuide::entryPoint() const {
   // TODO This is a little hacky. We are assuming beam down x.
   // Would be better to use the reference frame for this.
@@ -116,6 +121,10 @@ Eigen::Vector3d ParabolicGuide::exitPoint() const {
   auto entry = m_position;
   entry[0] += m_a;
   return entry;
+}
+
+bool ParabolicGuide::accept(ComponentVisitor *visitor) const {
+    return visitor->visit(this);
 }
 
 bool ParabolicGuide::operator==(const ParabolicGuide &other) const {

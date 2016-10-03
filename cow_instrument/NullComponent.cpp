@@ -1,4 +1,5 @@
 #include "NullComponent.h"
+#include "ComponentVisitor.h"
 
 Eigen::Vector3d NullComponent::getPos() const { return Eigen::Vector3d{0, 0, 0}; }
 
@@ -34,6 +35,8 @@ ComponentIdType NullComponent::componentId() const
 }
 
 std::string NullComponent::name() const { return NullComponent::TypeName; }
+
+bool NullComponent::accept(ComponentVisitor * visitor) const { return visitor->visit(this); }
 
 const std::string NullComponent::TypeName = "NullComponent";
 

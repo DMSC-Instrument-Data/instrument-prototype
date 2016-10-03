@@ -2,6 +2,7 @@
 #define POINTSAMPLE_H
 
 #include "PointPathComponent.h"
+#include "ComponentVisitor.h"
 
 /**
  * A point sample. Behaves as a point from a neutronic perspective.
@@ -15,6 +16,10 @@ public:
   virtual bool isSource() const override { return false; }
 
   virtual bool isSample() const override { return true; }
+
+  virtual bool accept(ComponentVisitor *visitor) const override {
+    return visitor->visit(this);
+  }
 };
 
 #endif

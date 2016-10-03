@@ -23,13 +23,15 @@ public:
   virtual void registerContents(
       std::vector<const Detector *> &lookupDetectors,
       std::vector<const PathComponent *> &lookupPathComponents) const;
-  virtual ComponentIdType componentId() const override;
-  virtual std::string name() const override;
+  ComponentIdType componentId() const;
+  std::string name() const;
 
   virtual double length() const override;
+  double a() const;
+  double h() const;
   virtual Eigen::Vector3d entryPoint() const override;
   virtual Eigen::Vector3d exitPoint() const override;
-
+  virtual bool accept(class ComponentVisitor *visitor) const override;
   bool operator==(const ParabolicGuide &other) const;
 
 private:

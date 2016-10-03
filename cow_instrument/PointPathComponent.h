@@ -58,9 +58,7 @@ Eigen::Quaterniond PointPathComponent<T>::getRotation() const {
 
 template <typename T>
 void PointPathComponent<T>::shiftPositionBy(const Eigen::Vector3d &pos) {
-  m_pos[0] += pos[0];
-  m_pos[1] += pos[1];
-  m_pos[2] += pos[2];
+  m_pos += pos;
 }
 
 template <typename T>
@@ -135,5 +133,6 @@ template <typename T> Eigen::Vector3d PointPathComponent<T>::entryPoint() const 
 template <typename T> Eigen::Vector3d PointPathComponent<T>::exitPoint() const {
   return getPos(); // This is a point component
 }
+
 
 #endif

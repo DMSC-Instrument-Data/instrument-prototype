@@ -7,6 +7,7 @@
 template <class T> class CowPtr {
 public:
   typedef std::shared_ptr<T> RefPtr;
+  typedef std::shared_ptr<const T> RefConstPtr;
 
 private:
   RefPtr m_sp;
@@ -44,6 +45,7 @@ public:
   bool operator==(const CowPtr<T> &other) const;
   bool unique() const;
   bool copyable() const;
+  RefPtr heldValue() const;
 };
 
 template <typename T> void CowPtr<T>::copy() {
@@ -83,4 +85,7 @@ template <typename T> bool CowPtr<T>::unique() const { return m_sp.unique(); }
 
 template <typename T> bool CowPtr<T>::copyable() const { return !unique(); }
 
+template <typename T> typename CowPtr<T>::RefPtr CowPtr<T>::heldValue() const {
+  return m_sp;
+}
 #endif

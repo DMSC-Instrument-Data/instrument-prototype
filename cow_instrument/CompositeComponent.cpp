@@ -1,9 +1,28 @@
 #include "CompositeComponent.h"
+#include "ComponentVisitor.h"
 #include "Detector.h"
 
 CompositeComponent::CompositeComponent(ComponentIdType componentId,
                                        std::string name)
     : m_componentId(componentId), m_name(name) {}
+
+CompositeComponent::CompositeComponent(const CompositeComponent &other)
+    : m_componentId(other.componentId()), m_name(other.name()) {
+  for (auto &child : other.m_children) {
+    m_children.emplace_back(child->clone());
+  }
+}
+
+CompositeComponent &CompositeComponent::
+operator=(const CompositeComponent &other) {
+  m_componentId = other.componentId();
+  m_name = other.name();
+  m_children.clear();
+  for (auto &child : other.m_children) {
+    m_children.emplace_back(child->clone());
+  }
+  return *this;
+}
 
 Eigen::Vector3d CompositeComponent::getPos() const {
 
@@ -24,6 +43,10 @@ void CompositeComponent::shiftPositionBy(const Eigen::Vector3d &delta) {
   for (size_t i = 0; i < m_children.size(); ++i) {
     m_children[i]->shiftPositionBy(delta);
   }
+}
+
+std::vector<std::shared_ptr<Component>> CompositeComponent::children() const {
+  return m_children;
 }
 
 void CompositeComponent::rotate(const Eigen::Vector3d &axis,
@@ -70,6 +93,10 @@ bool CompositeComponent::equals(const Component &other) const {
 }
 
 void CompositeComponent::addComponent(std::unique_ptr<Component> &&child) {
+  if (dynamic_cast<const CompositeComponent *>(child.get())) {
+    throw std::invalid_argument(
+        "Cannot add a composite component to a composite component");
+  }
   m_children.emplace_back(std::move(child));
 }
 
@@ -95,6 +122,10 @@ ComponentIdType CompositeComponent::componentId() const {
 }
 
 std::string CompositeComponent::name() const { return m_name; }
+
+bool CompositeComponent::accept(ComponentVisitor *visitor) const {
+  return visitor->visit(this);
+}
 
 Eigen::Quaterniond CompositeComponent::getRotation() const {
   throw std::runtime_error("Not implemented");
