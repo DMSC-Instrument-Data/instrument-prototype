@@ -10,6 +10,7 @@
 #include "PathFactory.h"
 #include "gmock/gmock.h"
 #include <cow_ptr.h>
+#include <vector>
 
 class MockComponent : public Component {
 public:
@@ -21,9 +22,10 @@ public:
                void(const Eigen::Affine3d &, const Eigen::Quaterniond &));
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
-  MOCK_CONST_METHOD2(registerContents,
-                     void(std::vector<const Detector *> &,
-                          std::vector<const PathComponent *> &));
+  MOCK_METHOD4(registerContents,
+               void(std::vector<const Detector *> &,
+                    std::vector<const PathComponent *> &, std::vector<size_t> &,
+                    std::vector<size_t> &));
   ~MockComponent() {}
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
   MOCK_CONST_METHOD0(name, std::string());
@@ -41,9 +43,9 @@ public:
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
 
-  void
-  registerContents(std::vector<const Detector *> &,
-                   std::vector<const PathComponent *> &pathComponents) const {
+  void registerContents(std::vector<const Detector *> &,
+                        std::vector<const PathComponent *> &pathComponents,
+                        std::vector<size_t> &, std::vector<size_t> &) {
     pathComponents.push_back(this);
   }
 
@@ -75,15 +77,16 @@ public:
   MOCK_CONST_METHOD0(detectorId, DetectorIdType());
   MOCK_CONST_METHOD0(getPos, Eigen::Vector3d());
   MOCK_CONST_METHOD0(getRotation, Eigen::Quaterniond());
-  MOCK_METHOD2(rotate,
-               void(const Eigen::Affine3d &, const Eigen::Quaterniond &));
   MOCK_METHOD1(shiftPositionBy, void(const Eigen::Vector3d &));
   MOCK_METHOD3(rotate, void(const Eigen::Vector3d&, const double&, const Eigen::Vector3d&));
+  MOCK_METHOD2(rotate,
+               void(const Eigen::Affine3d &, const Eigen::Quaterniond &));
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
-  MOCK_CONST_METHOD2(registerContents,
-                     void(std::vector<const Detector *> &,
-                          std::vector<const PathComponent *> &));
+  MOCK_METHOD4(registerContents,
+               void(std::vector<const Detector *> &,
+                    std::vector<const PathComponent *> &, std::vector<size_t> &,
+                    std::vector<size_t> &));
   ~MockDetector() {}
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
   MOCK_CONST_METHOD0(name, std::string());

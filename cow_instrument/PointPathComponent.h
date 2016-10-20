@@ -22,9 +22,10 @@ public:
   virtual void rotate(const Eigen::Affine3d &transform,
                       const Eigen::Quaterniond &rotationPart) override;
   virtual bool equals(const Component &other) const override;
-  virtual void registerContents(
-      std::vector<const Detector *> &detectorLookup,
-      std::vector<const PathComponent *> &pathLookup) const override;
+  virtual void registerContents(std::vector<const Detector *> &detectorLookup,
+                                std::vector<const PathComponent *> &pathLookup,
+                                std::vector<size_t> &detectorIndexes,
+                                std::vector<size_t> &pathIndexes) override;
   virtual ComponentIdType componentId() const override;
   virtual std::string name() const override;
 
@@ -38,9 +39,12 @@ public:
   bool operator!=(const PointPathComponent<T> &other) const;
 
 private:
+  void setIndex(size_t pathIndex);
+
   Eigen::Vector3d m_pos;
   Eigen::Quaterniond m_rotation;
   ComponentIdType m_componentId;
+  size_t m_pathIndex;
 };
 
 template <typename T>
@@ -112,9 +116,13 @@ operator!=(const PointPathComponent<T> &other) const {
 template <typename T>
 void PointPathComponent<T>::registerContents(
     std::vector<const Detector *> &,
-    std::vector<const PathComponent *> &pathLookup) const {
+    std::vector<const PathComponent *> &pathLookup, std::vector<size_t> &,
+    std::vector<size_t> &pathIndexes) {
   // This is not a detector
   pathLookup.push_back(this);
+  size_t newIndex = pathLookup.size();
+  pathIndexes.push_back(newIndex);
+  this->setIndex(newIndex);
 }
 
 template <typename T>
@@ -134,5 +142,8 @@ template <typename T> Eigen::Vector3d PointPathComponent<T>::exitPoint() const {
   return getPos(); // This is a point component
 }
 
+template <typename T> void PointPathComponent<T>::setIndex(size_t pathIndex) {
+  m_pathIndex = pathIndex;
+}
 
 #endif

@@ -26,7 +26,8 @@ public:
   Component *clone() const { return new FakePathComponent{m_position}; }
   bool equals(const Component &other) const { return false; }
   void registerContents(std::vector<const Detector *> &,
-                        std::vector<const PathComponent *> &) const {}
+                        std::vector<const PathComponent *> &,
+                        std::vector<size_t> &, std::vector<size_t> &) {}
   ComponentIdType componentId() const { return ComponentIdType{1}; }
   std::string name() const { return ""; }
   bool accept(ComponentVisitor *) const { return false; }

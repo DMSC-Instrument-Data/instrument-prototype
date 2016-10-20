@@ -111,9 +111,11 @@ const Component &CompositeComponent::getChild(size_t index) const {
 
 void CompositeComponent::registerContents(
     std::vector<const Detector *> &lookupDetectors,
-    std::vector<const PathComponent *> &lookupPathComponents) const {
+    std::vector<const PathComponent *> &lookupPathComponents,
+    std::vector<size_t> &detectorIndexes, std::vector<size_t> &pathIndexes) {
   for (auto &child : m_children) {
-    child->registerContents(lookupDetectors, lookupPathComponents);
+    child->registerContents(lookupDetectors, lookupPathComponents,
+                            detectorIndexes, pathIndexes);
   }
 }
 

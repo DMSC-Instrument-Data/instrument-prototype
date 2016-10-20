@@ -17,12 +17,15 @@ namespace {
  * @param detectorStore
  * @param pathStore
  */
-void findKeyComponents(const Component &component,
+void findKeyComponents(Component &component,
                        std::vector<const Detector *> &detectorStore,
-                       std::vector<const PathComponent *> &pathStore) {
+                       std::vector<const PathComponent *> &pathStore,
+                       std::vector<size_t> &detectorIndexes,
+                       std::vector<size_t> &pathIndexes) {
 
   // Walk through and register all detectors on the store.
-  component.registerContents(detectorStore, pathStore);
+  component.registerContents(detectorStore, pathStore, detectorIndexes,
+                             pathIndexes);
 }
 
 void checkDetectorRange(size_t detectorIndex,
@@ -59,7 +62,9 @@ void InstrumentTree::init() {
   for (const auto &node : m_nodes.const_ref()) {
     const auto &component = node.const_ref();
     // Put all detectors into a flat map.
-    findKeyComponents(component, *m_detectorVec, *m_pathVec);
+    findKeyComponents(const_cast<Component &>(component), *m_detectorVec,
+                      *m_pathVec, m_detectorIndexes,
+                      m_pathIndexes); // HACK! const_cast. Remove!
     if (node.version() != expectedVersion) {
       throw std::invalid_argument(
           "Cannot make an Instrument tree around Nodes of differing version");
@@ -139,15 +144,11 @@ size_t InstrumentTree::samplePathIndex() const { return m_sampleIndex; }
 
 size_t InstrumentTree::sourcePathIndex() const { return m_sourceIndex; }
 
-CowPtr<std::vector<Node>>::RefPtr InstrumentTree::unsafeContents() const
-{
-    return m_nodes.heldValue();
+CowPtr<std::vector<Node>>::RefPtr InstrumentTree::unsafeContents() const {
+  return m_nodes.heldValue();
 }
 
-size_t InstrumentTree::nodeSize() const
-{
-    return m_nodes->size();
-}
+size_t InstrumentTree::nodeSize() const { return m_nodes->size(); }
 
 size_t InstrumentTree::nDetectors() const { return m_detectorVec->size(); }
 
@@ -194,6 +195,8 @@ bool InstrumentTree::modify(size_t nodeIndex, const Command &command) {
   if (cowTriggered) {
     m_detectorVec->clear();
     m_pathVec->clear();
+    m_detectorIndexes.clear();
+    m_pathIndexes.clear();
     init();
   }
   return cowTriggered;

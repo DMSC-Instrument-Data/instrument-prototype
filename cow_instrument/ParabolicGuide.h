@@ -20,9 +20,10 @@ public:
                       const Eigen::Quaterniond &rotationPart) override;
   virtual ParabolicGuide *clone() const override;
   virtual bool equals(const Component &other) const override;
-  virtual void registerContents(
-      std::vector<const Detector *> &lookupDetectors,
-      std::vector<const PathComponent *> &lookupPathComponents) const;
+  virtual void
+  registerContents(std::vector<const Detector *> &lookupDetectors,
+                   std::vector<const PathComponent *> &lookupPathComponents,
+                   std::vector<size_t> &, std::vector<size_t> &pathIndexes);
   ComponentIdType componentId() const;
   std::string name() const;
 
@@ -35,12 +36,14 @@ public:
   bool operator==(const ParabolicGuide &other) const;
 
 private:
+  void setIndex(size_t pathIndex);
   ComponentIdType m_componentId;
   double m_a;
   double m_h;
   Eigen::Vector3d m_position;
   Eigen::Quaterniond m_rotation;
   double m_length;
+  size_t m_pathIndex;
 };
 
 #endif

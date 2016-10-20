@@ -16,7 +16,8 @@ public:
   NullComponent *clone() const override;
   bool equals(const Component &) const override;
   void registerContents(std::vector<const Detector *> &,
-                        std::vector<const PathComponent *> &) const override;
+                        std::vector<const PathComponent *> &,
+                        std::vector<size_t> &, std::vector<size_t> &) override;
   ComponentIdType componentId() const override;
   std::string name() const override;
   static const std::string TypeName;

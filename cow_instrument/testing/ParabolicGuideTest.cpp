@@ -108,10 +108,13 @@ TEST(parabolic_guide_test, test_register_only_path_components) {
 
   std::vector<const Detector *> detectorVec;
   std::vector<const PathComponent *> pathComponentVec;
+  std::vector<size_t> detectorIndexes;
+  std::vector<size_t> pathIndexes;
   size_t detectorVecStartSize = detectorVec.size();
   size_t pathComponentVecSize = pathComponentVec.size();
   // Perform registration
-  guide.registerContents(detectorVec, pathComponentVec);
+  guide.registerContents(detectorVec, pathComponentVec, detectorIndexes,
+                         pathIndexes);
   EXPECT_EQ(detectorVec.size(), detectorVecStartSize)
       << "Do not register ParabolicGuide as a Detector";
   EXPECT_EQ(pathComponentVec.size(), pathComponentVecSize + 1)

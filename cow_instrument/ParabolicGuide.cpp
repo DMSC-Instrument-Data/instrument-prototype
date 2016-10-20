@@ -92,9 +92,13 @@ bool ParabolicGuide::equals(const Component &other) const {
 
 void ParabolicGuide::registerContents(
     std::vector<const Detector *> &,
-    std::vector<const PathComponent *> &pathComponents) const {
+    std::vector<const PathComponent *> &pathComponents, std::vector<size_t> &,
+    std::vector<size_t> &pathIndexes) {
   // Register this as a path component. It is not a detector.
   pathComponents.push_back(this);
+  std::size_t newIndex = pathComponents.size();
+  pathIndexes.push_back(newIndex);
+  this->setIndex(newIndex);
 }
 
 ComponentIdType ParabolicGuide::componentId() const { return m_componentId; }
@@ -131,5 +135,7 @@ bool ParabolicGuide::operator==(const ParabolicGuide &other) const {
   return m_componentId == other.m_componentId && m_a == other.m_a &&
          m_h == other.m_h && m_position == other.m_position;
 }
+
+void ParabolicGuide::setIndex(size_t pathIndex) { m_pathIndex = pathIndex; }
 
 

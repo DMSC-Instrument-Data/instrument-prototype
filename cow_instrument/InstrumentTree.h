@@ -80,6 +80,10 @@ private:
   size_t m_sourceIndex;
   /// PathComponent vector index of the sample
   size_t m_sampleIndex;
+  /// Detector indexes corresponding to Detector* in m_detectorVec
+  std::vector<size_t> m_detectorIndexes;
+  /// Path component indexes corresponding to t PathComponent* in m_pathVec
+  std::vector<size_t> m_pathIndexes;
 };
 
 using InstrumentTree_const_uptr = std::unique_ptr<const InstrumentTree>;

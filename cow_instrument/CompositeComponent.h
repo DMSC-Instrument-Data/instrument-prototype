@@ -27,7 +27,9 @@ public:
   size_t size() const {return m_children.size();}
   const Component& getChild(size_t index) const;
   void registerContents(std::vector<const Detector *> &lookup,
-                        std::vector<const PathComponent *> &) const override;
+                        std::vector<const PathComponent *> &,
+                        std::vector<size_t> &detectorIndexes,
+                        std::vector<size_t> &pathIndexes) override;
   ComponentIdType componentId() const override;
   std::string name() const override;
   virtual bool accept(class ComponentVisitor *visitor) const override;
