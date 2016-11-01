@@ -22,10 +22,11 @@ public:
                void(const Eigen::Affine3d &, const Eigen::Quaterniond &));
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
-  MOCK_METHOD4(registerContents,
-               void(std::vector<const Detector *> &,
-                    std::vector<const PathComponent *> &, std::vector<size_t> &,
-                    std::vector<size_t> &));
+  MOCK_CONST_METHOD6(registerContents,
+                     void(std::vector<const Detector *> &,
+                          std::vector<const PathComponent *> &,
+                          std::vector<size_t> &, std::vector<size_t> &, size_t,
+                          std::vector<ComponentProxy> &));
   ~MockComponent() {}
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
   MOCK_CONST_METHOD0(name, std::string());
@@ -45,7 +46,8 @@ public:
 
   void registerContents(std::vector<const Detector *> &,
                         std::vector<const PathComponent *> &pathComponents,
-                        std::vector<size_t> &, std::vector<size_t> &) {
+                        std::vector<size_t> &, std::vector<size_t> &, size_t,
+                        std::vector<ComponentProxy> &) const {
     pathComponents.push_back(this);
   }
 
@@ -83,10 +85,11 @@ public:
                void(const Eigen::Affine3d &, const Eigen::Quaterniond &));
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
-  MOCK_METHOD4(registerContents,
-               void(std::vector<const Detector *> &,
-                    std::vector<const PathComponent *> &, std::vector<size_t> &,
-                    std::vector<size_t> &));
+  MOCK_CONST_METHOD6(registerContents,
+                     void(std::vector<const Detector *> &,
+                          std::vector<const PathComponent *> &,
+                          std::vector<size_t> &, std::vector<size_t> &, size_t,
+                          std::vector<ComponentProxy> &));
   ~MockDetector() {}
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
   MOCK_CONST_METHOD0(name, std::string());

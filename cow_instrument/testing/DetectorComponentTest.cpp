@@ -179,4 +179,36 @@ TEST(detector_component_test, test_shift_position_by) {
   EXPECT_TRUE(detector.getPos().isApprox(position + offset, 1e-14));
 }
 
+TEST(detector_component_test, test_register_contents) {
+
+  DetectorComponent detector(ComponentIdType(1), DetectorIdType{1},
+                             Eigen::Vector3d{1, 0, 0} /*Detector position*/);
+
+  // Registers
+  std::vector<const Detector *> detectorLookup;
+  std::vector<const PathComponent *> pathLookup;
+  std::vector<size_t> detectorIndexes;
+  std::vector<size_t> pathIndexes;
+  size_t parent = 1;
+  std::vector<ComponentProxy> proxies;
+
+  detector.registerContents(detectorLookup, pathLookup, detectorIndexes,
+                            pathIndexes, parent, proxies);
+
+  EXPECT_EQ(detectorLookup.size(), 1) << "Detector pointer list should grow";
+  EXPECT_EQ(pathLookup.size(), 0)
+      << "Path lookup list should NOT grow. These are detectors";
+  EXPECT_EQ(pathIndexes.size(), 0)
+      << "Path indexes should NOT grow. These are detectors";
+  EXPECT_EQ(detectorIndexes.size(), 1) << "Detector indexes should grow";
+  EXPECT_EQ(proxies.size(), 1) << "Proxies should grow";
+
+  EXPECT_TRUE(proxies[0].hasParent());
+  EXPECT_FALSE(proxies[0].hasChildren());
+  EXPECT_EQ(proxies[0].parent(), parent);
+  EXPECT_EQ(&proxies[0].const_ref(), &detector);
+  EXPECT_EQ(detectorIndexes[0], 0)
+      << "Should be pointing to the zeroth index of proxies";
+}
+
 } // namespace

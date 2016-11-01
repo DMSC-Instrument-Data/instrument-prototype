@@ -17,7 +17,9 @@ public:
   bool equals(const Component &) const override;
   void registerContents(std::vector<const Detector *> &,
                         std::vector<const PathComponent *> &,
-                        std::vector<size_t> &, std::vector<size_t> &) override;
+                        std::vector<size_t> &, std::vector<size_t> &,
+                        size_t previousIndex,
+                        std::vector<ComponentProxy> &) const override;
   ComponentIdType componentId() const override;
   std::string name() const override;
   static const std::string TypeName;

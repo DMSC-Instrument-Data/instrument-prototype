@@ -26,7 +26,8 @@ bool NullComponent::equals(const Component& other) const{
 void NullComponent::registerContents(std::vector<const Detector *> &,
                                      std::vector<const PathComponent *> &,
                                      std::vector<size_t> &,
-                                     std::vector<size_t> &) {
+                                     std::vector<size_t> &, size_t,
+                                     std::vector<ComponentProxy> &) const {
   // Do nothing.
 }
 

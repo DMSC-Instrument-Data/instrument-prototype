@@ -29,12 +29,12 @@ public:
   void registerContents(std::vector<const Detector *> &lookup,
                         std::vector<const PathComponent *> &pathComponents,
                         std::vector<size_t> &detectorIndexes,
-                        std::vector<size_t> &) override;
+                        std::vector<size_t> &, size_t previousIndex,
+                        std::vector<ComponentProxy> &) const override;
   std::string name() const override;
   virtual bool accept(ComponentVisitor *visitor) const override;
 
 private:
-  void setIndex(size_t detectorIndex);
   const DetectorIdType m_detectorId;
   const ComponentIdType m_componentId;
   Eigen::Vector3d m_pos;

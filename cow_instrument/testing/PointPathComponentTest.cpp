@@ -92,3 +92,31 @@ TEST(point_path_component_test, test_rotate_fast) {
   EXPECT_TRUE(rotatedVector.isApprox(Eigen::Vector3d{0, 1, 0}, 1e-14))
       << "Internal PointPathComponent rotation not updated correctly";
 }
+
+TEST(point_path_component_test, test_register_contents) {
+  ToyPointPathComponent component(Eigen::Vector3d{1, 0, 0}, ComponentIdType(1));
+
+  // Registers
+  std::vector<const Detector *> detectorLookup;
+  std::vector<const PathComponent *> pathLookup;
+  std::vector<size_t> detectorIndexes;
+  std::vector<size_t> pathIndexes;
+  size_t parent = -1;
+  std::vector<ComponentProxy> proxies;
+
+  component.registerContents(detectorLookup, pathLookup, detectorIndexes,
+                             pathIndexes, parent, proxies);
+
+  EXPECT_EQ(detectorLookup.size(), 0);
+  EXPECT_EQ(pathLookup.size(), 1);
+  EXPECT_EQ(pathIndexes.size(), 1);
+  EXPECT_EQ(detectorIndexes.size(), 0);
+  EXPECT_EQ(proxies.size(), 1) << "Proxies should grow";
+
+  EXPECT_FALSE(proxies[0].hasParent());
+  EXPECT_FALSE(proxies[0].hasChildren());
+  EXPECT_EQ(proxies[0].parent(), parent);
+  EXPECT_EQ(&proxies[0].const_ref(), &component);
+  EXPECT_EQ(pathIndexes[0], 0)
+      << "Should be pointing to the zeroth index of proxies";
+}

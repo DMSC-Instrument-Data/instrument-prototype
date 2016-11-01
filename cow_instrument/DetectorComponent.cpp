@@ -51,11 +51,13 @@ bool DetectorComponent::equals(const Component &other) const {
 void DetectorComponent::registerContents(
     std::vector<const Detector *> &lookupDetectors,
     std::vector<const PathComponent *> &, std::vector<size_t> &detectorIndexes,
-    std::vector<size_t> &) {
+    std::vector<size_t> &, size_t previousIndex,
+    std::vector<ComponentProxy> &componentProxies) const {
+
+  const size_t newIndex = componentProxies.size();
+  componentProxies.emplace_back(previousIndex, this);
   lookupDetectors.push_back(this);
-  size_t newDetectorIndex = lookupDetectors.size();
-  detectorIndexes.push_back(newDetectorIndex);
-  this->setIndex(newDetectorIndex);
+  detectorIndexes.push_back(newIndex); // We track the thing we just added.
 }
 
 std::string DetectorComponent::name() const {
@@ -72,6 +74,3 @@ DetectorIdType DetectorComponent::detectorId() const { return m_detectorId; }
 
 ComponentIdType DetectorComponent::componentId() const { return m_componentId; }
 
-void DetectorComponent::setIndex(size_t detectorIndex) {
-  m_detectorIndex = detectorIndex;
-}

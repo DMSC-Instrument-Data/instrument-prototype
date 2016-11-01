@@ -31,6 +31,7 @@ include_directories(${GTEST_INCLUDE_DIR} ${GMOCK_INCLUDE_DIR} ${Boost_INCLUDE_DI
 
 set ( TEST_FILES
                  CompositeComponentTest.cpp
+                 ComponentProxyTest.cpp
                  DetectorComponentTest.cpp
                  DetectorInfoTest.cpp                 
                  FixedLengthVectorTest.cpp                 

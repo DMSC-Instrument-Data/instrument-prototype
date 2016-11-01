@@ -23,7 +23,9 @@ public:
   virtual void
   registerContents(std::vector<const Detector *> &lookupDetectors,
                    std::vector<const PathComponent *> &lookupPathComponents,
-                   std::vector<size_t> &, std::vector<size_t> &pathIndexes);
+                   std::vector<size_t> &, std::vector<size_t> &pathIndexes,
+                   size_t previousIndex,
+                   std::vector<ComponentProxy> &componentProxies) const;
   ComponentIdType componentId() const;
   std::string name() const;
 
@@ -36,7 +38,6 @@ public:
   bool operator==(const ParabolicGuide &other) const;
 
 private:
-  void setIndex(size_t pathIndex);
   ComponentIdType m_componentId;
   double m_a;
   double m_h;

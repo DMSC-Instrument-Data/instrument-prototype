@@ -112,10 +112,15 @@ const Component &CompositeComponent::getChild(size_t index) const {
 void CompositeComponent::registerContents(
     std::vector<const Detector *> &lookupDetectors,
     std::vector<const PathComponent *> &lookupPathComponents,
-    std::vector<size_t> &detectorIndexes, std::vector<size_t> &pathIndexes) {
+    std::vector<size_t> &detectorIndexes, std::vector<size_t> &pathIndexes,
+    size_t previousIndex, std::vector<ComponentProxy> &componentProxies) const {
+
+  componentProxies.emplace_back(previousIndex, this);
+  size_t newPreviousIndex = componentProxies.size() - 1;
   for (auto &child : m_children) {
     child->registerContents(lookupDetectors, lookupPathComponents,
-                            detectorIndexes, pathIndexes);
+                            detectorIndexes, pathIndexes, newPreviousIndex,
+                            componentProxies);
   }
 }
 

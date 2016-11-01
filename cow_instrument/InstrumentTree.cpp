@@ -17,15 +17,16 @@ namespace {
  * @param detectorStore
  * @param pathStore
  */
-void findKeyComponents(Component &component,
+void findKeyComponents(const Component &component,
                        std::vector<const Detector *> &detectorStore,
                        std::vector<const PathComponent *> &pathStore,
                        std::vector<size_t> &detectorIndexes,
-                       std::vector<size_t> &pathIndexes) {
+                       std::vector<size_t> &pathIndexes,
+                       std::vector<ComponentProxy> &componentProxies) {
 
   // Walk through and register all detectors on the store.
   component.registerContents(detectorStore, pathStore, detectorIndexes,
-                             pathIndexes);
+                             pathIndexes, -1, componentProxies);
 }
 
 void checkDetectorRange(size_t detectorIndex,
@@ -62,9 +63,9 @@ void InstrumentTree::init() {
   for (const auto &node : m_nodes.const_ref()) {
     const auto &component = node.const_ref();
     // Put all detectors into a flat map.
-    findKeyComponents(const_cast<Component &>(component), *m_detectorVec,
-                      *m_pathVec, m_detectorIndexes,
-                      m_pathIndexes); // HACK! const_cast. Remove!
+    // std::vector<ComponentProxy> m_componentProxies;
+    findKeyComponents(component, *m_detectorVec, *m_pathVec, m_detectorIndexes,
+                      m_pathIndexes, m_componentProxies);
     if (node.version() != expectedVersion) {
       throw std::invalid_argument(
           "Cannot make an Instrument tree around Nodes of differing version");

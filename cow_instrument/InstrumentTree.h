@@ -7,7 +7,7 @@
 #include <Eigen/Core>
 #include "cow_ptr.h"
 #include "IdType.h"
-
+#include "ComponentProxy.h"
 
 class Node;
 class NodeIterator;
@@ -84,6 +84,8 @@ private:
   std::vector<size_t> m_detectorIndexes;
   /// Path component indexes corresponding to t PathComponent* in m_pathVec
   std::vector<size_t> m_pathIndexes;
+  /// Component Proxies
+  std::vector<ComponentProxy> m_componentProxies;
 };
 
 using InstrumentTree_const_uptr = std::unique_ptr<const InstrumentTree>;

@@ -9,6 +9,7 @@
 #include <cmath>
 
 #include "Command.h"
+#include "ComponentProxy.h"
 #include "cow_ptr.h"
 #include "Detector.h"
 #include "IdType.h"
@@ -78,6 +79,13 @@ private:
 
   // Instrument
   std::shared_ptr<const InstTree> m_instrumentTree;
+
+  /// Detector indexes corresponding to Detector* in m_detectorVec
+  std::vector<size_t> m_detectorIndexes;
+  /// Path component indexes corresponding to t PathComponent* in m_pathVec
+  std::vector<size_t> m_pathIndexes;
+
+  std::vector<ComponentProxy> m_componentProxies;
 };
 
 namespace {

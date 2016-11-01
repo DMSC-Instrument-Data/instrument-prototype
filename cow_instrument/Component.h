@@ -6,6 +6,7 @@
 #include "IdType.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include "ComponentProxy.h"
 
 class Detector;
 class PathComponent;
@@ -22,10 +23,12 @@ public:
   virtual ~Component() {}
   virtual Component *clone() const = 0;
   virtual bool equals(const Component &other) const = 0;
-  virtual void registerContents(std::vector<const Detector *> &detectorLookup,
-                                std::vector<const PathComponent *> &pathLookup,
-                                std::vector<size_t> &detectorIndexes,
-                                std::vector<size_t> &pathIndexes) = 0;
+  virtual void
+  registerContents(std::vector<const Detector *> &detectorLookup,
+                   std::vector<const PathComponent *> &pathLookup,
+                   std::vector<size_t> &detectorIndexes,
+                   std::vector<size_t> &pathIndexes, size_t previousIndex,
+                   std::vector<ComponentProxy> &componentProxies) const = 0;
   virtual ComponentIdType componentId() const = 0;
   virtual std::string name() const = 0;
   virtual bool accept(class ComponentVisitor *visitor) const = 0;

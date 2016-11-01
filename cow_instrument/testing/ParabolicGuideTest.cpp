@@ -112,9 +112,10 @@ TEST(parabolic_guide_test, test_register_only_path_components) {
   std::vector<size_t> pathIndexes;
   size_t detectorVecStartSize = detectorVec.size();
   size_t pathComponentVecSize = pathComponentVec.size();
+  std::vector<ComponentProxy> componentProxies;
   // Perform registration
   guide.registerContents(detectorVec, pathComponentVec, detectorIndexes,
-                         pathIndexes);
+                         pathIndexes, -1, componentProxies);
   EXPECT_EQ(detectorVec.size(), detectorVecStartSize)
       << "Do not register ParabolicGuide as a Detector";
   EXPECT_EQ(pathComponentVec.size(), pathComponentVecSize + 1)
@@ -229,4 +230,33 @@ TEST(parabolic_guide_test, test_rotate_fast) {
       guide.getRotation().toRotationMatrix() * Eigen::Vector3d{1, 0, 0};
   EXPECT_TRUE(rotatedVector.isApprox(Eigen::Vector3d{0, 1, 0}, 1e-14))
       << "Internal guide rotation not updated correctly";
+}
+
+TEST(parabolic_guide_test, test_register_contents) {
+
+  ParabolicGuide guide(ComponentIdType(1), 2, 1E-9, {0, 0, 0});
+
+  // Registers
+  std::vector<const Detector *> detectorLookup;
+  std::vector<const PathComponent *> pathLookup;
+  std::vector<size_t> detectorIndexes;
+  std::vector<size_t> pathIndexes;
+  size_t parent = -1;
+  std::vector<ComponentProxy> proxies;
+
+  guide.registerContents(detectorLookup, pathLookup, detectorIndexes,
+                         pathIndexes, parent, proxies);
+
+  EXPECT_EQ(detectorLookup.size(), 0);
+  EXPECT_EQ(pathLookup.size(), 1);
+  EXPECT_EQ(pathIndexes.size(), 1);
+  EXPECT_EQ(detectorIndexes.size(), 0);
+  EXPECT_EQ(proxies.size(), 1) << "Proxies should grow";
+
+  EXPECT_FALSE(proxies[0].hasParent());
+  EXPECT_FALSE(proxies[0].hasChildren());
+  EXPECT_EQ(proxies[0].parent(), parent);
+  EXPECT_EQ(&proxies[0].const_ref(), &guide);
+  EXPECT_EQ(pathIndexes[0], 0)
+      << "Should be pointing to the zeroth index of proxies";
 }

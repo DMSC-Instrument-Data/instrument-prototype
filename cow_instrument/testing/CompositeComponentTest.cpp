@@ -105,4 +105,39 @@ TEST(composite_component_test, test_rotate_fast) {
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(child));
 }
 
+TEST(composite_component_test, test_register_contents) {
+
+  using namespace testing;
+  MockComponent *child = new MockComponent;
+
+  CompositeComponent composite{ComponentIdType(1)};
+  composite.addComponent(std::unique_ptr<Component>(std::move(child)));
+
+  // Registers
+  std::vector<const Detector *> detectorLookup;
+  std::vector<const PathComponent *> pathLookup;
+  std::vector<size_t> detectorIndexes;
+  std::vector<size_t> pathIndexes;
+  size_t parent = -1;
+  std::vector<ComponentProxy> proxies;
+
+  EXPECT_CALL(*child, registerContents(_, _, _, _, _, _)).Times(1);
+
+  composite.registerContents(detectorLookup, pathLookup, detectorIndexes,
+                             pathIndexes, parent, proxies);
+
+  EXPECT_EQ(detectorLookup.size(), 0) << "Composite is not a detector";
+  EXPECT_EQ(pathLookup.size(), 0) << "Composite is not a path component";
+  EXPECT_EQ(pathIndexes.size(), 0) << "Composite is not a path component";
+  EXPECT_EQ(detectorIndexes.size(), 0) << "Composite is not a detector";
+  EXPECT_EQ(proxies.size(), 1) << "Proxies should grow";
+
+  EXPECT_FALSE(proxies[0].hasParent());
+  EXPECT_FALSE(proxies[0].hasChildren());
+  EXPECT_EQ(proxies[0].parent(), parent);
+  EXPECT_EQ(&proxies[0].const_ref(), &composite);
+
+  EXPECT_TRUE(Mock::VerifyAndClearExpectations(child));
+}
+
 } // namespace
