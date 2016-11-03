@@ -29,6 +29,17 @@ public:
                    std::vector<size_t> &detectorIndexes,
                    std::vector<size_t> &pathIndexes, size_t previousIndex,
                    std::vector<ComponentProxy> &componentProxies) const = 0;
+  virtual void
+  registerContents(std::vector<const Detector *> &detectorLookup,
+                   std::vector<const PathComponent *> &pathLookup,
+                   std::vector<size_t> &detectorIndexes,
+                   std::vector<size_t> &pathIndexes,
+                   std::vector<ComponentProxy> &componentProxies) const {
+    throw std::runtime_error("No override for register contents on Component. "
+                             "Should not have been called.");
+
+  }; // TODO make pure virtual
+
   virtual ComponentIdType componentId() const = 0;
   virtual std::string name() const = 0;
   virtual bool accept(class ComponentVisitor *visitor) const = 0;

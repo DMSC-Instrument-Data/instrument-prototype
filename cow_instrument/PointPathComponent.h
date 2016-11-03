@@ -28,6 +28,12 @@ public:
       std::vector<size_t> &detectorIndexes, std::vector<size_t> &pathIndexes,
       size_t previousIndex,
       std::vector<ComponentProxy> &componentProxies) const override;
+  virtual void registerContents(
+      std::vector<const Detector *> &detectorLookup,
+      std::vector<const PathComponent *> &pathLookup,
+      std::vector<size_t> &detectorIndexes, std::vector<size_t> &pathIndexes,
+      std::vector<ComponentProxy> &componentProxies) const override;
+
   virtual ComponentIdType componentId() const override;
   virtual std::string name() const override;
 
@@ -122,6 +128,21 @@ void PointPathComponent<T>::registerContents(
 
   const size_t newIndex = componentProxies.size();
   componentProxies.emplace_back(previousIndex, this);
+
+  componentProxies[previousIndex].addChild(newIndex);
+  pathLookup.push_back(this);
+  pathIndexes.push_back(newIndex);
+}
+
+template <typename T>
+void PointPathComponent<T>::registerContents(
+    std::vector<const Detector *> &,
+    std::vector<const PathComponent *> &pathLookup, std::vector<size_t> &,
+    std::vector<size_t> &pathIndexes,
+    std::vector<ComponentProxy> &componentProxies) const {
+
+  const size_t newIndex = componentProxies.size();
+  componentProxies.emplace_back(this);
   pathLookup.push_back(this);
   pathIndexes.push_back(newIndex);
 }

@@ -26,7 +26,7 @@ void findKeyComponents(const Component &component,
 
   // Walk through and register all detectors on the store.
   component.registerContents(detectorStore, pathStore, detectorIndexes,
-                             pathIndexes, -1, componentProxies);
+                             pathIndexes, componentProxies);
 }
 
 void checkDetectorRange(size_t detectorIndex,
@@ -106,6 +106,10 @@ InstrumentTree::InstrumentTree(CowPtr<std::vector<Node>> nodes)
 
 const Node &InstrumentTree::root() const { return m_nodes.const_ref()[0]; }
 
+const ComponentProxy &InstrumentTree::rootProxy() const {
+  return m_componentProxies[0];
+}
+
 const Detector &InstrumentTree::getDetector(size_t detectorIndex) const {
 
   checkDetectorRange(detectorIndex, m_detectorVec.const_ref());
@@ -150,6 +154,10 @@ CowPtr<std::vector<Node>>::RefPtr InstrumentTree::unsafeContents() const {
 }
 
 size_t InstrumentTree::nodeSize() const { return m_nodes->size(); }
+
+size_t InstrumentTree::componentSize() const {
+  return m_componentProxies.size();
+}
 
 size_t InstrumentTree::nDetectors() const { return m_detectorVec->size(); }
 
@@ -214,4 +222,8 @@ bool InstrumentTree::modify(const Node *node, const Command &command) {
 
 const Node *const InstrumentTree::nodeAt(size_t index) const {
   return &m_nodes.const_ref()[index];
+}
+
+const ComponentProxy &InstrumentTree::proxyAt(size_t index) const {
+  return m_componentProxies[index];
 }

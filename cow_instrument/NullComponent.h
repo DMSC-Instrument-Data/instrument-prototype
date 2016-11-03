@@ -20,6 +20,11 @@ public:
                         std::vector<size_t> &, std::vector<size_t> &,
                         size_t previousIndex,
                         std::vector<ComponentProxy> &) const override;
+  void registerContents(
+      std::vector<const Detector *> &detectorLookup,
+      std::vector<const PathComponent *> &pathLookup,
+      std::vector<size_t> &detectorIndexes, std::vector<size_t> &pathIndexes,
+      std::vector<ComponentProxy> &componentProxies) const override;
   ComponentIdType componentId() const override;
   std::string name() const override;
   static const std::string TypeName;

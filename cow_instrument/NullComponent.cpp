@@ -31,6 +31,14 @@ void NullComponent::registerContents(std::vector<const Detector *> &,
   // Do nothing.
 }
 
+void NullComponent::registerContents(std::vector<const Detector *> &,
+                                     std::vector<const PathComponent *> &,
+                                     std::vector<size_t> &,
+                                     std::vector<size_t> &,
+                                     std::vector<ComponentProxy> &) const {
+  // Do nothing.
+}
+
 ComponentIdType NullComponent::componentId() const
 {
     throw std::runtime_error("NullComponent does not implement componentId");

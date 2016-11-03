@@ -44,6 +44,9 @@ public:
 
   size_t nChildren() const;
 
+  bool operator==(const ComponentProxy &other) const;
+  bool operator!=(const ComponentProxy &other) const;
+
 private:
   /// Parent component, negative index indicates no parent.
   int64_t m_previous;

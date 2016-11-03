@@ -17,14 +17,6 @@ TEST(composite_component_test, test_provide_name) {
   EXPECT_EQ(composite.name(), name);
 }
 
-TEST(composite_component_test, test_one_level_deep_only) {
-  CompositeComponent level1{ComponentIdType(1), "level1"};
-  EXPECT_THROW(level1.addComponent(std::unique_ptr<Component>(
-                   new CompositeComponent{ComponentIdType(2), "level2"})),
-               std::invalid_argument)
-      << "Cannot have multiple levels of composite";
-}
-
 TEST(composite_component_test, test_clone){
     CompositeComponent composite{ComponentIdType(1)};
 
@@ -118,13 +110,12 @@ TEST(composite_component_test, test_register_contents) {
   std::vector<const PathComponent *> pathLookup;
   std::vector<size_t> detectorIndexes;
   std::vector<size_t> pathIndexes;
-  size_t parent = -1;
   std::vector<ComponentProxy> proxies;
 
   EXPECT_CALL(*child, registerContents(_, _, _, _, _, _)).Times(1);
 
   composite.registerContents(detectorLookup, pathLookup, detectorIndexes,
-                             pathIndexes, parent, proxies);
+                             pathIndexes, proxies);
 
   EXPECT_EQ(detectorLookup.size(), 0) << "Composite is not a detector";
   EXPECT_EQ(pathLookup.size(), 0) << "Composite is not a path component";
@@ -134,7 +125,6 @@ TEST(composite_component_test, test_register_contents) {
 
   EXPECT_FALSE(proxies[0].hasParent());
   EXPECT_FALSE(proxies[0].hasChildren());
-  EXPECT_EQ(proxies[0].parent(), parent);
   EXPECT_EQ(&proxies[0].const_ref(), &composite);
 
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(child));

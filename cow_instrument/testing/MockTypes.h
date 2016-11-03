@@ -27,6 +27,11 @@ public:
                           std::vector<const PathComponent *> &,
                           std::vector<size_t> &, std::vector<size_t> &, size_t,
                           std::vector<ComponentProxy> &));
+  MOCK_CONST_METHOD5(registerContents,
+                     void(std::vector<const Detector *> &,
+                          std::vector<const PathComponent *> &,
+                          std::vector<size_t> &, std::vector<size_t> &,
+                          std::vector<ComponentProxy> &));
   ~MockComponent() {}
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
   MOCK_CONST_METHOD0(name, std::string());
@@ -47,6 +52,13 @@ public:
   void registerContents(std::vector<const Detector *> &,
                         std::vector<const PathComponent *> &pathComponents,
                         std::vector<size_t> &, std::vector<size_t> &, size_t,
+                        std::vector<ComponentProxy> &) const {
+    pathComponents.push_back(this);
+  }
+
+  void registerContents(std::vector<const Detector *> &,
+                        std::vector<const PathComponent *> &pathComponents,
+                        std::vector<size_t> &, std::vector<size_t> &,
                         std::vector<ComponentProxy> &) const {
     pathComponents.push_back(this);
   }

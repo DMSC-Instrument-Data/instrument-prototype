@@ -101,11 +101,10 @@ TEST(point_path_component_test, test_register_contents) {
   std::vector<const PathComponent *> pathLookup;
   std::vector<size_t> detectorIndexes;
   std::vector<size_t> pathIndexes;
-  size_t parent = -1;
   std::vector<ComponentProxy> proxies;
 
   component.registerContents(detectorLookup, pathLookup, detectorIndexes,
-                             pathIndexes, parent, proxies);
+                             pathIndexes, proxies);
 
   EXPECT_EQ(detectorLookup.size(), 0);
   EXPECT_EQ(pathLookup.size(), 1);
@@ -115,7 +114,6 @@ TEST(point_path_component_test, test_register_contents) {
 
   EXPECT_FALSE(proxies[0].hasParent());
   EXPECT_FALSE(proxies[0].hasChildren());
-  EXPECT_EQ(proxies[0].parent(), parent);
   EXPECT_EQ(&proxies[0].const_ref(), &component);
   EXPECT_EQ(pathIndexes[0], 0)
       << "Should be pointing to the zeroth index of proxies";

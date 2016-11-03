@@ -93,10 +93,6 @@ bool CompositeComponent::equals(const Component &other) const {
 }
 
 void CompositeComponent::addComponent(std::unique_ptr<Component> &&child) {
-  if (dynamic_cast<const CompositeComponent *>(child.get())) {
-    throw std::invalid_argument(
-        "Cannot add a composite component to a composite component");
-  }
   m_children.emplace_back(std::move(child));
 }
 
@@ -115,11 +111,29 @@ void CompositeComponent::registerContents(
     std::vector<size_t> &detectorIndexes, std::vector<size_t> &pathIndexes,
     size_t previousIndex, std::vector<ComponentProxy> &componentProxies) const {
 
+  const bool firstEntry = componentProxies.empty();
   componentProxies.emplace_back(previousIndex, this);
   size_t newPreviousIndex = componentProxies.size() - 1;
+  componentProxies[previousIndex].addChild(newPreviousIndex);
   for (auto &child : m_children) {
     child->registerContents(lookupDetectors, lookupPathComponents,
                             detectorIndexes, pathIndexes, newPreviousIndex,
+                            componentProxies);
+  }
+}
+
+void CompositeComponent::registerContents(
+    std::vector<const Detector *> &lookupDetectors,
+    std::vector<const PathComponent *> &lookupPathComponents,
+    std::vector<size_t> &detectorIndexes, std::vector<size_t> &pathIndexes,
+    std::vector<ComponentProxy> &componentProxies) const {
+
+  componentProxies.emplace_back(this);
+  size_t previousIndex = componentProxies.size() - 1;
+
+  for (auto &child : m_children) {
+    child->registerContents(lookupDetectors, lookupPathComponents,
+                            detectorIndexes, pathIndexes, previousIndex,
                             componentProxies);
   }
 }

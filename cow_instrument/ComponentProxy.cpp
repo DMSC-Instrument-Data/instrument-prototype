@@ -1,4 +1,5 @@
 #include "ComponentProxy.h"
+#include "Component.h"
 
 void ComponentProxy::addChild(size_t child) { m_next.emplace_back(child); }
 
@@ -30,3 +31,12 @@ const Component &ComponentProxy::const_ref() const { return *m_contents; }
 size_t ComponentProxy::nChildren() const { return m_next.size(); }
 
 const std::vector<size_t> &ComponentProxy::children() const { return m_next; }
+
+bool ComponentProxy::operator==(const ComponentProxy &other) const {
+  return m_contents->equals(other.const_ref()) && m_next == other.children() &&
+         m_previous == other.parent();
+}
+
+bool ComponentProxy::operator!=(const ComponentProxy &other) const {
+  return !(this->operator==(other));
+}

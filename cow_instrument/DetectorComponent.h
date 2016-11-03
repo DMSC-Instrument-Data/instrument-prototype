@@ -31,6 +31,12 @@ public:
                         std::vector<size_t> &detectorIndexes,
                         std::vector<size_t> &, size_t previousIndex,
                         std::vector<ComponentProxy> &) const override;
+
+  void registerContents(
+      std::vector<const Detector *> &detectorLookup,
+      std::vector<const PathComponent *> &pathLookup,
+      std::vector<size_t> &detectorIndexes, std::vector<size_t> &pathIndexes,
+      std::vector<ComponentProxy> &componentProxies) const override;
   std::string name() const override;
   virtual bool accept(ComponentVisitor *visitor) const override;
 
