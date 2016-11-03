@@ -117,10 +117,6 @@ TEST(instrument_tree_test, test_uptr_constructor) {
   EXPECT_EQ(0, instrument.version());
 }
 
-TEST(instrument_tree_test, test_root_node_must_be_valid) {
-
-  EXPECT_THROW(InstrumentTree({}), std::invalid_argument);
-}
 
 TEST(instrument_tree_test, test_version_check_on_constructor) {
 
@@ -699,9 +695,7 @@ TEST(instrument_tree_test, test_component_proxies) {
 
   a->addComponent(std::move(d));
 
-  std::vector<Node> nodes;
-  nodes.emplace_back(CowPtr<Component>(a));
-  InstrumentTree instrument(std::move(nodes));
+  InstrumentTree instrument(a);
 
   auto it = instrument.begin();
   // Check the first component A.

@@ -22,6 +22,8 @@ class PointSample;
  */
 class InstrumentTree {
 public:
+  InstrumentTree(std::shared_ptr<Component> componentRoot);
+
   InstrumentTree(std::vector<Node> &&nodes);
 
   InstrumentTree(CowPtr<std::vector<Node>> nodes);
@@ -89,6 +91,9 @@ private:
   std::vector<size_t> m_pathIndexes;
   /// Component Proxies
   std::vector<ComponentProxy> m_componentProxies;
+  /// Component Root
+  std::shared_ptr<Component>
+      m_componentRoot; // TODO. This needs to change to a unique_ptr
 };
 
 using InstrumentTree_const_uptr = std::unique_ptr<const InstrumentTree>;

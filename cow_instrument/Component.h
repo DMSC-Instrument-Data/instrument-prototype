@@ -34,11 +34,7 @@ public:
                    std::vector<const PathComponent *> &pathLookup,
                    std::vector<size_t> &detectorIndexes,
                    std::vector<size_t> &pathIndexes,
-                   std::vector<ComponentProxy> &componentProxies) const {
-    throw std::runtime_error("No override for register contents on Component. "
-                             "Should not have been called.");
-
-  }; // TODO make pure virtual
+                   std::vector<ComponentProxy> &componentProxies) const = 0;
 
   virtual ComponentIdType componentId() const = 0;
   virtual std::string name() const = 0;

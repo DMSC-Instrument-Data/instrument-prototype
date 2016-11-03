@@ -29,6 +29,10 @@ public:
                         std::vector<const PathComponent *> &,
                         std::vector<size_t> &, std::vector<size_t> &, size_t,
                         std::vector<ComponentProxy> &) const {}
+  void registerContents(std::vector<const Detector *> &,
+                        std::vector<const PathComponent *> &,
+                        std::vector<size_t> &, std::vector<size_t> &,
+                        std::vector<ComponentProxy> &) const {}
   ComponentIdType componentId() const { return ComponentIdType{1}; }
   std::string name() const { return ""; }
   bool accept(ComponentVisitor *) const { return false; }

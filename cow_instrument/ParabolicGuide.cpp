@@ -95,15 +95,24 @@ void ParabolicGuide::registerContents(
     std::vector<const PathComponent *> &pathComponents, std::vector<size_t> &,
     std::vector<size_t> &pathIndexes, size_t previousIndex,
     std::vector<ComponentProxy> &componentProxies) const {
-  // Register this as a path component. It is not a detector.
 
-  const bool isFirst = componentProxies.empty();
+  // Register this as a path component. It is not a detector.
   const size_t newIndex = componentProxies.size();
   componentProxies.emplace_back(previousIndex, this);
-  if (!isFirst) {
-    componentProxies[previousIndex].addChild(newIndex);
-  }
+  componentProxies[previousIndex].addChild(newIndex);
   pathComponents.push_back(this);
+  pathIndexes.push_back(newIndex);
+}
+
+void ParabolicGuide::registerContents(
+    std::vector<const Detector *> &,
+    std::vector<const PathComponent *> &lookupPathComponents,
+    std::vector<size_t> &, std::vector<size_t> &pathIndexes,
+    std::vector<ComponentProxy> &componentProxies) const {
+  // Register this as a path component. It is not a detector.
+  const size_t newIndex = componentProxies.size();
+  componentProxies.emplace_back(this);
+  lookupPathComponents.push_back(this);
   pathIndexes.push_back(newIndex);
 }
 

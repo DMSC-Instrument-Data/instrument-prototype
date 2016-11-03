@@ -54,11 +54,7 @@ bool findSample(const PathComponent *item) { return item->isSample(); }
 
 void InstrumentTree::init() {
 
-  if (m_nodes->empty()) {
-    throw std::invalid_argument(
-        "No root Node. Cannot create an InstrumentTree");
-  }
-
+  if (m_nodes->size() > 0) {
   const unsigned int expectedVersion = this->version();
   for (const auto &node : m_nodes.const_ref()) {
     const auto &component = node.const_ref();
@@ -71,6 +67,12 @@ void InstrumentTree::init() {
           "Cannot make an Instrument tree around Nodes of differing version");
     }
   }
+  } else {
+
+    findKeyComponents(*m_componentRoot, *m_detectorVec, *m_pathVec,
+                      m_detectorIndexes, m_pathIndexes, m_componentProxies);
+  }
+
   const auto begin_pathVec = m_pathVec.const_ref().cbegin();
   const auto end_pathVec = m_pathVec.const_ref().cend();
   auto sourceIt = std::find_if(begin_pathVec, end_pathVec, findSource);
@@ -86,6 +88,14 @@ void InstrumentTree::init() {
 
   // Should we shrink to fit to reduce excess capacity?
   // m_detectorVec.shrink_to_fit(); This could be costly
+}
+
+InstrumentTree::InstrumentTree(std::shared_ptr<Component> componentRoot)
+    : m_nodes(std::make_shared<std::vector<Node>>()),
+      m_componentRoot(componentRoot),
+      m_detectorVec(std::make_shared<std::vector<Detector const *>>()),
+      m_pathVec(std::make_shared<std::vector<PathComponent const *>>()) {
+  init();
 }
 
 InstrumentTree::InstrumentTree(std::vector<Node> &&nodes)
