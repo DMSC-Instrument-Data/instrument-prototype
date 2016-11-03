@@ -2,6 +2,7 @@
 #define COMPONENTPROXY_H
 
 #include <vector>
+#include <cstddef>
 
 class Component;
 
