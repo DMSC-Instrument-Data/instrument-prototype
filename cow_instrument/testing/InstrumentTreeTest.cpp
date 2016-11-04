@@ -665,8 +665,7 @@ TEST(instrument_tree_test, test_tree_no_cascade) {
   // EXPECT_EQ((newTree.begin() + 3)->version(), instrument.version() + 1);
 }
 
-TEST(instrument_tree_test, test_component_proxies) {
-
+InstrumentTree makeInstrumentTree() {
   /*
 
     we start like this. A-B-C-D-E are componenets within a single node.
@@ -695,8 +694,12 @@ TEST(instrument_tree_test, test_component_proxies) {
 
   a->addComponent(std::move(d));
 
-  InstrumentTree instrument(a);
+  return InstrumentTree(a);
+}
 
+TEST(instrument_tree_test, test_component_proxies) {
+
+  InstrumentTree instrument = makeInstrumentTree();
   auto it = instrument.begin();
   // Check the first component A.
   EXPECT_EQ(it->const_ref().componentId(), ComponentIdType(1));
@@ -729,12 +732,32 @@ TEST(instrument_tree_test, test_component_proxies) {
   EXPECT_TRUE(it->hasParent());
   EXPECT_FALSE(it->hasChildren());
   EXPECT_EQ(it->parent(), 3);
+}
 
-  std::cout << "ComponentProxy size: " << sizeof(ComponentProxy) << std::endl;
-  std::cout << "size_t size: " << sizeof(size_t) << std::endl;
-  std::cout << "Component pointer size: " << sizeof(Component const *const)
-            << std::endl;
-  std::cout << "vector size_t size: " << sizeof(std::vector<ComponentProxy>{})
-            << std::endl;
+TEST(instrument_tree_test, test_subtree_search) {
+  InstrumentTree instrument = makeInstrumentTree();
+
+  // Subtree of A
+  auto indexes = instrument.subTreeIndexes(0);
+  EXPECT_EQ(indexes, (std::vector<size_t>{0, 1, 2, 3, 4}))
+      << "Subtree for A. should include everything";
+
+  // Subtree of B
+  indexes = instrument.subTreeIndexes(1);
+  EXPECT_EQ(indexes, (std::vector<size_t>{1}))
+      << "Should just include itself. Subtree for B incorrect";
+
+  // Subtree of C
+  indexes = instrument.subTreeIndexes(2);
+  EXPECT_EQ(indexes, (std::vector<size_t>{2}))
+      << "Should just include itself. Subtree for C incorrect";
+
+  // Subtree of D
+  indexes = instrument.subTreeIndexes(3);
+  EXPECT_EQ(indexes, (std::vector<size_t>{3, 4})) << "Subtree for D incorrect";
+
+  // Subtree of E
+  indexes = instrument.subTreeIndexes(4);
+  EXPECT_EQ(indexes, (std::vector<size_t>{4})) << "Subtree for E incorrect";
 }
 }

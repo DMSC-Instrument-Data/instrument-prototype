@@ -72,6 +72,8 @@ public:
 
   size_t nodeSize() const;
   size_t componentSize() const;
+  /// Enable use to determine all sub-components.
+  std::vector<size_t> subTreeIndexes(size_t proxyIndex) const;
 
 private:
   void init();

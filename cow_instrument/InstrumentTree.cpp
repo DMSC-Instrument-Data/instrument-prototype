@@ -169,6 +169,22 @@ size_t InstrumentTree::componentSize() const {
   return m_componentProxies.size();
 }
 
+std::vector<size_t> InstrumentTree::subTreeIndexes(size_t proxyIndex) const {
+  if (proxyIndex >= componentSize()) {
+    throw std::invalid_argument("No subtree for proxy index: " +
+                                std::to_string(proxyIndex));
+  }
+
+  std::vector<size_t> subtree = {proxyIndex};
+  for (size_t index = 0; index < subtree.size(); ++index) {
+    auto &currentProxy = m_componentProxies[subtree[index]];
+    const auto &currentChildren = currentProxy.children();
+    subtree.insert(subtree.end(), currentChildren.begin(),
+                   currentChildren.end());
+  }
+  return subtree;
+}
+
 size_t InstrumentTree::nDetectors() const { return m_detectorVec->size(); }
 
 size_t InstrumentTree::nPathComponents() const { return m_pathVec->size(); }
