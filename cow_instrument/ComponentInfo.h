@@ -34,6 +34,8 @@ public:
   const ComponentProxy &proxyAt(size_t index) const;
   const ComponentProxy &rootProxy() const;
   size_t componentSize() const;
+  size_t detectorSize() const;
+  size_t pathSize() const;
   std::vector<size_t> subTreeIndexes(size_t proxyIndex) const;
 
   std::vector<const Detector *> detectorComponents() const;
@@ -48,6 +50,9 @@ public:
 
   bool operator==(const ComponentInfo &other) const;
   bool operator!=(const ComponentInfo &other) const;
+
+  const Detector &detectorComponentAt(size_t detectorIndex) const;
+  const PathComponent &pathComponentAt(size_t pathComponentIndex) const;
 
 private:
   size_t updateProxies(Component const *const comp);

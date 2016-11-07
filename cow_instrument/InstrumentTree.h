@@ -54,18 +54,10 @@ public:
   size_t samplePathIndex() const;
   size_t sourcePathIndex() const;
 
-  std::vector<ComponentProxy>::const_iterator begin() const {
-    return m_componentInfo.begin();
-  }
-  std::vector<ComponentProxy>::const_iterator end() const {
-    return m_componentInfo.end();
-  }
-  std::vector<ComponentProxy>::const_iterator cbegin() const {
-    return m_componentInfo.cbegin();
-  }
-  std::vector<ComponentProxy>::const_iterator cend() const {
-    return m_componentInfo.cend();
-  }
+  std::vector<ComponentProxy>::const_iterator begin() const;
+  std::vector<ComponentProxy>::const_iterator end() const;
+  std::vector<ComponentProxy>::const_iterator cbegin() const;
+  std::vector<ComponentProxy>::const_iterator cend() const;
 
   // TODO. Had to add this for serialization. We could do better.
   CowPtr<std::vector<Node>>::RefPtr unsafeContents() const;
@@ -86,7 +78,7 @@ private:
   ComponentInfo m_componentInfo;
   /// Component root
   std::shared_ptr<Component>
-      m_componentRoot; // TODO. This needs to change to a unique_ptr
+      m_componentRoot; // TODO. This probably needs to be COW.
 };
 
 using InstrumentTree_const_uptr = std::unique_ptr<const InstrumentTree>;

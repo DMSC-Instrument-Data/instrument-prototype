@@ -5,13 +5,31 @@
 #include "PathComponent.h"
 #include <string>
 
-void ComponentInfo::clear()
-{
-    m_proxies.clear();
-    m_detectorComponents.clear();
-    m_pathComponents.clear();
-    m_detectorComponentIndexes.clear();
-    m_pathComponentIndexes.clear();
+namespace {
+
+void checkDetectorRange(size_t detectorIndex, size_t limit) {
+  if (detectorIndex >= limit) {
+    throw std::invalid_argument(
+        "Detector Index is outside range of indexes. Index is: " +
+        std::to_string(detectorIndex));
+  }
+}
+
+void checkPathRange(size_t pathIndex, size_t limit) {
+  if (pathIndex >= limit) {
+    throw std::invalid_argument(
+        "PathComponent Index is outside range of indexes. Index is: " +
+        std::to_string(pathIndex));
+  }
+}
+}
+
+void ComponentInfo::clear() {
+  m_proxies.clear();
+  m_detectorComponents.clear();
+  m_pathComponents.clear();
+  m_detectorComponentIndexes.clear();
+  m_pathComponentIndexes.clear();
 }
 
 void ComponentInfo::registerDetector(Detector const *const comp) {
@@ -54,15 +72,18 @@ size_t ComponentInfo::registerComposite(const CompositeComponent *const comp,
 std::vector<ComponentProxy> ComponentInfo::proxies() { return m_proxies; }
 
 const ComponentProxy &ComponentInfo::proxyAt(size_t index) const {
-    return m_proxies[index];
+  return m_proxies[index];
 }
 
-const ComponentProxy &ComponentInfo::rootProxy() const
-{
- return m_proxies[0];
-}
+const ComponentProxy &ComponentInfo::rootProxy() const { return m_proxies[0]; }
 
 size_t ComponentInfo::componentSize() const { return m_proxies.size(); }
+
+size_t ComponentInfo::detectorSize() const {
+  return m_detectorComponents.size();
+}
+
+size_t ComponentInfo::pathSize() const { return m_pathComponents.size(); }
 
 std::vector<size_t> ComponentInfo::subTreeIndexes(size_t proxyIndex) const {
   if (proxyIndex >= componentSize()) {
@@ -130,4 +151,15 @@ bool ComponentInfo::operator==(const ComponentInfo &other) const {
 
 bool ComponentInfo::operator!=(const ComponentInfo &other) const {
   return !operator==(other);
+}
+
+const Detector &ComponentInfo::detectorComponentAt(size_t detectorIndex) const {
+  checkDetectorRange(detectorIndex, this->detectorSize());
+  return *m_detectorComponents[detectorIndex];
+}
+
+const PathComponent &
+ComponentInfo::pathComponentAt(size_t pathComponentIndex) const {
+  checkPathRange(pathComponentIndex, this->pathSize());
+  return *m_pathComponents[pathComponentIndex];
 }

@@ -23,24 +23,6 @@ void findKeyComponents(const Component &component, ComponentInfo &info) {
   component.registerContents(info);
 }
 
-void checkDetectorRange(size_t detectorIndex,
-                        const std::vector<Detector const *> &detectorVec) {
-  if (detectorIndex >= detectorVec.size()) {
-    throw std::invalid_argument(
-        "Detector Index is outside range of indexes. Index is: " +
-        std::to_string(detectorIndex));
-  }
-}
-
-void checkPathRange(size_t pathIndex,
-                    const std::vector<PathComponent const *> &pathVec) {
-  if (pathIndex >= pathVec.size()) {
-    throw std::invalid_argument(
-        "PathComponent Index is outside range of indexes. Index is: " +
-        std::to_string(pathIndex));
-  }
-}
-
 bool findSource(const PathComponent *item) { return item->isSource(); }
 
 bool findSample(const PathComponent *item) { return item->isSample(); }
@@ -107,18 +89,12 @@ const ComponentProxy &InstrumentTree::rootProxy() const {
 }
 
 const Detector &InstrumentTree::getDetector(size_t detectorIndex) const {
-
-  checkDetectorRange(detectorIndex, m_componentInfo.detectorComponents());
-
-  return *m_componentInfo.detectorComponents()[detectorIndex];
+  return m_componentInfo.detectorComponentAt(detectorIndex);
 }
 
 const PathComponent &
 InstrumentTree::getPathComponent(size_t pathComponentIndex) const {
-
-  checkPathRange(pathComponentIndex, m_componentInfo.pathComponents());
-
-  return *m_componentInfo.pathComponents()[pathComponentIndex];
+  return m_componentInfo.pathComponentAt(pathComponentIndex);
 };
 
 unsigned int InstrumentTree::version() const {
@@ -127,17 +103,19 @@ unsigned int InstrumentTree::version() const {
 
 void InstrumentTree::fillDetectorMap(
     std::map<DetectorIdType, size_t> &toFill) const {
-  for (size_t index = 0; index < m_componentInfo.detectorComponents().size(); ++index) {
-    toFill.insert(std::make_pair(m_componentInfo.detectorComponents()[index]->detectorId(), index));
+  for (size_t index = 0; index < m_componentInfo.detectorComponents().size();
+       ++index) {
+    toFill.insert(std::make_pair(
+        m_componentInfo.detectorComponents()[index]->detectorId(), index));
   }
 }
 
 const PathComponent &InstrumentTree::source() const {
-  return *m_componentInfo.pathComponents()[m_sourceIndex];
+  return m_componentInfo.pathComponentAt(m_sourceIndex);
 }
 
 const PathComponent &InstrumentTree::sample() const {
-  return *m_componentInfo.pathComponents()[m_sampleIndex];
+  return m_componentInfo.pathComponentAt(m_sampleIndex);
 }
 
 size_t InstrumentTree::samplePathIndex() const { return m_sampleIndex; }
@@ -158,9 +136,13 @@ std::vector<size_t> InstrumentTree::subTreeIndexes(size_t proxyIndex) const {
   return m_componentInfo.subTreeIndexes(proxyIndex);
 }
 
-size_t InstrumentTree::nDetectors() const { return m_componentInfo.detectorComponents().size(); }
+size_t InstrumentTree::nDetectors() const {
+  return m_componentInfo.detectorSize();
+}
 
-size_t InstrumentTree::nPathComponents() const { return m_componentInfo.pathComponents().size(); }
+size_t InstrumentTree::nPathComponents() const {
+  return m_componentInfo.pathSize();
+}
 
 /*
  * Modify is not thread-safe owing to the fact that the vector of detector
@@ -223,4 +205,17 @@ const Node *const InstrumentTree::nodeAt(size_t index) const {
 
 const ComponentProxy &InstrumentTree::proxyAt(size_t index) const {
   return m_componentInfo.proxyAt(index);
+}
+
+std::vector<ComponentProxy>::const_iterator InstrumentTree::begin() const {
+  return m_componentInfo.begin();
+}
+std::vector<ComponentProxy>::const_iterator InstrumentTree::end() const {
+  return m_componentInfo.end();
+}
+std::vector<ComponentProxy>::const_iterator InstrumentTree::cbegin() const {
+  return m_componentInfo.cbegin();
+}
+std::vector<ComponentProxy>::const_iterator InstrumentTree::cend() const {
+  return m_componentInfo.cend();
 }
