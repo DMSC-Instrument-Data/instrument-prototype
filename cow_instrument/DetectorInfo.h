@@ -41,10 +41,6 @@ public:
 
   bool isMonitor(size_t detectorIndex) const;
 
-  void initL2();
-
-  void initL1();
-
   double l2(size_t detectorIndex) const;
 
   Eigen::Vector3d position(size_t detectorIndex) const;
@@ -62,6 +58,9 @@ public:
   CowPtr<L2s> l2s() const;
 
 private:
+  void init();
+  void initL2();
+  void initL1();
 
   //------------------- MetaData -------------
   const size_t m_nDetectors;
@@ -80,12 +79,8 @@ private:
   // Instrument
   std::shared_ptr<const InstTree> m_instrumentTree;
 
-  /// Detector indexes corresponding to Detector* in m_detectorVec
-  std::vector<size_t> m_detectorIndexes;
-  /// Path component indexes corresponding to t PathComponent* in m_pathVec
-  std::vector<size_t> m_pathIndexes;
-
-  std::vector<ComponentProxy> m_componentProxies;
+  std::vector<Eigen::Vector3d> m_positions;
+  std::vector<Eigen::Quaterniond> m_rotations;
 };
 
 namespace {
@@ -117,10 +112,11 @@ DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
       m_isMonitor(std::make_shared<MonitorFlags>(m_nDetectors, Bool(false))),
       m_l1(std::make_shared<L1s>(m_nDetectors)),
       m_l2(std::make_shared<L2s>(m_nDetectors)),
-      m_instrumentTree(std::forward<InstSptrType>(instrumentTree)) {
+      m_instrumentTree(std::forward<InstSptrType>(instrumentTree)),
+      m_positions(m_instrumentTree->componentSize()),
+      m_rotations(m_instrumentTree->componentSize()) {
 
-  initL1();
-  initL2();
+  init();
 }
 
 template <typename InstTree>
@@ -145,6 +141,12 @@ template <typename InstTree>
 bool DetectorInfo<InstTree>::isMonitor(size_t detectorIndex) const {
   detectorRangeCheck(detectorIndex, m_isMonitor.const_ref());
   return m_isMonitor.const_ref()[detectorIndex];
+}
+
+template <typename InstTree> void DetectorInfo<InstTree>::init() {
+
+  initL1();
+  initL2();
 }
 
 template <typename InstTree> void DetectorInfo<InstTree>::initL1() {
@@ -251,8 +253,7 @@ void DetectorInfo<InstTree>::modify(size_t nodeIndex, Command &command) {
 
   // All other geometry-derived information is now also invalid. Very
   // important!
-  initL1();
-  initL2();
+  init();
 
   // Meta-data should all still be valid.
 }

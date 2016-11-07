@@ -668,7 +668,7 @@ TEST(instrument_tree_test, test_tree_no_cascade) {
 InstrumentTree makeInstrumentTree() {
   /*
 
-    we start like this. A-B-C-D-E are componenets within a single node.
+    we start like this. A-B-C-D-E are components within a single node.
 
         A
         |
@@ -759,5 +759,13 @@ TEST(instrument_tree_test, test_subtree_search) {
   // Subtree of E
   indexes = instrument.subTreeIndexes(4);
   EXPECT_EQ(indexes, (std::vector<size_t>{4})) << "Subtree for E incorrect";
+}
+
+TEST(instrument_tree_test, test_subtree_unreachable_throws) {
+
+  InstrumentTree instrument = makeInstrumentTree();
+
+  EXPECT_THROW(instrument.subTreeIndexes(instrument.componentSize()),
+               std::invalid_argument);
 }
 }

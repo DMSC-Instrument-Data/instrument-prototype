@@ -26,17 +26,9 @@ public:
   bool equals(const Component &other) const override;
   DetectorIdType detectorId() const override;
   ComponentIdType componentId() const override;
-  void registerContents(std::vector<const Detector *> &lookup,
-                        std::vector<const PathComponent *> &pathComponents,
-                        std::vector<size_t> &detectorIndexes,
-                        std::vector<size_t> &, size_t previousIndex,
-                        std::vector<ComponentProxy> &) const override;
-
-  void registerContents(
-      std::vector<const Detector *> &detectorLookup,
-      std::vector<const PathComponent *> &pathLookup,
-      std::vector<size_t> &detectorIndexes, std::vector<size_t> &pathIndexes,
-      std::vector<ComponentProxy> &componentProxies) const override;
+  virtual void registerContents(ComponentInfo &info) const override;
+  virtual void registerContents(ComponentInfo &info,
+                                size_t parentIndex) const override;
   std::string name() const override;
   virtual bool accept(ComponentVisitor *visitor) const override;
 

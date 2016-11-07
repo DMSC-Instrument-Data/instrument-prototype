@@ -22,16 +22,9 @@ public:
                void(const Eigen::Affine3d &, const Eigen::Quaterniond &));
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
-  MOCK_CONST_METHOD6(registerContents,
-                     void(std::vector<const Detector *> &,
-                          std::vector<const PathComponent *> &,
-                          std::vector<size_t> &, std::vector<size_t> &, size_t,
-                          std::vector<ComponentProxy> &));
-  MOCK_CONST_METHOD5(registerContents,
-                     void(std::vector<const Detector *> &,
-                          std::vector<const PathComponent *> &,
-                          std::vector<size_t> &, std::vector<size_t> &,
-                          std::vector<ComponentProxy> &));
+  MOCK_CONST_METHOD1(registerContents, void(ComponentInfo &));
+  MOCK_CONST_METHOD2(registerContents, void(ComponentInfo &, size_t));
+
   ~MockComponent() {}
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
   MOCK_CONST_METHOD0(name, std::string());
@@ -49,18 +42,11 @@ public:
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
 
-  void registerContents(std::vector<const Detector *> &,
-                        std::vector<const PathComponent *> &pathComponents,
-                        std::vector<size_t> &, std::vector<size_t> &, size_t,
-                        std::vector<ComponentProxy> &) const {
-    pathComponents.push_back(this);
+  void registerContents(ComponentInfo &info) const {
+    info.registerPathComponent(this);
   }
-
-  void registerContents(std::vector<const Detector *> &,
-                        std::vector<const PathComponent *> &pathComponents,
-                        std::vector<size_t> &, std::vector<size_t> &,
-                        std::vector<ComponentProxy> &) const {
-    pathComponents.push_back(this);
+  void registerContents(ComponentInfo &info, size_t parentIndex) const {
+    info.registerPathComponent(this, parentIndex);
   }
 
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
@@ -97,17 +83,8 @@ public:
                void(const Eigen::Affine3d &, const Eigen::Quaterniond &));
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
-  MOCK_CONST_METHOD6(registerContents,
-                     void(std::vector<const Detector *> &,
-                          std::vector<const PathComponent *> &,
-                          std::vector<size_t> &, std::vector<size_t> &, size_t,
-                          std::vector<ComponentProxy> &));
-
-  MOCK_CONST_METHOD5(registerContents,
-                     void(std::vector<const Detector *> &,
-                          std::vector<const PathComponent *> &,
-                          std::vector<size_t> &, std::vector<size_t> &,
-                          std::vector<ComponentProxy> &));
+  MOCK_CONST_METHOD1(registerContents, void(ComponentInfo &));
+  MOCK_CONST_METHOD2(registerContents, void(ComponentInfo &, size_t));
   ~MockDetector() {}
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
   MOCK_CONST_METHOD0(name, std::string());
@@ -122,6 +99,7 @@ public:
   virtual std::unique_ptr<T> modify(size_t, const Command &command) const = 0;
   virtual size_t samplePathIndex() const = 0;
   virtual size_t sourcePathIndex() const = 0;
+  virtual size_t componentSize() const = 0;
   virtual ~PolymorphicInstrumentTree() {}
 };
 
@@ -139,6 +117,7 @@ public:
         .WillByDefault(testing::ReturnRef(m_detector));
     ON_CALL(*this, getPathComponent(testing::_))
         .WillByDefault(testing::ReturnRef(m_mockPathComponent));
+    ON_CALL(*this, componentSize()).WillByDefault(testing::Return(1));
   }
 
   MockInstrumentTree(size_t nDetectors) {
@@ -150,12 +129,15 @@ public:
         .WillByDefault(testing::ReturnRef(m_detector));
     ON_CALL(*this, getPathComponent(testing::_))
         .WillByDefault(testing::ReturnRef(m_mockPathComponent));
+    ON_CALL(*this, componentSize())
+        .WillByDefault(testing::Return(nDetectors + 1));
   }
   MOCK_CONST_METHOD0(nDetectors, size_t());
   MOCK_CONST_METHOD1(getDetector, const Detector &(size_t));
   MOCK_CONST_METHOD1(getPathComponent, const PathComponent &(size_t));
   MOCK_CONST_METHOD0(samplePathIndex, size_t());
   MOCK_CONST_METHOD0(sourcePathIndex, size_t());
+  MOCK_CONST_METHOD0(componentSize, size_t());
 
   std::unique_ptr<MockInstrumentTree> modify(size_t nodeIndex,
                                              const Command &command) const {

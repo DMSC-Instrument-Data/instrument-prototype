@@ -7,7 +7,7 @@
 #include <Eigen/Core>
 #include "cow_ptr.h"
 #include "IdType.h"
-#include "ComponentProxy.h"
+#include "ComponentInfo.h"
 
 class Node;
 class NodeIterator;
@@ -79,20 +79,24 @@ private:
   void init();
 
   /// Pointers to all known detectors in the instrument tree
-  CowPtr<std::vector<Detector const *>> m_detectorVec;
+  std::vector<Detector const *> m_detectorVec;
   /// Pointers to all known path components in the instrument tree
-  CowPtr<std::vector<PathComponent const *>> m_pathVec;
+  std::vector<PathComponent const *> m_pathVec;
   CowPtr<std::vector<Node>> m_nodes;
   /// PathComponent vector index of the source
   size_t m_sourceIndex;
   /// PathComponent vector index of the sample
   size_t m_sampleIndex;
+  /// vector of proxies and relevant pointers
+  ComponentInfo m_componentInfo;
+
   /// Detector indexes corresponding to Detector* in m_detectorVec
-  std::vector<size_t> m_detectorIndexes;
+  std::vector<size_t> m_detectorIndexes; // TODO - remove into component info
   /// Path component indexes corresponding to t PathComponent* in m_pathVec
-  std::vector<size_t> m_pathIndexes;
+  std::vector<size_t> m_pathIndexes; // TODO - remove into component info
   /// Component Proxies
-  std::vector<ComponentProxy> m_componentProxies;
+  std::vector<ComponentProxy>
+      m_componentProxies; // TODO - remove into component info
   /// Component Root
   std::shared_ptr<Component>
       m_componentRoot; // TODO. This needs to change to a unique_ptr

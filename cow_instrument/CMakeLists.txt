@@ -19,6 +19,7 @@ add_subdirectory(mappers)
 
 set ( SOURCE_FILES
                    CompositeComponent.cpp
+                   ComponentInfo.cpp
                    ComponentProxy.cpp
                    DetectorComponent.cpp
                    InstrumentTree.cpp
@@ -35,6 +36,7 @@ set ( INCLUDE_FILES
                    Bool.h
                    Command.h
                    Component.h
+                   ComponentInfo.h
                    ComponentProxy.h
                    ComponentVisitor.h
                    CompositeComponent.h

@@ -106,26 +106,25 @@ TEST(composite_component_test, test_register_contents) {
   composite.addComponent(std::unique_ptr<Component>(std::move(child)));
 
   // Registers
-  std::vector<const Detector *> detectorLookup;
-  std::vector<const PathComponent *> pathLookup;
-  std::vector<size_t> detectorIndexes;
-  std::vector<size_t> pathIndexes;
-  std::vector<ComponentProxy> proxies;
+  ComponentInfo info;
 
-  EXPECT_CALL(*child, registerContents(_, _, _, _, _, _)).Times(1);
+  EXPECT_CALL(*child, registerContents(_, _)).Times(1);
 
-  composite.registerContents(detectorLookup, pathLookup, detectorIndexes,
-                             pathIndexes, proxies);
+  composite.registerContents(info);
 
-  EXPECT_EQ(detectorLookup.size(), 0) << "Composite is not a detector";
-  EXPECT_EQ(pathLookup.size(), 0) << "Composite is not a path component";
-  EXPECT_EQ(pathIndexes.size(), 0) << "Composite is not a path component";
-  EXPECT_EQ(detectorIndexes.size(), 0) << "Composite is not a detector";
-  EXPECT_EQ(proxies.size(), 1) << "Proxies should grow";
+  EXPECT_EQ(info.detectorComponents().size(), 0)
+      << "Composite is not a detector";
+  EXPECT_EQ(info.pathComponents().size(), 0)
+      << "Composite is not a path component";
+  EXPECT_EQ(info.pathComponentIndexes().size(), 0)
+      << "Composite is not a path component";
+  EXPECT_EQ(info.detectorComponentIndexes().size(), 0)
+      << "Composite is not a detector";
+  EXPECT_EQ(info.proxies().size(), 1) << "Proxies should grow";
 
-  EXPECT_FALSE(proxies[0].hasParent());
-  EXPECT_FALSE(proxies[0].hasChildren());
-  EXPECT_EQ(&proxies[0].const_ref(), &composite);
+  EXPECT_FALSE(info.proxies()[0].hasParent());
+  EXPECT_FALSE(info.proxies()[0].hasChildren());
+  EXPECT_EQ(&info.proxies()[0].const_ref(), &composite);
 
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(child));
 }

@@ -26,19 +26,8 @@ public:
   void addComponent(std::unique_ptr<Component>&& child);
   size_t size() const {return m_children.size();}
   const Component& getChild(size_t index) const;
-  void registerContents(
-      std::vector<const Detector *> &lookup,
-      std::vector<const PathComponent *> &,
-      std::vector<size_t> &detectorIndexes, std::vector<size_t> &pathIndexes,
-      size_t previousIndex,
-      std::vector<ComponentProxy> &componentProxies) const override;
-
-  void registerContents(
-      std::vector<const Detector *> &lookup,
-      std::vector<const PathComponent *> &,
-      std::vector<size_t> &detectorIndexes, std::vector<size_t> &pathIndexes,
-      std::vector<ComponentProxy> &componentProxies) const override;
-
+  void registerContents(ComponentInfo &info) const override;
+  void registerContents(ComponentInfo &info, size_t parentIndex) const override;
   ComponentIdType componentId() const override;
   std::string name() const override;
   virtual bool accept(class ComponentVisitor *visitor) const override;

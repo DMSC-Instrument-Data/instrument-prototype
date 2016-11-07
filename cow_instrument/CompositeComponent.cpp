@@ -105,36 +105,22 @@ const Component &CompositeComponent::getChild(size_t index) const {
   }
 }
 
-void CompositeComponent::registerContents(
-    std::vector<const Detector *> &lookupDetectors,
-    std::vector<const PathComponent *> &lookupPathComponents,
-    std::vector<size_t> &detectorIndexes, std::vector<size_t> &pathIndexes,
-    size_t previousIndex, std::vector<ComponentProxy> &componentProxies) const {
+void CompositeComponent::registerContents(ComponentInfo &info) const {
 
-  const bool firstEntry = componentProxies.empty();
-  componentProxies.emplace_back(previousIndex, this);
-  size_t newPreviousIndex = componentProxies.size() - 1;
-  componentProxies[previousIndex].addChild(newPreviousIndex);
+  size_t parentIndex = info.registerComposite(this);
+
   for (auto &child : m_children) {
-    child->registerContents(lookupDetectors, lookupPathComponents,
-                            detectorIndexes, pathIndexes, newPreviousIndex,
-                            componentProxies);
+    child->registerContents(info, parentIndex);
   }
 }
 
-void CompositeComponent::registerContents(
-    std::vector<const Detector *> &lookupDetectors,
-    std::vector<const PathComponent *> &lookupPathComponents,
-    std::vector<size_t> &detectorIndexes, std::vector<size_t> &pathIndexes,
-    std::vector<ComponentProxy> &componentProxies) const {
+void CompositeComponent::registerContents(ComponentInfo &info,
+                                          size_t parentIndex) const {
 
-  componentProxies.emplace_back(this);
-  size_t previousIndex = componentProxies.size() - 1;
+  size_t newParentIndex = info.registerComposite(this, parentIndex);
 
   for (auto &child : m_children) {
-    child->registerContents(lookupDetectors, lookupPathComponents,
-                            detectorIndexes, pathIndexes, previousIndex,
-                            componentProxies);
+    child->registerContents(info, newParentIndex);
   }
 }
 

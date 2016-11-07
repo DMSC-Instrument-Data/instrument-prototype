@@ -15,16 +15,9 @@ public:
   virtual ~NullComponent();
   NullComponent *clone() const override;
   bool equals(const Component &) const override;
-  void registerContents(std::vector<const Detector *> &,
-                        std::vector<const PathComponent *> &,
-                        std::vector<size_t> &, std::vector<size_t> &,
-                        size_t previousIndex,
-                        std::vector<ComponentProxy> &) const override;
-  void registerContents(
-      std::vector<const Detector *> &detectorLookup,
-      std::vector<const PathComponent *> &pathLookup,
-      std::vector<size_t> &detectorIndexes, std::vector<size_t> &pathIndexes,
-      std::vector<ComponentProxy> &componentProxies) const override;
+  void registerContents(ComponentInfo &) const override;
+  virtual void registerContents(ComponentInfo &, size_t) const override;
+
   ComponentIdType componentId() const override;
   std::string name() const override;
   static const std::string TypeName;

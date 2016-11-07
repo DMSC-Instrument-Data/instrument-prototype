@@ -106,19 +106,12 @@ TEST(parabolic_guide_test, test_register_only_path_components) {
 
   ParabolicGuide guide(ComponentIdType(1), 1.0, 1.0, Eigen::Vector3d{1.0, 1.0, 1.0});
 
-  std::vector<const Detector *> detectorVec;
-  std::vector<const PathComponent *> pathComponentVec;
-  std::vector<size_t> detectorIndexes;
-  std::vector<size_t> pathIndexes;
-  size_t detectorVecStartSize = detectorVec.size();
-  size_t pathComponentVecSize = pathComponentVec.size();
-  std::vector<ComponentProxy> componentProxies;
+  ComponentInfo info;
   // Perform registration
-  guide.registerContents(detectorVec, pathComponentVec, detectorIndexes,
-                         pathIndexes, componentProxies);
-  EXPECT_EQ(detectorVec.size(), detectorVecStartSize)
+  guide.registerContents(info);
+  EXPECT_EQ(info.detectorComponents().size(), 0)
       << "Do not register ParabolicGuide as a Detector";
-  EXPECT_EQ(pathComponentVec.size(), pathComponentVecSize + 1)
+  EXPECT_EQ(info.pathComponents().size(), 1)
       << "ParabolicGuide should be registered as a PathComponent";
 }
 
@@ -237,24 +230,19 @@ TEST(parabolic_guide_test, test_register_contents) {
   ParabolicGuide guide(ComponentIdType(1), 2, 1E-9, {0, 0, 0});
 
   // Registers
-  std::vector<const Detector *> detectorLookup;
-  std::vector<const PathComponent *> pathLookup;
-  std::vector<size_t> detectorIndexes;
-  std::vector<size_t> pathIndexes;
-  std::vector<ComponentProxy> proxies;
+  ComponentInfo info;
 
-  guide.registerContents(detectorLookup, pathLookup, detectorIndexes,
-                         pathIndexes, proxies);
+  guide.registerContents(info);
 
-  EXPECT_EQ(detectorLookup.size(), 0);
-  EXPECT_EQ(pathLookup.size(), 1);
-  EXPECT_EQ(pathIndexes.size(), 1);
-  EXPECT_EQ(detectorIndexes.size(), 0);
-  EXPECT_EQ(proxies.size(), 1) << "Proxies should grow";
+  EXPECT_EQ(info.detectorComponents().size(), 0);
+  EXPECT_EQ(info.pathComponents().size(), 1);
+  EXPECT_EQ(info.pathComponentIndexes().size(), 1);
+  EXPECT_EQ(info.detectorComponentIndexes().size(), 0);
+  EXPECT_EQ(info.proxies().size(), 1) << "Proxies should grow";
 
-  EXPECT_FALSE(proxies[0].hasParent());
-  EXPECT_FALSE(proxies[0].hasChildren());
-  EXPECT_EQ(&proxies[0].const_ref(), &guide);
-  EXPECT_EQ(pathIndexes[0], 0)
+  EXPECT_FALSE(info.proxies()[0].hasParent());
+  EXPECT_FALSE(info.proxies()[0].hasChildren());
+  EXPECT_EQ(&info.proxies()[0].const_ref(), &guide);
+  EXPECT_EQ(info.pathComponentIndexes()[0], 0)
       << "Should be pointing to the zeroth index of proxies";
 }

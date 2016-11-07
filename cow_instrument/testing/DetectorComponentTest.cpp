@@ -185,27 +185,24 @@ TEST(detector_component_test, test_register_contents) {
                              Eigen::Vector3d{1, 0, 0} /*Detector position*/);
 
   // Registers
-  std::vector<const Detector *> detectorLookup;
-  std::vector<const PathComponent *> pathLookup;
-  std::vector<size_t> detectorIndexes;
-  std::vector<size_t> pathIndexes;
-  std::vector<ComponentProxy> proxies;
+  ComponentInfo info;
 
-  detector.registerContents(detectorLookup, pathLookup, detectorIndexes,
-                            pathIndexes, proxies);
+  detector.registerContents(info);
 
-  EXPECT_EQ(detectorLookup.size(), 1) << "Detector pointer list should grow";
-  EXPECT_EQ(pathLookup.size(), 0)
+  EXPECT_EQ(info.detectorComponents().size(), 1)
+      << "Detector pointer list should grow";
+  EXPECT_EQ(info.pathComponents().size(), 0)
       << "Path lookup list should NOT grow. These are detectors";
-  EXPECT_EQ(pathIndexes.size(), 0)
+  EXPECT_EQ(info.pathComponentIndexes().size(), 0)
       << "Path indexes should NOT grow. These are detectors";
-  EXPECT_EQ(detectorIndexes.size(), 1) << "Detector indexes should grow";
-  EXPECT_EQ(proxies.size(), 1) << "Proxies should grow";
+  EXPECT_EQ(info.detectorComponentIndexes().size(), 1)
+      << "Detector indexes should grow";
+  EXPECT_EQ(info.proxies().size(), 1) << "Proxies should grow";
 
-  EXPECT_FALSE(proxies[0].hasParent());
-  EXPECT_FALSE(proxies[0].hasChildren());
-  EXPECT_EQ(&proxies[0].const_ref(), &detector);
-  EXPECT_EQ(detectorIndexes[0], 0)
+  EXPECT_FALSE(info.proxies()[0].hasParent());
+  EXPECT_FALSE(info.proxies()[0].hasChildren());
+  EXPECT_EQ(&info.proxies()[0].const_ref(), &detector);
+  EXPECT_EQ(info.detectorComponentIndexes()[0], 0)
       << "Should be pointing to the zeroth index of proxies";
 }
 

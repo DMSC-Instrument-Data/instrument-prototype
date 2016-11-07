@@ -20,18 +20,9 @@ public:
                       const Eigen::Quaterniond &rotationPart) override;
   virtual ParabolicGuide *clone() const override;
   virtual bool equals(const Component &other) const override;
-  virtual void
-  registerContents(std::vector<const Detector *> &,
-                   std::vector<const PathComponent *> &lookupPathComponents,
-                   std::vector<size_t> &, std::vector<size_t> &pathIndexes,
-                   size_t previousIndex,
-                   std::vector<ComponentProxy> &componentProxies) const;
-  virtual void
-  registerContents(std::vector<const Detector *> &,
-                   std::vector<const PathComponent *> &lookupPathComponents,
-                   std::vector<size_t> &, std::vector<size_t> &pathIndexes,
-                   std::vector<ComponentProxy> &componentProxies) const;
-
+  virtual void registerContents(ComponentInfo &info) const;
+  virtual void registerContents(ComponentInfo &info,
+                                size_t parentIndex) const override;
   ComponentIdType componentId() const;
   std::string name() const;
 

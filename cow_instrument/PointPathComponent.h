@@ -22,18 +22,9 @@ public:
   virtual void rotate(const Eigen::Affine3d &transform,
                       const Eigen::Quaterniond &rotationPart) override;
   virtual bool equals(const Component &other) const override;
-  virtual void registerContents(
-      std::vector<const Detector *> &detectorLookup,
-      std::vector<const PathComponent *> &pathLookup,
-      std::vector<size_t> &detectorIndexes, std::vector<size_t> &pathIndexes,
-      size_t previousIndex,
-      std::vector<ComponentProxy> &componentProxies) const override;
-  virtual void registerContents(
-      std::vector<const Detector *> &detectorLookup,
-      std::vector<const PathComponent *> &pathLookup,
-      std::vector<size_t> &detectorIndexes, std::vector<size_t> &pathIndexes,
-      std::vector<ComponentProxy> &componentProxies) const override;
-
+  virtual void registerContents(ComponentInfo &info) const override;
+  virtual void registerContents(ComponentInfo &info,
+                                size_t parentIndex) const override;
   virtual ComponentIdType componentId() const override;
   virtual std::string name() const override;
 
@@ -120,31 +111,14 @@ operator!=(const PointPathComponent<T> &other) const {
 }
 
 template <typename T>
-void PointPathComponent<T>::registerContents(
-    std::vector<const Detector *> &,
-    std::vector<const PathComponent *> &pathLookup, std::vector<size_t> &,
-    std::vector<size_t> &pathIndexes, size_t previousIndex,
-    std::vector<ComponentProxy> &componentProxies) const {
-
-  const size_t newIndex = componentProxies.size();
-  componentProxies.emplace_back(previousIndex, this);
-
-  componentProxies[previousIndex].addChild(newIndex);
-  pathLookup.push_back(this);
-  pathIndexes.push_back(newIndex);
+void PointPathComponent<T>::registerContents(ComponentInfo &info) const {
+  info.registerPathComponent(this);
 }
 
 template <typename T>
-void PointPathComponent<T>::registerContents(
-    std::vector<const Detector *> &,
-    std::vector<const PathComponent *> &pathLookup, std::vector<size_t> &,
-    std::vector<size_t> &pathIndexes,
-    std::vector<ComponentProxy> &componentProxies) const {
-
-  const size_t newIndex = componentProxies.size();
-  componentProxies.emplace_back(this);
-  pathLookup.push_back(this);
-  pathIndexes.push_back(newIndex);
+void PointPathComponent<T>::registerContents(ComponentInfo &info,
+                                             size_t parentIndex) const {
+  info.registerPathComponent(this, parentIndex);
 }
 
 template <typename T>

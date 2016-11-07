@@ -47,28 +47,13 @@ bool DetectorComponent::equals(const Component &other) const {
   return false;
 }
 
-void DetectorComponent::registerContents(
-    std::vector<const Detector *> &lookupDetectors,
-    std::vector<const PathComponent *> &, std::vector<size_t> &detectorIndexes,
-    std::vector<size_t> &, size_t previousIndex,
-    std::vector<ComponentProxy> &componentProxies) const {
-
-  const size_t newIndex = componentProxies.size();
-  componentProxies.emplace_back(previousIndex, this);
-  componentProxies[previousIndex].addChild(newIndex);
-  lookupDetectors.push_back(this);
-  detectorIndexes.push_back(newIndex); // We track the thing we just added.
+void DetectorComponent::registerContents(ComponentInfo &info) const {
+  info.registerDetector(this);
 }
 
-void DetectorComponent::registerContents(
-    std::vector<const Detector *> &lookupDetectors,
-    std::vector<const PathComponent *> &pathLookup,
-    std::vector<size_t> &detectorIndexes, std::vector<size_t> &pathIndexes,
-    std::vector<ComponentProxy> &componentProxies) const {
-  const size_t newIndex = componentProxies.size();
-  componentProxies.emplace_back(this);
-  lookupDetectors.push_back(this);
-  detectorIndexes.push_back(newIndex); // We track the thing we just added.
+void DetectorComponent::registerContents(ComponentInfo &info,
+                                         size_t parentIndex) const {
+  info.registerDetector(this, parentIndex);
 }
 
 std::string DetectorComponent::name() const {
