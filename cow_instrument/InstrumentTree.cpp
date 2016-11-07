@@ -63,24 +63,10 @@ void InstrumentTree::init() {
   } else {
     findKeyComponents(*m_componentRoot, m_componentInfo);
   }
-  m_componentProxies =
-      m_componentInfo
-          .proxies(); // HACK. do not want to unpack this. see header.
-  m_detectorIndexes =
-      m_componentInfo.detectorComponentIndexes(); // HACK. do not want to unpack
-                                                  // this. see header.
-  m_pathVec =
-      m_componentInfo
-          .pathComponents(); // HACK. do not want to unpack this. see header.
-  m_detectorVec = m_componentInfo.detectorComponents(); // HACK. do not want to
-                                                        // unpack this. see
-                                                        // header.
-  m_pathIndexes = m_componentInfo.pathComponentIndexes(); // HACK. do not want
-                                                          // to unpack this. see
-                                                          // header.
 
-  const auto begin_pathVec = m_pathVec.cbegin();
-  const auto end_pathVec = m_pathVec.cend();
+  auto pathComponents = m_componentInfo.pathComponents();
+  const auto begin_pathVec = pathComponents.cbegin();
+  const auto end_pathVec = pathComponents.cend();
   auto sourceIt = std::find_if(begin_pathVec, end_pathVec, findSource);
   auto sampleIt = std::find_if(begin_pathVec, end_pathVec, findSample);
   if (sourceIt == end_pathVec) {
@@ -117,22 +103,22 @@ InstrumentTree::InstrumentTree(CowPtr<std::vector<Node>> nodes)
 const Node &InstrumentTree::root() const { return m_nodes.const_ref()[0]; }
 
 const ComponentProxy &InstrumentTree::rootProxy() const {
-  return m_componentProxies[0];
+  return m_componentInfo.rootProxy();
 }
 
 const Detector &InstrumentTree::getDetector(size_t detectorIndex) const {
 
-  checkDetectorRange(detectorIndex, m_detectorVec);
+  checkDetectorRange(detectorIndex, m_componentInfo.detectorComponents());
 
-  return *m_detectorVec[detectorIndex];
+  return *m_componentInfo.detectorComponents()[detectorIndex];
 }
 
 const PathComponent &
 InstrumentTree::getPathComponent(size_t pathComponentIndex) const {
 
-  checkPathRange(pathComponentIndex, m_pathVec);
+  checkPathRange(pathComponentIndex, m_componentInfo.pathComponents());
 
-  return *m_pathVec[pathComponentIndex];
+  return *m_componentInfo.pathComponents()[pathComponentIndex];
 };
 
 unsigned int InstrumentTree::version() const {
@@ -141,17 +127,17 @@ unsigned int InstrumentTree::version() const {
 
 void InstrumentTree::fillDetectorMap(
     std::map<DetectorIdType, size_t> &toFill) const {
-  for (size_t index = 0; index < m_detectorVec.size(); ++index) {
-    toFill.insert(std::make_pair(m_detectorVec[index]->detectorId(), index));
+  for (size_t index = 0; index < m_componentInfo.detectorComponents().size(); ++index) {
+    toFill.insert(std::make_pair(m_componentInfo.detectorComponents()[index]->detectorId(), index));
   }
 }
 
 const PathComponent &InstrumentTree::source() const {
-  return *m_pathVec[m_sourceIndex];
+  return *m_componentInfo.pathComponents()[m_sourceIndex];
 }
 
 const PathComponent &InstrumentTree::sample() const {
-  return *m_pathVec[m_sampleIndex];
+  return *m_componentInfo.pathComponents()[m_sampleIndex];
 }
 
 size_t InstrumentTree::samplePathIndex() const { return m_sampleIndex; }
@@ -165,16 +151,16 @@ CowPtr<std::vector<Node>>::RefPtr InstrumentTree::unsafeContents() const {
 size_t InstrumentTree::nodeSize() const { return m_nodes->size(); }
 
 size_t InstrumentTree::componentSize() const {
-  return m_componentProxies.size();
+  return m_componentInfo.componentSize();
 }
 
 std::vector<size_t> InstrumentTree::subTreeIndexes(size_t proxyIndex) const {
   return m_componentInfo.subTreeIndexes(proxyIndex);
 }
 
-size_t InstrumentTree::nDetectors() const { return m_detectorVec.size(); }
+size_t InstrumentTree::nDetectors() const { return m_componentInfo.detectorComponents().size(); }
 
-size_t InstrumentTree::nPathComponents() const { return m_pathVec.size(); }
+size_t InstrumentTree::nPathComponents() const { return m_componentInfo.pathComponents().size(); }
 
 /*
  * Modify is not thread-safe owing to the fact that the vector of detector
@@ -215,10 +201,8 @@ bool InstrumentTree::modify(size_t nodeIndex, const Command &command) {
    * indicate that such action is required.
    */
   if (cowTriggered) {
-    m_detectorVec.clear();
-    m_pathVec.clear();
-    m_detectorIndexes.clear();
-    m_pathIndexes.clear();
+    // We must purge any existing memory.
+    m_componentInfo.clear();
     init();
   }
   return cowTriggered;
@@ -238,5 +222,5 @@ const Node *const InstrumentTree::nodeAt(size_t index) const {
 }
 
 const ComponentProxy &InstrumentTree::proxyAt(size_t index) const {
-  return m_componentProxies[index];
+  return m_componentInfo.proxyAt(index);
 }

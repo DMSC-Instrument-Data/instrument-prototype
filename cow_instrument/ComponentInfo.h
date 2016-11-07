@@ -20,6 +20,7 @@ class CompositeComponent;
 class ComponentInfo {
 public:
   ComponentInfo() = default;
+  void clear();
   void registerDetector(Detector const *const comp);
   void registerPathComponent(PathComponent const *const comp);
   size_t registerComposite(CompositeComponent const *const comp);
@@ -31,6 +32,7 @@ public:
 
   std::vector<ComponentProxy> proxies();
   const ComponentProxy &proxyAt(size_t index) const;
+  const ComponentProxy &rootProxy() const;
   size_t componentSize() const;
   std::vector<size_t> subTreeIndexes(size_t proxyIndex) const;
 

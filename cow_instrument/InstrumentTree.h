@@ -55,16 +55,16 @@ public:
   size_t sourcePathIndex() const;
 
   std::vector<ComponentProxy>::const_iterator begin() const {
-    return m_componentProxies.begin();
+    return m_componentInfo.begin();
   }
   std::vector<ComponentProxy>::const_iterator end() const {
-    return m_componentProxies.end();
+    return m_componentInfo.end();
   }
   std::vector<ComponentProxy>::const_iterator cbegin() const {
-    return m_componentProxies.cbegin();
+    return m_componentInfo.cbegin();
   }
   std::vector<ComponentProxy>::const_iterator cend() const {
-    return m_componentProxies.cend();
+    return m_componentInfo.cend();
   }
 
   // TODO. Had to add this for serialization. We could do better.
@@ -77,11 +77,6 @@ public:
 
 private:
   void init();
-
-  /// Pointers to all known detectors in the instrument tree
-  std::vector<Detector const *> m_detectorVec;
-  /// Pointers to all known path components in the instrument tree
-  std::vector<PathComponent const *> m_pathVec;
   CowPtr<std::vector<Node>> m_nodes;
   /// PathComponent vector index of the source
   size_t m_sourceIndex;
@@ -89,15 +84,7 @@ private:
   size_t m_sampleIndex;
   /// vector of proxies and relevant pointers
   ComponentInfo m_componentInfo;
-
-  /// Detector indexes corresponding to Detector* in m_detectorVec
-  std::vector<size_t> m_detectorIndexes; // TODO - remove into component info
-  /// Path component indexes corresponding to t PathComponent* in m_pathVec
-  std::vector<size_t> m_pathIndexes; // TODO - remove into component info
-  /// Component Proxies
-  std::vector<ComponentProxy>
-      m_componentProxies; // TODO - remove into component info
-  /// Component Root
+  /// Component root
   std::shared_ptr<Component>
       m_componentRoot; // TODO. This needs to change to a unique_ptr
 };

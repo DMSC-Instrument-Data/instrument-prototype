@@ -5,6 +5,15 @@
 #include "PathComponent.h"
 #include <string>
 
+void ComponentInfo::clear()
+{
+    m_proxies.clear();
+    m_detectorComponents.clear();
+    m_pathComponents.clear();
+    m_detectorComponentIndexes.clear();
+    m_pathComponentIndexes.clear();
+}
+
 void ComponentInfo::registerDetector(Detector const *const comp) {
 
   const size_t newIndex = updateProxies(comp);
@@ -45,7 +54,12 @@ size_t ComponentInfo::registerComposite(const CompositeComponent *const comp,
 std::vector<ComponentProxy> ComponentInfo::proxies() { return m_proxies; }
 
 const ComponentProxy &ComponentInfo::proxyAt(size_t index) const {
-  return m_proxies[index];
+    return m_proxies[index];
+}
+
+const ComponentProxy &ComponentInfo::rootProxy() const
+{
+ return m_proxies[0];
 }
 
 size_t ComponentInfo::componentSize() const { return m_proxies.size(); }
