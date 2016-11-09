@@ -108,7 +108,6 @@ public:
   virtual const Detector &getDetector(size_t detectorIndex) const = 0;
   virtual const PathComponent &getPathComponent(size_t detectorIndex) const = 0;
   virtual std::unique_ptr<T> modify(size_t, const Command &command) const = 0;
-  virtual std::unique_ptr<T> modify2(size_t, const Command2 &command) const = 0;
   virtual size_t samplePathIndex() const = 0;
   virtual size_t sourcePathIndex() const = 0;
   virtual size_t componentSize() const = 0;
@@ -171,16 +170,9 @@ public:
                                              const Command &command) const {
     return std::unique_ptr<MockInstrumentTree>(modifyProxy(nodeIndex, command));
   }
-  std::unique_ptr<MockInstrumentTree> modify2(size_t nodeIndex,
-                                              const Command2 &command) const {
-    return std::unique_ptr<MockInstrumentTree>(
-        modifyProxy2(nodeIndex, command));
-  }
 
   MOCK_CONST_METHOD2(modifyProxy,
                      MockInstrumentTree *(size_t, const Command &));
-  MOCK_CONST_METHOD2(modifyProxy2,
-                     MockInstrumentTree *(size_t, const Command2 &));
 
   virtual ~MockInstrumentTree() {}
 

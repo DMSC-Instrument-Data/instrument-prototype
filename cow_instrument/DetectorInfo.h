@@ -263,9 +263,10 @@ void DetectorInfo<InstTree>::modify(size_t nodeIndex, Command &command) {
 }
 
 template <typename InstTree>
-void DetectorInfo<InstTree>::modify2(size_t nodeIndex, Command2 &command) {
+void DetectorInfo<InstTree>::modify2(size_t componentIndex, Command2 &command) {
 
-  m_instrumentTree->modify2(nodeIndex, command);
+  DetectorInfo<InstTree> *const trial = this;
+  command.execute(componentIndex);
 
   // All other geometry-derived information is now also invalid. Very
   // important!

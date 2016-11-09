@@ -300,22 +300,17 @@ TEST(detector_info_test, test_modify) {
 TEST(detector_info_test, test_modify2) {
 
   using namespace testing;
-  auto *pMockInstrumentTree = new NiceMockInstrumentTree{};
-
-  // We expect that the modify method of the existing instrument tree gets
-  // called
-  EXPECT_CALL(*pMockInstrumentTree, modifyProxy2(testing::_, testing::_))
-      .Times(1);
 
   DetectorInfoWithMockInstrument detectorInfo{
-      std::shared_ptr<MockInstrumentTree>(pMockInstrumentTree),
+      std::shared_ptr<MockInstrumentTree>(new NiceMockInstrumentTree{}),
       SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
 
   MockCommand2 command;
+  EXPECT_CALL(command, execute(_)).Times(1);
   detectorInfo.modify2(0, command);
 
   // test modify called on instrument.
-  EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree));
+  EXPECT_TRUE(testing::Mock::VerifyAndClear(&command));
 }
 
 TEST(detector_info_test, test_copy) {
