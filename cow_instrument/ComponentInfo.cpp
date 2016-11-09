@@ -25,6 +25,12 @@ void checkPathRange(size_t pathIndex, size_t limit) {
 }
 
 void ComponentInfo::clear() {
+  /* TODO. I think this operation is only in place to support the current
+   mutable
+   * use case. I think that the clear functionality should be removed.
+   *
+
+*/
   m_proxies.clear();
   m_detectorComponents.clear();
   m_pathComponents.clear();
@@ -34,39 +40,39 @@ void ComponentInfo::clear() {
 
 void ComponentInfo::registerDetector(Detector const *const comp) {
 
-  const size_t newIndex = updateProxies(comp);
+  const size_t newIndex = coreUpdate(comp);
   m_detectorComponents.push_back(comp);
   m_detectorComponentIndexes.push_back(newIndex);
 }
 
 void ComponentInfo::registerPathComponent(PathComponent const *const comp) {
 
-  const size_t newIndex = updateProxies(comp);
+  const size_t newIndex = coreUpdate(comp);
   m_pathComponents.push_back(comp);
   m_pathComponentIndexes.push_back(newIndex);
 }
 
 size_t ComponentInfo::registerComposite(CompositeComponent const *const comp) {
-  return updateProxies(comp);
+  return coreUpdate(comp);
 }
 
 void ComponentInfo::registerDetector(const Detector *const comp,
                                      size_t parentIndex) {
-  updateProxies(comp, parentIndex);
+  coreUpdate(comp, parentIndex);
   m_detectorComponents.push_back(comp);
   m_detectorComponentIndexes.push_back(parentIndex);
 }
 
 void ComponentInfo::registerPathComponent(const PathComponent *const comp,
                                           size_t parentIndex) {
-  updateProxies(comp, parentIndex);
+  coreUpdate(comp, parentIndex);
   m_pathComponents.push_back(comp);
   m_pathComponentIndexes.push_back(parentIndex);
 }
 
 size_t ComponentInfo::registerComposite(const CompositeComponent *const comp,
                                         size_t parentIndex) {
-  return updateProxies(comp, parentIndex);
+  return coreUpdate(comp, parentIndex);
 }
 
 std::vector<ComponentProxy> ComponentInfo::proxies() { return m_proxies; }
@@ -117,17 +123,21 @@ std::vector<size_t> ComponentInfo::detectorComponentIndexes() const {
   return m_detectorComponentIndexes;
 }
 
-size_t ComponentInfo::updateProxies(Component const *const comp,
-                                    size_t previousIndex) {
+size_t ComponentInfo::coreUpdate(Component const *const comp,
+                                 size_t previousIndex) {
   size_t newIndex = m_proxies.size();
   m_proxies.emplace_back(previousIndex, comp);
   m_proxies[previousIndex].addChild(newIndex);
-  return newIndex;
+  m_positions.emplace_back(comp->getPos());
+  m_rotations.emplace_back(comp->getRotation());
+  return newIndex; // Return the last index.
 }
 
-size_t ComponentInfo::updateProxies(Component const *const comp) {
+size_t ComponentInfo::coreUpdate(Component const *const comp) {
   const size_t newIndex = m_proxies.size();
   m_proxies.emplace_back(comp);
+  m_positions.emplace_back(comp->getPos());
+  m_rotations.emplace_back(comp->getRotation());
   return newIndex; // Return the last index.
 }
 
@@ -162,4 +172,12 @@ const PathComponent &
 ComponentInfo::pathComponentAt(size_t pathComponentIndex) const {
   checkPathRange(pathComponentIndex, this->pathSize());
   return *m_pathComponents[pathComponentIndex];
+}
+
+std::vector<Eigen::Vector3d> ComponentInfo::startPositions() const {
+  return m_positions;
+}
+
+std::vector<Eigen::Quaterniond> ComponentInfo::startRotations() const {
+  return m_rotations;
 }

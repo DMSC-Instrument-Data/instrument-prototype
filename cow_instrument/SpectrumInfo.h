@@ -38,6 +38,8 @@ public:
 
   void modify(size_t nodeIndex, Command &command);
 
+  void modify2(size_t commandIndex, Command2 &command);
+
 private:
   DetectorInfo<InstTree> m_detectorInfo;
   CowPtr<Spectra> m_spectra;
@@ -143,6 +145,11 @@ template <typename InstTree> CowPtr<L2s> SpectrumInfo<InstTree>::l2s() const {
 template <typename InstTree>
 void SpectrumInfo<InstTree>::modify(size_t nodeIndex, Command &command) {
   m_detectorInfo.modify(nodeIndex, command);
+}
+
+template <typename InstTree>
+void SpectrumInfo<InstTree>::modify2(size_t nodeIndex, Command2 &command) {
+  m_detectorInfo.modify2(nodeIndex, command);
 }
 
 #endif

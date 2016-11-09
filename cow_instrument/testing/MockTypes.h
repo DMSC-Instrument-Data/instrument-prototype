@@ -72,6 +72,17 @@ public:
   ~MockCommand() {}
 };
 
+class MockCommand2 : public Command2 {
+public:
+  MockCommand2() {
+    using namespace testing;
+    ON_CALL(*this, isMetaDataCommand()).WillByDefault(Return(false));
+  }
+  MOCK_CONST_METHOD1(execute, void(size_t));
+  MOCK_CONST_METHOD0(isMetaDataCommand, bool());
+  ~MockCommand2() {}
+};
+
 class MockDetector : public Detector {
 public:
   MOCK_CONST_METHOD0(detectorId, DetectorIdType());
@@ -97,9 +108,12 @@ public:
   virtual const Detector &getDetector(size_t detectorIndex) const = 0;
   virtual const PathComponent &getPathComponent(size_t detectorIndex) const = 0;
   virtual std::unique_ptr<T> modify(size_t, const Command &command) const = 0;
+  virtual std::unique_ptr<T> modify2(size_t, const Command2 &command) const = 0;
   virtual size_t samplePathIndex() const = 0;
   virtual size_t sourcePathIndex() const = 0;
   virtual size_t componentSize() const = 0;
+  virtual std::vector<Eigen::Vector3d> startPositions() const = 0;
+  virtual std::vector<Eigen::Quaterniond> startRotations() const = 0;
   virtual ~PolymorphicInstrumentTree() {}
 };
 
@@ -118,6 +132,12 @@ public:
     ON_CALL(*this, getPathComponent(testing::_))
         .WillByDefault(testing::ReturnRef(m_mockPathComponent));
     ON_CALL(*this, componentSize()).WillByDefault(testing::Return(1));
+    ON_CALL(*this, startPositions())
+        .WillByDefault(
+            testing::Return(std::vector<Eigen::Vector3d>(1, {0, 0, 0})));
+    ON_CALL(*this, startRotations())
+        .WillByDefault(testing::Return(std::vector<Eigen::Quaterniond>(
+            1, Eigen::Quaterniond(Eigen::Affine3d::Identity().rotation()))));
   }
 
   MockInstrumentTree(size_t nDetectors) {
@@ -131,6 +151,12 @@ public:
         .WillByDefault(testing::ReturnRef(m_mockPathComponent));
     ON_CALL(*this, componentSize())
         .WillByDefault(testing::Return(nDetectors + 1));
+    ON_CALL(*this, startPositions())
+        .WillByDefault(
+            testing::Return(std::vector<Eigen::Vector3d>(1, {0, 0, 0})));
+    ON_CALL(*this, startRotations())
+        .WillByDefault(testing::Return(std::vector<Eigen::Quaterniond>(
+            1, Eigen::Quaterniond(Eigen::Affine3d::Identity().rotation()))));
   }
   MOCK_CONST_METHOD0(nDetectors, size_t());
   MOCK_CONST_METHOD1(getDetector, const Detector &(size_t));
@@ -138,14 +164,23 @@ public:
   MOCK_CONST_METHOD0(samplePathIndex, size_t());
   MOCK_CONST_METHOD0(sourcePathIndex, size_t());
   MOCK_CONST_METHOD0(componentSize, size_t());
+  MOCK_CONST_METHOD0(startPositions, std::vector<Eigen::Vector3d>());
+  MOCK_CONST_METHOD0(startRotations, std::vector<Eigen::Quaterniond>());
 
   std::unique_ptr<MockInstrumentTree> modify(size_t nodeIndex,
                                              const Command &command) const {
     return std::unique_ptr<MockInstrumentTree>(modifyProxy(nodeIndex, command));
   }
+  std::unique_ptr<MockInstrumentTree> modify2(size_t nodeIndex,
+                                              const Command2 &command) const {
+    return std::unique_ptr<MockInstrumentTree>(
+        modifyProxy2(nodeIndex, command));
+  }
 
   MOCK_CONST_METHOD2(modifyProxy,
                      MockInstrumentTree *(size_t, const Command &));
+  MOCK_CONST_METHOD2(modifyProxy2,
+                     MockInstrumentTree *(size_t, const Command2 &));
 
   virtual ~MockInstrumentTree() {}
 

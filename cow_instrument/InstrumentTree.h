@@ -67,6 +67,9 @@ public:
   /// Enable use to determine all sub-components.
   std::vector<size_t> subTreeIndexes(size_t proxyIndex) const;
 
+  std::vector<Eigen::Vector3d> startPositions() const;
+  std::vector<Eigen::Quaterniond> startRotations() const;
+
 private:
   void init();
   CowPtr<std::vector<Node>> m_nodes;

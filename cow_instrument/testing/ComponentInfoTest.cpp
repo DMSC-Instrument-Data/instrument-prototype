@@ -139,4 +139,26 @@ TEST(component_info_test, test_subtree_search) {
             (std::set<size_t>{3}))
       << "Should just include itself. Subtree for D incorrect";
 }
+
+TEST(component_info_test, test_rotations) {
+
+  auto comp = makeTree();
+  ComponentInfo info;
+  comp->registerContents(info);
+  auto rotations = info.startRotations();
+  EXPECT_EQ(rotations.size(), info.componentSize());
+}
+
+TEST(component_info_test, test_positions) {
+
+  auto comp = makeTree();
+  ComponentInfo info;
+  comp->registerContents(info);
+  auto start = info.begin();
+  auto last = --info.end();
+  auto positions = info.startPositions();
+  EXPECT_EQ(positions.size(), info.componentSize());
+  EXPECT_EQ(positions.front(), start->const_ref().getPos());
+  EXPECT_EQ(positions.back(), last->const_ref().getPos());
+}
 }

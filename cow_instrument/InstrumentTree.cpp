@@ -136,6 +136,16 @@ std::vector<size_t> InstrumentTree::subTreeIndexes(size_t proxyIndex) const {
   return m_componentInfo.subTreeIndexes(proxyIndex);
 }
 
+std::vector<Eigen::Vector3d> InstrumentTree::startPositions() const {
+  // forwarding
+  return m_componentInfo.startPositions();
+}
+
+std::vector<Eigen::Quaterniond> InstrumentTree::startRotations() const {
+  // forwarding
+  return m_componentInfo.startRotations();
+}
+
 size_t InstrumentTree::nDetectors() const {
   return m_componentInfo.detectorSize();
 }

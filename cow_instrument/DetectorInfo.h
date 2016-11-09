@@ -53,6 +53,8 @@ public:
 
   void modify(size_t nodeIndex, Command &command);
 
+  void modify2(size_t component_index, Command2 &command);
+
   std::vector<Spectrum> makeSpectra() const;
 
   CowPtr<L2s> l2s() const;
@@ -79,7 +81,9 @@ private:
   // Instrument
   std::shared_ptr<const InstTree> m_instrumentTree;
 
+  // All positions indexed by component index
   std::vector<Eigen::Vector3d> m_positions;
+  // All rotations indexed by component index
   std::vector<Eigen::Quaterniond> m_rotations;
 };
 
@@ -113,8 +117,8 @@ DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
       m_l1(std::make_shared<L1s>(m_nDetectors)),
       m_l2(std::make_shared<L2s>(m_nDetectors)),
       m_instrumentTree(std::forward<InstSptrType>(instrumentTree)),
-      m_positions(m_instrumentTree->componentSize()),
-      m_rotations(m_instrumentTree->componentSize()) {
+      m_positions(m_instrumentTree->startPositions()),
+      m_rotations(m_instrumentTree->startRotations()) {
 
   init();
 }
@@ -250,6 +254,18 @@ template <typename InstTree>
 void DetectorInfo<InstTree>::modify(size_t nodeIndex, Command &command) {
 
   m_instrumentTree->modify(nodeIndex, command);
+
+  // All other geometry-derived information is now also invalid. Very
+  // important!
+  init();
+
+  // Meta-data should all still be valid.
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::modify2(size_t nodeIndex, Command2 &command) {
+
+  m_instrumentTree->modify2(nodeIndex, command);
 
   // All other geometry-derived information is now also invalid. Very
   // important!

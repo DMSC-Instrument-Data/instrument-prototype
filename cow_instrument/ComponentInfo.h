@@ -4,6 +4,8 @@
 #include <vector>
 #include <cstddef>
 #include "ComponentProxy.h"
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 
 class Detector;
 class PathComponent;
@@ -54,11 +56,27 @@ public:
   const Detector &detectorComponentAt(size_t detectorIndex) const;
   const PathComponent &pathComponentAt(size_t pathComponentIndex) const;
 
-private:
-  size_t updateProxies(Component const *const comp);
-  size_t updateProxies(Component const *const comp, size_t previousIndex);
+  std::vector<Eigen::Vector3d> startPositions() const;
+  std::vector<Eigen::Quaterniond> startRotations() const;
 
+private:
+  size_t coreUpdate(Component const *const comp);
+  size_t coreUpdate(Component const *const comp, size_t previousIndex);
+
+  /*
+   These collections have the same size as the number of components. They are
+   component
+   type independent
+   */
   std::vector<ComponentProxy> m_proxies;
+  std::vector<Eigen::Vector3d> m_positions;
+  std::vector<Eigen::Quaterniond> m_rotations;
+
+  /*
+    These collections are conditionally updated depending upon component type.
+    The vector
+    of indexes allows us to go from say detector_index -> component_index.
+   */
   std::vector<const Detector *> m_detectorComponents;
   std::vector<const PathComponent *> m_pathComponents;
   std::vector<size_t> m_pathComponentIndexes;

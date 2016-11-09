@@ -135,5 +135,9 @@ bool CompositeComponent::accept(ComponentVisitor *visitor) const {
 }
 
 Eigen::Quaterniond CompositeComponent::getRotation() const {
-  throw std::runtime_error("Not implemented");
+
+  /*
+   I'm not sure that this operation makes sense on a composite?
+   */
+  return Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()};
 }
