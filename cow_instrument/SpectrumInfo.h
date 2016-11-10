@@ -38,7 +38,10 @@ public:
 
   void modify(size_t nodeIndex, Command &command);
 
-  void modify2(size_t commandIndex, Command2 &command);
+  void moveDetector(size_t spectrumIndex, const Eigen::Vector3d &offset);
+
+  void rotateDetector(size_t spectrumIndex, const Eigen::Vector3d &axis,
+                      const double &theta, const Eigen::Vector3d &center);
 
 private:
   DetectorInfo<InstTree> m_detectorInfo;
@@ -148,8 +151,21 @@ void SpectrumInfo<InstTree>::modify(size_t nodeIndex, Command &command) {
 }
 
 template <typename InstTree>
-void SpectrumInfo<InstTree>::modify2(size_t nodeIndex, Command2 &command) {
-  m_detectorInfo.modify2(nodeIndex, command);
+void SpectrumInfo<InstTree>::moveDetector(size_t spectrumIndex,
+                                          const Eigen::Vector3d &offset) {
+  for (auto detectorIndex : m_spectra.const_ref()[spectrumIndex].indexes()) {
+    m_detectorInfo.moveDetector(detectorIndex, offset);
+  }
+}
+
+template <typename InstTree>
+void SpectrumInfo<InstTree>::rotateDetector(size_t spectrumIndex,
+                                            const Eigen::Vector3d &axis,
+                                            const double &theta,
+                                            const Eigen::Vector3d &center) {
+  for (auto detectorIndex : m_spectra.const_ref()[spectrumIndex].indexes()) {
+    m_detectorInfo.rotateDetector(detectorIndex, axis, theta, center);
+  }
 }
 
 #endif

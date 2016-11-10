@@ -123,6 +123,14 @@ std::vector<size_t> ComponentInfo::detectorComponentIndexes() const {
   return m_detectorComponentIndexes;
 }
 
+size_t ComponentInfo::detIndexToCompIndex(size_t detectorIndex) const {
+  return m_detectorComponentIndexes[detectorIndex];
+}
+
+size_t ComponentInfo::pathIndexToCompIndex(size_t pathIndex) const {
+  return m_pathComponentIndexes[pathIndex];
+}
+
 size_t ComponentInfo::coreUpdate(Component const *const comp,
                                  size_t previousIndex) {
   size_t newIndex = m_proxies.size();

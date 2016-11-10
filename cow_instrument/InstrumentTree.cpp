@@ -146,6 +146,14 @@ std::vector<Eigen::Quaterniond> InstrumentTree::startRotations() const {
   return m_componentInfo.startRotations();
 }
 
+size_t InstrumentTree::detIndexToCompIndex(size_t detectorIndex) const {
+  return m_componentInfo.detIndexToCompIndex(detectorIndex);
+}
+
+size_t InstrumentTree::pathIndexToCompIndex(size_t pathIndex) const {
+  return m_componentInfo.pathIndexToCompIndex(pathIndex);
+}
+
 size_t InstrumentTree::nDetectors() const {
   return m_componentInfo.detectorSize();
 }

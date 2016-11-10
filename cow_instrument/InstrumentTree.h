@@ -70,6 +70,9 @@ public:
   std::vector<Eigen::Vector3d> startPositions() const;
   std::vector<Eigen::Quaterniond> startRotations() const;
 
+  size_t detIndexToCompIndex(size_t detectorIndex) const;
+  size_t pathIndexToCompIndex(size_t pathIndex) const;
+
 private:
   void init();
   CowPtr<std::vector<Node>> m_nodes;

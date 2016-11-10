@@ -72,17 +72,6 @@ public:
   ~MockCommand() {}
 };
 
-class MockCommand2 : public Command2 {
-public:
-  MockCommand2() {
-    using namespace testing;
-    ON_CALL(*this, isMetaDataCommand()).WillByDefault(Return(false));
-  }
-  MOCK_CONST_METHOD1(execute, void(size_t));
-  MOCK_CONST_METHOD0(isMetaDataCommand, bool());
-  ~MockCommand2() {}
-};
-
 class MockDetector : public Detector {
 public:
   MOCK_CONST_METHOD0(detectorId, DetectorIdType());

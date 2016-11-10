@@ -62,6 +62,11 @@ public:
   void rotate(size_t componentIndex, const Eigen::Vector3d &axis,
               const double &theta, const Eigen::Vector3d &center);
 
+  void moveDetector(size_t detectorIndex, const Eigen::Vector3d &offset);
+
+  void rotateDetector(size_t detectorIndex, const Eigen::Vector3d &axis,
+                      const double &theta, const Eigen::Vector3d &center);
+
   std::vector<Spectrum> makeSpectra() const;
 
   CowPtr<L2s> l2s() const;
@@ -320,6 +325,23 @@ void DetectorInfo<InstTree>::rotate(size_t componentIndex,
   init();
 
   // Meta-data should all still be valid.
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::moveDetector(size_t detectorIndex,
+                                          const Eigen::Vector3d &offset) {
+
+  move(m_instrumentTree->detIndexToCompIndex(detectorIndex), offset);
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::rotateDetector(size_t detectorIndex,
+                                            const Eigen::Vector3d &axis,
+                                            const double &theta,
+                                            const Eigen::Vector3d &center) {
+
+  rotate(m_instrumentTree->detIndexToCompIndex(detectorIndex), axis, theta,
+         center);
 }
 
 template <typename InstTree>

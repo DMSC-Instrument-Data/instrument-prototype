@@ -44,6 +44,8 @@ public:
   std::vector<const PathComponent *> pathComponents() const;
   std::vector<size_t> pathComponentIndexes() const;
   std::vector<size_t> detectorComponentIndexes() const;
+  size_t detIndexToCompIndex(size_t detectorIndex) const;
+  size_t pathIndexToCompIndex(size_t pathIndex) const;
 
   std::vector<ComponentProxy>::const_iterator begin() const;
   std::vector<ComponentProxy>::const_iterator end() const;
