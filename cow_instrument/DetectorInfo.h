@@ -43,15 +43,21 @@ public:
 
   double l2(size_t detectorIndex) const;
 
-  Eigen::Vector3d position(size_t detectorIndex) const;
+  Eigen::Vector3d position(size_t detectorIndex) const; // TO DEPRECATE
 
   Eigen::Vector3d position2(size_t componentIndex) const;
 
+  Eigen::Vector3d positionDetector(size_t detectorIndex) const;
+
   Eigen::Quaterniond rotation(size_t componentIndex) const;
+
+  Eigen::Quaterniond rotationDetector(size_t detectorIndex) const;
 
   double l1(size_t detectorIndex) const;
 
   size_t size() const;
+
+  size_t componentSize() const;
 
   const InstTree &const_instrumentTree() const;
 
@@ -243,6 +249,7 @@ double DetectorInfo<InstTree>::l2(size_t detectorIndex) const {
 
 template <typename InstTree>
 Eigen::Vector3d DetectorInfo<InstTree>::position(size_t detectorIndex) const {
+  // DEPRECATED
   return m_instrumentTree->getDetector(detectorIndex).getPos();
 }
 
@@ -252,9 +259,21 @@ Eigen::Vector3d DetectorInfo<InstTree>::position2(size_t componentIndex) const {
 }
 
 template <typename InstTree>
+Eigen::Vector3d
+DetectorInfo<InstTree>::positionDetector(size_t detectorIndex) const {
+  return m_positions[m_instrumentTree->detIndexToCompIndex(detectorIndex)];
+}
+
+template <typename InstTree>
 Eigen::Quaterniond
 DetectorInfo<InstTree>::rotation(size_t componentIndex) const {
   return m_rotations[componentIndex];
+}
+
+template <typename InstTree>
+Eigen::Quaterniond
+DetectorInfo<InstTree>::rotationDetector(size_t detectorIndex) const {
+  return m_rotations[m_instrumentTree->detIndexToCompIndex(detectorIndex)];
 }
 
 template <typename InstTree>
@@ -265,6 +284,11 @@ double DetectorInfo<InstTree>::l1(size_t detectorIndex) const {
 
 template <typename InstTree> size_t DetectorInfo<InstTree>::size() const {
   return m_nDetectors;
+}
+
+template <typename InstTree>
+size_t DetectorInfo<InstTree>::componentSize() const {
+  return m_instrumentTree->componentSize();
 }
 
 template <typename InstTree>

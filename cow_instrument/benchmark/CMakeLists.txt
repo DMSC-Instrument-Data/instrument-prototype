@@ -25,7 +25,7 @@ include_directories(${GBENCH_INCLUDE_DIR})
 
 set ( BENCH_FILES_SRC
                  InstrumentConstructionBenchmark.cpp
-                 InstrumentReadBenchmark.cpp
+                 DetectorInfoReadBenchmark.cpp
                  InstrumentSerializationBenchmark.cpp
                  DetectorInfoWriteTranslateBenchmark.cpp
                  DetectorInfoWriteRotateBenchmark.cpp
