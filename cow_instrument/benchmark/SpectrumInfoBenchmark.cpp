@@ -3,7 +3,6 @@
 #include "SpectrumInfo.h"
 #include "StandardInstrument.h"
 #include "SourceSampleDetectorPathFactory.h"
-#include "Node.h"
 #include <memory.h>
 
 namespace {
@@ -17,7 +16,7 @@ public:
       : benchmark::Fixture(),
         m_spectrumInfo(DetectorInfo<InstrumentTree>(
             std::make_shared<InstrumentTree>(
-                std_instrument::construct_root_node()),
+                std_instrument::construct_root_component()),
             SourceSampleDetectorPathFactory<InstrumentTree>{})) {}
 };
 
