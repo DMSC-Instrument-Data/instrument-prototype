@@ -23,7 +23,6 @@ set ( SOURCE_FILES
                    ComponentProxy.cpp
                    DetectorComponent.cpp
                    InstrumentTree.cpp
-                   MoveCommand.cpp
                    Node.cpp
                    NullComponent.cpp
                    ParabolicGuide.cpp
@@ -53,7 +52,6 @@ set ( INCLUDE_FILES
                    L2s.h
                    MaskFlags.h
                    MonitorFlags.h
-                   MoveCommand.h
                    Node.h
                    NullComponent.h
                    ParabolicGuide.h

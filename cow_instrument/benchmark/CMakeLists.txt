@@ -27,7 +27,7 @@ set ( BENCH_FILES_SRC
                  InstrumentConstructionBenchmark.cpp
                  InstrumentReadBenchmark.cpp
                  InstrumentSerializationBenchmark.cpp
-                 InstrumentWriteTranslateBenchmark.cpp
+                 DetectorInfoWriteTranslateBenchmark.cpp
                  InstrumentWriteRotateBenchmark.cpp
                  SpectrumInfoBenchmark.cpp
                  StandardInstrument.cpp

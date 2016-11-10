@@ -38,7 +38,6 @@ set ( TEST_FILES
                  FixedLengthVectorTest.cpp                 
                  IndexTranslatorTest.cpp
                  InstrumentTreeTest.cpp
-                 MoveCommandTest.cpp
                  NodeTest.cpp
                  ParabolicGuideTest.cpp
                  PathComponentTest.cpp

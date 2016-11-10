@@ -2,6 +2,7 @@
 #define STANDARD_INSTRUMENT_H
 
 #include "InstrumentTree.h"
+#include "DetectorInfo.h"
 #include <vector>
 #include <benchmark/benchmark_api.h>
 
@@ -17,6 +18,7 @@ class StandardInstrumentFixture : public benchmark::Fixture {
 
 public:
   InstrumentTree m_instrument;
+  DetectorInfo<InstrumentTree> m_detectorInfo;
 
   StandardInstrumentFixture();
 };
