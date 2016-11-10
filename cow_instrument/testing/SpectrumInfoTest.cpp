@@ -4,6 +4,8 @@
 #include "MockTypes.h"
 #include "SourceSampleDetectorPathFactory.h"
 
+namespace {
+
 TEST(spectrum_info_test, test_constructor_lhr) {
   std::vector<Spectrum> spectra{{0}, {1}, {2}};
   size_t nDetectors = 3;
@@ -129,23 +131,5 @@ TEST(spectrum_info_test, test_l2_mapped) {
       << "Mock DetectorInfo used incorrectly";
 }
 
-TEST(spectrum_info_test, test_modify) {
-
-  using namespace testing;
-  auto *pMockInstrumentTree = new NiceMockInstrumentTree{};
-
-  // We expect that the modify method of the existing instrument tree gets
-  // called
-  EXPECT_CALL(*pMockInstrumentTree, modifyProxy(testing::_, testing::_))
-      .Times(1);
-
-  SpectrumInfo<MockInstrumentTree> spectrumInfo(DetectorInfoWithMockInstrument{
-      std::shared_ptr<MockInstrumentTree>{pMockInstrumentTree},
-      SourceSampleDetectorPathFactory<MockInstrumentTree>{}});
-
-  MockCommand command;
-  spectrumInfo.modify(0, command);
-
-  // test modify called on instrument.
-  EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree));
 }
+

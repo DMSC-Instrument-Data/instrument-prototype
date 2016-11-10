@@ -8,7 +8,6 @@
 #include <sstream>
 #include <cmath>
 
-#include "Command.h"
 #include "ComponentProxy.h"
 #include "cow_ptr.h"
 #include "Detector.h"
@@ -60,8 +59,6 @@ public:
   size_t componentSize() const;
 
   const InstTree &const_instrumentTree() const;
-
-  void modify(size_t nodeIndex, Command &command);
 
   void move(size_t componentIndex, const Eigen::Vector3d &offset);
 
@@ -294,18 +291,6 @@ size_t DetectorInfo<InstTree>::componentSize() const {
 template <typename InstTree>
 const InstTree &DetectorInfo<InstTree>::const_instrumentTree() const {
   return *m_instrumentTree;
-}
-
-template <typename InstTree>
-void DetectorInfo<InstTree>::modify(size_t nodeIndex, Command &command) {
-
-  m_instrumentTree->modify(nodeIndex, command);
-
-  // All other geometry-derived information is now also invalid. Very
-  // important!
-  init();
-
-  // Meta-data should all still be valid.
 }
 
 template <typename InstTree>

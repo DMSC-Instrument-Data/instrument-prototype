@@ -1,5 +1,4 @@
 #include "Node.h"
-#include "Command.h"
 #include "Component.h"
 #include "NullComponent.h"
 
@@ -21,16 +20,6 @@ Node::Node(size_t previous, CowPtr<Component> contents, std::string name,
       m_version(version), m_next(std::move(children)) {}
 
 Node::~Node() {}
-
-bool Node::modify(const Command &command) {
-  /*
-   * We pass in the cow_ptr<Component> by lvalue ref.
-   * It is therefore up to the Command whether it invokes a non-const
-   * method call on the cow_ptr. The Command::execute() MUST correctly
-   * indicate whether a writeable opeation was performed by returning true.
-   */
-  return command.execute(m_contents);
-}
 
 void Node::addChild(size_t child) { m_next.emplace_back(child); }
 

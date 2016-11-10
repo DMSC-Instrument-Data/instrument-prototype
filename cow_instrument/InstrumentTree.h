@@ -11,7 +11,6 @@
 
 class Node;
 class NodeIterator;
-class Command;
 class Detector;
 class PathComponent;
 class PointSource;
@@ -37,9 +36,6 @@ public:
   const PathComponent &source() const;
   const PathComponent &sample() const;
   unsigned int version() const;
-
-  bool modify(size_t node, const Command &command);
-  bool modify(const Node *node, const Command &command);
 
   // This is how we help the client out when they want to work with detector
   // ids.

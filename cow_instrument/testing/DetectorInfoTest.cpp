@@ -7,7 +7,6 @@
 #include <stdexcept>
 #include <memory>
 #include "IdType.h"
-#include "Command.h"
 #include "SourceSampleDetectorPathFactory.h"
 
 namespace {
@@ -274,27 +273,6 @@ TEST(detector_info_test, test_calculate_l1) {
   EXPECT_TRUE(testing::Mock::VerifyAndClearExpectations(&source));
   EXPECT_TRUE(testing::Mock::VerifyAndClearExpectations(&sample));
   EXPECT_TRUE(testing::Mock::VerifyAndClearExpectations(&detector));
-}
-
-TEST(detector_info_test, test_modify) {
-
-  using namespace testing;
-  auto *pMockInstrumentTree = new NiceMockInstrumentTree{};
-
-  // We expect that the modify method of the existing instrument tree gets
-  // called
-  EXPECT_CALL(*pMockInstrumentTree, modifyProxy(testing::_, testing::_))
-      .Times(1);
-
-  DetectorInfoWithMockInstrument detectorInfo{
-      std::shared_ptr<MockInstrumentTree>(pMockInstrumentTree),
-      SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
-
-  MockCommand command;
-  detectorInfo.modify(0, command);
-
-  // test modify called on instrument.
-  EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree));
 }
 
 TEST(detector_info_test, test_move) {

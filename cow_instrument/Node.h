@@ -8,7 +8,6 @@
 #include <string>
 
 class Component;
-class Command;
 class InstrumentTree;
 
 /**
@@ -63,7 +62,6 @@ public:
   CowPtr<Component>::RefPtr unsafeContents() const;
 
 private:
-  bool modify(const Command &command);
 
   /// Parent node, negative index indicates no parent.
   int64_t m_previous;

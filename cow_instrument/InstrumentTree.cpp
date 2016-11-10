@@ -3,7 +3,6 @@
 #include "Detector.h"
 #include "CompositeComponent.h"
 #include "PathComponent.h"
-#include "Command.h"
 #include <utility>
 #include <string>
 #include <algorithm>
@@ -160,61 +159,6 @@ size_t InstrumentTree::nDetectors() const {
 
 size_t InstrumentTree::nPathComponents() const {
   return m_componentInfo.pathSize();
-}
-
-/*
- * Modify is not thread-safe owing to the fact that the vector of detector
- * and vector of path component pointers is potentially corruptable between
- * the time that the cow occurs in the Command::Modify and the
- * InstrumentTree::init().
- */
-bool InstrumentTree::modify(size_t nodeIndex, const Command &command) {
-
-  /* We increment the version number of the Nodes. Consider removing the Node
-   * Version Number. It has no practicle use-case other than diagnostics, and
-   * the increemnt
-   * is a writeable operation on the COW ptr.
-   */
-  std::for_each(m_nodes->begin(), m_nodes->end(),
-                [](Node &node) { node.incrementVersion(); });
-
-  bool cowTriggered = false;
-  if (command.isMetaDataCommand()) {
-    // No cascading behaviour.
-    auto &currentNode = m_nodes->operator[](nodeIndex);
-    cowTriggered |= currentNode.modify(command);
-
-  } else {
-    // Cascading behaviour
-    std::vector<size_t> toModify = {nodeIndex};
-    for (size_t index = 0; index < toModify.size(); ++index) {
-      auto &currentNode = m_nodes->operator[](toModify[index]);
-      cowTriggered |= currentNode.modify(command);
-      const auto &currentChildren = currentNode.children();
-      toModify.insert(toModify.end(), currentChildren.begin(),
-                      currentChildren.end());
-    }
-  }
-
-  /*
-   * We only rebuild our Detector* vector if the modifications
-   * indicate that such action is required.
-   */
-  if (cowTriggered) {
-    // We must purge any existing memory.
-    m_componentInfo.clear();
-    init();
-  }
-  return cowTriggered;
-}
-
-bool InstrumentTree::modify(const Node *node, const Command &command) {
-  for (size_t index = 0; index < m_nodes->size(); ++index) {
-    if (&m_nodes.const_ref()[index] == node) {
-      return modify(index, command);
-    }
-  }
-  throw std::invalid_argument("Node has not been found");
 }
 
 const Node *const InstrumentTree::nodeAt(size_t index) const {

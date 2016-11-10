@@ -4,7 +4,6 @@
 #include <vector>
 #include <memory>
 
-#include "Command.h"
 #include "cow_ptr.h"
 #include "DetectorInfo.h"
 #include "InstrumentTree.h"
@@ -35,8 +34,6 @@ public:
   double l2(size_t index) const;
 
   CowPtr<L2s> l2s() const;
-
-  void modify(size_t nodeIndex, Command &command);
 
   void moveDetector(size_t spectrumIndex, const Eigen::Vector3d &offset);
 
@@ -143,11 +140,6 @@ double SpectrumInfo<InstTree>::l2(size_t index) const {
 
 template <typename InstTree> CowPtr<L2s> SpectrumInfo<InstTree>::l2s() const {
   return m_l2;
-}
-
-template <typename InstTree>
-void SpectrumInfo<InstTree>::modify(size_t nodeIndex, Command &command) {
-  m_detectorInfo.modify(nodeIndex, command);
 }
 
 template <typename InstTree>

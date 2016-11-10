@@ -2,7 +2,6 @@
 #define MOCKTYPES_H
 
 #include "Component.h"
-#include "Command.h"
 #include "Detector.h"
 #include "DetectorInfo.h"
 #include "InstrumentTree.h"
@@ -61,17 +60,6 @@ public:
   ~MockPathComponent() {}
 };
 
-class MockCommand : public Command {
-public:
-  MockCommand() {
-    using namespace testing;
-    ON_CALL(*this, isMetaDataCommand()).WillByDefault(Return(false));
-  }
-  MOCK_CONST_METHOD1(execute, bool(CowPtr<Component> &));
-  MOCK_CONST_METHOD0(isMetaDataCommand, bool());
-  ~MockCommand() {}
-};
-
 class MockDetector : public Detector {
 public:
   MOCK_CONST_METHOD0(detectorId, DetectorIdType());
@@ -96,7 +84,6 @@ public:
   virtual size_t nDetectors() const = 0;
   virtual const Detector &getDetector(size_t detectorIndex) const = 0;
   virtual const PathComponent &getPathComponent(size_t detectorIndex) const = 0;
-  virtual std::unique_ptr<T> modify(size_t, const Command &command) const = 0;
   virtual size_t samplePathIndex() const = 0;
   virtual size_t sourcePathIndex() const = 0;
   virtual size_t componentSize() const = 0;
@@ -158,14 +145,6 @@ public:
   MOCK_CONST_METHOD0(startPositions, std::vector<Eigen::Vector3d>());
   MOCK_CONST_METHOD0(startRotations, std::vector<Eigen::Quaterniond>());
   MOCK_CONST_METHOD1(subTreeIndexes, std::vector<size_t>(size_t));
-
-  std::unique_ptr<MockInstrumentTree> modify(size_t nodeIndex,
-                                             const Command &command) const {
-    return std::unique_ptr<MockInstrumentTree>(modifyProxy(nodeIndex, command));
-  }
-
-  MOCK_CONST_METHOD2(modifyProxy,
-                     MockInstrumentTree *(size_t, const Command &));
 
   virtual ~MockInstrumentTree() {}
 
