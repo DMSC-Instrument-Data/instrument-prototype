@@ -1,11 +1,6 @@
 #include "StandardInstrument.h"
-#include "InstrumentTree.h"
 #include "DetectorInfo.h"
-#include "Node.h"
-#include "Detector.h"
-#include <iostream>
 #include <benchmark/benchmark_api.h>
-#include "IdType.h"
 
 namespace {
 
@@ -48,16 +43,6 @@ BENCHMARK_F(WriteTranslateFixture,
 BENCHMARK_F(WriteTranslateFixture,
             BM_translate_one_bank)(benchmark::State &state) {
   this->translateOnComponent(2, false /*no read metric*/, state);
-}
-
-BENCHMARK_F(WriteTranslateFixture,
-            BM_translate_root_with_read)(benchmark::State &state) {
-  this->translateOnComponent(0, true, state);
-}
-
-BENCHMARK_F(WriteTranslateFixture,
-            BM_translate_one_trolle_with_read)(benchmark::State &state) {
-  this->translateOnComponent(1, true, state);
 }
 
 BENCHMARK_F(WriteTranslateFixture,

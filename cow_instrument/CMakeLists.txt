@@ -27,7 +27,6 @@ set ( SOURCE_FILES
                    NullComponent.cpp
                    ParabolicGuide.cpp
                    PathComponent.cpp
-                   RotateCommand.cpp
 )
 
 
@@ -61,7 +60,6 @@ set ( INCLUDE_FILES
                    PointPathComponent.h
                    PointSample.h
                    PointSource.h
-                   RotateCommand.h
                    SourceSampleDetectorPathFactory.h
                    SpectrumInfo.h
                    Spectrum.h
