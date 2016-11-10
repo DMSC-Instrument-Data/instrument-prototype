@@ -45,6 +45,10 @@ public:
 
   Eigen::Vector3d position(size_t detectorIndex) const;
 
+  Eigen::Vector3d position2(size_t componentIndex) const;
+
+  Eigen::Quaterniond rotation(size_t componentIndex) const;
+
   double l1(size_t detectorIndex) const;
 
   size_t size() const;
@@ -53,7 +57,10 @@ public:
 
   void modify(size_t nodeIndex, Command &command);
 
-  void modify2(size_t component_index, Command2 &command);
+  void move(size_t componentIndex, const Eigen::Vector3d &offset);
+
+  void rotate(size_t componentIndex, const Eigen::Vector3d &axis,
+              const double &theta, const Eigen::Vector3d &center);
 
   std::vector<Spectrum> makeSpectra() const;
 
@@ -73,7 +80,6 @@ private:
   //------------------- DerivedInfo
   CowPtr<L1s> m_l1;
   CowPtr<L2s> m_l2;
-
 
   std::shared_ptr<const Paths> m_l2Paths;
   std::shared_ptr<const Paths> m_l1Paths;
@@ -236,6 +242,17 @@ Eigen::Vector3d DetectorInfo<InstTree>::position(size_t detectorIndex) const {
 }
 
 template <typename InstTree>
+Eigen::Vector3d DetectorInfo<InstTree>::position2(size_t componentIndex) const {
+  return m_positions[componentIndex];
+}
+
+template <typename InstTree>
+Eigen::Quaterniond
+DetectorInfo<InstTree>::rotation(size_t componentIndex) const {
+  return m_rotations[componentIndex];
+}
+
+template <typename InstTree>
 double DetectorInfo<InstTree>::l1(size_t detectorIndex) const {
   detectorRangeCheck(detectorIndex, m_l1.const_ref());
   return m_l1.const_ref()[detectorIndex];
@@ -263,10 +280,40 @@ void DetectorInfo<InstTree>::modify(size_t nodeIndex, Command &command) {
 }
 
 template <typename InstTree>
-void DetectorInfo<InstTree>::modify2(size_t componentIndex, Command2 &command) {
+void DetectorInfo<InstTree>::move(size_t componentIndex,
+                                  const Eigen::Vector3d &offset) {
 
-  DetectorInfo<InstTree> *const trial = this;
-  command.execute(componentIndex);
+  const std::vector<size_t> indexes =
+      m_instrumentTree->subTreeIndexes(componentIndex);
+  for (auto &index : indexes) {
+    m_positions[index] += offset;
+  }
+
+  // All other geometry-derived information is now also invalid. Very
+  // important!
+  init();
+
+  // Meta-data should all still be valid.
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::rotate(size_t componentIndex,
+                                    const Eigen::Vector3d &axis,
+                                    const double &theta,
+                                    const Eigen::Vector3d &center) {
+
+  using namespace Eigen;
+  const auto transform =
+      Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
+  const auto rotation = transform.rotation();
+
+  const std::vector<size_t> indexes =
+      m_instrumentTree->subTreeIndexes(componentIndex);
+  for (auto &index : indexes) {
+
+    m_positions[index] = transform * m_positions[index];
+    m_rotations[index] = rotation * m_rotations[index];
+  }
 
   // All other geometry-derived information is now also invalid. Very
   // important!

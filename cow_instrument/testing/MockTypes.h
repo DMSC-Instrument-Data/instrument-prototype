@@ -113,6 +113,7 @@ public:
   virtual size_t componentSize() const = 0;
   virtual std::vector<Eigen::Vector3d> startPositions() const = 0;
   virtual std::vector<Eigen::Quaterniond> startRotations() const = 0;
+  virtual std::vector<size_t> subTreeIndexes(size_t proxyIndex) const = 0;
   virtual ~PolymorphicInstrumentTree() {}
 };
 
@@ -132,11 +133,12 @@ public:
         .WillByDefault(testing::ReturnRef(m_mockPathComponent));
     ON_CALL(*this, componentSize()).WillByDefault(testing::Return(1));
     ON_CALL(*this, startPositions())
-        .WillByDefault(
-            testing::Return(std::vector<Eigen::Vector3d>(1, {0, 0, 0})));
+        .WillByDefault(testing::Return(
+            std::vector<Eigen::Vector3d>(1 /*componentSize()*/, {0, 0, 0})));
     ON_CALL(*this, startRotations())
         .WillByDefault(testing::Return(std::vector<Eigen::Quaterniond>(
-            1, Eigen::Quaterniond(Eigen::Affine3d::Identity().rotation()))));
+            1 /*componentSize()*/,
+            Eigen::Quaterniond(Eigen::Affine3d::Identity().rotation()))));
   }
 
   MockInstrumentTree(size_t nDetectors) {
@@ -151,11 +153,12 @@ public:
     ON_CALL(*this, componentSize())
         .WillByDefault(testing::Return(nDetectors + 1));
     ON_CALL(*this, startPositions())
-        .WillByDefault(
-            testing::Return(std::vector<Eigen::Vector3d>(1, {0, 0, 0})));
+        .WillByDefault(testing::Return(
+            std::vector<Eigen::Vector3d>(1 /*componentSize()*/, {0, 0, 0})));
     ON_CALL(*this, startRotations())
         .WillByDefault(testing::Return(std::vector<Eigen::Quaterniond>(
-            1, Eigen::Quaterniond(Eigen::Affine3d::Identity().rotation()))));
+            1 /*componentSize()*/,
+            Eigen::Quaterniond(Eigen::Affine3d::Identity().rotation()))));
   }
   MOCK_CONST_METHOD0(nDetectors, size_t());
   MOCK_CONST_METHOD1(getDetector, const Detector &(size_t));
@@ -165,6 +168,7 @@ public:
   MOCK_CONST_METHOD0(componentSize, size_t());
   MOCK_CONST_METHOD0(startPositions, std::vector<Eigen::Vector3d>());
   MOCK_CONST_METHOD0(startRotations, std::vector<Eigen::Quaterniond>());
+  MOCK_CONST_METHOD1(subTreeIndexes, std::vector<size_t>(size_t));
 
   std::unique_ptr<MockInstrumentTree> modify(size_t nodeIndex,
                                              const Command &command) const {
