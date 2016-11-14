@@ -2,6 +2,8 @@
 #define COMPONENTMAPPERFACTORY_H
 
 #include <vector>
+#include <memory>
+
 class ComponentVisitor;
 
 class ComponentMapperFactory {
