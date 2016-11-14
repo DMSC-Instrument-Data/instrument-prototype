@@ -8,7 +8,6 @@
 
 class Node;
 namespace std_instrument {
-std::vector<Node> construct_root_node();
 std::shared_ptr<Component> construct_root_component();
 }
 

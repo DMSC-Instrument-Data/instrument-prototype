@@ -1,25 +1,23 @@
 #include "StandardInstrument.h"
-#include "Node.h"
 #include <benchmark/benchmark_api.h>
 
 namespace {
 
-void BM_instrument_node_tree_construction(benchmark::State &state) {
-  unsigned int size = 0;
+void BM_instrument_component_tree_construction(benchmark::State &state) {
+
   while (state.KeepRunning()) {
-    auto flattenedNodeTree = std_instrument::construct_root_node();
-    benchmark::DoNotOptimize(size += flattenedNodeTree.size());
+    benchmark::DoNotOptimize(std_instrument::construct_root_component());
   }
   state.SetItemsProcessed(state.iterations() * 1);
 }
-BENCHMARK(BM_instrument_node_tree_construction);
+BENCHMARK(BM_instrument_component_tree_construction);
 
 void BM_instrument_tree_construction(benchmark::State &state) {
-  unsigned int version = 0;
+  size_t nDetectors = 0;
   while (state.KeepRunning()) {
-    auto flattenedNodeTree = std_instrument::construct_root_node();
-    InstrumentTree instrumentTree(std::move(flattenedNodeTree));
-    benchmark::DoNotOptimize(version += instrumentTree.version());
+    auto tree = std_instrument::construct_root_component();
+    InstrumentTree instrumentTree(tree);
+    benchmark::DoNotOptimize(nDetectors += instrumentTree.nDetectors());
   }
   state.SetItemsProcessed(state.iterations() * 1);
 }
@@ -29,6 +27,7 @@ BENCHMARK_F(StandardInstrumentFixture, BM_instrument_tree_copy_unmodified)(bench
     while (state.KeepRunning()) {
       // Then modify that node
       auto copyInstrument = m_instrument;
+      (void)copyInstrument;
     }
     // For statistics. Mark the number of itertions
     state.SetItemsProcessed(state.iterations() * 1);

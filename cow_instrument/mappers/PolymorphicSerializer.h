@@ -12,6 +12,7 @@
 #include <memory>
 #include "cow_ptr.h"
 #include "SharedPtrSerialization.h"
+#include "ComponentVisitor.h"
 
 template <typename MapperFactory> class PolymorphicSerializer {
 private:

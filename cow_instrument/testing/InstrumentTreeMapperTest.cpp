@@ -2,7 +2,6 @@
 #include "InstrumentTree.h"
 #include "CompositeComponent.h"
 #include "DetectorComponent.h"
-#include "Node.h"
 #include "PointSample.h"
 #include "PointSource.h"
 #include <Eigen/Core>
@@ -26,7 +25,9 @@ InstrumentTree make_instrument() {
 
   */
 
-  auto composite = std::make_shared<CompositeComponent>(ComponentIdType(1));
+  auto root = std::make_shared<CompositeComponent>(ComponentIdType(0));
+  auto composite = std::unique_ptr<CompositeComponent>(
+      new CompositeComponent(ComponentIdType(1)));
   composite->addComponent(
       std::unique_ptr<DetectorComponent>(new DetectorComponent(
           ComponentIdType(1), DetectorIdType(1), Eigen::Vector3d{1, 1, 1})));
@@ -34,22 +35,16 @@ InstrumentTree make_instrument() {
       std::unique_ptr<DetectorComponent>(new DetectorComponent(
           ComponentIdType(1), DetectorIdType(2), Eigen::Vector3d{1, 1, 1})));
 
-  std::vector<Node> nodes;
+  root->addComponent(std::move(composite));
 
-  nodes.push_back(Node());                                // Add A
-  nodes.push_back(Node(0, CowPtr<Component>(composite))); // Add B
-  nodes.push_back(
-      Node(0, CowPtr<Component>(new PointSource(Eigen::Vector3d{0, 0, 0},
-                                                ComponentIdType(3))))); // Add C
-  nodes.push_back(
-      Node(0, CowPtr<Component>(new PointSample(Eigen::Vector3d{0, 0, 10},
-                                                ComponentIdType(4))))); // Add D
+  root->addComponent(std::unique_ptr<PointSource>(
+      (new PointSource(Eigen::Vector3d{0, 0, 0},
+                       ComponentIdType(3))))); // Add C
+  root->addComponent(std::unique_ptr<PointSample>(
+      (new PointSample(Eigen::Vector3d{0, 0, 10},
+                       ComponentIdType(4))))); // Add D
 
-  nodes[0].addChild(1); // add composite
-  nodes[0].addChild(2); // add source
-  nodes[0].addChild(3); // add sample
-
-  return InstrumentTree(std::move(nodes));
+  return InstrumentTree(root);
 }
 }
 
@@ -72,7 +67,6 @@ TEST(instrument_tree_mapper_test, test_create) {
 
   InstrumentTree product = outputMapper.create();
 
-  EXPECT_EQ(product.nodeSize(), original.nodeSize());
   EXPECT_EQ(product.nDetectors(), original.nDetectors());
   EXPECT_EQ(product.nPathComponents(), original.nPathComponents());
   EXPECT_TRUE(product.getDetector(0).equals(original.getDetector(0)))

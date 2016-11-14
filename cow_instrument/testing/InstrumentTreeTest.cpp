@@ -1,5 +1,4 @@
 #include "InstrumentTree.h"
-#include "Node.h"
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "MockTypes.h"
@@ -27,32 +26,25 @@ InstrumentTree make_simple_tree(DetectorIdType detector1Id,
 
   */
 
-  auto composite = std::make_shared<CompositeComponent>(ComponentIdType(1));
+  auto root = std::make_shared<CompositeComponent>(ComponentIdType(0));
+  auto composite = std::unique_ptr<CompositeComponent>(
+      new CompositeComponent(ComponentIdType(1)));
+
   composite->addComponent(
       std::unique_ptr<DetectorComponent>(new DetectorComponent(
           ComponentIdType(1), DetectorIdType(detector1Id), Eigen::Vector3d{1, 1, 1})));
 
-  std::vector<Node> nodes;
+  root->addComponent(std::move(composite));
+  root->addComponent(std::unique_ptr<DetectorComponent>(
+      new DetectorComponent(ComponentIdType(2), DetectorIdType(detector2Id),
+                            Eigen::Vector3d{1, 1, 1})));
 
-  nodes.push_back(Node(CowPtr<Component>(new NiceMock<MockComponent>())));
-  nodes.push_back(Node(0, CowPtr<Component>(composite)));
-  nodes.push_back(Node(0, CowPtr<Component>(std::unique_ptr<DetectorComponent>(
-                                                new DetectorComponent(
-                                                    ComponentIdType(2),
-                                                    DetectorIdType(detector2Id),
-                                                    Eigen::Vector3d{1, 1, 1})).release())));
+  root->addComponent(std::unique_ptr<PointSource>(
+      new PointSource(Eigen::Vector3d{0, 0, 0}, ComponentIdType(3))));
+  root->addComponent(std::unique_ptr<PointSample>(
+      new PointSample(Eigen::Vector3d{0, 0, 10}, ComponentIdType(4))));
 
-  nodes.push_back(Node(
-      0, CowPtr<Component>(new PointSource(Eigen::Vector3d{0, 0, 0}, ComponentIdType(3)))));
-  nodes.push_back(Node(0, CowPtr<Component>(new PointSample(
-                              Eigen::Vector3d{0, 0, 10}, ComponentIdType(4)))));
-
-  nodes[0].addChild(1); // add composite
-  nodes[0].addChild(2); // add detector
-  nodes[0].addChild(3); // add source
-  nodes[0].addChild(4); // add sample
-
-  return InstrumentTree(std::move(nodes));
+  return InstrumentTree(root);
 }
 
 InstrumentTree
@@ -70,96 +62,56 @@ make_very_basic_tree(ComponentIdType idForSource = ComponentIdType(0),
 
   */
 
-  std::vector<Node> nodes;
-  nodes.push_back(Node{});
-  nodes.push_back(
-      Node(0, CowPtr<Component>(new DetectorComponent(
-                  idForDetector, DetectorIdType(1), Eigen::Vector3d{1, 1, 1}))));
+  auto root = std::make_shared<CompositeComponent>(ComponentIdType(0));
 
-  nodes.push_back(
-      Node(0, CowPtr<Component>(new PointSource(Eigen::Vector3d{0, 0, 0}, idForSource))));
-  nodes.push_back(
-      Node(0, CowPtr<Component>(new PointSample(Eigen::Vector3d{0, 0, 10}, idForSample))));
+  root->addComponent(std::unique_ptr<DetectorComponent>(new DetectorComponent(
+      idForDetector, DetectorIdType(1), Eigen::Vector3d{1, 1, 1})));
 
-  nodes[0].addChild(1);
-  nodes[0].addChild(2);
-  nodes[0].addChild(3);
-  return InstrumentTree(std::move(nodes));
+  root->addComponent(std::unique_ptr<PointSource>(
+      new PointSource(Eigen::Vector3d{0, 0, 0}, idForSource)));
+  root->addComponent(std::unique_ptr<PointSample>(
+      new PointSample(Eigen::Vector3d{0, 0, 10}, idForSample)));
+
+  return InstrumentTree(root);
 }
 
 /**
-Test helper method. Adds a source and sample node to an existing node vector
+Test helper method. Adds a source and sample node to an existing root
 and creates an instrument tree from it.
  */
-InstrumentTree makeRegularInstrument(std::vector<Node> &&nodes,
-                                     int versionNumber = 0) {
-  const size_t originalSize = nodes.size();
-  nodes.push_back(Node(
-      0, CowPtr<Component>(new PointSource(Eigen::Vector3d{0, 0, 0}, ComponentIdType(100))),
-      "Source", versionNumber));
-  nodes.push_back(Node(0, CowPtr<Component>(new PointSample(
-                              Eigen::Vector3d{0, 0, 10}, ComponentIdType(101))),
-                       "Sample", versionNumber));
+InstrumentTree
+makeRegularInstrument(std::shared_ptr<CompositeComponent> &root) {
 
-  nodes[0].addChild(originalSize + 1);
-  nodes[1].addChild(originalSize + 2);
+  root->addComponent(std::unique_ptr<PointSource>(
+      new PointSource(Eigen::Vector3d{0, 0, 0}, ComponentIdType(100))));
+  root->addComponent(std::unique_ptr<PointSample>(
+      new PointSample(Eigen::Vector3d{0, 0, 10}, ComponentIdType(101))));
 
-  return InstrumentTree(std::move(nodes));
-}
-
-TEST(instrument_tree_test, test_uptr_constructor) {
-
-  Node a(CowPtr<Component>(new NiceMock<MockComponent>()));
-
-  // Calls std::shared_ptr<T>(std::unique_ptr<T>&&) constructor
-  InstrumentTree instrument = makeRegularInstrument({a});
-
-  EXPECT_EQ(0, instrument.version());
-}
-
-
-TEST(instrument_tree_test, test_version_check_on_constructor) {
-
-  const unsigned int versionNumber = 1;
-  std::vector<Node> nodes;
-  nodes.emplace_back(CowPtr<Component>(new NiceMock<MockComponent>()), "a",
-                     versionNumber);
-  nodes.emplace_back(0, CowPtr<Component>(new NiceMock<MockComponent>()), "b",
-                     versionNumber +
-                         1 /*version number incremented. This is bad*/);
-  nodes[0].addChild(1);
-
-  EXPECT_THROW(makeRegularInstrument(std::move(nodes)), std::invalid_argument);
+  return InstrumentTree(root);
 }
 
 TEST(instrument_tree_test, test_cannot_construct_without_sample) {
 
   auto source_ptr = new NiceMock<MockPathComponent>();
-  auto source = CowPtr<Component>(source_ptr);
+  auto source = std::shared_ptr<Component>(source_ptr);
 
   // Make a the source
   EXPECT_CALL(*source_ptr, isSource()).WillRepeatedly(Return(true));
   EXPECT_CALL(*source_ptr, isSample()).WillRepeatedly(Return(false));
 
-  std::vector<Node> nodes;
-  nodes.emplace_back(source);
-
-  EXPECT_THROW(InstrumentTree(std::move(nodes)), std::invalid_argument)
+  EXPECT_THROW(InstrumentTree{source}, std::invalid_argument)
       << "Should throw, there is no sample";
 }
 
 TEST(instrument_tree_test, test_cannot_construct_without_source) {
   auto sample_ptr = new NiceMock<MockPathComponent>();
-  auto sample = CowPtr<Component>(sample_ptr);
+  auto sample = std::shared_ptr<Component>(sample_ptr);
 
   // Make a the source
   EXPECT_CALL(*sample_ptr, isSource()).WillRepeatedly(Return(false));
   EXPECT_CALL(*sample_ptr, isSample()).WillRepeatedly(Return(true));
 
-  std::vector<Node> nodes;
-  nodes.emplace_back(sample);
-
-  EXPECT_THROW(InstrumentTree(std::move(nodes)), std::invalid_argument)
+  EXPECT_THROW(InstrumentTree{sample}, std::invalid_argument)
       << "Should throw, there is not source";
 }
 
@@ -177,27 +129,11 @@ TEST(instrument_tree_test, test_find_source_sample) {
 
 TEST(instrument_tree_test, test_copy) {
 
-  /*
-   * Create a simple tree with two nodes
-   InstrumentTree a ----> b
-   */
-
-  const unsigned int versionNumber = 1;
-  std::vector<Node> nodes;
-  nodes.emplace_back(CowPtr<Component>(new NiceMock<MockComponent>()), "a",
-                     versionNumber);
-  nodes.emplace_back(0, CowPtr<Component>(new NiceMock<MockComponent>()), "b",
-                     versionNumber);
-  nodes[0].addChild(1);
-
   InstrumentTree original =
-      makeRegularInstrument(std::move(nodes), versionNumber);
+      make_simple_tree(DetectorIdType(1), DetectorIdType(2));
 
   // Perform copy.
   auto copy = original;
-
-  // Check that the version numbers of the nodes are the same.
-  EXPECT_EQ(copy.root().version(), original.root().version());
 
   auto itOrig = original.cbegin();
   auto itCopy = copy.cbegin();
@@ -209,90 +145,6 @@ TEST(instrument_tree_test, test_copy) {
     EXPECT_EQ(proxyOrig, proxyCopy);
 
   } while (itOrig != original.cend() && itCopy != copy.cend());
-}
-
-TEST(instrument_tree_test, test_constructor) {
-
-  /*
-
-        A
-        |
- ------------------
- |                |
- B                C
-
-  */
-
-  MockComponent *a_contents = new NiceMock<MockComponent>();
-  MockComponent *b_contents = new NiceMock<MockComponent>();
-  MockComponent *c_contents = new NiceMock<MockComponent>();
-
-  std::vector<Node> nodes;
-  nodes.emplace_back(CowPtr<Component>(a_contents));
-  nodes.emplace_back(0, CowPtr<Component>(b_contents));
-  nodes.emplace_back(0, CowPtr<Component>(c_contents));
-  nodes[0].addChild(1);
-  nodes[0].addChild(2);
-
-  InstrumentTree instrument = makeRegularInstrument(std::move(nodes));
-  EXPECT_EQ(&instrument.root().const_ref(), a_contents);
-  EXPECT_NE(instrument.cbegin(), instrument.cend());
-}
-
-TEST(instrument_tree_test, test_detector_access) {
-
-  /*
-
-        A (not a detector)
-        |
- -------------------------------------------------
- |                                               |
- B (Composite containing Detector)               C (Detector)
-
-  */
-
-  std::vector<Node> nodes;
-  nodes.emplace_back(CowPtr<Component>(new NiceMock<MockComponent>()));
-  DetectorIdType detector1Id(0);
-  auto composite = std::make_shared<CompositeComponent>(ComponentIdType(1));
-  composite->addComponent(
-      std::unique_ptr<DetectorComponent>(new DetectorComponent(
-          ComponentIdType(1), DetectorIdType(detector1Id), Eigen::Vector3d{1, 1, 1})));
-
-  nodes.emplace_back(0, CowPtr<Component>(composite));
-
-  DetectorIdType detector2Id = detector1Id + 1;
-  nodes.emplace_back(
-      0,
-      CowPtr<Component>(std::unique_ptr<DetectorComponent>(
-                            new DetectorComponent(ComponentIdType(1),
-                                                  DetectorIdType(detector2Id),
-                                                  Eigen::Vector3d{1, 1, 1})).release()));
-
-  nodes[0].addChild(1);
-  nodes[0].addChild(2);
-
-  InstrumentTree tree = makeRegularInstrument(std::move(nodes));
-
-  const Detector &det1 = tree.getDetector(0);
-  EXPECT_EQ(det1.detectorId(), detector1Id);
-
-  const Detector &det2 = tree.getDetector(1);
-  EXPECT_EQ(det2.detectorId(), detector2Id);
-
-  // Ask for something that doesn't exist.
-  EXPECT_THROW(tree.getDetector(3), std::invalid_argument);
-}
-
-TEST(instrument_tree_test, test_fill_detector_map_no_detectors) {
-  std::vector<Node> nodes;
-  nodes.emplace_back(CowPtr<Component>(new NiceMock<MockComponent>()));
-
-  InstrumentTree instrument = makeRegularInstrument(std::move(nodes));
-
-  std::map<DetectorIdType, size_t> container;
-  instrument.fillDetectorMap(container);
-  EXPECT_EQ(container.size(), 0) << "No detectors to add";
 }
 
 TEST(instrument_tree_test, test_fill_detector_map) {

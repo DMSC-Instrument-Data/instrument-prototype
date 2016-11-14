@@ -1,16 +1,14 @@
 #ifndef INSTRUMENTTREEMAPPER_H
 #define INSTRUMENTTREEMAPPER_H
 
-#include "NodeMapper.h"
 #include "VectorOfMapper.h"
+#include "ComponentMapper.h"
 #include <memory>
 
 
 class InstrumentTreeMapper {
   public:
-
-    std::shared_ptr<VectorOfMapper<NodeMapper>> nodeMapper;
-
+    ComponentMapper componentMapper;
     InstrumentTreeMapper();
     InstrumentTreeMapper(const class InstrumentTree& source);
     InstrumentTree create();

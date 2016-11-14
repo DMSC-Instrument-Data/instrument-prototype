@@ -1,5 +1,4 @@
 #include "InstrumentTree.h"
-#include "Node.h"
 #include "Detector.h"
 #include "CompositeComponent.h"
 #include "PathComponent.h"
@@ -29,21 +28,7 @@ bool findSample(const PathComponent *item) { return item->isSample(); }
 
 void InstrumentTree::init() {
 
-  if (m_nodes->size() > 0) {
-  const unsigned int expectedVersion = this->version();
-  for (const auto &node : m_nodes.const_ref()) {
-    const auto &component = node.const_ref();
-    // Put all detectors into a flat map.
-    // std::vector<ComponentProxy> m_componentProxies;
-    findKeyComponents(component, m_componentInfo);
-    if (node.version() != expectedVersion) {
-      throw std::invalid_argument(
-          "Cannot make an Instrument tree around Nodes of differing version");
-    }
-  }
-  } else {
-    findKeyComponents(*m_componentRoot, m_componentInfo);
-  }
+  findKeyComponents(*m_componentRoot, m_componentInfo);
 
   auto pathComponents = m_componentInfo.pathComponents();
   const auto begin_pathVec = pathComponents.cbegin();
@@ -64,24 +49,9 @@ void InstrumentTree::init() {
 }
 
 InstrumentTree::InstrumentTree(std::shared_ptr<Component> componentRoot)
-    : m_nodes(std::make_shared<std::vector<Node>>()),
-      m_componentRoot(componentRoot) {
+    : m_componentRoot(componentRoot) {
   init();
 }
-
-InstrumentTree::InstrumentTree(std::vector<Node> &&nodes)
-    : m_nodes(std::make_shared<std::vector<Node>>(std::move(nodes))) {
-
-  init();
-}
-
-InstrumentTree::InstrumentTree(CowPtr<std::vector<Node>> nodes)
-    : m_nodes(nodes) {
-
-  init();
-}
-
-const Node &InstrumentTree::root() const { return m_nodes.const_ref()[0]; }
 
 const ComponentProxy &InstrumentTree::rootProxy() const {
   return m_componentInfo.rootProxy();
@@ -95,10 +65,6 @@ const PathComponent &
 InstrumentTree::getPathComponent(size_t pathComponentIndex) const {
   return m_componentInfo.pathComponentAt(pathComponentIndex);
 };
-
-unsigned int InstrumentTree::version() const {
-  return m_nodes.const_ref()[0].version();
-}
 
 void InstrumentTree::fillDetectorMap(
     std::map<DetectorIdType, size_t> &toFill) const {
@@ -120,12 +86,6 @@ const PathComponent &InstrumentTree::sample() const {
 size_t InstrumentTree::samplePathIndex() const { return m_sampleIndex; }
 
 size_t InstrumentTree::sourcePathIndex() const { return m_sourceIndex; }
-
-CowPtr<std::vector<Node>>::RefPtr InstrumentTree::unsafeContents() const {
-  return m_nodes.heldValue();
-}
-
-size_t InstrumentTree::nodeSize() const { return m_nodes->size(); }
 
 size_t InstrumentTree::componentSize() const {
   return m_componentInfo.componentSize();
@@ -153,16 +113,16 @@ size_t InstrumentTree::pathIndexToCompIndex(size_t pathIndex) const {
   return m_componentInfo.pathIndexToCompIndex(pathIndex);
 }
 
+std::shared_ptr<Component> InstrumentTree::rootComponent() const {
+  return m_componentRoot;
+}
+
 size_t InstrumentTree::nDetectors() const {
   return m_componentInfo.detectorSize();
 }
 
 size_t InstrumentTree::nPathComponents() const {
   return m_componentInfo.pathSize();
-}
-
-const Node *const InstrumentTree::nodeAt(size_t index) const {
-  return &m_nodes.const_ref()[index];
 }
 
 const ComponentProxy &InstrumentTree::proxyAt(size_t index) const {

@@ -9,8 +9,6 @@
 #include "IdType.h"
 #include "ComponentInfo.h"
 
-class Node;
-class NodeIterator;
 class Detector;
 class PathComponent;
 class PointSource;
@@ -23,11 +21,6 @@ class InstrumentTree {
 public:
   InstrumentTree(std::shared_ptr<Component> componentRoot);
 
-  InstrumentTree(std::vector<Node> &&nodes);
-
-  InstrumentTree(CowPtr<std::vector<Node>> nodes);
-
-  const Node &root() const;
   const ComponentProxy &rootProxy() const;
 
   const Detector &getDetector(size_t detectorIndex) const;
@@ -35,7 +28,6 @@ public:
   const PathComponent &getPathComponent(size_t pathComponentIndex) const;
   const PathComponent &source() const;
   const PathComponent &sample() const;
-  unsigned int version() const;
 
   // This is how we help the client out when they want to work with detector
   // ids.
@@ -44,7 +36,6 @@ public:
   size_t nDetectors() const;
   size_t nPathComponents() const;
 
-  Node const *const nodeAt(size_t index) const;
   const ComponentProxy &proxyAt(size_t index) const;
 
   size_t samplePathIndex() const;
@@ -55,10 +46,6 @@ public:
   std::vector<ComponentProxy>::const_iterator cbegin() const;
   std::vector<ComponentProxy>::const_iterator cend() const;
 
-  // TODO. Had to add this for serialization. We could do better.
-  CowPtr<std::vector<Node>>::RefPtr unsafeContents() const;
-
-  size_t nodeSize() const;
   size_t componentSize() const;
   /// Enable use to determine all sub-components.
   std::vector<size_t> subTreeIndexes(size_t proxyIndex) const;
@@ -69,9 +56,11 @@ public:
   size_t detIndexToCompIndex(size_t detectorIndex) const;
   size_t pathIndexToCompIndex(size_t pathIndex) const;
 
+  // Unsafe. Consider refactoring.
+  std::shared_ptr<Component> rootComponent() const;
+
 private:
   void init();
-  CowPtr<std::vector<Node>> m_nodes;
   /// PathComponent vector index of the source
   size_t m_sourceIndex;
   /// PathComponent vector index of the sample
