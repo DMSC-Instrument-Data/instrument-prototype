@@ -4,7 +4,7 @@
 
 namespace {
 
-class WriteTranslateFixture : public StandardInstrumentFixture {
+class DetectorInfoWriteTranslateFixture : public StandardInstrumentFixture {
 
 public:
   void translateOnComponent(size_t componentIndex, bool read,
@@ -30,22 +30,22 @@ public:
   }
 };
 
-
-BENCHMARK_F(WriteTranslateFixture, BM_translate_root)(benchmark::State &state) {
+BENCHMARK_F(DetectorInfoWriteTranslateFixture,
+            BM_translate_root)(benchmark::State &state) {
   this->translateOnComponent(0, false /*no read metric*/, state);
 }
 
-BENCHMARK_F(WriteTranslateFixture,
+BENCHMARK_F(DetectorInfoWriteTranslateFixture,
             BM_translate_one_trolley)(benchmark::State &state) {
   this->translateOnComponent(1, false /*no read metric*/, state);
 }
 
-BENCHMARK_F(WriteTranslateFixture,
+BENCHMARK_F(DetectorInfoWriteTranslateFixture,
             BM_translate_one_bank)(benchmark::State &state) {
   this->translateOnComponent(2, false /*no read metric*/, state);
 }
 
-BENCHMARK_F(WriteTranslateFixture,
+BENCHMARK_F(DetectorInfoWriteTranslateFixture,
             BM_translate_one_bank_with_read)(benchmark::State &state) {
   this->translateOnComponent(2, true, state);
 }

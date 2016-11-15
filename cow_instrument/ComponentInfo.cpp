@@ -4,6 +4,8 @@
 #include "Detector.h"
 #include "PathComponent.h"
 #include <string>
+#include <algorithm>
+#include <iterator>
 
 namespace {
 
@@ -101,8 +103,8 @@ std::vector<size_t> ComponentInfo::subTreeIndexes(size_t proxyIndex) const {
   for (size_t index = 0; index < subtree.size(); ++index) {
     auto &currentProxy = m_proxies[subtree[index]];
     const auto &currentChildren = currentProxy.children();
-    subtree.insert(subtree.end(), currentChildren.begin(),
-                   currentChildren.end());
+    std::copy(currentChildren.begin(), currentChildren.end(),
+              std::back_inserter(subtree));
   }
   return subtree;
 }
@@ -178,7 +180,7 @@ const Detector &ComponentInfo::detectorComponentAt(size_t detectorIndex) const {
 
 const PathComponent &
 ComponentInfo::pathComponentAt(size_t pathComponentIndex) const {
-  checkPathRange(pathComponentIndex, this->pathSize());
+  // checkPathRange(pathComponentIndex, this->pathSize());
   return *m_pathComponents[pathComponentIndex];
 }
 

@@ -12,7 +12,7 @@ void BM_instrument_component_tree_construction(benchmark::State &state) {
 }
 BENCHMARK(BM_instrument_component_tree_construction);
 
-void BM_instrument_tree_construction(benchmark::State &state) {
+void BM_instrument_tree_copy_construction(benchmark::State &state) {
   size_t nDetectors = 0;
   while (state.KeepRunning()) {
     auto tree = std_instrument::construct_root_component();
@@ -21,16 +21,5 @@ void BM_instrument_tree_construction(benchmark::State &state) {
   }
   state.SetItemsProcessed(state.iterations() * 1);
 }
-BENCHMARK(BM_instrument_tree_construction);
-
-BENCHMARK_F(StandardInstrumentFixture, BM_instrument_tree_copy_unmodified)(benchmark::State &state) {
-    while (state.KeepRunning()) {
-      // Then modify that node
-      auto copyInstrument = m_instrument;
-      (void)copyInstrument;
-    }
-    // For statistics. Mark the number of itertions
-    state.SetItemsProcessed(state.iterations() * 1);
-  }
-
+BENCHMARK(BM_instrument_tree_copy_construction);
 }

@@ -89,16 +89,16 @@ private:
   CowPtr<L1s> m_l1;
   CowPtr<L2s> m_l2;
 
-  std::shared_ptr<const Paths> m_l2Paths;
-  std::shared_ptr<const Paths> m_l1Paths;
+  CowPtr<const Paths> m_l2Paths;
+  CowPtr<const Paths> m_l1Paths;
 
   // Instrument
   std::shared_ptr<const InstTree> m_instrumentTree;
 
   // All positions indexed by component index
-  std::vector<Eigen::Vector3d> m_positions;
+  CowPtr<std::vector<Eigen::Vector3d>> m_positions;
   // All rotations indexed by component index
-  std::vector<Eigen::Quaterniond> m_rotations;
+  CowPtr<std::vector<Eigen::Quaterniond>> m_rotations;
 };
 
 namespace {
@@ -131,8 +131,10 @@ DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
       m_l1(std::make_shared<L1s>(m_nDetectors)),
       m_l2(std::make_shared<L2s>(m_nDetectors)),
       m_instrumentTree(std::forward<InstSptrType>(instrumentTree)),
-      m_positions(m_instrumentTree->startPositions()),
-      m_rotations(m_instrumentTree->startRotations()) {
+      m_positions(std::make_shared<std::vector<Eigen::Vector3d>>(
+          m_instrumentTree->startPositions())),
+      m_rotations(std::make_shared<std::vector<Eigen::Quaterniond>>(
+          m_instrumentTree->startRotations())) {
 
   init();
 }
@@ -252,25 +254,25 @@ Eigen::Vector3d DetectorInfo<InstTree>::position(size_t detectorIndex) const {
 
 template <typename InstTree>
 Eigen::Vector3d DetectorInfo<InstTree>::position2(size_t componentIndex) const {
-  return m_positions[componentIndex];
+  return (*m_positions)[componentIndex];
 }
 
 template <typename InstTree>
 Eigen::Vector3d
 DetectorInfo<InstTree>::positionDetector(size_t detectorIndex) const {
-  return m_positions[m_instrumentTree->detIndexToCompIndex(detectorIndex)];
+  return (*m_positions)[m_instrumentTree->detIndexToCompIndex(detectorIndex)];
 }
 
 template <typename InstTree>
 Eigen::Quaterniond
 DetectorInfo<InstTree>::rotation(size_t componentIndex) const {
-  return m_rotations[componentIndex];
+  return (*m_rotations)[componentIndex];
 }
 
 template <typename InstTree>
 Eigen::Quaterniond
 DetectorInfo<InstTree>::rotationDetector(size_t detectorIndex) const {
-  return m_rotations[m_instrumentTree->detIndexToCompIndex(detectorIndex)];
+  return (*m_rotations)[m_instrumentTree->detIndexToCompIndex(detectorIndex)];
 }
 
 template <typename InstTree>
@@ -300,7 +302,7 @@ void DetectorInfo<InstTree>::move(size_t componentIndex,
   const std::vector<size_t> indexes =
       m_instrumentTree->subTreeIndexes(componentIndex);
   for (auto &index : indexes) {
-    m_positions[index] += offset;
+    (*m_positions)[index] += offset;
   }
 
   // All other geometry-derived information is now also invalid. Very
@@ -325,8 +327,8 @@ void DetectorInfo<InstTree>::rotate(size_t componentIndex,
       m_instrumentTree->subTreeIndexes(componentIndex);
   for (auto &index : indexes) {
 
-    m_positions[index] = transform * m_positions[index];
-    m_rotations[index] = rotation * m_rotations[index];
+    (*m_positions)[index] = transform * (*m_positions)[index];
+    (*m_rotations)[index] = rotation * (*m_rotations)[index];
   }
 
   // All other geometry-derived information is now also invalid. Very

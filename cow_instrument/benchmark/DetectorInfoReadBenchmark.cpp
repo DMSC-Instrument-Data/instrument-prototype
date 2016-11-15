@@ -3,7 +3,9 @@
 
 namespace {
 
-BENCHMARK_F(StandardInstrumentFixture,
+using DetectorInfoReadFixture = StandardInstrumentFixture;
+
+BENCHMARK_F(DetectorInfoReadFixture,
             BM_detectorinfo_component_read_single_position)(
     benchmark::State &state) {
   const size_t max = m_detectorInfo.componentSize();
@@ -15,7 +17,7 @@ BENCHMARK_F(StandardInstrumentFixture,
   state.SetItemsProcessed(state.iterations() * max);
 }
 
-BENCHMARK_F(StandardInstrumentFixture,
+BENCHMARK_F(DetectorInfoReadFixture,
             BM_detectorinfo_component_read_single_rotation)(
     benchmark::State &state) {
   const size_t max = m_detectorInfo.componentSize();
@@ -27,7 +29,7 @@ BENCHMARK_F(StandardInstrumentFixture,
   state.SetItemsProcessed(state.iterations() * max);
 }
 
-BENCHMARK_F(StandardInstrumentFixture,
+BENCHMARK_F(DetectorInfoReadFixture,
             BM_detectorinfo_detector_read_single_position)(
     benchmark::State &state) {
   const size_t max = m_detectorInfo.size(); // ndetectors
@@ -39,7 +41,7 @@ BENCHMARK_F(StandardInstrumentFixture,
   state.SetItemsProcessed(state.iterations() * max);
 }
 
-BENCHMARK_F(StandardInstrumentFixture,
+BENCHMARK_F(DetectorInfoReadFixture,
             BM_detectorinfo_detector_read_single_rotation)(
     benchmark::State &state) {
   const size_t max = m_detectorInfo.size(); // ndetectors

@@ -3,7 +3,7 @@
 
 namespace {
 
-class WriteRotateFixture : public StandardInstrumentFixture {
+class DetectorInfoWriteRotateFixture : public StandardInstrumentFixture {
 
 public:
   void rotateOnComponent(size_t componentIndex, bool read,
@@ -32,20 +32,22 @@ public:
   }
 };
 
-BENCHMARK_F(WriteRotateFixture, BM_rotate_root)(benchmark::State &state) {
+BENCHMARK_F(DetectorInfoWriteRotateFixture,
+            BM_rotate_root)(benchmark::State &state) {
   this->rotateOnComponent(0, false /*no read metric*/, state);
 }
 
-BENCHMARK_F(WriteRotateFixture,
+BENCHMARK_F(DetectorInfoWriteRotateFixture,
             BM_rotate_one_trolley)(benchmark::State &state) {
   this->rotateOnComponent(1, false /*no read metric*/, state);
 }
 
-BENCHMARK_F(WriteRotateFixture, BM_rotate_one_bank)(benchmark::State &state) {
+BENCHMARK_F(DetectorInfoWriteRotateFixture,
+            BM_rotate_one_bank)(benchmark::State &state) {
   this->rotateOnComponent(2, false /*no read metric*/, state);
 }
 
-BENCHMARK_F(WriteRotateFixture,
+BENCHMARK_F(DetectorInfoWriteRotateFixture,
             BM_rotate_one_bank_with_pos_read)(benchmark::State &state) {
   this->rotateOnComponent(2, true /*with read metric*/, state);
 }
