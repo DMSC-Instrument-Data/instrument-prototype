@@ -63,7 +63,7 @@ private:
   void init();
   /// PathComponent vector index of the source
   size_t m_sourceIndex;
-  /// PathComponent vector index of the sample
+  /// Pa_componentthComponent vector index of the sample
   size_t m_sampleIndex;
   /// vector of proxies and relevant pointers
   ComponentInfo m_componentInfo;

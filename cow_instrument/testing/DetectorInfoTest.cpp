@@ -50,10 +50,9 @@ TEST(detector_info_test, test_construct) {
       new testing::NiceMock<MockInstrumentTree>{};
   EXPECT_CALL(*pMockInstrumentTree, nDetectors())
       .WillRepeatedly(testing::Return(1));
-  NiceMock<MockDetector> mockDetector;
-  EXPECT_CALL(*pMockInstrumentTree, getDetector(_))
+  EXPECT_CALL(*pMockInstrumentTree, detIndexToCompIndex(_))
       .Times(1)
-      .WillOnce(ReturnRef(mockDetector));
+      .WillOnce(Return(0));
 
   std::shared_ptr<MockInstrumentTree> mockInstrumentTree{pMockInstrumentTree};
 
@@ -82,11 +81,9 @@ TEST(detector_info_test, test_construct_with_bad_l2_paths_throws) {
       new testing::NiceMock<MockInstrumentTree>{};
   EXPECT_CALL(*pMockInstrumentTree, nDetectors())
       .WillRepeatedly(testing::Return(nDetectors));
-
-  NiceMock<MockDetector> mockDetector;
-  EXPECT_CALL(*pMockInstrumentTree, getDetector(_))
+  EXPECT_CALL(*pMockInstrumentTree, detIndexToCompIndex(_))
       .Times(1)
-      .WillOnce(ReturnRef(mockDetector));
+      .WillOnce(Return(0));
 
   std::shared_ptr<MockInstrumentTree> mockInstrumentTree{pMockInstrumentTree};
 

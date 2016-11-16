@@ -68,8 +68,10 @@ TEST(spectrum_info_test, test_l2) {
   // Create an Instrument around the Detector
   auto instrument =
       std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors);
-  EXPECT_CALL(*instrument.get(), getDetector(_))
-      .WillRepeatedly(ReturnRef(detector));
+
+  EXPECT_CALL(*instrument.get(), startPositions())
+      .WillOnce(Return(std::vector<Eigen::Vector3d>{{0, 0, 40}}));
+  EXPECT_CALL(*instrument.get(), detIndexToCompIndex(_)).WillOnce(Return(0));
 
   // Create a DetectorInfo around the Instrument
   DetectorInfoWithMockInstrument detectorInfo{
@@ -96,19 +98,15 @@ TEST(spectrum_info_test, test_l2_mapped) {
 
   // Create two detectors
   size_t nDetectors = 2;
-  MockDetector detectorA, detectorB;
-  // This is where I place one of the the detectors
-  EXPECT_CALL(detectorA, getPos())
-      .WillRepeatedly(testing::Return(Eigen::Vector3d{0, 0, 40}));
-  // This is where I place the other of the the detectors
-  EXPECT_CALL(detectorB, getPos())
-      .WillRepeatedly(testing::Return(Eigen::Vector3d{0, 0, 30}));
 
   auto instrument =
       std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors);
-  EXPECT_CALL(*instrument.get(), getDetector(_))
-      .WillOnce(ReturnRef(detectorA))
-      .WillOnce(ReturnRef(detectorB));
+
+  EXPECT_CALL(*instrument.get(), startPositions())
+      .WillOnce(Return(std::vector<Eigen::Vector3d>{{0, 0, 40}, {0, 0, 30}}));
+  EXPECT_CALL(*instrument.get(), detIndexToCompIndex(_))
+      .WillOnce(Return(0))
+      .WillOnce(Return(1));
 
   // Create a DetectorInfo around the Instrument
   DetectorInfoWithMockInstrument detectorInfo{
@@ -123,10 +121,8 @@ TEST(spectrum_info_test, test_l2_mapped) {
   // detector
   // spectra.
   EXPECT_EQ(35.0, spectrumInfo.l2(0)) << "(40 + 30)/2 - 0";
-  EXPECT_TRUE(Mock::VerifyAndClearExpectations(&detectorA))
-      << "Mock Detector used incorrectly";
-  EXPECT_TRUE(Mock::VerifyAndClearExpectations(&detectorB))
-      << "Mock Detector used incorrectly";
+  EXPECT_TRUE(Mock::VerifyAndClearExpectations(instrument.get()))
+      << "Mock Instrument used incorrectly";
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(&detectorInfo))
       << "Mock DetectorInfo used incorrectly";
 }

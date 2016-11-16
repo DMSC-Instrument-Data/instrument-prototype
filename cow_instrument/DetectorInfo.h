@@ -78,6 +78,9 @@ private:
   void init();
   void initL2();
   void initL1();
+  void moveComponent(size_t componentIndex, const Eigen::Vector3d &offset);
+  void rotateComponent(size_t componentIndex, const Eigen::Vector3d &axis,
+                       const double &theta, const Eigen::Vector3d &center);
 
   //------------------- MetaData -------------
   const size_t m_nDetectors;
@@ -213,8 +216,7 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL2() {
   for (size_t detectorIndex = 0; detectorIndex < m_nDetectors;
        ++detectorIndex) {
 
-    const Detector &det = m_instrumentTree->getDetector(detectorIndex);
-    auto detectorPos = det.getPos();
+    auto detectorPos = positionDetector(detectorIndex);
     size_t i = 0;
     const Path &path = (*m_l2Paths)[detectorIndex];
     if (path.size() < 1) {
@@ -224,6 +226,7 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL2() {
     double l2 = 0;
 
     l2 += m_instrumentTree->getPathComponent(path[i]).length();
+
     // For each detector-l2-path calculate the total neutronic length
     for (i = 1; i < path.size(); ++i) {
       const PathComponent &current =
@@ -296,14 +299,21 @@ const InstTree &DetectorInfo<InstTree>::const_instrumentTree() const {
 }
 
 template <typename InstTree>
-void DetectorInfo<InstTree>::move(size_t componentIndex,
-                                  const Eigen::Vector3d &offset) {
+void DetectorInfo<InstTree>::moveComponent(size_t componentIndex,
+                                           const Eigen::Vector3d &offset) {
 
   const std::vector<size_t> indexes =
       m_instrumentTree->subTreeIndexes(componentIndex);
   for (auto &index : indexes) {
     (*m_positions)[index] += offset;
   }
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::move(size_t componentIndex,
+                                  const Eigen::Vector3d &offset) {
+
+  moveComponent(componentIndex, offset);
 
   // All other geometry-derived information is now also invalid. Very
   // important!
@@ -318,6 +328,20 @@ void DetectorInfo<InstTree>::rotate(size_t componentIndex,
                                     const double &theta,
                                     const Eigen::Vector3d &center) {
 
+  rotateComponent(componentIndex, axis, theta, center);
+  // All other geometry-derived information is now also invalid. Very
+  // important!
+  init();
+
+  // Meta-data should all still be valid.
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::rotateComponent(size_t componentIndex,
+                                             const Eigen::Vector3d &axis,
+                                             const double &theta,
+                                             const Eigen::Vector3d &center) {
+
   using namespace Eigen;
   const auto transform =
       Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
@@ -330,19 +354,16 @@ void DetectorInfo<InstTree>::rotate(size_t componentIndex,
     (*m_positions)[index] = transform * (*m_positions)[index];
     (*m_rotations)[index] = rotation * (*m_rotations)[index];
   }
-
-  // All other geometry-derived information is now also invalid. Very
-  // important!
-  init();
-
-  // Meta-data should all still be valid.
 }
 
 template <typename InstTree>
 void DetectorInfo<InstTree>::moveDetector(size_t detectorIndex,
                                           const Eigen::Vector3d &offset) {
 
-  move(m_instrumentTree->detIndexToCompIndex(detectorIndex), offset);
+  moveComponent(m_instrumentTree->detIndexToCompIndex(detectorIndex), offset);
+
+  // Only l2 needs to be recalculated.
+  initL2();
 }
 
 template <typename InstTree>
@@ -351,8 +372,11 @@ void DetectorInfo<InstTree>::rotateDetector(size_t detectorIndex,
                                             const double &theta,
                                             const Eigen::Vector3d &center) {
 
-  rotate(m_instrumentTree->detIndexToCompIndex(detectorIndex), axis, theta,
-         center);
+  rotateComponent(m_instrumentTree->detIndexToCompIndex(detectorIndex), axis,
+                  theta, center);
+
+  // Only l2 needs to be recalculated.
+  initL2();
 }
 
 template <typename InstTree>
