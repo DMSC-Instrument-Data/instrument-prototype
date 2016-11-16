@@ -100,6 +100,9 @@ private:
   CowPtr<std::vector<Eigen::Vector3d>> m_positions;
   // All rotations indexed by component index
   CowPtr<std::vector<Eigen::Quaterniond>> m_rotations;
+
+  CowPtr<std::vector<Eigen::Vector3d>> m_startEntryPoints;
+  CowPtr<std::vector<Eigen::Vector3d>> m_startExitPoints;
 };
 
 namespace {
@@ -135,7 +138,13 @@ DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
       m_positions(std::make_shared<std::vector<Eigen::Vector3d>>(
           m_instrumentTree->startPositions())),
       m_rotations(std::make_shared<std::vector<Eigen::Quaterniond>>(
-          m_instrumentTree->startRotations())) {
+          m_instrumentTree->startRotations())),
+      m_startEntryPoints(std::make_shared<std::vector<Eigen::Vector3d>>(
+          m_instrumentTree->startEntryPoints())),
+      m_startExitPoints(std::make_shared<std::vector<Eigen::Vector3d>>(
+          m_instrumentTree->startExitPoints()))
+
+{
 
   init();
 }
@@ -194,12 +203,13 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL1() {
     double l1 = 0;
     // For each detector-l1-path calculate the total neutronic length
 
-    l1 += m_instrumentTree->getPathComponent(path[i]).length();
+    l1 += m_instrumentTree->getPathComponent(path[i]).length(); // TODO
     for (i = 1; i < path.size(); ++i) {
       const PathComponent &current =
           m_instrumentTree->getPathComponent(path[i]);
       const PathComponent &previous =
           m_instrumentTree->getPathComponent(path[i - 1]);
+
       l1 += distance(current.entryPoint(), previous.exitPoint());
       l1 += current.length();
     }
@@ -342,7 +352,6 @@ void DetectorInfo<InstTree>::rotateComponent(size_t componentIndex,
   const std::vector<size_t> indexes =
       m_instrumentTree->subTreeIndexes(componentIndex);
   for (auto &index : indexes) {
-
     (*m_positions)[index] = transform * (*m_positions)[index];
     (*m_rotations)[index] = rotation * (*m_rotations)[index];
   }

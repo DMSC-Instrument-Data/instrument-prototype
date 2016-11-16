@@ -46,7 +46,8 @@ public:
   std::vector<size_t> detectorComponentIndexes() const;
   size_t detIndexToCompIndex(size_t detectorIndex) const;
   size_t pathIndexToCompIndex(size_t pathIndex) const;
-
+  std::vector<Eigen::Vector3d> startEntryPoints() const;
+  std::vector<Eigen::Vector3d> startExitPoints() const;
   std::vector<ComponentProxy>::const_iterator begin() const;
   std::vector<ComponentProxy>::const_iterator end() const;
   std::vector<ComponentProxy>::const_iterator cbegin() const;
@@ -81,6 +82,8 @@ private:
    */
   std::vector<const Detector *> m_detectorComponents;
   std::vector<const PathComponent *> m_pathComponents;
+  std::vector<Eigen::Vector3d> m_entryPoints; // For path components
+  std::vector<Eigen::Vector3d> m_exitPoints;  // For path components
   std::vector<size_t> m_pathComponentIndexes;
   std::vector<size_t> m_detectorComponentIndexes;
 };

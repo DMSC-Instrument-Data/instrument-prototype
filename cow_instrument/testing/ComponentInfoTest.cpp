@@ -161,4 +161,24 @@ TEST(component_info_test, test_positions) {
   EXPECT_EQ(positions.front(), start->const_ref().getPos());
   EXPECT_EQ(positions.back(), last->const_ref().getPos());
 }
+
+TEST(component_info_test, test_start_entry_exit_points) {
+  auto comp = makeTree();
+  ComponentInfo info;
+  comp->registerContents(info);
+  auto pathIndexes = info.pathComponentIndexes();
+  auto positions = info.startPositions();
+  auto exitPoints = info.startExitPoints();
+  auto entryPoints = info.startEntryPoints();
+
+  // For point path components. We expect exit and entry positions to be the
+  // same as point position.
+  size_t i = 0;
+  for (auto &index : pathIndexes) {
+
+    EXPECT_EQ(positions[index], exitPoints[i]);
+    EXPECT_EQ(positions[index], entryPoints[i]);
+    ++i;
+  }
+}
 }

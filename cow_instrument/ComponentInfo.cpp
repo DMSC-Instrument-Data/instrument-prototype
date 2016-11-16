@@ -51,6 +51,8 @@ void ComponentInfo::registerPathComponent(PathComponent const *const comp) {
 
   const size_t newIndex = coreUpdate(comp);
   m_pathComponents.push_back(comp);
+  m_entryPoints.push_back(comp->entryPoint());
+  m_exitPoints.push_back(comp->exitPoint());
   m_pathComponentIndexes.push_back(newIndex);
 }
 
@@ -67,9 +69,11 @@ void ComponentInfo::registerDetector(const Detector *const comp,
 
 void ComponentInfo::registerPathComponent(const PathComponent *const comp,
                                           size_t parentIndex) {
-  coreUpdate(comp, parentIndex);
+  size_t componentIndex = coreUpdate(comp, parentIndex);
   m_pathComponents.push_back(comp);
-  m_pathComponentIndexes.push_back(parentIndex);
+  m_entryPoints.push_back(comp->entryPoint());
+  m_exitPoints.push_back(comp->exitPoint());
+  m_pathComponentIndexes.push_back(componentIndex);
 }
 
 size_t ComponentInfo::registerComposite(const CompositeComponent *const comp,
@@ -131,6 +135,14 @@ size_t ComponentInfo::detIndexToCompIndex(size_t detectorIndex) const {
 
 size_t ComponentInfo::pathIndexToCompIndex(size_t pathIndex) const {
   return m_pathComponentIndexes[pathIndex];
+}
+
+std::vector<Eigen::Vector3d> ComponentInfo::startEntryPoints() const {
+  return m_entryPoints;
+}
+
+std::vector<Eigen::Vector3d> ComponentInfo::startExitPoints() const {
+  return m_exitPoints;
 }
 
 size_t ComponentInfo::coreUpdate(Component const *const comp,

@@ -498,4 +498,10 @@ TEST(detector_info_test, test_copy) {
   EXPECT_EQ(pMockInstrumentTree, &copy.const_instrumentTree());
   EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree));
 }
+
+TEST(detector_info_test,
+     test_not_yet_using_cached_start_end_indexes_for_l1_l2_calcs) {
+  EXPECT_TRUE(false)
+      << "Should not be going through components to get entry/exit/length";
+}
 }

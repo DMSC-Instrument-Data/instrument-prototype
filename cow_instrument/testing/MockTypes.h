@@ -15,10 +15,6 @@ class MockComponent : public Component {
 public:
   MOCK_CONST_METHOD0(getPos, Eigen::Vector3d());
   MOCK_CONST_METHOD0(getRotation, Eigen::Quaterniond());
-  MOCK_METHOD1(shiftPositionBy, void(const Eigen::Vector3d &));
-  MOCK_METHOD3(rotate, void(const Eigen::Vector3d&, const double&, const Eigen::Vector3d&));
-  MOCK_METHOD2(rotate,
-               void(const Eigen::Affine3d &, const Eigen::Quaterniond &));
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
   MOCK_CONST_METHOD1(registerContents, void(ComponentInfo &));
@@ -34,10 +30,6 @@ class MockPathComponent : public PathComponent {
 public:
   MOCK_CONST_METHOD0(getPos, Eigen::Vector3d());
   MOCK_CONST_METHOD0(getRotation, Eigen::Quaterniond());
-  MOCK_METHOD1(shiftPositionBy, void(const Eigen::Vector3d &));
-  MOCK_METHOD3(rotate, void(const Eigen::Vector3d&, const double&, const Eigen::Vector3d&));
-  MOCK_METHOD2(rotate,
-               void(const Eigen::Affine3d &, const Eigen::Quaterniond &));
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
 
@@ -65,10 +57,6 @@ public:
   MOCK_CONST_METHOD0(detectorId, DetectorIdType());
   MOCK_CONST_METHOD0(getPos, Eigen::Vector3d());
   MOCK_CONST_METHOD0(getRotation, Eigen::Quaterniond());
-  MOCK_METHOD1(shiftPositionBy, void(const Eigen::Vector3d &));
-  MOCK_METHOD3(rotate, void(const Eigen::Vector3d&, const double&, const Eigen::Vector3d&));
-  MOCK_METHOD2(rotate,
-               void(const Eigen::Affine3d &, const Eigen::Quaterniond &));
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
   MOCK_CONST_METHOD1(registerContents, void(ComponentInfo &));
@@ -92,6 +80,8 @@ public:
   virtual std::vector<size_t> subTreeIndexes(size_t proxyIndex) const = 0;
   virtual size_t detIndexToCompIndex(size_t detectorIndex) const = 0;
   virtual size_t pathIndexToCompIndex(size_t pathIndex) const = 0;
+  virtual std::vector<Eigen::Vector3d> startEntryPoints() const = 0;
+  virtual std::vector<Eigen::Vector3d> startExitPoints() const = 0;
   virtual ~PolymorphicInstrumentTree() {}
 };
 
@@ -117,6 +107,12 @@ public:
         .WillByDefault(testing::Return(std::vector<Eigen::Quaterniond>(
             1 /*componentSize()*/,
             Eigen::Quaterniond(Eigen::Affine3d::Identity().rotation()))));
+    ON_CALL(*this, startEntryPoints())
+        .WillByDefault(testing::Return(
+            std::vector<Eigen::Vector3d>(1 /*componentSize()*/, {0, 0, 0})));
+    ON_CALL(*this, startExitPoints())
+        .WillByDefault(testing::Return(
+            std::vector<Eigen::Vector3d>(1 /*componentSize()*/, {0, 0, 0})));
   }
 
   MockInstrumentTree(size_t nDetectors) {
@@ -137,6 +133,12 @@ public:
         .WillByDefault(testing::Return(std::vector<Eigen::Quaterniond>(
             1 /*componentSize()*/,
             Eigen::Quaterniond(Eigen::Affine3d::Identity().rotation()))));
+    ON_CALL(*this, startEntryPoints())
+        .WillByDefault(testing::Return(
+            std::vector<Eigen::Vector3d>(1 /*componentSize()*/, {0, 0, 0})));
+    ON_CALL(*this, startExitPoints())
+        .WillByDefault(testing::Return(
+            std::vector<Eigen::Vector3d>(1 /*componentSize()*/, {0, 0, 0})));
   }
   MOCK_CONST_METHOD0(nDetectors, size_t());
   MOCK_CONST_METHOD1(getDetector, const Detector &(size_t));
@@ -149,6 +151,8 @@ public:
   MOCK_CONST_METHOD1(subTreeIndexes, std::vector<size_t>(size_t));
   MOCK_CONST_METHOD1(detIndexToCompIndex, size_t(size_t));
   MOCK_CONST_METHOD1(pathIndexToCompIndex, size_t(size_t));
+  MOCK_CONST_METHOD0(startEntryPoints, std::vector<Eigen::Vector3d>());
+  MOCK_CONST_METHOD0(startExitPoints, std::vector<Eigen::Vector3d>());
 
   virtual ~MockInstrumentTree() {}
 

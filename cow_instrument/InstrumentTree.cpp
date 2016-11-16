@@ -105,6 +105,14 @@ std::vector<Eigen::Quaterniond> InstrumentTree::startRotations() const {
   return m_componentInfo.startRotations();
 }
 
+std::vector<Eigen::Vector3d> InstrumentTree::startExitPoints() const {
+  return m_componentInfo.startExitPoints();
+}
+
+std::vector<Eigen::Vector3d> InstrumentTree::startEntryPoints() const {
+  return m_componentInfo.startEntryPoints();
+}
+
 size_t InstrumentTree::detIndexToCompIndex(size_t detectorIndex) const {
   return m_componentInfo.detIndexToCompIndex(detectorIndex);
 }
