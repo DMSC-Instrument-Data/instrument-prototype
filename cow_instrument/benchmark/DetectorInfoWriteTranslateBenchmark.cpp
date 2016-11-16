@@ -21,7 +21,7 @@ public:
         size_t nComponents =
             m_detectorInfo.const_instrumentTree().componentSize();
         for (size_t i = 0; i < nComponents; ++i) {
-          benchmark::DoNotOptimize(pos += m_detectorInfo.position2(i));
+          benchmark::DoNotOptimize(pos += m_detectorInfo.position(i));
         }
       }
     }

@@ -22,8 +22,7 @@ std::unique_ptr<Component> make_square_bank(size_t width, size_t height,
               Eigen::Vector3d{double(i), double(j), double(0)})));
     }
   }
-  bank->shiftPositionBy(
-      Eigen::Vector3d{-double(width) / 2, -double(height) / 2, 0}); // Center it
+
   return std::move(bank);
 }
 }
@@ -49,18 +48,12 @@ std::shared_ptr<Component> construct_root_component() {
   const double height_d = double(height);
 
   auto N = make_square_bank(width, height, "North");
-  N->shiftPositionBy(Eigen::Vector3d{0, height_d, 3});
   auto E = make_square_bank(width, height, "South");
-  E->shiftPositionBy(Eigen::Vector3d{-width_d, 0, 3});
   auto S = make_square_bank(width, height, "East");
-  S->shiftPositionBy(Eigen::Vector3d{0, -height_d, 3});
   auto W = make_square_bank(width, height, "West");
-  E->shiftPositionBy(Eigen::Vector3d{width_d, 0, 3});
 
   auto l_curtain = make_square_bank(width, height, "Left curtain");
-  l_curtain->shiftPositionBy(Eigen::Vector3d{-width_d, 0, 6});
   auto r_curtain = make_square_bank(width, height, "Right curtain");
-  r_curtain->shiftPositionBy(Eigen::Vector3d{width_d, 0, 6});
 
   auto frontTrolley = std::unique_ptr<CompositeComponent>(
       new CompositeComponent(ComponentIdType(1), "front_trolley"));

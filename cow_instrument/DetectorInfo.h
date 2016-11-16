@@ -42,9 +42,7 @@ public:
 
   double l2(size_t detectorIndex) const;
 
-  Eigen::Vector3d position(size_t detectorIndex) const; // TO DEPRECATE
-
-  Eigen::Vector3d position2(size_t componentIndex) const;
+  Eigen::Vector3d position(size_t componentIndex) const;
 
   Eigen::Vector3d positionDetector(size_t detectorIndex) const;
 
@@ -250,13 +248,7 @@ double DetectorInfo<InstTree>::l2(size_t detectorIndex) const {
 }
 
 template <typename InstTree>
-Eigen::Vector3d DetectorInfo<InstTree>::position(size_t detectorIndex) const {
-  // DEPRECATED
-  return m_instrumentTree->getDetector(detectorIndex).getPos();
-}
-
-template <typename InstTree>
-Eigen::Vector3d DetectorInfo<InstTree>::position2(size_t componentIndex) const {
+Eigen::Vector3d DetectorInfo<InstTree>::position(size_t componentIndex) const {
   return (*m_positions)[componentIndex];
 }
 

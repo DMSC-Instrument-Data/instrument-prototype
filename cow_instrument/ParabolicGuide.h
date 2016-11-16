@@ -13,11 +13,6 @@ public:
 
   Eigen::Vector3d getPos() const override;
   virtual Eigen::Quaterniond getRotation() const override;
-  virtual void shiftPositionBy(const Eigen::Vector3d &pos) override;
-  virtual void rotate(const Eigen::Vector3d &axis, const double &theta,
-                      const Eigen::Vector3d &center) override;
-  virtual void rotate(const Eigen::Affine3d &transform,
-                      const Eigen::Quaterniond &rotationPart) override;
   virtual ParabolicGuide *clone() const override;
   virtual bool equals(const Component &other) const override;
   virtual void registerContents(ComponentInfo &info) const;

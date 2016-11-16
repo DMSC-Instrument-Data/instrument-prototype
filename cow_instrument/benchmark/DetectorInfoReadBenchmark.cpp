@@ -11,7 +11,7 @@ BENCHMARK_F(DetectorInfoReadFixture,
   const size_t max = m_detectorInfo.componentSize();
   while (state.KeepRunning()) {
     for (size_t i = 1; i < max; ++i) {
-      benchmark::DoNotOptimize(m_detectorInfo.position2(i));
+      benchmark::DoNotOptimize(m_detectorInfo.position(i));
     }
   }
   state.SetItemsProcessed(state.iterations() * max);

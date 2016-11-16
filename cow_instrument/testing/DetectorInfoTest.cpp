@@ -286,10 +286,10 @@ TEST(detector_info_test, test_move) {
       std::shared_ptr<MockInstrumentTree>(instrumentTree),
       SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
 
-  auto before = detectorInfo.position2(0);
+  auto before = detectorInfo.position(0);
   auto offset = Eigen::Vector3d{1, 0, 0};
   detectorInfo.move(0, offset);
-  auto after = detectorInfo.position2(0);
+  auto after = detectorInfo.position(0);
 
   EXPECT_EQ(after, before + offset);
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(instrumentTree));
@@ -318,7 +318,7 @@ TEST(detector_info_test, test_single_rotation_around_component_origin) {
 
   const Eigen::Vector3d rotationAxis{0, 0, 1};
   const double rotationAngle = M_PI / 2;
-  const Eigen::Vector3d rotationCenter{detectorInfo.position2(
+  const Eigen::Vector3d rotationCenter{detectorInfo.position(
       sampleComponentIndex)}; // rotate around component center
 
   detectorInfo.rotate(sampleComponentIndex, rotationAxis, rotationAngle,
@@ -331,7 +331,7 @@ TEST(detector_info_test, test_single_rotation_around_component_origin) {
   EXPECT_TRUE(rotatedVector.isApprox(Eigen::Vector3d{0, 1, 0}, 1e-14))
       << "Internal rotation not updated correctly";
 
-  EXPECT_TRUE(detectorInfo.position2(sampleComponentIndex)
+  EXPECT_TRUE(detectorInfo.position(sampleComponentIndex)
                   .isApprox(Eigen::Vector3d{0, 0, 0}, 1e-14))
       << "Position should be unchanged as rotation was around its own center";
 
@@ -370,7 +370,7 @@ TEST(detector_info_test, test_multiple_rotation_around_component_origin) {
   detectorInfo.rotate(sampleComponentIndex, rotationAxis, rotationAngle,
                       rotationCenter);
 
-  auto samplePosition = detectorInfo.position2(sampleComponentIndex);
+  auto samplePosition = detectorInfo.position(sampleComponentIndex);
 
   // Check that the position has not changed
   EXPECT_TRUE(samplePosition.isApprox(rotationCenter, 1e-14))
@@ -414,7 +414,7 @@ TEST(detector_info_test, test_single_rotation_around_arbitrary_center) {
   detectorInfo.rotate(sampleComponentIndex, rotationAxis, rotationAngle,
                       rotationCenter);
   // Check that the position has the rotation applied.
-  EXPECT_TRUE(detectorInfo.position2(sampleComponentIndex)
+  EXPECT_TRUE(detectorInfo.position(sampleComponentIndex)
                   .isApprox(Eigen::Vector3d(0, 1, 0), 1e-14));
 
   // Check that the internal rotation gets updated
@@ -459,7 +459,7 @@ TEST(detector_info_test, test_multiple_rotation_arbitrary_center) {
                       rotationCenter);
 
   // Check that the position has the rotations applied.
-  EXPECT_TRUE(detectorInfo.position2(sampleComponentIndex)
+  EXPECT_TRUE(detectorInfo.position(sampleComponentIndex)
                   .isApprox(Eigen::Vector3d(0, 0, 1), 1e-14));
 
   // Check that the internal rotation gets updated. i.e component is rotated
