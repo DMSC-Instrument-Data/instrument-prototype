@@ -93,16 +93,17 @@ private:
   CowPtr<const Paths> m_l2Paths;
   CowPtr<const Paths> m_l1Paths;
 
-  // Instrument
+  /// Instrument tree.
   std::shared_ptr<const InstTree> m_instrumentTree;
-
-  // All positions indexed by component index
+  /// All positions indexed by component index. Owned by DetectorInfo.
   CowPtr<std::vector<Eigen::Vector3d>> m_positions;
-  // All rotations indexed by component index
+  /// All rotations indexed by component index. Owned by DetectorInfo.
   CowPtr<std::vector<Eigen::Quaterniond>> m_rotations;
-
+  /// All path component entry points.
   CowPtr<std::vector<Eigen::Vector3d>> m_startEntryPoints;
+  /// All path component exit points
   CowPtr<std::vector<Eigen::Vector3d>> m_startExitPoints;
+  /// All path lengths
   std::shared_ptr<const std::vector<double>> m_pathLengths; // Shouldn't change
 };
 

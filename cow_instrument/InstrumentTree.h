@@ -23,12 +23,6 @@ public:
 
   const ComponentProxy &rootProxy() const;
 
-  const Detector &getDetector(size_t detectorIndex) const;
-
-  const PathComponent &getPathComponent(size_t pathComponentIndex) const;
-  const PathComponent &source() const;
-  const PathComponent &sample() const;
-
   // This is how we help the client out when they want to work with detector
   // ids.
   void fillDetectorMap(std::map<DetectorIdType, size_t> &toFill) const;
@@ -59,11 +53,12 @@ public:
   size_t detIndexToCompIndex(size_t detectorIndex) const;
   size_t pathIndexToCompIndex(size_t pathIndex) const;
 
-  // Unsafe. Consider refactoring.
+  // Needed for serialization.
   std::shared_ptr<Component> rootComponent() const;
 
 private:
   void init();
+
   /// PathComponent vector index of the source
   size_t m_sourceIndex;
   /// Pa_componentthComponent vector index of the sample
@@ -71,9 +66,22 @@ private:
   /// vector of proxies and relevant pointers
   ComponentInfo m_componentInfo;
   /// Component root
-  std::shared_ptr<Component>
-      m_componentRoot; // TODO. This probably needs to be COW.
+  std::shared_ptr<Component> m_componentRoot;
 };
+
+// Do not encourage use of. A convenience for testing.
+namespace nonstandard {
+/// Get the source Component. Should not be required!
+const PathComponent &source(const InstrumentTree &instrumentTree);
+/// Get the sample Component. Should not be required!
+const PathComponent &sample(const InstrumentTree &instrumentTree);
+/// Get the path component
+const PathComponent &getPathComponent(const InstrumentTree &instrumentTree,
+                                      size_t pathComponentIndex);
+/// Get the detector
+const Detector &getDetector(const InstrumentTree &instrumentTree,
+                            size_t detectorIndex);
+}
 
 using InstrumentTree_const_uptr = std::unique_ptr<const InstrumentTree>;
 using InstrumentTree_uptr = std::unique_ptr<const InstrumentTree>;

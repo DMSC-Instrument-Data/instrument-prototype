@@ -62,9 +62,9 @@ size_t ComponentInfo::registerComposite(CompositeComponent const *const comp) {
 
 void ComponentInfo::registerDetector(const Detector *const comp,
                                      size_t parentIndex) {
-  coreUpdate(comp, parentIndex);
+  const size_t newIndex = coreUpdate(comp, parentIndex);
   m_detectorComponents.push_back(comp);
-  m_detectorComponentIndexes.push_back(parentIndex);
+  m_detectorComponentIndexes.push_back(newIndex);
 }
 
 void ComponentInfo::registerPathComponent(const PathComponent *const comp,
@@ -170,17 +170,6 @@ bool ComponentInfo::operator==(const ComponentInfo &other) const {
 
 bool ComponentInfo::operator!=(const ComponentInfo &other) const {
   return !operator==(other);
-}
-
-const Detector &ComponentInfo::detectorComponentAt(size_t detectorIndex) const {
-  checkDetectorRange(detectorIndex, this->detectorSize());
-  return *m_detectorComponents[detectorIndex];
-}
-
-const PathComponent &
-ComponentInfo::pathComponentAt(size_t pathComponentIndex) const {
-  // checkPathRange(pathComponentIndex, this->pathSize());
-  return *m_pathComponents[pathComponentIndex];
 }
 
 std::vector<Eigen::Vector3d> ComponentInfo::startPositions() const {

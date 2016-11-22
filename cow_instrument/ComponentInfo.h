@@ -56,9 +56,6 @@ public:
   bool operator==(const ComponentInfo &other) const;
   bool operator!=(const ComponentInfo &other) const;
 
-  const Detector &detectorComponentAt(size_t detectorIndex) const;
-  const PathComponent &pathComponentAt(size_t pathComponentIndex) const;
-
   std::vector<Eigen::Vector3d> startPositions() const;
   std::vector<Eigen::Quaterniond> startRotations() const;
 

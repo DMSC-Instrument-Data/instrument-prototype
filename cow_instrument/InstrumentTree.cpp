@@ -57,15 +57,6 @@ const ComponentProxy &InstrumentTree::rootProxy() const {
   return m_componentInfo.rootProxy();
 }
 
-const Detector &InstrumentTree::getDetector(size_t detectorIndex) const {
-  return m_componentInfo.detectorComponentAt(detectorIndex);
-}
-
-const PathComponent &
-InstrumentTree::getPathComponent(size_t pathComponentIndex) const {
-  return m_componentInfo.pathComponentAt(pathComponentIndex);
-};
-
 void InstrumentTree::fillDetectorMap(
     std::map<DetectorIdType, size_t> &toFill) const {
   for (size_t index = 0; index < m_componentInfo.detectorComponents().size();
@@ -73,14 +64,6 @@ void InstrumentTree::fillDetectorMap(
     toFill.insert(std::make_pair(
         m_componentInfo.detectorComponents()[index]->detectorId(), index));
   }
-}
-
-const PathComponent &InstrumentTree::source() const {
-  return m_componentInfo.pathComponentAt(m_sourceIndex);
-}
-
-const PathComponent &InstrumentTree::sample() const {
-  return m_componentInfo.pathComponentAt(m_sampleIndex);
 }
 
 size_t InstrumentTree::samplePathIndex() const { return m_sampleIndex; }
@@ -152,4 +135,33 @@ std::vector<ComponentProxy>::const_iterator InstrumentTree::cbegin() const {
 }
 std::vector<ComponentProxy>::const_iterator InstrumentTree::cend() const {
   return m_componentInfo.cend();
+}
+
+const PathComponent &
+nonstandard::getPathComponent(const InstrumentTree &instrumentTree,
+                              size_t pathComponentIndex) {
+  return dynamic_cast<const PathComponent &>(
+      instrumentTree.proxyAt(instrumentTree.pathIndexToCompIndex(
+                                 pathComponentIndex)).const_ref());
+}
+
+const PathComponent &nonstandard::source(const InstrumentTree &instrumentTree) {
+  return dynamic_cast<const PathComponent &>(
+      instrumentTree.proxyAt(instrumentTree.pathIndexToCompIndex(
+                                 instrumentTree.sourcePathIndex()))
+          .const_ref());
+}
+
+const PathComponent &nonstandard::sample(const InstrumentTree &instrumentTree) {
+  return dynamic_cast<const PathComponent &>(
+      instrumentTree.proxyAt(instrumentTree.pathIndexToCompIndex(
+                                 instrumentTree.samplePathIndex()))
+          .const_ref());
+}
+
+const Detector &nonstandard::getDetector(const InstrumentTree &instrumentTree,
+                                         size_t detectorIndex) {
+  return dynamic_cast<const Detector &>(
+      instrumentTree.proxyAt(instrumentTree.detIndexToCompIndex(detectorIndex))
+          .const_ref());
 }

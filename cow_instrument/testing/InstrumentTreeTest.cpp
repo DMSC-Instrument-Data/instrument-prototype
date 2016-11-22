@@ -121,9 +121,14 @@ TEST(instrument_tree_test, test_find_source_sample) {
    */
   auto instrument = make_very_basic_tree();
 
-  const PathComponent &source = instrument.source();
+  auto sourceProxy = instrument.proxyAt(
+      instrument.pathIndexToCompIndex(instrument.sourcePathIndex()));
+  auto sampleProxy = instrument.proxyAt(
+      instrument.pathIndexToCompIndex(instrument.samplePathIndex()));
+
+  const Component &source = sourceProxy.const_ref();
   EXPECT_TRUE(dynamic_cast<const PointSource *>(&source) != NULL);
-  const PathComponent &sample = instrument.sample();
+  const Component &sample = sampleProxy.const_ref();
   EXPECT_TRUE(dynamic_cast<const PointSample *>(&sample) != NULL);
 }
 
@@ -164,9 +169,9 @@ TEST(instrument_tree_test,
 
   auto instrument =
       make_very_basic_tree(idForSource, idForSample, idForDetector);
-  const auto &detectorComponent = instrument.getDetector(0);
-  const auto &pathComponent1 = instrument.getPathComponent(0);
-  const auto &pathComponent2 = instrument.getPathComponent(1);
+  const auto &detectorComponent = nonstandard::getDetector(instrument, 0);
+  const auto &pathComponent1 = nonstandard::getPathComponent(instrument, 0);
+  const auto &pathComponent2 = nonstandard::getPathComponent(instrument, 1);
 
   EXPECT_EQ(detectorComponent.componentId(), idForDetector);
   EXPECT_EQ(pathComponent1.componentId(), idForSource);
