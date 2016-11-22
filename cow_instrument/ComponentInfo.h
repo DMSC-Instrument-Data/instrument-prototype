@@ -40,8 +40,6 @@ public:
   size_t detectorSize() const;
   size_t pathSize() const;
   std::vector<size_t> subTreeIndexes(size_t proxyIndex) const;
-
-  std::vector<const PathComponent *> pathComponents() const;
   std::vector<size_t> pathComponentIndexes() const;
   std::vector<size_t> detectorComponentIndexes() const;
   size_t detIndexToCompIndex(size_t detectorIndex) const;
@@ -62,10 +60,17 @@ public:
   std::vector<ComponentIdType> componentIds() const;
   std::vector<DetectorIdType> detectorIds() const;
   void fillDetectorMap(std::map<DetectorIdType, size_t> &toFill) const;
+  int64_t sourcePathIndex() const;
+  int64_t samplePathIndex() const;
 
 private:
   size_t coreUpdate(Component const *const comp);
   size_t coreUpdate(Component const *const comp, size_t previousIndex);
+
+  /// PathComponent vector index of the source
+  int64_t m_sourceIndex = -1;
+  /// PathComponent vector index of the sample
+  int64_t m_sampleIndex = -1;
 
   /*
    These collections have the same size as the number of components. They are
@@ -82,7 +87,6 @@ private:
     The vector
     of indexes allows us to go from say detector_index -> component_index.
    */
-  std::vector<const PathComponent *> m_pathComponents;
   std::vector<Eigen::Vector3d> m_entryPoints; // For path components
   std::vector<Eigen::Vector3d> m_exitPoints;  // For path components
   std::vector<double> m_pathLengths; // For path components

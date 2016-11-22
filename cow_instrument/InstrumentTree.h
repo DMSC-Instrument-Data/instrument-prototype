@@ -34,6 +34,8 @@ public:
 
   size_t samplePathIndex() const;
   size_t sourcePathIndex() const;
+  size_t sampleComponentIndex() const;
+  size_t sourceComponentIndex() const;
 
   std::vector<ComponentProxy>::const_iterator begin() const;
   std::vector<ComponentProxy>::const_iterator end() const;
@@ -59,9 +61,9 @@ public:
 private:
   void init();
 
-  /// PathComponent vector index of the source
+  /// Path index
   size_t m_sourceIndex;
-  /// Pa_componentthComponent vector index of the sample
+  /// Path index
   size_t m_sampleIndex;
   /// vector of proxies and relevant pointers
   ComponentInfo m_componentInfo;

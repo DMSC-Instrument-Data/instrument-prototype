@@ -29,23 +29,16 @@ bool findSample(const PathComponent *item) { return item->isSample(); }
 void InstrumentTree::init() {
 
   findKeyComponents(*m_componentRoot, m_componentInfo);
-
-  auto pathComponents = m_componentInfo.pathComponents();
-  const auto begin_pathVec = pathComponents.cbegin();
-  const auto end_pathVec = pathComponents.cend();
-  auto sourceIt = std::find_if(begin_pathVec, end_pathVec, findSource);
-  auto sampleIt = std::find_if(begin_pathVec, end_pathVec, findSample);
-  if (sourceIt == end_pathVec) {
+  auto sourceIndex = m_componentInfo.sourcePathIndex();
+  auto sampleIndex = m_componentInfo.samplePathIndex();
+  if (sourceIndex < 0) {
     throw std::invalid_argument("Instrument has no marked source");
   }
-  if (sampleIt == end_pathVec) {
+  if (sampleIndex < 0) {
     throw std::invalid_argument("Instrument has no marked sample");
   }
-  m_sourceIndex = std::distance(begin_pathVec, sourceIt);
-  m_sampleIndex = std::distance(begin_pathVec, sampleIt);
-
-  // Should we shrink to fit to reduce excess capacity?
-  // m_detectorVec.shrink_to_fit(); This could be costly
+  m_sourceIndex = sourceIndex;
+  m_sampleIndex = sampleIndex;
 }
 
 InstrumentTree::InstrumentTree(std::shared_ptr<Component> componentRoot)
@@ -60,6 +53,14 @@ const ComponentProxy &InstrumentTree::rootProxy() const {
 void InstrumentTree::fillDetectorMap(
     std::map<DetectorIdType, size_t> &toFill) const {
   m_componentInfo.fillDetectorMap(toFill);
+}
+
+size_t InstrumentTree::sampleComponentIndex() const {
+  return pathIndexToCompIndex(m_sampleIndex);
+}
+
+size_t InstrumentTree::sourceComponentIndex() const {
+  return pathIndexToCompIndex(m_sourceIndex);
 }
 
 size_t InstrumentTree::samplePathIndex() const { return m_sampleIndex; }
@@ -143,15 +144,13 @@ nonstandard::getPathComponent(const InstrumentTree &instrumentTree,
 
 const PathComponent &nonstandard::source(const InstrumentTree &instrumentTree) {
   return dynamic_cast<const PathComponent &>(
-      instrumentTree.proxyAt(instrumentTree.pathIndexToCompIndex(
-                                 instrumentTree.sourcePathIndex()))
+      instrumentTree.proxyAt(instrumentTree.sourceComponentIndex())
           .const_ref());
 }
 
 const PathComponent &nonstandard::sample(const InstrumentTree &instrumentTree) {
   return dynamic_cast<const PathComponent &>(
-      instrumentTree.proxyAt(instrumentTree.pathIndexToCompIndex(
-                                 instrumentTree.samplePathIndex()))
+      instrumentTree.proxyAt(instrumentTree.sampleComponentIndex())
           .const_ref());
 }
 

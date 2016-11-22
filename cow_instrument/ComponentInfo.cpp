@@ -7,25 +7,6 @@
 #include <algorithm>
 #include <iterator>
 
-namespace {
-
-void checkDetectorRange(size_t detectorIndex, size_t limit) {
-  if (detectorIndex >= limit) {
-    throw std::invalid_argument(
-        "Detector Index is outside range of indexes. Index is: " +
-        std::to_string(detectorIndex));
-  }
-}
-
-void checkPathRange(size_t pathIndex, size_t limit) {
-  if (pathIndex >= limit) {
-    throw std::invalid_argument(
-        "PathComponent Index is outside range of indexes. Index is: " +
-        std::to_string(pathIndex));
-  }
-}
-}
-
 void ComponentInfo::registerDetector(Detector const *const comp) {
 
   const size_t newIndex = coreUpdate(comp);
@@ -34,11 +15,16 @@ void ComponentInfo::registerDetector(Detector const *const comp) {
 
 void ComponentInfo::registerPathComponent(PathComponent const *const comp) {
 
-  const size_t newIndex = coreUpdate(comp);
-  m_pathComponents.push_back(comp);
+  const size_t nextComponentIndex = coreUpdate(comp);
+  const size_t nextPathIndex = m_pathComponentIndexes.size();
   m_entryPoints.push_back(comp->entryPoint());
   m_exitPoints.push_back(comp->exitPoint());
-  m_pathComponentIndexes.push_back(newIndex);
+  m_pathComponentIndexes.push_back(nextComponentIndex);
+  if (m_sampleIndex < 0 && comp->isSample()) {
+    m_sampleIndex = nextPathIndex;
+  } else if (m_sourceIndex < 0 && comp->isSource()) {
+    m_sourceIndex = nextPathIndex;
+  }
 }
 
 size_t ComponentInfo::registerComposite(CompositeComponent const *const comp) {
@@ -54,12 +40,17 @@ void ComponentInfo::registerDetector(const Detector *const comp,
 
 void ComponentInfo::registerPathComponent(const PathComponent *const comp,
                                           size_t parentIndex) {
-  size_t componentIndex = coreUpdate(comp, parentIndex);
-  m_pathComponents.push_back(comp);
+  const size_t nextComponentIndex = coreUpdate(comp, parentIndex);
+  const size_t nextPathIndex = m_pathComponentIndexes.size();
   m_entryPoints.push_back(comp->entryPoint());
   m_exitPoints.push_back(comp->exitPoint());
   m_pathLengths.push_back(comp->length());
-  m_pathComponentIndexes.push_back(componentIndex);
+  m_pathComponentIndexes.push_back(nextComponentIndex);
+  if (m_sampleIndex < 0 && comp->isSample()) {
+    m_sampleIndex = nextPathIndex;
+  } else if (m_sourceIndex < 0 && comp->isSource()) {
+    m_sourceIndex = nextPathIndex;
+  }
 }
 
 size_t ComponentInfo::registerComposite(const CompositeComponent *const comp,
@@ -77,11 +68,7 @@ size_t ComponentInfo::detectorSize() const {
   return m_detectorComponentIndexes.size();
 }
 
-size_t ComponentInfo::pathSize() const { return m_pathComponents.size(); }
-
-std::vector<const PathComponent *> ComponentInfo::pathComponents() const {
-  return m_pathComponents;
-}
+size_t ComponentInfo::pathSize() const { return m_pathComponentIndexes.size(); }
 
 std::vector<size_t> ComponentInfo::pathComponentIndexes() const {
   return m_pathComponentIndexes;
@@ -197,3 +184,7 @@ ComponentInfo::fillDetectorMap(std::map<DetectorIdType, size_t> &toFill) const {
     toFill.insert(std::make_pair(m_detectorIds[i], i));
   }
 }
+
+int64_t ComponentInfo::sourcePathIndex() const { return m_sourceIndex; }
+
+int64_t ComponentInfo::samplePathIndex() const { return m_sampleIndex; }

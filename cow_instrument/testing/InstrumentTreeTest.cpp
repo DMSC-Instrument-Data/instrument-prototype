@@ -120,10 +120,8 @@ TEST(instrument_tree_test, test_find_source_sample) {
    */
   auto instrument = make_very_basic_tree();
 
-  auto sourceProxy = instrument.proxyAt(
-      instrument.pathIndexToCompIndex(instrument.sourcePathIndex()));
-  auto sampleProxy = instrument.proxyAt(
-      instrument.pathIndexToCompIndex(instrument.samplePathIndex()));
+  auto sourceProxy = instrument.proxyAt(instrument.sourceComponentIndex());
+  auto sampleProxy = instrument.proxyAt(instrument.sampleComponentIndex());
 
   const Component &source = sourceProxy.const_ref();
   EXPECT_TRUE(dynamic_cast<const PointSource *>(&source) != NULL);

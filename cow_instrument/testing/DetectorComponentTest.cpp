@@ -82,9 +82,9 @@ TEST(detector_component_test, test_register_contents) {
   detector.registerContents(info);
 
   EXPECT_EQ(info.detectorSize(), 1) << "Detector pointer list should grow";
-  EXPECT_EQ(info.pathComponents().size(), 0)
+  EXPECT_EQ(info.pathSize(), 0)
       << "Path lookup list should NOT grow. These are detectors";
-  EXPECT_EQ(info.pathComponentIndexes().size(), 0)
+  EXPECT_EQ(info.pathSize(), 0)
       << "Path indexes should NOT grow. These are detectors";
   EXPECT_EQ(info.detectorComponentIndexes().size(), 1)
       << "Detector indexes should grow";
