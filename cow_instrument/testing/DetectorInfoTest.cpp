@@ -11,38 +11,6 @@
 
 namespace {
 
-void addMockSourceSampleToInstrument(
-    testing::NiceMock<MockInstrumentTree> *pMockInstrumentTree,
-    MockPathComponent &source, MockPathComponent &sample,
-    Eigen::Vector3d sourcePos = Eigen::Vector3d{0, 0, 0}, Eigen::Vector3d samplePos = Eigen::Vector3d{0, 0, 20}) {
-  testing::Action<double()> returnZeroLength = testing::Return(0.0);
-
-  // This is where I place the source
-  testing::Action<Eigen::Vector3d()> returnSourceCentre = testing::Return(sourcePos);
-  EXPECT_CALL(source, length()).WillRepeatedly(returnZeroLength);
-  EXPECT_CALL(source, entryPoint()).WillRepeatedly(returnSourceCentre);
-  EXPECT_CALL(source, exitPoint()).WillRepeatedly(returnSourceCentre);
-
-  // This is where I place the sample
-  testing::Action<Eigen::Vector3d()> returnSampleCentre = testing::Return(samplePos);
-  EXPECT_CALL(sample, length()).WillRepeatedly(returnZeroLength);
-  EXPECT_CALL(sample, entryPoint()).WillRepeatedly(returnSampleCentre);
-  EXPECT_CALL(sample, exitPoint()).WillRepeatedly(returnSampleCentre);
-
-  const size_t sourceIndex = 0;
-  const size_t sampleIndex = 1;
-
-  // Hook it all up to the instrument tree
-  EXPECT_CALL(*pMockInstrumentTree, sourcePathIndex())
-      .WillRepeatedly(testing::Return(sourceIndex));
-  EXPECT_CALL(*pMockInstrumentTree, samplePathIndex())
-      .WillRepeatedly(testing::Return(sampleIndex));
-  EXPECT_CALL(*pMockInstrumentTree, getPathComponent(sourceIndex))
-      .WillRepeatedly(testing::ReturnRef(source));
-  EXPECT_CALL(*pMockInstrumentTree, getPathComponent(sampleIndex))
-      .WillRepeatedly(testing::ReturnRef(sample));
-}
-
 TEST(detector_info_test, test_construct) {
 
   using namespace testing;
@@ -211,23 +179,36 @@ TEST(detector_info_test, test_calculate_l2_throw_out_of_range) {
 
 TEST(detector_info_test, test_calculate_l2) {
 
+  using namespace testing;
   size_t nDetectors = 1;
-
-  MockDetector detector;
-  MockPathComponent source;
-  MockPathComponent sample;
-
-  // This is where I place the detector
-  EXPECT_CALL(detector, getPos())
-      .WillRepeatedly(testing::Return(Eigen::Vector3d{0, 0, 40}));
 
   auto *pMockInstrumentTree =
       new testing::NiceMock<MockInstrumentTree>(nDetectors);
 
-  EXPECT_CALL(*pMockInstrumentTree, getDetector(testing::_))
-      .WillRepeatedly(testing::ReturnRef(detector));
+  /*
+    3-component instrument.
 
-  addMockSourceSampleToInstrument(pMockInstrumentTree, source, sample);
+    Source at x=0
+    Sample at x = 20
+    Single detector at x=40
+  */
+  EXPECT_CALL(*pMockInstrumentTree, pathLengths())
+      .WillRepeatedly(Return(std::vector<double>(2, 0)));
+  EXPECT_CALL(*pMockInstrumentTree, startPositions())
+      .WillRepeatedly(Return(
+          std::vector<Eigen::Vector3d>{{0, 0, 0}, {0, 0, 20}, {0, 0, 40}}));
+  EXPECT_CALL(*pMockInstrumentTree, startEntryPoints())
+      .WillRepeatedly(
+          Return(std::vector<Eigen::Vector3d>{{0, 0, 0}, {0, 0, 20}}));
+  EXPECT_CALL(*pMockInstrumentTree, startExitPoints())
+      .WillRepeatedly(
+          Return(std::vector<Eigen::Vector3d>{{0, 0, 0}, {0, 0, 20}}));
+  EXPECT_CALL(*pMockInstrumentTree, sourcePathIndex())
+      .WillRepeatedly(Return(0));
+  EXPECT_CALL(*pMockInstrumentTree, samplePathIndex())
+      .WillRepeatedly(Return(1));
+  EXPECT_CALL(*pMockInstrumentTree, detIndexToCompIndex(_))
+      .WillRepeatedly(Return(2));
 
   DetectorInfoWithNiceMockInstrument detectorInfo{
       std::shared_ptr<NiceMockInstrumentTree>(pMockInstrumentTree),
@@ -235,9 +216,7 @@ TEST(detector_info_test, test_calculate_l2) {
 
   auto l2 = detectorInfo.l2(0);
   EXPECT_EQ(l2, 20) << "sqrt((40 - 20)^2)";
-  EXPECT_TRUE(testing::Mock::VerifyAndClearExpectations(&source));
-  EXPECT_TRUE(testing::Mock::VerifyAndClearExpectations(&sample));
-  EXPECT_TRUE(testing::Mock::VerifyAndClearExpectations(&detector));
+  EXPECT_TRUE(testing::Mock::VerifyAndClearExpectations(pMockInstrumentTree));
 }
 
 TEST(detector_info_test, test_calculate_l1) {
@@ -247,6 +226,12 @@ TEST(detector_info_test, test_calculate_l1) {
   auto *pMockInstrumentTree =
       new testing::NiceMock<MockInstrumentTree>(nDetectors);
 
+  /*
+    Effectively a 2-component instrument.
+
+    Source at x=0
+    Sample at x = 20
+  */
   EXPECT_CALL(*pMockInstrumentTree, pathLengths()).WillRepeatedly(Return(std::vector<double>(2,0)));
   EXPECT_CALL(*pMockInstrumentTree, startEntryPoints()).WillRepeatedly(Return(std::vector<Eigen::Vector3d>{{0,0,3}, {0,0,5}}));
   EXPECT_CALL(*pMockInstrumentTree, startExitPoints()).WillRepeatedly(Return(std::vector<Eigen::Vector3d>{{0,0,3}, {0,0,5}}));

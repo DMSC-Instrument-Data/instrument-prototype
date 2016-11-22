@@ -39,7 +39,6 @@ public:
   size_t detectorSize() const;
   size_t pathSize() const;
   std::vector<size_t> subTreeIndexes(size_t proxyIndex) const;
-
   std::vector<const Detector *> detectorComponents() const;
   std::vector<const PathComponent *> pathComponents() const;
   std::vector<size_t> pathComponentIndexes() const;

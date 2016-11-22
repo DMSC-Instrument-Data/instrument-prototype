@@ -202,10 +202,7 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL1() {
                              "components (sample + source).");
     }
 
-    double l1 = 0;
-    // For each detector-l1-path calculate the total neutronic length
-
-    l1 += (*m_pathLengths)[path[i]];
+    double l1 = (*m_pathLengths)[path[i]];
     for (i = 1; i < path.size(); ++i) {
 
       l1 += distance((*m_startEntryPoints)[path[i]], (*m_startExitPoints)[path[i-1]]);
@@ -229,21 +226,15 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL2() {
       throw std::logic_error("Cannot have a L2 specified with less than 1 path "
                              "components (sample).");
     }
-    double l2 = 0;
-
-    l2 += m_instrumentTree->getPathComponent(path[i]).length();
+    double l2 = (*m_pathLengths)[path[i]];
 
     // For each detector-l2-path calculate the total neutronic length
     for (i = 1; i < path.size(); ++i) {
-      const PathComponent &current =
-          m_instrumentTree->getPathComponent(path[i]);
-      const PathComponent &previous =
-          m_instrumentTree->getPathComponent(path[i - 1]);
-      l2 += distance(current.entryPoint(), previous.exitPoint());
-      l2 += current.length();
+      l2 += distance((*m_startEntryPoints)[path[i]],
+                     (*m_startExitPoints)[path[i - 1]]);
+      l2 += (*m_pathLengths)[path[i]];
     }
-    l2 += distance(m_instrumentTree->getPathComponent(path[i - 1]).exitPoint(),
-                   detectorPos);
+    l2 += distance((*m_startExitPoints)[path[i - 1]], detectorPos);
 
     (*m_l2)[detectorIndex] = l2;
   }
@@ -306,6 +297,7 @@ void DetectorInfo<InstTree>::moveComponent(size_t componentIndex,
       m_instrumentTree->subTreeIndexes(componentIndex);
   for (auto &index : indexes) {
     (*m_positions)[index] += offset;
+    // TODO m_entry and m_exit points should also be translated here!
   }
 }
 
@@ -352,6 +344,7 @@ void DetectorInfo<InstTree>::rotateComponent(size_t componentIndex,
   for (auto &index : indexes) {
     (*m_positions)[index] = transform * (*m_positions)[index];
     (*m_rotations)[index] = rotation * (*m_rotations)[index];
+    // TODO m_entry and m_exit points should also be translated here!
   }
 }
 

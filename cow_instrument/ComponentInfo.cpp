@@ -84,10 +84,6 @@ size_t ComponentInfo::registerComposite(const CompositeComponent *const comp,
 
 std::vector<ComponentProxy> ComponentInfo::proxies() { return m_proxies; }
 
-const ComponentProxy &ComponentInfo::proxyAt(size_t index) const {
-  return m_proxies[index];
-}
-
 const ComponentProxy &ComponentInfo::rootProxy() const { return m_proxies[0]; }
 
 size_t ComponentInfo::componentSize() const { return m_proxies.size(); }
@@ -98,21 +94,7 @@ size_t ComponentInfo::detectorSize() const {
 
 size_t ComponentInfo::pathSize() const { return m_pathComponents.size(); }
 
-std::vector<size_t> ComponentInfo::subTreeIndexes(size_t proxyIndex) const {
-  if (proxyIndex >= componentSize()) {
-    throw std::invalid_argument("No subtree for proxy index: " +
-                                std::to_string(proxyIndex));
-  }
 
-  std::vector<size_t> subtree = {proxyIndex};
-  for (size_t index = 0; index < subtree.size(); ++index) {
-    auto &currentProxy = m_proxies[subtree[index]];
-    const auto &currentChildren = currentProxy.children();
-    std::copy(currentChildren.begin(), currentChildren.end(),
-              std::back_inserter(subtree));
-  }
-  return subtree;
-}
 
 std::vector<const Detector *> ComponentInfo::detectorComponents() const {
   return m_detectorComponents;
@@ -207,4 +189,24 @@ std::vector<Eigen::Vector3d> ComponentInfo::startPositions() const {
 
 std::vector<Eigen::Quaterniond> ComponentInfo::startRotations() const {
   return m_rotations;
+}
+
+std::vector<size_t> ComponentInfo::subTreeIndexes(size_t proxyIndex) const {
+  if (proxyIndex >= componentSize()) {
+    throw std::invalid_argument("No subtree for proxy index: " +
+                                std::to_string(proxyIndex));
+  }
+
+  std::vector<size_t> subtree = {proxyIndex};
+  for (size_t index = 0; index < subtree.size(); ++index) {
+    auto &currentProxy = m_proxies[subtree[index]];
+    const auto &currentChildren = currentProxy.children();
+    std::copy(currentChildren.begin(), currentChildren.end(),
+              std::back_inserter(subtree));
+  }
+  return subtree;
+}
+
+const ComponentProxy &ComponentInfo::proxyAt(size_t index) const {
+  return m_proxies[index];
 }
