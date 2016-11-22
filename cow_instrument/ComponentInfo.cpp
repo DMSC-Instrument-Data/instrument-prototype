@@ -185,6 +185,14 @@ ComponentInfo::fillDetectorMap(std::map<DetectorIdType, size_t> &toFill) const {
   }
 }
 
+void ComponentInfo::fillComponentMap(
+    std::map<ComponentIdType, size_t> &toFill) const {
+  const size_t nEntries = m_componentIds.size();
+  for (size_t i = 0; i < nEntries; ++i) {
+    toFill.insert(std::make_pair(m_componentIds[i], i));
+  }
+}
+
 int64_t ComponentInfo::sourcePathIndex() const { return m_sourceIndex; }
 
 int64_t ComponentInfo::samplePathIndex() const { return m_sampleIndex; }

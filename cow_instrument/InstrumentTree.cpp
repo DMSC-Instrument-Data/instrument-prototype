@@ -21,9 +21,6 @@ void findKeyComponents(const Component &component, ComponentInfo &info) {
   component.registerContents(info);
 }
 
-bool findSource(const PathComponent *item) { return item->isSource(); }
-
-bool findSample(const PathComponent *item) { return item->isSample(); }
 }
 
 void InstrumentTree::init() {
@@ -53,6 +50,11 @@ const ComponentProxy &InstrumentTree::rootProxy() const {
 void InstrumentTree::fillDetectorMap(
     std::map<DetectorIdType, size_t> &toFill) const {
   m_componentInfo.fillDetectorMap(toFill);
+}
+
+void InstrumentTree::fillComponentMap(
+    std::map<ComponentIdType, size_t> &toFill) const {
+  m_componentInfo.fillComponentMap(toFill);
 }
 
 size_t InstrumentTree::sampleComponentIndex() const {
@@ -132,31 +134,4 @@ std::vector<ComponentProxy>::const_iterator InstrumentTree::cbegin() const {
 }
 std::vector<ComponentProxy>::const_iterator InstrumentTree::cend() const {
   return m_componentInfo.cend();
-}
-
-const PathComponent &
-nonstandard::getPathComponent(const InstrumentTree &instrumentTree,
-                              size_t pathComponentIndex) {
-  return dynamic_cast<const PathComponent &>(
-      instrumentTree.proxyAt(instrumentTree.pathIndexToCompIndex(
-                                 pathComponentIndex)).const_ref());
-}
-
-const PathComponent &nonstandard::source(const InstrumentTree &instrumentTree) {
-  return dynamic_cast<const PathComponent &>(
-      instrumentTree.proxyAt(instrumentTree.sourceComponentIndex())
-          .const_ref());
-}
-
-const PathComponent &nonstandard::sample(const InstrumentTree &instrumentTree) {
-  return dynamic_cast<const PathComponent &>(
-      instrumentTree.proxyAt(instrumentTree.sampleComponentIndex())
-          .const_ref());
-}
-
-const Detector &nonstandard::getDetector(const InstrumentTree &instrumentTree,
-                                         size_t detectorIndex) {
-  return dynamic_cast<const Detector &>(
-      instrumentTree.proxyAt(instrumentTree.detIndexToCompIndex(detectorIndex))
-          .const_ref());
 }

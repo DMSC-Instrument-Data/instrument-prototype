@@ -23,9 +23,8 @@ public:
 
   const ComponentProxy &rootProxy() const;
 
-  // This is how we help the client out when they want to work with detector
-  // ids.
   void fillDetectorMap(std::map<DetectorIdType, size_t> &toFill) const;
+  void fillComponentMap(std::map<ComponentIdType, size_t> &toFill) const;
 
   size_t nDetectors() const;
   size_t nPathComponents() const;
@@ -70,20 +69,6 @@ private:
   /// Component root
   std::shared_ptr<Component> m_componentRoot;
 };
-
-// Do not encourage use of. A convenience for testing.
-namespace nonstandard {
-/// Get the source Component. Should not be required!
-const PathComponent &source(const InstrumentTree &instrumentTree);
-/// Get the sample Component. Should not be required!
-const PathComponent &sample(const InstrumentTree &instrumentTree);
-/// Get the path component
-const PathComponent &getPathComponent(const InstrumentTree &instrumentTree,
-                                      size_t pathComponentIndex);
-/// Get the detector
-const Detector &getDetector(const InstrumentTree &instrumentTree,
-                            size_t detectorIndex);
-}
 
 using InstrumentTree_const_uptr = std::unique_ptr<const InstrumentTree>;
 using InstrumentTree_uptr = std::unique_ptr<const InstrumentTree>;

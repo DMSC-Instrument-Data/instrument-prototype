@@ -166,13 +166,12 @@ TEST(instrument_tree_test,
 
   auto instrument =
       make_very_basic_tree(idForSource, idForSample, idForDetector);
-  const auto &detectorComponent = nonstandard::getDetector(instrument, 0);
-  const auto &pathComponent1 = nonstandard::getPathComponent(instrument, 0);
-  const auto &pathComponent2 = nonstandard::getPathComponent(instrument, 1);
 
-  EXPECT_EQ(detectorComponent.componentId(), idForDetector);
-  EXPECT_EQ(pathComponent1.componentId(), idForSource);
-  EXPECT_EQ(pathComponent2.componentId(), idForSample);
+  std::map<ComponentIdType, size_t> componentIdMap;
+  instrument.fillComponentMap(componentIdMap);
+  EXPECT_EQ(componentIdMap[idForDetector], 1);
+  EXPECT_EQ(componentIdMap[idForSource], 2);
+  EXPECT_EQ(componentIdMap[idForSample], 3);
 }
 
 InstrumentTree makeInstrumentTree() {

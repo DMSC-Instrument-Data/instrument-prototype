@@ -69,14 +69,8 @@ TEST(instrument_tree_mapper_test, test_create) {
 
   EXPECT_EQ(product.nDetectors(), original.nDetectors());
   EXPECT_EQ(product.nPathComponents(), original.nPathComponents());
-  EXPECT_TRUE(nonstandard::getDetector(product, 0)
-                  .equals(nonstandard::getDetector(original, 0)))
-      << "No detector match. InstrumentTrees look different.";
-  EXPECT_TRUE(nonstandard::getPathComponent(product, 0)
-                  .equals(nonstandard::getPathComponent(original, 0)))
-      << "No path component match. InstrumentTrees look different.";
-  EXPECT_TRUE(nonstandard::getPathComponent(product, 1)
-                  .equals(nonstandard::getPathComponent(original, 1)))
-      << "No path component match. InstrumentTrees look different.";
+
+  EXPECT_TRUE(product.rootComponent()->equals(*original.rootComponent()))
+      << "InstrumentTrees look different.";
 }
 
