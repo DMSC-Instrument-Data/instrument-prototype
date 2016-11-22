@@ -109,7 +109,7 @@ TEST(parabolic_guide_test, test_register_only_path_components) {
   ComponentInfo info;
   // Perform registration
   guide.registerContents(info);
-  EXPECT_EQ(info.detectorComponents().size(), 0)
+  EXPECT_EQ(info.detectorSize(), 0)
       << "Do not register ParabolicGuide as a Detector";
   EXPECT_EQ(info.pathComponents().size(), 1)
       << "ParabolicGuide should be registered as a PathComponent";
@@ -183,7 +183,7 @@ TEST(parabolic_guide_test, test_register_contents) {
 
   guide.registerContents(info);
 
-  EXPECT_EQ(info.detectorComponents().size(), 0);
+  EXPECT_EQ(info.detectorSize(), 0);
   EXPECT_EQ(info.pathComponents().size(), 1);
   EXPECT_EQ(info.pathComponentIndexes().size(), 1);
   EXPECT_EQ(info.detectorComponentIndexes().size(), 0);

@@ -3,9 +3,11 @@
 
 #include <vector>
 #include <cstddef>
+#include "IdType.h"
 #include "ComponentProxy.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+#include <map>
 
 class Detector;
 class PathComponent;
@@ -22,7 +24,6 @@ class CompositeComponent;
 class ComponentInfo {
 public:
   ComponentInfo() = default;
-  void clear();
   void registerDetector(Detector const *const comp);
   void registerPathComponent(PathComponent const *const comp);
   size_t registerComposite(CompositeComponent const *const comp);
@@ -39,7 +40,7 @@ public:
   size_t detectorSize() const;
   size_t pathSize() const;
   std::vector<size_t> subTreeIndexes(size_t proxyIndex) const;
-  std::vector<const Detector *> detectorComponents() const;
+
   std::vector<const PathComponent *> pathComponents() const;
   std::vector<size_t> pathComponentIndexes() const;
   std::vector<size_t> detectorComponentIndexes() const;
@@ -58,6 +59,9 @@ public:
 
   std::vector<Eigen::Vector3d> startPositions() const;
   std::vector<Eigen::Quaterniond> startRotations() const;
+  std::vector<ComponentIdType> componentIds() const;
+  std::vector<DetectorIdType> detectorIds() const;
+  void fillDetectorMap(std::map<DetectorIdType, size_t> &toFill) const;
 
 private:
   size_t coreUpdate(Component const *const comp);
@@ -71,19 +75,20 @@ private:
   std::vector<ComponentProxy> m_proxies;
   std::vector<Eigen::Vector3d> m_positions;
   std::vector<Eigen::Quaterniond> m_rotations;
+  std::vector<ComponentIdType> m_componentIds;
 
   /*
     These collections are conditionally updated depending upon component type.
     The vector
     of indexes allows us to go from say detector_index -> component_index.
    */
-  std::vector<const Detector *> m_detectorComponents;
   std::vector<const PathComponent *> m_pathComponents;
   std::vector<Eigen::Vector3d> m_entryPoints; // For path components
   std::vector<Eigen::Vector3d> m_exitPoints;  // For path components
   std::vector<double> m_pathLengths; // For path components
   std::vector<size_t> m_pathComponentIndexes;
   std::vector<size_t> m_detectorComponentIndexes;
+  std::vector<DetectorIdType> m_detectorIds;
 };
 
 #endif

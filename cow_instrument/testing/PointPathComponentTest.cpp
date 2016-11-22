@@ -57,7 +57,7 @@ TEST(point_path_component_test, test_register_contents) {
 
   component.registerContents(info);
 
-  EXPECT_EQ(info.detectorComponents().size(), 0);
+  EXPECT_EQ(info.detectorSize(), 0);
   EXPECT_EQ(info.pathComponents().size(), 1);
   EXPECT_EQ(info.pathComponentIndexes().size(), 1);
   EXPECT_EQ(info.detectorComponentIndexes().size(), 0);

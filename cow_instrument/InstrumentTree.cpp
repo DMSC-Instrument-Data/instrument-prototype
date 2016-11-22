@@ -59,11 +59,7 @@ const ComponentProxy &InstrumentTree::rootProxy() const {
 
 void InstrumentTree::fillDetectorMap(
     std::map<DetectorIdType, size_t> &toFill) const {
-  for (size_t index = 0; index < m_componentInfo.detectorComponents().size();
-       ++index) {
-    toFill.insert(std::make_pair(
-        m_componentInfo.detectorComponents()[index]->detectorId(), index));
-  }
+  m_componentInfo.fillDetectorMap(toFill);
 }
 
 size_t InstrumentTree::samplePathIndex() const { return m_sampleIndex; }

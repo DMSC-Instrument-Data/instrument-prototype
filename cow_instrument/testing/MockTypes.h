@@ -28,6 +28,10 @@ public:
 
 class MockPathComponent : public PathComponent {
 public:
+  MockPathComponent() {
+    ON_CALL(*this, componentId())
+        .WillByDefault(testing::Return(ComponentIdType(0)));
+  }
   MOCK_CONST_METHOD0(getPos, Eigen::Vector3d());
   MOCK_CONST_METHOD0(getRotation, Eigen::Quaterniond());
   MOCK_CONST_METHOD0(clone, Component *());

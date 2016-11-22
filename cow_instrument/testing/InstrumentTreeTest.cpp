@@ -95,7 +95,7 @@ TEST(instrument_tree_test, test_cannot_construct_without_sample) {
   auto source_ptr = new NiceMock<MockPathComponent>();
   auto source = std::shared_ptr<Component>(source_ptr);
 
-  // Make a the source
+  // Make the source
   EXPECT_CALL(*source_ptr, isSource()).WillRepeatedly(Return(true));
   EXPECT_CALL(*source_ptr, isSample()).WillRepeatedly(Return(false));
 
@@ -107,10 +107,9 @@ TEST(instrument_tree_test, test_cannot_construct_without_source) {
   auto sample_ptr = new NiceMock<MockPathComponent>();
   auto sample = std::shared_ptr<Component>(sample_ptr);
 
-  // Make a the source
+  // Make a the sample
   EXPECT_CALL(*sample_ptr, isSource()).WillRepeatedly(Return(false));
   EXPECT_CALL(*sample_ptr, isSample()).WillRepeatedly(Return(true));
-
   EXPECT_THROW(InstrumentTree{sample}, std::invalid_argument)
       << "Should throw, there is not source";
 }

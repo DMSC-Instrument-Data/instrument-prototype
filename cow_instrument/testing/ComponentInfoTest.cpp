@@ -183,4 +183,24 @@ TEST(component_info_test, test_start_entry_exit_points) {
     ++i;
   }
 }
+
+TEST(component_info_test, test_component_ids) {
+
+  auto comp = makeTree();
+  ComponentInfo info;
+  comp->registerContents(info);
+  auto vecComponentIds = info.componentIds();
+  auto componentIds =
+      std::set<ComponentIdType>(vecComponentIds.begin(), vecComponentIds.end());
+  EXPECT_EQ(componentIds.count(ComponentIdType(1)), 1)
+      << "Should have on Id matching this";
+  EXPECT_EQ(componentIds.count(ComponentIdType(2)), 1)
+      << "Should have on Id matching this";
+  EXPECT_EQ(componentIds.count(ComponentIdType(3)), 1)
+      << "Should have on Id matching this";
+  EXPECT_EQ(componentIds.count(ComponentIdType(4)), 1)
+      << "Should have on Id matching this";
+  EXPECT_EQ(componentIds.count(ComponentIdType(5)), 0)
+      << "Should NOT have on Id matching this";
+}
 }

@@ -26,24 +26,9 @@ void checkPathRange(size_t pathIndex, size_t limit) {
 }
 }
 
-void ComponentInfo::clear() {
-  /* TODO. I think this operation is only in place to support the current
-   mutable
-   * use case. I think that the clear functionality should be removed.
-   *
-
-*/
-  m_proxies.clear();
-  m_detectorComponents.clear();
-  m_pathComponents.clear();
-  m_detectorComponentIndexes.clear();
-  m_pathComponentIndexes.clear();
-}
-
 void ComponentInfo::registerDetector(Detector const *const comp) {
 
   const size_t newIndex = coreUpdate(comp);
-  m_detectorComponents.push_back(comp);
   m_detectorComponentIndexes.push_back(newIndex);
 }
 
@@ -63,8 +48,8 @@ size_t ComponentInfo::registerComposite(CompositeComponent const *const comp) {
 void ComponentInfo::registerDetector(const Detector *const comp,
                                      size_t parentIndex) {
   const size_t newIndex = coreUpdate(comp, parentIndex);
-  m_detectorComponents.push_back(comp);
   m_detectorComponentIndexes.push_back(newIndex);
+  m_detectorIds.push_back(comp->detectorId());
 }
 
 void ComponentInfo::registerPathComponent(const PathComponent *const comp,
@@ -89,16 +74,10 @@ const ComponentProxy &ComponentInfo::rootProxy() const { return m_proxies[0]; }
 size_t ComponentInfo::componentSize() const { return m_proxies.size(); }
 
 size_t ComponentInfo::detectorSize() const {
-  return m_detectorComponents.size();
+  return m_detectorComponentIndexes.size();
 }
 
 size_t ComponentInfo::pathSize() const { return m_pathComponents.size(); }
-
-
-
-std::vector<const Detector *> ComponentInfo::detectorComponents() const {
-  return m_detectorComponents;
-}
 
 std::vector<const PathComponent *> ComponentInfo::pathComponents() const {
   return m_pathComponents;
@@ -135,6 +114,7 @@ std::vector<double> ComponentInfo::pathLengths() const{
 size_t ComponentInfo::coreUpdate(Component const *const comp,
                                  size_t previousIndex) {
   size_t newIndex = m_proxies.size();
+  m_componentIds.emplace_back(comp->componentId());
   m_proxies.emplace_back(previousIndex, comp);
   m_proxies[previousIndex].addChild(newIndex);
   m_positions.emplace_back(comp->getPos());
@@ -144,6 +124,7 @@ size_t ComponentInfo::coreUpdate(Component const *const comp,
 
 size_t ComponentInfo::coreUpdate(Component const *const comp) {
   const size_t newIndex = m_proxies.size();
+  m_componentIds.emplace_back(comp->componentId());
   m_proxies.emplace_back(comp);
   m_positions.emplace_back(comp->getPos());
   m_rotations.emplace_back(comp->getRotation());
@@ -180,6 +161,14 @@ std::vector<Eigen::Quaterniond> ComponentInfo::startRotations() const {
   return m_rotations;
 }
 
+std::vector<ComponentIdType> ComponentInfo::componentIds() const {
+  return m_componentIds;
+}
+
+std::vector<DetectorIdType> ComponentInfo::detectorIds() const {
+  return m_detectorIds;
+}
+
 std::vector<size_t> ComponentInfo::subTreeIndexes(size_t proxyIndex) const {
   if (proxyIndex >= componentSize()) {
     throw std::invalid_argument("No subtree for proxy index: " +
@@ -198,4 +187,13 @@ std::vector<size_t> ComponentInfo::subTreeIndexes(size_t proxyIndex) const {
 
 const ComponentProxy &ComponentInfo::proxyAt(size_t index) const {
   return m_proxies[index];
+}
+
+void
+ComponentInfo::fillDetectorMap(std::map<DetectorIdType, size_t> &toFill) const {
+
+  const size_t nEntries = m_detectorIds.size();
+  for (size_t i = 0; i < nEntries; ++i) {
+    toFill.insert(std::make_pair(m_detectorIds[i], i));
+  }
 }

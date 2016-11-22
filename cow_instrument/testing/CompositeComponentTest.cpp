@@ -69,8 +69,7 @@ TEST(composite_component_test, test_register_contents) {
 
   composite.registerContents(info);
 
-  EXPECT_EQ(info.detectorComponents().size(), 0)
-      << "Composite is not a detector";
+  EXPECT_EQ(info.detectorSize(), 0) << "Composite is not a detector";
   EXPECT_EQ(info.pathComponents().size(), 0)
       << "Composite is not a path component";
   EXPECT_EQ(info.pathComponentIndexes().size(), 0)
