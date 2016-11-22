@@ -73,6 +73,7 @@ void ComponentInfo::registerPathComponent(const PathComponent *const comp,
   m_pathComponents.push_back(comp);
   m_entryPoints.push_back(comp->entryPoint());
   m_exitPoints.push_back(comp->exitPoint());
+  m_pathLengths.push_back(comp->length());
   m_pathComponentIndexes.push_back(componentIndex);
 }
 
@@ -143,6 +144,10 @@ std::vector<Eigen::Vector3d> ComponentInfo::startEntryPoints() const {
 
 std::vector<Eigen::Vector3d> ComponentInfo::startExitPoints() const {
   return m_exitPoints;
+}
+
+std::vector<double> ComponentInfo::pathLengths() const{
+    return m_pathLengths;
 }
 
 size_t ComponentInfo::coreUpdate(Component const *const comp,

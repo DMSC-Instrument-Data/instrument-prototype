@@ -54,6 +54,7 @@ public:
   std::vector<Eigen::Quaterniond> startRotations() const;
   std::vector<Eigen::Vector3d> startExitPoints() const;
   std::vector<Eigen::Vector3d> startEntryPoints() const;
+  std::vector<double> pathLengths() const;
 
   size_t detIndexToCompIndex(size_t detectorIndex) const;
   size_t pathIndexToCompIndex(size_t pathIndex) const;

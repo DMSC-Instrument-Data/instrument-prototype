@@ -170,6 +170,7 @@ TEST(component_info_test, test_start_entry_exit_points) {
   auto positions = info.startPositions();
   auto exitPoints = info.startExitPoints();
   auto entryPoints = info.startEntryPoints();
+  auto lengths = info.pathLengths();
 
   // For point path components. We expect exit and entry positions to be the
   // same as point position.
@@ -178,6 +179,7 @@ TEST(component_info_test, test_start_entry_exit_points) {
 
     EXPECT_EQ(positions[index], exitPoints[i]);
     EXPECT_EQ(positions[index], entryPoints[i]);
+    EXPECT_EQ(lengths[i], 0);
     ++i;
   }
 }

@@ -103,6 +103,7 @@ private:
 
   CowPtr<std::vector<Eigen::Vector3d>> m_startEntryPoints;
   CowPtr<std::vector<Eigen::Vector3d>> m_startExitPoints;
+  std::shared_ptr<const std::vector<double>> m_pathLengths; // Shouldn't change
 };
 
 namespace {
@@ -142,7 +143,8 @@ DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
       m_startEntryPoints(std::make_shared<std::vector<Eigen::Vector3d>>(
           m_instrumentTree->startEntryPoints())),
       m_startExitPoints(std::make_shared<std::vector<Eigen::Vector3d>>(
-          m_instrumentTree->startExitPoints()))
+          m_instrumentTree->startExitPoints())),
+      m_pathLengths(std::make_shared<const std::vector<double>>(m_instrumentTree->pathLengths()))
 
 {
 
@@ -203,15 +205,11 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL1() {
     double l1 = 0;
     // For each detector-l1-path calculate the total neutronic length
 
-    l1 += m_instrumentTree->getPathComponent(path[i]).length(); // TODO
+    l1 += (*m_pathLengths)[path[i]];
     for (i = 1; i < path.size(); ++i) {
-      const PathComponent &current =
-          m_instrumentTree->getPathComponent(path[i]);
-      const PathComponent &previous =
-          m_instrumentTree->getPathComponent(path[i - 1]);
 
-      l1 += distance(current.entryPoint(), previous.exitPoint());
-      l1 += current.length();
+      l1 += distance((*m_startEntryPoints)[path[i]], (*m_startExitPoints)[path[i-1]]);
+      l1 += (*m_pathLengths)[path[i]];
     }
 
     (*m_l1)[detectorIndex] = l1;

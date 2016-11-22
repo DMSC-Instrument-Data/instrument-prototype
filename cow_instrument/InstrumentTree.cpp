@@ -113,6 +113,10 @@ std::vector<Eigen::Vector3d> InstrumentTree::startEntryPoints() const {
   return m_componentInfo.startEntryPoints();
 }
 
+std::vector<double> InstrumentTree::pathLengths() const{
+    return m_componentInfo.pathLengths();
+}
+
 size_t InstrumentTree::detIndexToCompIndex(size_t detectorIndex) const {
   return m_componentInfo.detIndexToCompIndex(detectorIndex);
 }

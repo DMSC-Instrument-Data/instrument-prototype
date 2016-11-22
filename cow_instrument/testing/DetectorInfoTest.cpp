@@ -241,25 +241,19 @@ TEST(detector_info_test, test_calculate_l2) {
 }
 
 TEST(detector_info_test, test_calculate_l1) {
-
+  using namespace testing;
   size_t nDetectors = 1;
-
-  MockDetector detector;
-  MockPathComponent source;
-  MockPathComponent sample;
-
-  // This is where I place the detector
-  EXPECT_CALL(detector, getPos())
-      .WillRepeatedly(testing::Return(Eigen::Vector3d{0, 0, 40}));
 
   auto *pMockInstrumentTree =
       new testing::NiceMock<MockInstrumentTree>(nDetectors);
 
-  EXPECT_CALL(*pMockInstrumentTree, getDetector(testing::_))
-      .WillRepeatedly(testing::ReturnRef(detector));
-
-  addMockSourceSampleToInstrument(pMockInstrumentTree, source, sample,
-                                  Eigen::Vector3d{0, 0, 3}, Eigen::Vector3d{0, 0, 5});
+  EXPECT_CALL(*pMockInstrumentTree, pathLengths()).WillRepeatedly(Return(std::vector<double>(2,0)));
+  EXPECT_CALL(*pMockInstrumentTree, startEntryPoints()).WillRepeatedly(Return(std::vector<Eigen::Vector3d>{{0,0,3}, {0,0,5}}));
+  EXPECT_CALL(*pMockInstrumentTree, startExitPoints()).WillRepeatedly(Return(std::vector<Eigen::Vector3d>{{0,0,3}, {0,0,5}}));
+  EXPECT_CALL(*pMockInstrumentTree, sourcePathIndex())
+      .WillRepeatedly(testing::Return(0));
+  EXPECT_CALL(*pMockInstrumentTree, samplePathIndex())
+      .WillRepeatedly(testing::Return(1));
 
   DetectorInfoWithNiceMockInstrument detectorInfo{
       std::shared_ptr<NiceMockInstrumentTree>(pMockInstrumentTree),
@@ -267,9 +261,7 @@ TEST(detector_info_test, test_calculate_l1) {
 
   auto l1 = detectorInfo.l1(0);
   EXPECT_EQ(l1, 2) << "sqrt((5 - 3)^2)";
-  EXPECT_TRUE(testing::Mock::VerifyAndClearExpectations(&source));
-  EXPECT_TRUE(testing::Mock::VerifyAndClearExpectations(&sample));
-  EXPECT_TRUE(testing::Mock::VerifyAndClearExpectations(&detector));
+  EXPECT_TRUE(testing::Mock::VerifyAndClearExpectations(pMockInstrumentTree));
 }
 
 TEST(detector_info_test, test_move) {
@@ -499,9 +491,4 @@ TEST(detector_info_test, test_copy) {
   EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree));
 }
 
-TEST(detector_info_test,
-     test_not_yet_using_cached_start_end_indexes_for_l1_l2_calcs) {
-  EXPECT_TRUE(false)
-      << "Should not be going through components to get entry/exit/length";
-}
 }

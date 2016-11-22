@@ -82,6 +82,7 @@ public:
   virtual size_t pathIndexToCompIndex(size_t pathIndex) const = 0;
   virtual std::vector<Eigen::Vector3d> startEntryPoints() const = 0;
   virtual std::vector<Eigen::Vector3d> startExitPoints() const = 0;
+  virtual std::vector<double> pathLengths() const = 0;
   virtual ~PolymorphicInstrumentTree() {}
 };
 
@@ -113,6 +114,9 @@ public:
     ON_CALL(*this, startExitPoints())
         .WillByDefault(testing::Return(
             std::vector<Eigen::Vector3d>(1 /*componentSize()*/, {0, 0, 0})));
+    ON_CALL(*this, pathLengths())
+        .WillByDefault(testing::Return(
+            std::vector<double>(1 /*componentSize()*/, 0)));
   }
 
   MockInstrumentTree(size_t nDetectors) {
@@ -139,6 +143,9 @@ public:
     ON_CALL(*this, startExitPoints())
         .WillByDefault(testing::Return(
             std::vector<Eigen::Vector3d>(1 /*componentSize()*/, {0, 0, 0})));
+    ON_CALL(*this, pathLengths())
+        .WillByDefault(testing::Return(
+            std::vector<double>(1 /*componentSize()*/, 0)));
   }
   MOCK_CONST_METHOD0(nDetectors, size_t());
   MOCK_CONST_METHOD1(getDetector, const Detector &(size_t));
@@ -153,6 +160,7 @@ public:
   MOCK_CONST_METHOD1(pathIndexToCompIndex, size_t(size_t));
   MOCK_CONST_METHOD0(startEntryPoints, std::vector<Eigen::Vector3d>());
   MOCK_CONST_METHOD0(startExitPoints, std::vector<Eigen::Vector3d>());
+  MOCK_CONST_METHOD0(pathLengths, std::vector<double>());
 
   virtual ~MockInstrumentTree() {}
 
