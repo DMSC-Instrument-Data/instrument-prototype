@@ -59,8 +59,10 @@ public:
   std::vector<Eigen::Quaterniond> startRotations() const;
   std::vector<ComponentIdType> componentIds() const;
   std::vector<DetectorIdType> detectorIds() const;
-  void fillDetectorMap(std::map<DetectorIdType, size_t> &toFill) const;
-  void fillComponentMap(std::map<ComponentIdType, size_t> &toFill) const;
+  void
+  fillDetectorMap(std::map<DetectorIdType, std::vector<size_t>> &toFill) const;
+  void fillComponentMap(
+      std::map<ComponentIdType, std::vector<size_t>> &toFill) const;
   int64_t sourcePathIndex() const;
   int64_t samplePathIndex() const;
 

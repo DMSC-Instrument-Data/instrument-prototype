@@ -203,4 +203,79 @@ TEST(component_info_test, test_component_ids) {
   EXPECT_EQ(componentIds.count(ComponentIdType(5)), 0)
       << "Should NOT have on Id matching this";
 }
+
+TEST(component_info_test, test_fill_component_map) {
+
+  auto comp = makeTree();
+  ComponentInfo info;
+  comp->registerContents(info);
+
+  std::map<ComponentIdType, std::vector<size_t>> compIdMap;
+  info.fillComponentMap(compIdMap);
+
+  auto allCompIds = info.componentIds();
+  size_t compIndex = 0;
+  for (auto &id : allCompIds) {
+    auto componentIndexesAtId = compIdMap[id];
+    EXPECT_EQ(componentIndexesAtId.size(), 1) << "Should find 1 of everything";
+    EXPECT_EQ(componentIndexesAtId[0], compIndex) << "Component index mismatch";
+    ++compIndex;
+  }
+}
+
+TEST(component_info_test, test_fill_component_map_scanning) {
+
+  auto scan1 = makeTree();
+  auto scan2 = makeTree();
+  ComponentInfo info;
+  scan1->registerContents(info);
+  scan2->registerContents(info);
+
+  std::map<ComponentIdType, std::vector<size_t>> compIdMap;
+  info.fillComponentMap(compIdMap);
+
+  auto allCompIds = info.componentIds();
+  for (auto &id : allCompIds) {
+    auto componentIndexesAtId = compIdMap[id];
+    EXPECT_EQ(componentIndexesAtId.size(), 2) << "Should be 2 of everything";
+  }
+}
+
+TEST(component_info_test, test_fill_detector_map) {
+
+  auto comp = makeTree();
+  ComponentInfo info;
+  comp->registerContents(info);
+
+  std::map<DetectorIdType, std::vector<size_t>> detectorIdMap;
+  info.fillDetectorMap(detectorIdMap);
+
+  auto allDetectorIds = info.detectorIds();
+  size_t detectorIndex = 0;
+  for (auto &id : allDetectorIds) {
+    auto detectorIndexesAtId = detectorIdMap[id];
+    EXPECT_EQ(detectorIndexesAtId.size(), 1) << "Should find 1 of everything";
+    EXPECT_EQ(detectorIndexesAtId[0], detectorIndex)
+        << "Detector index mismatch";
+    ++detectorIndex;
+  }
+}
+
+TEST(component_info_test, test_fill_detector_map_scanning) {
+
+  auto scan1 = makeTree();
+  auto scan2 = makeTree();
+  ComponentInfo info;
+  scan1->registerContents(info);
+  scan2->registerContents(info);
+
+  std::map<DetectorIdType, std::vector<size_t>> detectorIdMap;
+  info.fillDetectorMap(detectorIdMap);
+
+  auto allDetectorIds = info.detectorIds();
+  for (auto &id : allDetectorIds) {
+    auto detectorIndexesAtId = detectorIdMap[id];
+    EXPECT_EQ(detectorIndexesAtId.size(), 2) << "Should be 2 of everything";
+  }
+}
 }

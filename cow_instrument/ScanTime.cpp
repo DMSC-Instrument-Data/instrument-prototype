@@ -1,6 +1,6 @@
 #include "ScanTime.h"
 #include <utility>
-#include <numeric>
+#include <limits>
 
 ScanTime::ScanTime()
     : m_start(0), m_end(std::numeric_limits<uint32_t>::max()),

@@ -46,12 +46,13 @@ const ComponentProxy &FlatTree::rootProxy() const {
   return m_componentInfo.rootProxy();
 }
 
-void FlatTree::fillDetectorMap(std::map<DetectorIdType, size_t> &toFill) const {
+void FlatTree::fillDetectorMap(
+    std::map<DetectorIdType, std::vector<size_t>> &toFill) const {
   m_componentInfo.fillDetectorMap(toFill);
 }
 
-void
-FlatTree::fillComponentMap(std::map<ComponentIdType, size_t> &toFill) const {
+void FlatTree::fillComponentMap(
+    std::map<ComponentIdType, std::vector<size_t>> &toFill) const {
   m_componentInfo.fillComponentMap(toFill);
 }
 

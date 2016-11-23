@@ -176,20 +176,34 @@ const ComponentProxy &ComponentInfo::proxyAt(size_t index) const {
   return m_proxies[index];
 }
 
-void
-ComponentInfo::fillDetectorMap(std::map<DetectorIdType, size_t> &toFill) const {
+void ComponentInfo::fillDetectorMap(
+    std::map<DetectorIdType, std::vector<size_t>> &toFill) const {
 
   const size_t nEntries = m_detectorIds.size();
   for (size_t i = 0; i < nEntries; ++i) {
-    toFill.insert(std::make_pair(m_detectorIds[i], i));
+    const auto &key = m_detectorIds[i];
+    if (toFill.find(key) == toFill.end()) {
+      // Create a value for the key
+      toFill.insert(std::make_pair(key, std::vector<size_t>(1, i)));
+    } else {
+      // Extend values for this key
+      toFill[key].push_back(i);
+    }
   }
 }
 
 void ComponentInfo::fillComponentMap(
-    std::map<ComponentIdType, size_t> &toFill) const {
+    std::map<ComponentIdType, std::vector<size_t>> &toFill) const {
   const size_t nEntries = m_componentIds.size();
   for (size_t i = 0; i < nEntries; ++i) {
-    toFill.insert(std::make_pair(m_componentIds[i], i));
+    const ComponentIdType &key = m_componentIds[i];
+    if (toFill.find(key) == toFill.end()) {
+      // Create a value for the key
+      toFill.insert(std::make_pair(key, std::vector<size_t>(1, i)));
+    } else {
+      // Extend values for this key
+      toFill[key].push_back(i);
+    }
   }
 }
 

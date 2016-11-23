@@ -1,7 +1,7 @@
 #include "ScanTime.h"
 #include <gtest/gtest.h>
 #include <ctime>
-#include <numeric>
+#include <limits>
 
 TEST(scan_time_test, test_alltime) {
   ScanTime scan;

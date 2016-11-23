@@ -122,13 +122,13 @@ TEST(instrument_tree_test, test_find_source_sample) {
   auto sourceProxy = instrument.proxyAt(instrument.sourceComponentIndex());
   auto sampleProxy = instrument.proxyAt(instrument.sampleComponentIndex());
 
-  std::map<ComponentIdType, size_t> componentMap;
+  std::map<ComponentIdType, std::vector<size_t>> componentMap;
   instrument.fillComponentMap(componentMap);
 
   EXPECT_EQ(componentMap[sourceProxy.componentId()],
-            instrument.sourceComponentIndex());
+            std::vector<size_t>(1, instrument.sourceComponentIndex()));
   EXPECT_EQ(componentMap[sampleProxy.componentId()],
-            instrument.sampleComponentIndex());
+            std::vector<size_t>(1, instrument.sampleComponentIndex()));
 }
 
 TEST(instrument_tree_test, test_copy) {
@@ -153,7 +153,7 @@ TEST(instrument_tree_test, test_copy) {
 TEST(instrument_tree_test, test_fill_detector_map) {
 
   auto instrument = make_simple_tree(DetectorIdType(1), DetectorIdType(2));
-  std::map<DetectorIdType, size_t> container;
+  std::map<DetectorIdType, std::vector<size_t>> container;
   instrument.fillDetectorMap(container);
   EXPECT_EQ(container.size(), 2) << "Two detectors expected";
 }
@@ -168,11 +168,11 @@ TEST(instrument_tree_test,
   auto instrument =
       make_very_basic_tree(idForSource, idForSample, idForDetector);
 
-  std::map<ComponentIdType, size_t> componentIdMap;
+  std::map<ComponentIdType, std::vector<size_t>> componentIdMap;
   instrument.fillComponentMap(componentIdMap);
-  EXPECT_EQ(componentIdMap[idForDetector], 1);
-  EXPECT_EQ(componentIdMap[idForSource], 2);
-  EXPECT_EQ(componentIdMap[idForSample], 3);
+  EXPECT_EQ(componentIdMap[idForDetector], std::vector<size_t>(1, 1));
+  EXPECT_EQ(componentIdMap[idForSource], std::vector<size_t>(1, 2));
+  EXPECT_EQ(componentIdMap[idForSample], std::vector<size_t>(1, 3));
 }
 
 FlatTree makeInstrumentTree() {
