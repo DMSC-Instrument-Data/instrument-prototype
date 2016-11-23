@@ -23,11 +23,11 @@ class Component;
  */
 class ComponentProxy {
 public:
-  ComponentProxy(Component const *const contents);
+  ComponentProxy(const ComponentIdType &id);
 
-  ComponentProxy(size_t previous, Component const *const contents);
+  ComponentProxy(size_t previous, const ComponentIdType &id);
 
-  ComponentProxy(size_t previous, Component const *const contents,
+  ComponentProxy(size_t previous, const ComponentIdType &id,
                  std::vector<size_t> &&children);
 
   bool hasParent() const;
@@ -42,7 +42,7 @@ public:
 
   const std::vector<size_t> &children() const;
 
-  const ComponentIdType componentId() const;
+  const ComponentIdType componentId() const; // Not strictly needed.
 
   size_t nChildren() const;
 
@@ -54,8 +54,8 @@ private:
   int64_t m_previous;
   /// Next or child nodes (owned)
   std::vector<size_t> m_next; // Children
-  /// Immutable pointer to the component.
-  Component const *const m_contents;
+  /// Identifier for the component.
+  ComponentIdType m_componentId;
 };
 
 #endif

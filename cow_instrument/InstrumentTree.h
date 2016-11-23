@@ -66,7 +66,7 @@ private:
   size_t m_sampleIndex;
   /// vector of proxies and relevant pointers
   ComponentInfo m_componentInfo;
-  /// Component root
+  /// Component root. Stashed. We only need this for serialization at present.
   std::shared_ptr<Component> m_componentRoot;
 };
 

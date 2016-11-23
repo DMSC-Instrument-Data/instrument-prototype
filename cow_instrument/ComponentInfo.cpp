@@ -102,7 +102,7 @@ size_t ComponentInfo::coreUpdate(Component const *const comp,
                                  size_t previousIndex) {
   size_t newIndex = m_proxies.size();
   m_componentIds.emplace_back(comp->componentId());
-  m_proxies.emplace_back(previousIndex, comp);
+  m_proxies.emplace_back(previousIndex, comp->componentId());
   m_proxies[previousIndex].addChild(newIndex);
   m_positions.emplace_back(comp->getPos());
   m_rotations.emplace_back(comp->getRotation());
@@ -112,7 +112,7 @@ size_t ComponentInfo::coreUpdate(Component const *const comp,
 size_t ComponentInfo::coreUpdate(Component const *const comp) {
   const size_t newIndex = m_proxies.size();
   m_componentIds.emplace_back(comp->componentId());
-  m_proxies.emplace_back(comp);
+  m_proxies.emplace_back(comp->componentId());
   m_positions.emplace_back(comp->getPos());
   m_rotations.emplace_back(comp->getRotation());
   return newIndex; // Return the last index.
