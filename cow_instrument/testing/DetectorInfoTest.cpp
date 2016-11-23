@@ -471,4 +471,18 @@ TEST(detector_info_test, test_copy) {
   EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree));
 }
 
+TEST(detector_info_test, test_component_duration_default) {
+
+  auto *pMockInstrumentTree = new NiceMockInstrumentTree{};
+
+  DetectorInfoWithMockInstrument info{
+      std::shared_ptr<MockFlatTree>(pMockInstrumentTree),
+      SourceSampleDetectorPathFactory<MockFlatTree>{}};
+
+  EXPECT_EQ(info.scanCount(), 1) << "Only one scan position by default";
+  auto duration = info.componentDuration(0);
+  EXPECT_EQ(duration.start(), std::time_t(0));
+
+  EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree));
+}
 }

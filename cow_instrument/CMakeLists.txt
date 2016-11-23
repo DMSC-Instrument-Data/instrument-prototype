@@ -26,6 +26,7 @@ set ( SOURCE_FILES
                    NullComponent.cpp
                    ParabolicGuide.cpp
                    PathComponent.cpp
+                   ScanTime.cpp
 )
 
 
@@ -57,6 +58,7 @@ set ( INCLUDE_FILES
                    PointPathComponent.h
                    PointSample.h
                    PointSource.h
+                   ScanTime.h
                    SourceSampleDetectorPathFactory.h
                    SpectrumInfo.h
                    Spectrum.h

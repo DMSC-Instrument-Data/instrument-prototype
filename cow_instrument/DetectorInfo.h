@@ -7,6 +7,7 @@
 #include <string>
 #include <sstream>
 #include <cmath>
+#include <ctime>
 
 #include "ComponentProxy.h"
 #include "cow_ptr.h"
@@ -20,6 +21,7 @@
 #include "PathComponent.h"
 #include "PathFactory.h"
 #include "Spectrum.h"
+#include "ScanTime.h"
 
 /**
  * DetectorInfo type. Provides Meta-data context to an InstrumentTree
@@ -72,6 +74,10 @@ public:
 
   CowPtr<L2s> l2s() const;
 
+  const ScanTime &componentDuration(size_t componentIndex) const;
+
+  size_t scanCount() const;
+
 private:
   void init();
   void initL2();
@@ -105,6 +111,10 @@ private:
   CowPtr<std::vector<Eigen::Vector3d>> m_startExitPoints;
   /// All path lengths
   std::shared_ptr<const std::vector<double>> m_pathLengths; // Shouldn't change
+  /// Scan time index
+  std::shared_ptr<const std::vector<size_t>> m_timeIndexes;
+  /// Scan durations
+  std::shared_ptr<const ScanTimes> m_durations;
 };
 
 namespace {
@@ -145,9 +155,11 @@ DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
           m_instrumentTree->startEntryPoints())),
       m_startExitPoints(std::make_shared<std::vector<Eigen::Vector3d>>(
           m_instrumentTree->startExitPoints())),
-      m_pathLengths(std::make_shared<const std::vector<double>>(m_instrumentTree->pathLengths()))
-
-{
+      m_pathLengths(std::make_shared<const std::vector<double>>(
+          m_instrumentTree->pathLengths())),
+      m_timeIndexes(std::make_shared<const std::vector<size_t>>(
+          m_instrumentTree->componentSize())),
+      m_durations(std::make_shared<const ScanTimes>(1, ScanTime{})) {
 
   init();
 }
@@ -384,6 +396,16 @@ std::vector<Spectrum> DetectorInfo<InstTree>::makeSpectra() const {
 
 template <typename InstTree> CowPtr<L2s> DetectorInfo<InstTree>::l2s() const {
   return m_l2;
+}
+
+template <typename InstTree>
+const ScanTime &
+DetectorInfo<InstTree>::componentDuration(size_t componentIndex) const {
+  return (*m_durations)[(*m_timeIndexes)[componentIndex]];
+}
+
+template <typename InstTree> size_t DetectorInfo<InstTree>::scanCount() const {
+  return m_durations->size();
 }
 
 #endif
