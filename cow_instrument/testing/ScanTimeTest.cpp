@@ -17,12 +17,10 @@ TEST(scan_time_test, test_real_time) {
   std::tm start;
   start.tm_hour = 1;
   size_t duration = 1; // second
-  std::tm end = start;
-  end.tm_sec = duration;
 
   ScanTime scan(std::mktime(&start), 1);
 
   EXPECT_EQ(scan.duration(), duration);
   EXPECT_EQ(scan.start(), std::mktime(&start));
-  EXPECT_EQ(scan.end(), std::mktime(&end));
+  EXPECT_EQ(scan.end(), std::mktime(&start) + duration);
 }
