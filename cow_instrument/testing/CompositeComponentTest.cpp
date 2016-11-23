@@ -71,15 +71,10 @@ TEST(composite_component_test, test_register_contents) {
 
   EXPECT_EQ(info.detectorSize(), 0) << "Composite is not a detector";
   EXPECT_EQ(info.pathSize(), 0) << "Composite is not a path component";
-  EXPECT_EQ(info.pathComponentIndexes().size(), 0)
-      << "Composite is not a path component";
-  EXPECT_EQ(info.detectorComponentIndexes().size(), 0)
-      << "Composite is not a detector";
   EXPECT_EQ(info.proxies().size(), 1) << "Proxies should grow";
 
   EXPECT_FALSE(info.proxies()[0].hasParent());
   EXPECT_FALSE(info.proxies()[0].hasChildren());
-  EXPECT_EQ(&info.proxies()[0].const_ref(), &composite);
 
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(child));
 }

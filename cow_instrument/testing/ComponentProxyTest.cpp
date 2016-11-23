@@ -8,8 +8,6 @@ TEST(component_proxy_test, test_root_construction) {
   ComponentProxy proxy{mockComponent};
   EXPECT_FALSE(proxy.hasParent());
   EXPECT_FALSE(proxy.hasChildren());
-  EXPECT_TRUE(dynamic_cast<const MockComponent *>(&proxy.const_ref()) !=
-              nullptr);
   delete mockComponent;
 }
 

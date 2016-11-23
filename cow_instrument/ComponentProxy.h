@@ -4,6 +4,7 @@
 #include <vector>
 #include <cstddef>
 #include <cstdint>
+#include "IdType.h"
 
 class Component;
 
@@ -37,12 +38,11 @@ public:
 
   size_t parent() const;
 
-  // Provide read-only access outside of modify.
-  const Component &const_ref() const;
-
   size_t child(size_t index) const;
 
   const std::vector<size_t> &children() const;
+
+  const ComponentIdType componentId() const;
 
   size_t nChildren() const;
 

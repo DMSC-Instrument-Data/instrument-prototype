@@ -26,14 +26,16 @@ size_t ComponentProxy::child(size_t index) const {
   return m_next[index];
 }
 
-const Component &ComponentProxy::const_ref() const { return *m_contents; }
-
 size_t ComponentProxy::nChildren() const { return m_next.size(); }
 
 const std::vector<size_t> &ComponentProxy::children() const { return m_next; }
 
+const ComponentIdType ComponentProxy::componentId() const {
+  return m_contents->componentId();
+}
+
 bool ComponentProxy::operator==(const ComponentProxy &other) const {
-  return m_contents->equals(other.const_ref()) && m_next == other.children() &&
+  return m_contents->equals(*other.m_contents) && m_next == other.children() &&
          m_previous == other.parent();
 }
 

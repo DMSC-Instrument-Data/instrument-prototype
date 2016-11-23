@@ -191,7 +191,6 @@ TEST(parabolic_guide_test, test_register_contents) {
 
   EXPECT_FALSE(info.proxies()[0].hasParent());
   EXPECT_FALSE(info.proxies()[0].hasChildren());
-  EXPECT_EQ(&info.proxies()[0].const_ref(), &guide);
   EXPECT_EQ(info.pathComponentIndexes()[0], 0)
       << "Should be pointing to the zeroth index of proxies";
 }

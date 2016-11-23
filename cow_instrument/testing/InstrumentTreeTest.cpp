@@ -62,7 +62,7 @@ make_very_basic_tree(ComponentIdType idForSource = ComponentIdType(0),
 
   */
 
-  auto root = std::make_shared<CompositeComponent>(ComponentIdType(0));
+  auto root = std::make_shared<CompositeComponent>(ComponentIdType(3));
 
   root->addComponent(std::unique_ptr<DetectorComponent>(new DetectorComponent(
       idForDetector, DetectorIdType(1), Eigen::Vector3d{1, 1, 1})));
@@ -123,10 +123,13 @@ TEST(instrument_tree_test, test_find_source_sample) {
   auto sourceProxy = instrument.proxyAt(instrument.sourceComponentIndex());
   auto sampleProxy = instrument.proxyAt(instrument.sampleComponentIndex());
 
-  const Component &source = sourceProxy.const_ref();
-  EXPECT_TRUE(dynamic_cast<const PointSource *>(&source) != NULL);
-  const Component &sample = sampleProxy.const_ref();
-  EXPECT_TRUE(dynamic_cast<const PointSample *>(&sample) != NULL);
+  std::map<ComponentIdType, size_t> componentMap;
+  instrument.fillComponentMap(componentMap);
+
+  EXPECT_EQ(componentMap[sourceProxy.componentId()],
+            instrument.sourceComponentIndex());
+  EXPECT_EQ(componentMap[sampleProxy.componentId()],
+            instrument.sampleComponentIndex());
 }
 
 TEST(instrument_tree_test, test_copy) {
@@ -160,9 +163,9 @@ TEST(instrument_tree_test, test_fill_detector_map) {
 TEST(instrument_tree_test,
      test_get_detector_and_path_from_mixed_component_instrument) {
 
-  const ComponentIdType idForSource(1);
-  const ComponentIdType idForSample(2);
-  const ComponentIdType idForDetector(3);
+  const ComponentIdType idForSource(10);
+  const ComponentIdType idForSample(20);
+  const ComponentIdType idForDetector(30);
 
   auto instrument =
       make_very_basic_tree(idForSource, idForSample, idForDetector);
@@ -211,33 +214,33 @@ TEST(instrument_tree_test, test_component_proxies) {
   InstrumentTree instrument = makeInstrumentTree();
   auto it = instrument.begin();
   // Check the first component A.
-  EXPECT_EQ(it->const_ref().componentId(), ComponentIdType(1));
+  EXPECT_EQ(it->componentId(), ComponentIdType(1));
   EXPECT_FALSE(it->hasParent());
   EXPECT_TRUE(it->hasChildren());
   EXPECT_EQ(it->nChildren(), 3);
   EXPECT_EQ(it->children(), (std::vector<size_t>{1, 2, 3}));
   // Move on to B
   ++it;
-  EXPECT_EQ(it->const_ref().componentId(), ComponentIdType(2));
+  EXPECT_EQ(it->componentId(), ComponentIdType(2));
   EXPECT_TRUE(it->hasParent());
   EXPECT_FALSE(it->hasChildren());
   EXPECT_EQ(it->parent(), 0);
   // Move on to C
   ++it;
-  EXPECT_EQ(it->const_ref().componentId(), ComponentIdType(3));
+  EXPECT_EQ(it->componentId(), ComponentIdType(3));
   EXPECT_TRUE(it->hasParent());
   EXPECT_FALSE(it->hasChildren());
   EXPECT_EQ(it->parent(), 0);
   // Move on to D
   ++it;
-  EXPECT_EQ(it->const_ref().componentId(), ComponentIdType(4));
+  EXPECT_EQ(it->componentId(), ComponentIdType(4));
   EXPECT_TRUE(it->hasParent());
   EXPECT_TRUE(it->hasChildren());
   EXPECT_EQ(it->parent(), 0);
   EXPECT_EQ(it->children(), (std::vector<size_t>{4}));
   // Move on to E
   ++it;
-  EXPECT_EQ(it->const_ref().componentId(), ComponentIdType(5));
+  EXPECT_EQ(it->componentId(), ComponentIdType(5));
   EXPECT_TRUE(it->hasParent());
   EXPECT_FALSE(it->hasChildren());
   EXPECT_EQ(it->parent(), 3);

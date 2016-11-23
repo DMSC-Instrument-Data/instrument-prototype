@@ -55,14 +55,14 @@ TEST(component_info_test, test_component_proxies) {
   auto it = info.begin();
 
   // Check the first component A.
-  EXPECT_EQ(it->const_ref().componentId(), ComponentIdType(1));
+  EXPECT_EQ(it->componentId(), ComponentIdType(1));
   EXPECT_FALSE(it->hasParent());
   EXPECT_TRUE(it->hasChildren());
   EXPECT_EQ(it->nChildren(), 2);
   EXPECT_EQ(it->children(), (std::vector<size_t>{1, 3}));
   // Move on to B
   ++it;
-  EXPECT_EQ(it->const_ref().componentId(), ComponentIdType(2));
+  EXPECT_EQ(it->componentId(), ComponentIdType(2));
   EXPECT_TRUE(it->hasParent());
   EXPECT_TRUE(it->hasChildren());
   EXPECT_EQ(it->nChildren(), 1);
@@ -70,13 +70,13 @@ TEST(component_info_test, test_component_proxies) {
   EXPECT_EQ(it->children(), (std::vector<size_t>{2}));
   // Move on to C
   ++it;
-  EXPECT_EQ(it->const_ref().componentId(), ComponentIdType(3));
+  EXPECT_EQ(it->componentId(), ComponentIdType(3));
   EXPECT_TRUE(it->hasParent());
   EXPECT_FALSE(it->hasChildren());
   EXPECT_EQ(it->parent(), 1);
   // Move on to D
   ++it;
-  EXPECT_EQ(it->const_ref().componentId(), ComponentIdType(4));
+  EXPECT_EQ(it->componentId(), ComponentIdType(4));
   EXPECT_TRUE(it->hasParent());
   EXPECT_FALSE(it->hasChildren());
   EXPECT_EQ(it->parent(), 0);
@@ -158,8 +158,8 @@ TEST(component_info_test, test_positions) {
   auto last = --info.end();
   auto positions = info.startPositions();
   EXPECT_EQ(positions.size(), info.componentSize());
-  EXPECT_EQ(positions.front(), start->const_ref().getPos());
-  EXPECT_EQ(positions.back(), last->const_ref().getPos());
+  EXPECT_EQ(positions.front(), comp->getPos());
+  EXPECT_EQ(positions.back(), comp->children()[1]->getPos());
 }
 
 TEST(component_info_test, test_start_entry_exit_points) {
