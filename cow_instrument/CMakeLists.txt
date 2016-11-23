@@ -22,7 +22,7 @@ set ( SOURCE_FILES
                    ComponentInfo.cpp
                    ComponentProxy.cpp
                    DetectorComponent.cpp
-                   InstrumentTree.cpp
+                   FlatTree.cpp
                    NullComponent.cpp
                    ParabolicGuide.cpp
                    PathComponent.cpp
@@ -43,7 +43,7 @@ set ( INCLUDE_FILES
                    FixedLengthVector.h
                    IdType.h
                    IndexTranslator.h
-                   InstrumentTree.h
+                   FlatTree.h
                    IntToType.h
                    L1s.h
                    L2s.h

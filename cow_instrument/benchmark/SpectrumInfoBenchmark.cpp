@@ -1,5 +1,5 @@
 #include "benchmark/benchmark_api.h"
-#include "InstrumentTree.h"
+#include "FlatTree.h"
 #include "SpectrumInfo.h"
 #include "StandardInstrument.h"
 #include "SourceSampleDetectorPathFactory.h"
@@ -10,14 +10,14 @@ namespace {
 class SpectrumInfoFixture : public benchmark::Fixture {
 
 public:
-  SpectrumInfo<InstrumentTree> m_spectrumInfo;
+  SpectrumInfo<FlatTree> m_spectrumInfo;
 
   SpectrumInfoFixture()
       : benchmark::Fixture(),
-        m_spectrumInfo(DetectorInfo<InstrumentTree>(
-            std::make_shared<InstrumentTree>(
+        m_spectrumInfo(DetectorInfo<FlatTree>(
+            std::make_shared<FlatTree>(
                 std_instrument::construct_root_component()),
-            SourceSampleDetectorPathFactory<InstrumentTree>{})) {}
+            SourceSampleDetectorPathFactory<FlatTree>{})) {}
 };
 
 BENCHMARK_F(SpectrumInfoFixture, BM_l2_access)(benchmark::State &state) {

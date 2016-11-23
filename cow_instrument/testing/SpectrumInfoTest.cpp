@@ -9,10 +9,11 @@ namespace {
 TEST(spectrum_info_test, test_constructor_lhr) {
   std::vector<Spectrum> spectra{{0}, {1}, {2}};
   size_t nDetectors = 3;
-  auto instrument = std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors);
+  auto instrument =
+      std::make_shared<testing::NiceMock<MockFlatTree>>(nDetectors);
   DetectorInfoWithMockInstrument detectorInfo{
-      instrument, SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
-  SpectrumInfo<MockInstrumentTree> spectrumInfo(spectra, detectorInfo);
+      instrument, SourceSampleDetectorPathFactory<MockFlatTree>{}};
+  SpectrumInfo<MockFlatTree> spectrumInfo(spectra, detectorInfo);
 
   EXPECT_EQ(3, spectrumInfo.size());
   EXPECT_EQ(3, spectrumInfo.nDetectors());
@@ -21,10 +22,10 @@ TEST(spectrum_info_test, test_constructor_lhr) {
 TEST(spectrum_info_test, test_constructor_one_to_one) {
   size_t nDetectors = 3;
   auto instrument =
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors);
+      std::make_shared<testing::NiceMock<MockFlatTree>>(nDetectors);
   DetectorInfoWithMockInstrument detectorInfo{
-      instrument, SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
-  SpectrumInfo<MockInstrumentTree> spectrumInfo(detectorInfo);
+      instrument, SourceSampleDetectorPathFactory<MockFlatTree>{}};
+  SpectrumInfo<MockFlatTree> spectrumInfo(detectorInfo);
 
   EXPECT_EQ(3, spectrumInfo.size());
   EXPECT_EQ(3, spectrumInfo.nDetectors());
@@ -37,9 +38,9 @@ TEST(spectrum_info_test, test_spectra_fetch) {
   std::vector<Spectrum> spectra{{0}, {1, 2}, {3, 4, 5}};
   size_t nDetectors = 6;
   DetectorInfoWithMockInstrument tree{
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
-      SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
-  SpectrumInfo<MockInstrumentTree> spectrumInfo(spectra, tree);
+      std::make_shared<testing::NiceMock<MockFlatTree>>(nDetectors),
+      SourceSampleDetectorPathFactory<MockFlatTree>{}};
+  SpectrumInfo<MockFlatTree> spectrumInfo(spectra, tree);
 
   EXPECT_EQ(3, spectrumInfo.size());
   EXPECT_EQ(6, spectrumInfo.nDetectors());
@@ -67,7 +68,7 @@ TEST(spectrum_info_test, test_l2) {
 
   // Create an Instrument around the Detector
   auto instrument =
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors);
+      std::make_shared<testing::NiceMock<MockFlatTree>>(nDetectors);
 
   EXPECT_CALL(*instrument.get(), startPositions())
       .WillOnce(Return(std::vector<Eigen::Vector3d>{{0, 0, 40}}));
@@ -75,12 +76,12 @@ TEST(spectrum_info_test, test_l2) {
 
   // Create a DetectorInfo around the Instrument
   DetectorInfoWithMockInstrument detectorInfo{
-      instrument, SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
+      instrument, SourceSampleDetectorPathFactory<MockFlatTree>{}};
 
   // Create a SpectrumInfo around the DetectorInfo
   // Single detector in single spectra
   std::vector<Spectrum> spectra{{0}};
-  SpectrumInfo<MockInstrumentTree> spectrumInfo(spectra, detectorInfo);
+  SpectrumInfo<MockFlatTree> spectrumInfo(spectra, detectorInfo);
 
   // This is the point of the test. Do we calculate L2 correctly for our single
   // spectra.
@@ -100,7 +101,7 @@ TEST(spectrum_info_test, test_l2_mapped) {
   size_t nDetectors = 2;
 
   auto instrument =
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors);
+      std::make_shared<testing::NiceMock<MockFlatTree>>(nDetectors);
 
   EXPECT_CALL(*instrument.get(), startPositions())
       .WillOnce(Return(std::vector<Eigen::Vector3d>{{0, 0, 40}, {0, 0, 30}}));
@@ -110,12 +111,12 @@ TEST(spectrum_info_test, test_l2_mapped) {
 
   // Create a DetectorInfo around the Instrument
   DetectorInfoWithMockInstrument detectorInfo{
-      instrument, SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
+      instrument, SourceSampleDetectorPathFactory<MockFlatTree>{}};
 
   // Create a SpectrumInfo around the DetectorInfo
   // Two detectors in single spectra
   std::vector<Spectrum> spectra{{0, 1}};
-  SpectrumInfo<MockInstrumentTree> spectrumInfo(spectra, detectorInfo);
+  SpectrumInfo<MockFlatTree> spectrumInfo(spectra, detectorInfo);
 
   // This is the point of the test. Do we calculate L2 correctly for our dual
   // detector

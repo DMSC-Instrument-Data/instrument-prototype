@@ -4,7 +4,7 @@
 #include "Component.h"
 #include "Detector.h"
 #include "DetectorInfo.h"
-#include "InstrumentTree.h"
+#include "FlatTree.h"
 #include "PathComponent.h"
 #include "PathFactory.h"
 #include "gmock/gmock.h"
@@ -71,7 +71,7 @@ public:
   MOCK_CONST_METHOD1(accept, bool(ComponentVisitor *));
 };
 
-template <typename T> class PolymorphicInstrumentTree {
+template <typename T> class PolymorphicFlatTree {
 public:
   virtual size_t nDetectors() const = 0;
   virtual const Detector &getDetector(size_t detectorIndex) const = 0;
@@ -87,13 +87,12 @@ public:
   virtual std::vector<Eigen::Vector3d> startEntryPoints() const = 0;
   virtual std::vector<Eigen::Vector3d> startExitPoints() const = 0;
   virtual std::vector<double> pathLengths() const = 0;
-  virtual ~PolymorphicInstrumentTree() {}
+  virtual ~PolymorphicFlatTree() {}
 };
 
-class MockInstrumentTree
-    : public PolymorphicInstrumentTree<MockInstrumentTree> {
+class MockFlatTree : public PolymorphicFlatTree<MockFlatTree> {
 public:
-  MockInstrumentTree() {
+  MockFlatTree() {
     ON_CALL(m_detector, getPos()).WillByDefault(testing::Return(Eigen::Vector3d{0, 0, 10}));
     ON_CALL(m_mockPathComponent, getPos())
         .WillByDefault(testing::Return(Eigen::Vector3d{0, 0, 0}));
@@ -123,7 +122,7 @@ public:
             std::vector<double>(1 /*componentSize()*/, 0)));
   }
 
-  MockInstrumentTree(size_t nDetectors) {
+  MockFlatTree(size_t nDetectors) {
     ON_CALL(m_detector, getPos()).WillByDefault(testing::Return(Eigen::Vector3d{0, 0, 10}));
     ON_CALL(*this, nDetectors()).WillByDefault(testing::Return(nDetectors));
     ON_CALL(*this, samplePathIndex()).WillByDefault(testing::Return(size_t(0)));
@@ -166,23 +165,23 @@ public:
   MOCK_CONST_METHOD0(startExitPoints, std::vector<Eigen::Vector3d>());
   MOCK_CONST_METHOD0(pathLengths, std::vector<double>());
 
-  virtual ~MockInstrumentTree() {}
+  virtual ~MockFlatTree() {}
 
 private:
   testing::NiceMock<MockDetector> m_detector;
   testing::NiceMock<MockPathComponent> m_mockPathComponent;
 };
 
-class MockPathFactory : public PathFactory<MockInstrumentTree> {
+class MockPathFactory : public PathFactory<MockFlatTree> {
 
 public:
-  MOCK_CONST_METHOD1(createL2, Paths *(const MockInstrumentTree &instrument));
-  MOCK_CONST_METHOD1(createL1, Paths *(const MockInstrumentTree &instrument));
+  MOCK_CONST_METHOD1(createL2, Paths *(const MockFlatTree &instrument));
+  MOCK_CONST_METHOD1(createL1, Paths *(const MockFlatTree &instrument));
   virtual ~MockPathFactory() {}
 };
 
-using NiceMockInstrumentTree = testing::NiceMock<MockInstrumentTree>;
-using DetectorInfoWithMockInstrument = DetectorInfo<MockInstrumentTree>;
+using NiceMockInstrumentTree = testing::NiceMock<MockFlatTree>;
+using DetectorInfoWithMockInstrument = DetectorInfo<MockFlatTree>;
 using DetectorInfoWithNiceMockInstrument = DetectorInfo<NiceMockInstrumentTree>;
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef STANDARD_INSTRUMENT_H
 #define STANDARD_INSTRUMENT_H
 
-#include "InstrumentTree.h"
+#include "FlatTree.h"
 #include "DetectorInfo.h"
 #include <vector>
 #include <benchmark/benchmark_api.h>
@@ -17,8 +17,8 @@ std::shared_ptr<Component> construct_root_component();
 class StandardInstrumentFixture : public benchmark::Fixture {
 
 public:
-  InstrumentTree m_instrument;
-  DetectorInfo<InstrumentTree> m_detectorInfo;
+  FlatTree m_instrument;
+  DetectorInfo<FlatTree> m_detectorInfo;
 
   StandardInstrumentFixture();
 };

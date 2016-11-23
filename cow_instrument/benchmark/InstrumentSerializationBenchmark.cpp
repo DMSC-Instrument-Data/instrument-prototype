@@ -1,6 +1,6 @@
 #include "StandardInstrument.h"
-#include "InstrumentTree.h"
-#include "InstrumentTreeMapper.h"
+#include "FlatTree.h"
+#include "FlatTreeMapper.h"
 #include <benchmark/benchmark_api.h>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
@@ -12,7 +12,7 @@ BENCHMARK_F(StandardInstrumentFixture,
             BM_instrument_tree_serialize)(benchmark::State &state) {
 
   while (state.KeepRunning()) {
-    InstrumentTreeMapper originalMapper(m_instrument);
+    FlatTreeMapper originalMapper(m_instrument);
 
     // Write it out
     std::stringstream s;
@@ -27,7 +27,7 @@ BENCHMARK_F(StandardInstrumentFixture,
     benchmark::State &state) {
 
   while (state.KeepRunning()) {
-    InstrumentTreeMapper originalMapper(m_instrument);
+    FlatTreeMapper originalMapper(m_instrument);
 
     // Write it out
     std::stringstream s;
@@ -36,7 +36,7 @@ BENCHMARK_F(StandardInstrumentFixture,
 
     // Read it back in
     boost::archive::text_iarchive in(s);
-    InstrumentTreeMapper outputMapper;
+    FlatTreeMapper outputMapper;
     in >> outputMapper;
 
     benchmark::DoNotOptimize(outputMapper.create());

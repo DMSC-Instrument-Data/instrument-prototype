@@ -2,7 +2,7 @@ set ( SOURCE_FILES
                    CompositeComponentMapper.cpp
                    ComponentMapperFactory.cpp
                    DetectorComponentMapper.cpp
-                   InstrumentTreeMapper.cpp
+                   FlatTreeMapper.cpp
                    NullComponentMapper.cpp
                    ParabolicGuideMapper.cpp
                    PointSampleMapper.cpp
@@ -19,7 +19,7 @@ set ( INCLUDE_FILES
                    ComponentMapperFactory.h
                    DetectorComponentMapper.h
                    DetectorIdTypeMapper.h
-                   InstrumentTreeMapper.h
+                   FlatTreeMapper.h
                    IntToTypeMapper.h
                    NullComponentMapper.h
                    ParabolicGuideMapper.h

@@ -1,5 +1,5 @@
-#include "InstrumentTreeMapper.h"
-#include "InstrumentTree.h"
+#include "FlatTreeMapper.h"
+#include "FlatTree.h"
 #include "CompositeComponent.h"
 #include "DetectorComponent.h"
 #include "PointSample.h"
@@ -14,7 +14,7 @@
 
 namespace {
 
-InstrumentTree make_instrument() {
+FlatTree make_instrument() {
 
   /*
         A (Root)
@@ -44,28 +44,29 @@ InstrumentTree make_instrument() {
       (new PointSample(Eigen::Vector3d{0, 0, 10},
                        ComponentIdType(4))))); // Add D
 
-  return InstrumentTree(root);
+  return FlatTree(root);
 }
 }
 
 TEST(instrument_tree_mapper_test, test_cannot_create_without_instrument) {
-  InstrumentTreeMapper mapper;
-  EXPECT_THROW(mapper.create(), std::invalid_argument) << "Should throw. No instrument set.";
+  FlatTreeMapper mapper;
+  EXPECT_THROW(mapper.create(), std::invalid_argument)
+      << "Should throw. No instrument set.";
 }
 
 TEST(instrument_tree_mapper_test, test_create) {
-  InstrumentTree original = make_instrument();
-  InstrumentTreeMapper originalMapper(original);
+  FlatTree original = make_instrument();
+  FlatTreeMapper originalMapper(original);
 
   std::stringstream s;
   boost::archive::text_oarchive out(s);
   out << originalMapper;
 
   boost::archive::text_iarchive in(s);
-  InstrumentTreeMapper outputMapper;
+  FlatTreeMapper outputMapper;
   in >> outputMapper;
 
-  InstrumentTree product = outputMapper.create();
+  FlatTree product = outputMapper.create();
 
   EXPECT_EQ(product.nDetectors(), original.nDetectors());
   EXPECT_EQ(product.nPathComponents(), original.nPathComponents());
@@ -73,4 +74,3 @@ TEST(instrument_tree_mapper_test, test_create) {
   EXPECT_TRUE(product.rootComponent()->equals(*original.rootComponent()))
       << "InstrumentTrees look different.";
 }
-

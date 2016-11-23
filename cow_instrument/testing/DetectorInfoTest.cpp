@@ -1,5 +1,5 @@
 #include "DetectorInfo.h"
-#include "InstrumentTree.h"
+#include "FlatTree.h"
 #include "MockTypes.h"
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -14,15 +14,14 @@ namespace {
 TEST(detector_info_test, test_construct) {
 
   using namespace testing;
-  MockInstrumentTree *pMockInstrumentTree =
-      new testing::NiceMock<MockInstrumentTree>{};
+  MockFlatTree *pMockInstrumentTree = new testing::NiceMock<MockFlatTree>{};
   EXPECT_CALL(*pMockInstrumentTree, nDetectors())
       .WillRepeatedly(testing::Return(1));
   EXPECT_CALL(*pMockInstrumentTree, detIndexToCompIndex(_))
       .Times(1)
       .WillOnce(Return(0));
 
-  std::shared_ptr<MockInstrumentTree> mockInstrumentTree{pMockInstrumentTree};
+  std::shared_ptr<MockFlatTree> mockInstrumentTree{pMockInstrumentTree};
 
   MockPathFactory mockPathFactory;
   EXPECT_CALL(mockPathFactory, createL1(testing::_))
@@ -45,15 +44,14 @@ TEST(detector_info_test, test_construct_with_bad_l2_paths_throws) {
 
   const size_t nDetectors = 1;
 
-  MockInstrumentTree *pMockInstrumentTree =
-      new testing::NiceMock<MockInstrumentTree>{};
+  MockFlatTree *pMockInstrumentTree = new testing::NiceMock<MockFlatTree>{};
   EXPECT_CALL(*pMockInstrumentTree, nDetectors())
       .WillRepeatedly(testing::Return(nDetectors));
   EXPECT_CALL(*pMockInstrumentTree, detIndexToCompIndex(_))
       .Times(1)
       .WillOnce(Return(0));
 
-  std::shared_ptr<MockInstrumentTree> mockInstrumentTree{pMockInstrumentTree};
+  std::shared_ptr<MockFlatTree> mockInstrumentTree{pMockInstrumentTree};
 
   MockPathFactory mockPathFactory;
   // L1 is OK, contains source and sample possibilities.
@@ -75,12 +73,11 @@ TEST(detector_info_test, test_construct_with_bad_l1_paths_throws) {
 
   const size_t nDetectors = 1;
 
-  MockInstrumentTree *pMockInstrumentTree =
-      new testing::NiceMock<MockInstrumentTree>{};
+  MockFlatTree *pMockInstrumentTree = new testing::NiceMock<MockFlatTree>{};
   EXPECT_CALL(*pMockInstrumentTree, nDetectors())
       .WillRepeatedly(testing::Return(nDetectors));
 
-  std::shared_ptr<MockInstrumentTree> mockInstrumentTree{pMockInstrumentTree};
+  std::shared_ptr<MockFlatTree> mockInstrumentTree{pMockInstrumentTree};
 
   MockPathFactory mockPathFactory;
   // Single path entry for single detector. Not OK. L1 needs at least source +
@@ -108,7 +105,7 @@ TEST(detector_info_test, test_masking) {
       .WillOnce(testing::Return(new Paths(nDetectors, Path{0})));
 
   DetectorInfoWithNiceMockInstrument detectorInfo(
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
+      std::make_shared<testing::NiceMock<MockFlatTree>>(nDetectors),
       mockPathFactory);
 
   EXPECT_FALSE(detectorInfo.isMasked(0));
@@ -130,7 +127,7 @@ TEST(detector_info_test, test_get_l2s) {
       .WillOnce(testing::Return(new Paths(nDetectors, Path{0})));
 
   DetectorInfoWithNiceMockInstrument detectorInfo{
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
+      std::make_shared<testing::NiceMock<MockFlatTree>>(nDetectors),
       mockPathFactory};
 
   auto l2s = detectorInfo.l2s();
@@ -149,7 +146,7 @@ TEST(detector_info_test, test_monitors) {
       .WillOnce(testing::Return(new Paths(nDetectors, Path{0})));
 
   DetectorInfoWithMockInstrument detectorInfo{
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
+      std::make_shared<testing::NiceMock<MockFlatTree>>(nDetectors),
       mockPathFactory};
 
   EXPECT_FALSE(detectorInfo.isMonitor(0));
@@ -171,7 +168,7 @@ TEST(detector_info_test, test_calculate_l2_throw_out_of_range) {
       .WillOnce(testing::Return(new Paths(nDetectors, Path{0})));
 
   DetectorInfoWithNiceMockInstrument detectorInfo{
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
+      std::make_shared<testing::NiceMock<MockFlatTree>>(nDetectors),
       mockPathFactory};
 
   EXPECT_THROW(detectorInfo.l2(nDetectors), std::out_of_range);
@@ -182,8 +179,7 @@ TEST(detector_info_test, test_calculate_l2) {
   using namespace testing;
   size_t nDetectors = 1;
 
-  auto *pMockInstrumentTree =
-      new testing::NiceMock<MockInstrumentTree>(nDetectors);
+  auto *pMockInstrumentTree = new testing::NiceMock<MockFlatTree>(nDetectors);
 
   /*
     3-component instrument.
@@ -223,8 +219,7 @@ TEST(detector_info_test, test_calculate_l1) {
   using namespace testing;
   size_t nDetectors = 1;
 
-  auto *pMockInstrumentTree =
-      new testing::NiceMock<MockInstrumentTree>(nDetectors);
+  auto *pMockInstrumentTree = new testing::NiceMock<MockFlatTree>(nDetectors);
 
   /*
     Effectively a 2-component instrument.
@@ -260,8 +255,8 @@ TEST(detector_info_test, test_move) {
       .WillOnce(Return(std::vector<size_t>{0}));
 
   DetectorInfoWithMockInstrument detectorInfo{
-      std::shared_ptr<MockInstrumentTree>(instrumentTree),
-      SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
+      std::shared_ptr<MockFlatTree>(instrumentTree),
+      SourceSampleDetectorPathFactory<MockFlatTree>{}};
 
   auto before = detectorInfo.position(0);
   auto offset = Eigen::Vector3d{1, 0, 0};
@@ -288,8 +283,8 @@ TEST(detector_info_test, test_single_rotation_around_component_origin) {
           Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()}}));
 
   DetectorInfoWithMockInstrument detectorInfo{
-      std::shared_ptr<MockInstrumentTree>(instrumentTree),
-      SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
+      std::shared_ptr<MockFlatTree>(instrumentTree),
+      SourceSampleDetectorPathFactory<MockFlatTree>{}};
 
   const size_t sampleComponentIndex = 0;
 
@@ -335,8 +330,8 @@ TEST(detector_info_test, test_multiple_rotation_around_component_origin) {
           Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()}}));
 
   DetectorInfoWithMockInstrument detectorInfo{
-      std::shared_ptr<MockInstrumentTree>(instrumentTree),
-      SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
+      std::shared_ptr<MockFlatTree>(instrumentTree),
+      SourceSampleDetectorPathFactory<MockFlatTree>{}};
 
   const size_t sampleComponentIndex = 0;
 
@@ -384,8 +379,8 @@ TEST(detector_info_test, test_single_rotation_around_arbitrary_center) {
           Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()}}));
 
   DetectorInfoWithMockInstrument detectorInfo{
-      std::shared_ptr<MockInstrumentTree>(instrumentTree),
-      SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
+      std::shared_ptr<MockFlatTree>(instrumentTree),
+      SourceSampleDetectorPathFactory<MockFlatTree>{}};
   const size_t sampleComponentIndex = 0;
 
   detectorInfo.rotate(sampleComponentIndex, rotationAxis, rotationAngle,
@@ -424,8 +419,8 @@ TEST(detector_info_test, test_multiple_rotation_arbitrary_center) {
           Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()}}));
 
   DetectorInfoWithMockInstrument detectorInfo{
-      std::shared_ptr<MockInstrumentTree>(instrumentTree),
-      SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
+      std::shared_ptr<MockFlatTree>(instrumentTree),
+      SourceSampleDetectorPathFactory<MockFlatTree>{}};
   const size_t sampleComponentIndex = 0;
 
   // Rotate once by 90 degrees around z should put detector at 0,1,0
@@ -456,8 +451,8 @@ TEST(detector_info_test, test_copy) {
       .WillRepeatedly(testing::Return(2));
 
   DetectorInfoWithMockInstrument original{
-      std::shared_ptr<MockInstrumentTree>(pMockInstrumentTree),
-      SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
+      std::shared_ptr<MockFlatTree>(pMockInstrumentTree),
+      SourceSampleDetectorPathFactory<MockFlatTree>{}};
 
   // Set some arbitrary meta-data properties
   original.setMasked(0);

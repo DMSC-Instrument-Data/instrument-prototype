@@ -1,4 +1,4 @@
-#include "InstrumentTree.h"
+#include "FlatTree.h"
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "MockTypes.h"
@@ -13,8 +13,8 @@ using namespace testing;
 
 namespace {
 
-InstrumentTree make_simple_tree(DetectorIdType detector1Id,
-                                DetectorIdType detector2Id) {
+FlatTree make_simple_tree(DetectorIdType detector1Id,
+                          DetectorIdType detector2Id) {
 
   /*
 
@@ -30,9 +30,9 @@ InstrumentTree make_simple_tree(DetectorIdType detector1Id,
   auto composite = std::unique_ptr<CompositeComponent>(
       new CompositeComponent(ComponentIdType(1)));
 
-  composite->addComponent(
-      std::unique_ptr<DetectorComponent>(new DetectorComponent(
-          ComponentIdType(1), DetectorIdType(detector1Id), Eigen::Vector3d{1, 1, 1})));
+  composite->addComponent(std::unique_ptr<DetectorComponent>(
+      new DetectorComponent(ComponentIdType(1), DetectorIdType(detector1Id),
+                            Eigen::Vector3d{1, 1, 1})));
 
   root->addComponent(std::move(composite));
   root->addComponent(std::unique_ptr<DetectorComponent>(
@@ -44,10 +44,10 @@ InstrumentTree make_simple_tree(DetectorIdType detector1Id,
   root->addComponent(std::unique_ptr<PointSample>(
       new PointSample(Eigen::Vector3d{0, 0, 10}, ComponentIdType(4))));
 
-  return InstrumentTree(root);
+  return FlatTree(root);
 }
 
-InstrumentTree
+FlatTree
 make_very_basic_tree(ComponentIdType idForSource = ComponentIdType(0),
                      ComponentIdType idForSample = ComponentIdType(1),
                      ComponentIdType idForDetector = ComponentIdType(2)) {
@@ -72,22 +72,21 @@ make_very_basic_tree(ComponentIdType idForSource = ComponentIdType(0),
   root->addComponent(std::unique_ptr<PointSample>(
       new PointSample(Eigen::Vector3d{0, 0, 10}, idForSample)));
 
-  return InstrumentTree(root);
+  return FlatTree(root);
 }
 
 /**
 Test helper method. Adds a source and sample node to an existing root
 and creates an instrument tree from it.
  */
-InstrumentTree
-makeRegularInstrument(std::shared_ptr<CompositeComponent> &root) {
+FlatTree makeRegularInstrument(std::shared_ptr<CompositeComponent> &root) {
 
   root->addComponent(std::unique_ptr<PointSource>(
       new PointSource(Eigen::Vector3d{0, 0, 0}, ComponentIdType(100))));
   root->addComponent(std::unique_ptr<PointSample>(
       new PointSample(Eigen::Vector3d{0, 0, 10}, ComponentIdType(101))));
 
-  return InstrumentTree(root);
+  return FlatTree(root);
 }
 
 TEST(instrument_tree_test, test_cannot_construct_without_sample) {
@@ -99,7 +98,7 @@ TEST(instrument_tree_test, test_cannot_construct_without_sample) {
   EXPECT_CALL(*source_ptr, isSource()).WillRepeatedly(Return(true));
   EXPECT_CALL(*source_ptr, isSample()).WillRepeatedly(Return(false));
 
-  EXPECT_THROW(InstrumentTree{source}, std::invalid_argument)
+  EXPECT_THROW(FlatTree{source}, std::invalid_argument)
       << "Should throw, there is no sample";
 }
 
@@ -110,7 +109,7 @@ TEST(instrument_tree_test, test_cannot_construct_without_source) {
   // Make a the sample
   EXPECT_CALL(*sample_ptr, isSource()).WillRepeatedly(Return(false));
   EXPECT_CALL(*sample_ptr, isSample()).WillRepeatedly(Return(true));
-  EXPECT_THROW(InstrumentTree{sample}, std::invalid_argument)
+  EXPECT_THROW(FlatTree{sample}, std::invalid_argument)
       << "Should throw, there is not source";
 }
 
@@ -134,8 +133,7 @@ TEST(instrument_tree_test, test_find_source_sample) {
 
 TEST(instrument_tree_test, test_copy) {
 
-  InstrumentTree original =
-      make_simple_tree(DetectorIdType(1), DetectorIdType(2));
+  FlatTree original = make_simple_tree(DetectorIdType(1), DetectorIdType(2));
 
   // Perform copy.
   auto copy = original;
@@ -177,7 +175,7 @@ TEST(instrument_tree_test,
   EXPECT_EQ(componentIdMap[idForSample], 3);
 }
 
-InstrumentTree makeInstrumentTree() {
+FlatTree makeInstrumentTree() {
   /*
 
     we start like this. A-B-C-D-E are components within a single node.
@@ -206,12 +204,12 @@ InstrumentTree makeInstrumentTree() {
 
   a->addComponent(std::move(d));
 
-  return InstrumentTree(a);
+  return FlatTree(a);
 }
 
 TEST(instrument_tree_test, test_component_proxies) {
 
-  InstrumentTree instrument = makeInstrumentTree();
+  FlatTree instrument = makeInstrumentTree();
   auto it = instrument.begin();
   // Check the first component A.
   EXPECT_EQ(it->componentId(), ComponentIdType(1));
@@ -247,7 +245,7 @@ TEST(instrument_tree_test, test_component_proxies) {
 }
 
 TEST(instrument_tree_test, test_subtree_search) {
-  InstrumentTree instrument = makeInstrumentTree();
+  FlatTree instrument = makeInstrumentTree();
 
   // Subtree of A
   auto indexes = instrument.subTreeIndexes(0);
@@ -275,7 +273,7 @@ TEST(instrument_tree_test, test_subtree_search) {
 
 TEST(instrument_tree_test, test_subtree_unreachable_throws) {
 
-  InstrumentTree instrument = makeInstrumentTree();
+  FlatTree instrument = makeInstrumentTree();
 
   EXPECT_THROW(instrument.subTreeIndexes(instrument.componentSize()),
                std::invalid_argument);

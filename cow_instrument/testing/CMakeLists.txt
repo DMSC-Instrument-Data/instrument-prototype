@@ -37,7 +37,7 @@ set ( TEST_FILES
                  DetectorInfoTest.cpp                 
                  FixedLengthVectorTest.cpp                 
                  IndexTranslatorTest.cpp
-                 InstrumentTreeTest.cpp
+                 FlatTreeTest.cpp
                  ParabolicGuideTest.cpp
                  PathComponentTest.cpp
                  PointPathComponentTest.cpp
@@ -51,7 +51,7 @@ set ( TEST_FILES_MAPPERS
                 CompositeComponentMapperTest.cpp
                 ComponentMapperTest.cpp
                 DetectorComponentMapperTest.cpp
-                InstrumentTreeMapperTest.cpp
+                FlatTreeMapperTest.cpp
                 IntToTypeMapperTest.cpp
                 NullComponentMapperTest.cpp
                 ParabolicGuideMapperTest.cpp

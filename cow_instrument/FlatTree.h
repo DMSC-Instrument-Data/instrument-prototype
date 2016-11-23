@@ -1,11 +1,10 @@
-#ifndef INSTRUMENT_TREE_H
-#define INSTRUMENT_TREE_H
+#ifndef FLATTREE_H
+#define FLATTREE_H
 
 #include <memory>
 #include <vector>
 #include <map>
 #include <Eigen/Core>
-#include "cow_ptr.h"
 #include "IdType.h"
 #include "ComponentInfo.h"
 
@@ -15,11 +14,11 @@ class PointSource;
 class PointSample;
 
 /*
- The instrument is nothing more than syntatic sugar over the root Node.
+ Flattened representation of an Instrument Tree.
  */
-class InstrumentTree {
+class FlatTree {
 public:
-  InstrumentTree(std::shared_ptr<Component> componentRoot);
+  FlatTree(std::shared_ptr<Component> componentRoot);
 
   const ComponentProxy &rootProxy() const;
 
@@ -70,7 +69,7 @@ private:
   std::shared_ptr<Component> m_componentRoot;
 };
 
-using InstrumentTree_const_uptr = std::unique_ptr<const InstrumentTree>;
-using InstrumentTree_uptr = std::unique_ptr<const InstrumentTree>;
+using FlatTree_const_uptr = std::unique_ptr<const FlatTree>;
+using FlatTree_uptr = std::unique_ptr<const FlatTree>;
 
 #endif

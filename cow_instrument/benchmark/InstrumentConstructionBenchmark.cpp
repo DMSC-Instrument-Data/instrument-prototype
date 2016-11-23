@@ -16,7 +16,7 @@ void BM_instrument_tree_copy_construction(benchmark::State &state) {
   size_t nDetectors = 0;
   while (state.KeepRunning()) {
     auto tree = std_instrument::construct_root_component();
-    InstrumentTree instrumentTree(tree);
+    FlatTree instrumentTree(tree);
     benchmark::DoNotOptimize(nDetectors += instrumentTree.nDetectors());
   }
   state.SetItemsProcessed(state.iterations() * 1);

@@ -1,7 +1,7 @@
 #include "StandardInstrument.h"
 #include <benchmark/benchmark_api.h>
 #include "DetectorInfo.h"
-#include "InstrumentTree.h"
+#include "FlatTree.h"
 #include "SourceSampleDetectorPathFactory.h"
 #include <memory>
 
@@ -9,21 +9,21 @@ namespace {
 
 class DetectorInfoCreationFixture : public StandardInstrumentFixture {
 private:
-  std::shared_ptr<InstrumentTree> m_sharedInstrument;
+  std::shared_ptr<FlatTree> m_sharedInstrument;
 
 public:
   DetectorInfoCreationFixture()
-      : m_sharedInstrument(std::make_shared<InstrumentTree>(
+      : m_sharedInstrument(std::make_shared<FlatTree>(
             std_instrument::construct_root_component())) {}
 
   void construct() {
-    DetectorInfo<InstrumentTree> original(
-        m_sharedInstrument, SourceSampleDetectorPathFactory<InstrumentTree>{});
+    DetectorInfo<FlatTree> original(
+        m_sharedInstrument, SourceSampleDetectorPathFactory<FlatTree>{});
     (void)original;
   }
 
   void copy() {
-    DetectorInfo<InstrumentTree> copy(m_detectorInfo);
+    DetectorInfo<FlatTree> copy(m_detectorInfo);
     (void)copy;
   }
 };

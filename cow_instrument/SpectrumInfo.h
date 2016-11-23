@@ -6,7 +6,7 @@
 
 #include "cow_ptr.h"
 #include "DetectorInfo.h"
-#include "InstrumentTree.h"
+#include "FlatTree.h"
 #include "L2s.h"
 #include "Spectrum.h"
 
