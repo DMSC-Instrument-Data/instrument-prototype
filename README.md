@@ -2,7 +2,7 @@
 
 ##Repository Purpose##
 
-For comparitive designs of different approaches to intrument designs for version 2. This repository specifically looks at novel approaches to instrument representation. A major requirement is the ability to rapidly extract key detector information required for data reduction. See [requirements](https://github.com/mantidproject/documents/blob/master/Design/Instrument-2.0/requirements-v2.md) for more context.
+To create a prototype and minimal-viable-product for the next generation of virtual instruments. This repository specifically looks at novel approaches to virtual instrument representations for high-throughput data reduction from neutron scattering experiments. A major requirement is the ability to rapidly extract key detector information required for data reduction. See [requirements](https://github.com/mantidproject/documents/blob/master/Design/Instrument-2.0/requirements-v2.md) for more context.
 
 This repository is designed to host several prototypes aiming for the same purposes.
 
