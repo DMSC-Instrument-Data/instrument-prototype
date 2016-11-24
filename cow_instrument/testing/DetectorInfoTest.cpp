@@ -485,4 +485,54 @@ TEST(detector_info_test, test_component_duration_default) {
 
   EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree));
 }
+
+
+TEST(detector_info_test, test_scan_construction) {
+
+  // Create an instrument with a source a sample and a detector
+  auto *pMockInstrumentTree = new NiceMockInstrumentTree{};
+  EXPECT_CALL(*pMockInstrumentTree, nDetectors()).WillRepeatedly(testing::Return(1));
+  EXPECT_CALL(*pMockInstrumentTree, samplePathIndex()).WillRepeatedly(testing::Return(size_t(0)));
+  EXPECT_CALL(*pMockInstrumentTree, sourcePathIndex()).WillRepeatedly(testing::Return(size_t(1)));
+  EXPECT_CALL(*pMockInstrumentTree, componentSize()).WillRepeatedly(testing::Return(3));
+  EXPECT_CALL(*pMockInstrumentTree, startPositions())
+      .WillRepeatedly(testing::Return(
+          std::vector<Eigen::Vector3d>({{0, 0, 0}, {10, 0, 0}, {20, 0, 0}})));
+  EXPECT_CALL(*pMockInstrumentTree,  startRotations())
+      .WillRepeatedly(testing::Return(std::vector<Eigen::Quaterniond>(
+          3,
+          Eigen::Quaterniond(Eigen::Affine3d::Identity().rotation()))));
+  EXPECT_CALL(*pMockInstrumentTree,  startEntryPoints())
+      .WillRepeatedly(testing::Return(
+          std::vector<Eigen::Vector3d>({{0, 0, 0}, {10, 0, 0}, {20, 0, 0}})));
+  EXPECT_CALL(*pMockInstrumentTree,  startExitPoints())
+      .WillRepeatedly(testing::Return(
+          std::vector<Eigen::Vector3d>({{0, 0, 0}, {10, 0, 0}, {20, 0, 0}})));
+  EXPECT_CALL(*pMockInstrumentTree,  pathLengths())
+      .WillRepeatedly(testing::Return(
+          std::vector<double>(3 /*componentSize()*/, 0)));
+
+  auto timeIndexes = std::make_shared<std::vector<size_t>>();
+  timeIndexes->push_back(0);
+  timeIndexes->push_back(0);
+  timeIndexes->push_back(1);
+  auto scanTimes = std::make_shared<ScanTimes>();
+
+  scanTimes->push_back(ScanTime{std::time_t(0), 100});
+  scanTimes->push_back(ScanTime{std::time_t(50), 100});
+
+  DetectorInfoWithMockInstrument info{
+      std::shared_ptr<MockFlatTree>(pMockInstrumentTree),SourceSampleDetectorPathFactory<MockFlatTree>{}
+      , timeIndexes, scanTimes};
+
+
+  EXPECT_EQ(info.scanCount(), 2) << "Only two scan position by default";
+  EXPECT_EQ(info.componentDuration(0).start(), std::time_t(0)) << "Wrong time domain for source";
+  EXPECT_EQ(info.componentDuration(1).start(), std::time_t(0)) << "Wrong time domain for sample";
+  EXPECT_EQ(info.componentDuration(2).start(), std::time_t(50)) << "Wrong time domain for detector";
+
+
+  EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree));
+}
+
 }

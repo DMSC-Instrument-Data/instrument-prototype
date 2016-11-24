@@ -91,9 +91,6 @@ public:
 class MockFlatTree : public PolymorphicFlatTree<MockFlatTree> {
 public:
   MockFlatTree() {
-    ON_CALL(m_detector, getPos()).WillByDefault(testing::Return(Eigen::Vector3d{0, 0, 10}));
-    ON_CALL(m_mockPathComponent, getPos())
-        .WillByDefault(testing::Return(Eigen::Vector3d{0, 0, 0}));
     ON_CALL(*this, nDetectors()).WillByDefault(testing::Return(0));
     ON_CALL(*this, samplePathIndex()).WillByDefault(testing::Return(size_t(0)));
     ON_CALL(*this, sourcePathIndex()).WillByDefault(testing::Return(size_t(0)));
@@ -117,7 +114,6 @@ public:
   }
 
   MockFlatTree(size_t nDetectors) {
-    ON_CALL(m_detector, getPos()).WillByDefault(testing::Return(Eigen::Vector3d{0, 0, 10}));
     ON_CALL(*this, nDetectors()).WillByDefault(testing::Return(nDetectors));
     ON_CALL(*this, samplePathIndex()).WillByDefault(testing::Return(size_t(0)));
     ON_CALL(*this, sourcePathIndex()).WillByDefault(testing::Return(size_t(0)));
@@ -154,10 +150,6 @@ public:
   MOCK_CONST_METHOD0(pathLengths, std::vector<double>());
 
   virtual ~MockFlatTree() {}
-
-private:
-  testing::NiceMock<MockDetector> m_detector;
-  testing::NiceMock<MockPathComponent> m_mockPathComponent;
 };
 
 class MockPathFactory : public PathFactory<MockFlatTree> {
