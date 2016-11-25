@@ -44,8 +44,6 @@ std::shared_ptr<Component> construct_root_component() {
 
   const size_t width = 100;
   const size_t height = 100;
-  const double width_d = double(width);
-  const double height_d = double(height);
 
   auto N = make_square_bank(width, height, "North");
   auto E = make_square_bank(width, height, "South");

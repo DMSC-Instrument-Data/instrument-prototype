@@ -83,6 +83,12 @@ public:
 
   size_t scanCount() const;
 
+  void
+  fillDetectorMap(std::map<DetectorIdType, std::vector<size_t>> &map) const;
+
+  void
+  fillComponentMap(std::map<ComponentIdType, std::vector<size_t>> &map) const;
+
 private:
   void init();
   void initL2();
@@ -440,6 +446,18 @@ DetectorInfo<InstTree>::componentDuration(size_t componentIndex) const {
 
 template <typename InstTree> size_t DetectorInfo<InstTree>::scanCount() const {
   return m_durations->size();
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::fillDetectorMap(
+    std::map<DetectorIdType, std::vector<size_t>> &map) const {
+  m_instrumentTree->fillDetectorMap(map);
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::fillComponentMap(
+    std::map<ComponentIdType, std::vector<size_t>> &map) const {
+  m_instrumentTree->fillComponentMap(map);
 }
 
 #endif
