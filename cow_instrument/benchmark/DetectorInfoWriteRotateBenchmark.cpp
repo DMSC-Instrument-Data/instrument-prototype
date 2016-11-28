@@ -1,3 +1,4 @@
+#include "BenchmarkPolicy.h"
 #include "StandardInstrument.h"
 #include <benchmark/benchmark_api.h>
 
@@ -52,7 +53,8 @@ BENCHMARK_F(DetectorInfoWriteRotateFixture,
   this->rotateOnComponent(2, true /*with read metric*/, state);
 }
 
-void BM_rotation_one_bank_math(benchmark::State &state) {
+BENCHMARK_F(BenchmarkPolicy,
+            BM_rotation_one_bank_math)(benchmark::State &state) {
   // Check the rotation math independenly of other implementation details.
 
   // One bank has 100 * 100 detectors
@@ -79,6 +81,5 @@ void BM_rotation_one_bank_math(benchmark::State &state) {
   // compare against a single bank.
   state.SetItemsProcessed(state.iterations() * 1);
 }
-BENCHMARK(BM_rotation_one_bank_math);
 
 } // namespace

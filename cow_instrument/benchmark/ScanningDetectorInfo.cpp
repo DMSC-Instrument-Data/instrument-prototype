@@ -1,3 +1,4 @@
+#include "BenchmarkPolicy.h"
 #include "CompositeComponent.h"
 #include "DetectorComponent.h"
 #include "DetectorInfo.h"
@@ -84,7 +85,7 @@ DetectorInfo<FlatTree> createScanningDetectorInfo() {
   return info;
 }
 
-class DetectorInfoScanningFixture : public benchmark::Fixture {
+class DetectorInfoScanningFixture : public BenchmarkPolicy {
 private:
   DetectorInfo<FlatTree> m_detectorInfo;
 
