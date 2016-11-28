@@ -7,8 +7,9 @@
 #include <string>
 #include <sstream>
 #include <cmath>
+#include <ctime>
 
-#include "Command.h"
+#include "ComponentProxy.h"
 #include "cow_ptr.h"
 #include "Detector.h"
 #include "IdType.h"
@@ -20,6 +21,7 @@
 #include "PathComponent.h"
 #include "PathFactory.h"
 #include "Spectrum.h"
+#include "ScanTime.h"
 
 /**
  * DetectorInfo type. Provides Meta-data context to an InstrumentTree
@@ -30,7 +32,12 @@ template <typename InstTree> class DetectorInfo {
 public:
   template <typename InstSptrType, typename PathFactoryType>
   explicit DetectorInfo(InstSptrType &&instrumentTree,
-                        PathFactoryType &&pathFactory);
+                        PathFactoryType &&pathFactory, ScanTime scanTime = ScanTime{});
+
+
+  template <typename InstSptrType, typename PathFactoryType, typename TimeIndexesType, typename ScanTimesType>
+  explicit DetectorInfo(InstSptrType &&instrumentTree,
+                                         PathFactoryType &&pathFactory, TimeIndexesType && timeIndexes, ScanTimesType && scanTimes);
 
   void setMasked(size_t detectorIndex);
 
@@ -40,27 +47,55 @@ public:
 
   bool isMonitor(size_t detectorIndex) const;
 
-  void initL2();
-
-  void initL1();
-
   double l2(size_t detectorIndex) const;
 
-  Eigen::Vector3d position(size_t detectorIndex) const;
+  Eigen::Vector3d position(size_t componentIndex) const;
+
+  Eigen::Vector3d positionDetector(size_t detectorIndex) const;
+
+  Eigen::Quaterniond rotation(size_t componentIndex) const;
+
+  Eigen::Quaterniond rotationDetector(size_t detectorIndex) const;
 
   double l1(size_t detectorIndex) const;
 
   size_t size() const;
 
+  size_t componentSize() const;
+
   const InstTree &const_instrumentTree() const;
 
-  void modify(size_t nodeIndex, Command &command);
+  void move(size_t componentIndex, const Eigen::Vector3d &offset);
+
+  void rotate(size_t componentIndex, const Eigen::Vector3d &axis,
+              const double &theta, const Eigen::Vector3d &center);
+
+  void moveDetector(size_t detectorIndex, const Eigen::Vector3d &offset);
+
+  void rotateDetector(size_t detectorIndex, const Eigen::Vector3d &axis,
+                      const double &theta, const Eigen::Vector3d &center);
 
   std::vector<Spectrum> makeSpectra() const;
 
   CowPtr<L2s> l2s() const;
 
+  const ScanTime &componentDuration(size_t componentIndex) const;
+
+  size_t scanCount() const;
+
+  void
+  fillDetectorMap(std::map<DetectorIdType, std::vector<size_t>> &map) const;
+
+  void
+  fillComponentMap(std::map<ComponentIdType, std::vector<size_t>> &map) const;
+
 private:
+  void init();
+  void initL2();
+  void initL1();
+  void moveComponent(size_t componentIndex, const Eigen::Vector3d &offset);
+  void rotateComponent(size_t componentIndex, const Eigen::Vector3d &axis,
+                       const double &theta, const Eigen::Vector3d &center);
 
   //------------------- MetaData -------------
   const size_t m_nDetectors;
@@ -72,12 +107,25 @@ private:
   CowPtr<L1s> m_l1;
   CowPtr<L2s> m_l2;
 
+  CowPtr<const Paths> m_l2Paths;
+  CowPtr<const Paths> m_l1Paths;
 
-  std::shared_ptr<const Paths> m_l2Paths;
-  std::shared_ptr<const Paths> m_l1Paths;
-
-  // Instrument
+  /// Instrument tree.
   std::shared_ptr<const InstTree> m_instrumentTree;
+  /// All positions indexed by component index. Owned by DetectorInfo.
+  CowPtr<std::vector<Eigen::Vector3d>> m_positions;
+  /// All rotations indexed by component index. Owned by DetectorInfo.
+  CowPtr<std::vector<Eigen::Quaterniond>> m_rotations;
+  /// All path component entry points.
+  CowPtr<std::vector<Eigen::Vector3d>> m_startEntryPoints;
+  /// All path component exit points
+  CowPtr<std::vector<Eigen::Vector3d>> m_startExitPoints;
+  /// All path lengths
+  std::shared_ptr<const std::vector<double>> m_pathLengths; // Shouldn't change
+  /// Scan time index
+  std::shared_ptr<const std::vector<size_t>> m_timeIndexes;
+  /// Scan durations
+  std::shared_ptr<const ScanTimes> m_durations;
 };
 
 namespace {
@@ -101,7 +149,7 @@ double distance(const Eigen::Vector3d &a, const Eigen::Vector3d &b) {
 template <typename InstTree>
 template <typename InstSptrType, typename PathFactoryType>
 DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
-                                     PathFactoryType &&pathFactory)
+                                     PathFactoryType &&pathFactory, ScanTime scanTime)
     : m_l2Paths(pathFactory.createL2(*instrumentTree)),
       m_l1Paths(pathFactory.createL1(*instrumentTree)),
       m_nDetectors(instrumentTree->nDetectors()),
@@ -109,11 +157,52 @@ DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
       m_isMonitor(std::make_shared<MonitorFlags>(m_nDetectors, Bool(false))),
       m_l1(std::make_shared<L1s>(m_nDetectors)),
       m_l2(std::make_shared<L2s>(m_nDetectors)),
-      m_instrumentTree(std::forward<InstSptrType>(instrumentTree)) {
+      m_instrumentTree(std::forward<InstSptrType>(instrumentTree)),
+      m_positions(std::make_shared<std::vector<Eigen::Vector3d>>(
+          m_instrumentTree->startPositions())),
+      m_rotations(std::make_shared<std::vector<Eigen::Quaterniond>>(
+          m_instrumentTree->startRotations())),
+      m_startEntryPoints(std::make_shared<std::vector<Eigen::Vector3d>>(
+          m_instrumentTree->startEntryPoints())),
+      m_startExitPoints(std::make_shared<std::vector<Eigen::Vector3d>>(
+          m_instrumentTree->startExitPoints())),
+      m_pathLengths(std::make_shared<const std::vector<double>>(
+          m_instrumentTree->pathLengths())),
+      m_timeIndexes(std::make_shared<const std::vector<size_t>>(
+          m_instrumentTree->componentSize())),
+      m_durations(std::make_shared<const ScanTimes>(1, scanTime)) {
 
-  initL1();
-  initL2();
+  init();
 }
+
+template <typename InstTree>
+template <typename InstSptrType, typename PathFactoryType, typename TimeIndexesType, typename ScanTimesType>
+DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
+                                     PathFactoryType &&pathFactory, TimeIndexesType && timeIndexes, ScanTimesType && scanTimes)
+    : m_l2Paths(pathFactory.createL2(*instrumentTree)),
+      m_l1Paths(pathFactory.createL1(*instrumentTree)),
+      m_nDetectors(instrumentTree->nDetectors()),
+      m_isMasked(std::make_shared<MaskFlags>(m_nDetectors, Bool(false))),
+      m_isMonitor(std::make_shared<MonitorFlags>(m_nDetectors, Bool(false))),
+      m_l1(std::make_shared<L1s>(m_nDetectors)),
+      m_l2(std::make_shared<L2s>(m_nDetectors)),
+      m_instrumentTree(std::forward<InstSptrType>(instrumentTree)),
+      m_positions(std::make_shared<std::vector<Eigen::Vector3d>>(
+          m_instrumentTree->startPositions())),
+      m_rotations(std::make_shared<std::vector<Eigen::Quaterniond>>(
+          m_instrumentTree->startRotations())),
+      m_startEntryPoints(std::make_shared<std::vector<Eigen::Vector3d>>(
+          m_instrumentTree->startEntryPoints())),
+      m_startExitPoints(std::make_shared<std::vector<Eigen::Vector3d>>(
+          m_instrumentTree->startExitPoints())),
+      m_pathLengths(std::make_shared<const std::vector<double>>(
+          m_instrumentTree->pathLengths())),
+      m_timeIndexes(std::forward<TimeIndexesType>(timeIndexes)),
+      m_durations(std::forward<ScanTimesType>(scanTimes)) {
+
+  init();
+}
+
 
 template <typename InstTree>
 void DetectorInfo<InstTree>::setMasked(size_t detectorIndex) {
@@ -139,6 +228,12 @@ bool DetectorInfo<InstTree>::isMonitor(size_t detectorIndex) const {
   return m_isMonitor.const_ref()[detectorIndex];
 }
 
+template <typename InstTree> void DetectorInfo<InstTree>::init() {
+
+  initL1();
+  initL2();
+}
+
 template <typename InstTree> void DetectorInfo<InstTree>::initL1() {
 
   /*
@@ -160,17 +255,11 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL1() {
                              "components (sample + source).");
     }
 
-    double l1 = 0;
-    // For each detector-l1-path calculate the total neutronic length
-
-    l1 += m_instrumentTree->getPathComponent(path[i]).length();
+    double l1 = (*m_pathLengths)[path[i]];
     for (i = 1; i < path.size(); ++i) {
-      const PathComponent &current =
-          m_instrumentTree->getPathComponent(path[i]);
-      const PathComponent &previous =
-          m_instrumentTree->getPathComponent(path[i - 1]);
-      l1 += distance(current.entryPoint(), previous.exitPoint());
-      l1 += current.length();
+
+      l1 += distance((*m_startEntryPoints)[path[i]], (*m_startExitPoints)[path[i-1]]);
+      l1 += (*m_pathLengths)[path[i]];
     }
 
     (*m_l1)[detectorIndex] = l1;
@@ -183,28 +272,22 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL2() {
   for (size_t detectorIndex = 0; detectorIndex < m_nDetectors;
        ++detectorIndex) {
 
-    const Detector &det = m_instrumentTree->getDetector(detectorIndex);
-    auto detectorPos = det.getPos();
+    auto detectorPos = positionDetector(detectorIndex);
     size_t i = 0;
     const Path &path = (*m_l2Paths)[detectorIndex];
     if (path.size() < 1) {
       throw std::logic_error("Cannot have a L2 specified with less than 1 path "
                              "components (sample).");
     }
-    double l2 = 0;
+    double l2 = (*m_pathLengths)[path[i]];
 
-    l2 += m_instrumentTree->getPathComponent(path[i]).length();
     // For each detector-l2-path calculate the total neutronic length
     for (i = 1; i < path.size(); ++i) {
-      const PathComponent &current =
-          m_instrumentTree->getPathComponent(path[i]);
-      const PathComponent &previous =
-          m_instrumentTree->getPathComponent(path[i - 1]);
-      l2 += distance(current.entryPoint(), previous.exitPoint());
-      l2 += current.length();
+      l2 += distance((*m_startEntryPoints)[path[i]],
+                     (*m_startExitPoints)[path[i - 1]]);
+      l2 += (*m_pathLengths)[path[i]];
     }
-    l2 += distance(m_instrumentTree->getPathComponent(path[i - 1]).exitPoint(),
-                   detectorPos);
+    l2 += distance((*m_startExitPoints)[path[i - 1]], detectorPos);
 
     (*m_l2)[detectorIndex] = l2;
   }
@@ -217,8 +300,26 @@ double DetectorInfo<InstTree>::l2(size_t detectorIndex) const {
 }
 
 template <typename InstTree>
-Eigen::Vector3d DetectorInfo<InstTree>::position(size_t detectorIndex) const {
-  return m_instrumentTree->getDetector(detectorIndex).getPos();
+Eigen::Vector3d DetectorInfo<InstTree>::position(size_t componentIndex) const {
+  return (*m_positions)[componentIndex];
+}
+
+template <typename InstTree>
+Eigen::Vector3d
+DetectorInfo<InstTree>::positionDetector(size_t detectorIndex) const {
+  return (*m_positions)[m_instrumentTree->detIndexToCompIndex(detectorIndex)];
+}
+
+template <typename InstTree>
+Eigen::Quaterniond
+DetectorInfo<InstTree>::rotation(size_t componentIndex) const {
+  return (*m_rotations)[componentIndex];
+}
+
+template <typename InstTree>
+Eigen::Quaterniond
+DetectorInfo<InstTree>::rotationDetector(size_t detectorIndex) const {
+  return (*m_rotations)[m_instrumentTree->detIndexToCompIndex(detectorIndex)];
 }
 
 template <typename InstTree>
@@ -232,21 +333,95 @@ template <typename InstTree> size_t DetectorInfo<InstTree>::size() const {
 }
 
 template <typename InstTree>
+size_t DetectorInfo<InstTree>::componentSize() const {
+  return m_instrumentTree->componentSize();
+}
+
+template <typename InstTree>
 const InstTree &DetectorInfo<InstTree>::const_instrumentTree() const {
   return *m_instrumentTree;
 }
 
 template <typename InstTree>
-void DetectorInfo<InstTree>::modify(size_t nodeIndex, Command &command) {
+void DetectorInfo<InstTree>::moveComponent(size_t componentIndex,
+                                           const Eigen::Vector3d &offset) {
 
-  m_instrumentTree->modify(nodeIndex, command);
+  const std::vector<size_t> indexes =
+      m_instrumentTree->subTreeIndexes(componentIndex);
+  for (auto &index : indexes) {
+    (*m_positions)[index] += offset;
+    // TODO m_entry and m_exit points should also be translated here!
+  }
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::move(size_t componentIndex,
+                                  const Eigen::Vector3d &offset) {
+
+  moveComponent(componentIndex, offset);
 
   // All other geometry-derived information is now also invalid. Very
   // important!
-  initL1();
-  initL2();
+  init();
 
   // Meta-data should all still be valid.
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::rotate(size_t componentIndex,
+                                    const Eigen::Vector3d &axis,
+                                    const double &theta,
+                                    const Eigen::Vector3d &center) {
+
+  rotateComponent(componentIndex, axis, theta, center);
+  // All other geometry-derived information is now also invalid. Very
+  // important!
+  init();
+
+  // Meta-data should all still be valid.
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::rotateComponent(size_t componentIndex,
+                                             const Eigen::Vector3d &axis,
+                                             const double &theta,
+                                             const Eigen::Vector3d &center) {
+
+  using namespace Eigen;
+  const auto transform =
+      Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
+  const auto rotation = transform.rotation();
+
+  const std::vector<size_t> indexes =
+      m_instrumentTree->subTreeIndexes(componentIndex);
+  for (auto &index : indexes) {
+    (*m_positions)[index] = transform * (*m_positions)[index];
+    (*m_rotations)[index] = rotation * (*m_rotations)[index];
+    // TODO m_entry and m_exit points should also be translated here!
+  }
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::moveDetector(size_t detectorIndex,
+                                          const Eigen::Vector3d &offset) {
+
+  moveComponent(m_instrumentTree->detIndexToCompIndex(detectorIndex), offset);
+
+  // Only l2 needs to be recalculated.
+  initL2();
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::rotateDetector(size_t detectorIndex,
+                                            const Eigen::Vector3d &axis,
+                                            const double &theta,
+                                            const Eigen::Vector3d &center) {
+
+  rotateComponent(m_instrumentTree->detIndexToCompIndex(detectorIndex), axis,
+                  theta, center);
+
+  // Only l2 needs to be recalculated.
+  initL2();
 }
 
 template <typename InstTree>
@@ -261,6 +436,28 @@ std::vector<Spectrum> DetectorInfo<InstTree>::makeSpectra() const {
 
 template <typename InstTree> CowPtr<L2s> DetectorInfo<InstTree>::l2s() const {
   return m_l2;
+}
+
+template <typename InstTree>
+const ScanTime &
+DetectorInfo<InstTree>::componentDuration(size_t componentIndex) const {
+  return (*m_durations)[(*m_timeIndexes)[componentIndex]];
+}
+
+template <typename InstTree> size_t DetectorInfo<InstTree>::scanCount() const {
+  return m_durations->size();
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::fillDetectorMap(
+    std::map<DetectorIdType, std::vector<size_t>> &map) const {
+  m_instrumentTree->fillDetectorMap(map);
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::fillComponentMap(
+    std::map<ComponentIdType, std::vector<size_t>> &map) const {
+  m_instrumentTree->fillComponentMap(map);
 }
 
 #endif

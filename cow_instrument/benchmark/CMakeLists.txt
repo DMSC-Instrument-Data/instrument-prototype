@@ -24,16 +24,19 @@ endif()
 include_directories(${GBENCH_INCLUDE_DIR})
 
 set ( BENCH_FILES_SRC
+                 DetectorInfoConstructionBenchmark.cpp
+                 DetectorInfoReadBenchmark.cpp
+                 DetectorInfoWriteRotateBenchmark.cpp
+                 DetectorInfoWriteTranslateBenchmark.cpp
                  InstrumentConstructionBenchmark.cpp
-                 InstrumentReadBenchmark.cpp
                  InstrumentSerializationBenchmark.cpp
-                 InstrumentWriteTranslateBenchmark.cpp
-                 InstrumentWriteRotateBenchmark.cpp
+                 ScanningDetectorInfo.cpp
                  SpectrumInfoBenchmark.cpp
                  StandardInstrument.cpp
 )
 
 set ( BENCH_FILES_H
+                 BenchmarkPolicy.h
                  StandardInstrument.h
 )
 

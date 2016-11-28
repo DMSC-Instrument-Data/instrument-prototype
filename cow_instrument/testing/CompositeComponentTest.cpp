@@ -17,14 +17,6 @@ TEST(composite_component_test, test_provide_name) {
   EXPECT_EQ(composite.name(), name);
 }
 
-TEST(composite_component_test, test_one_level_deep_only) {
-  CompositeComponent level1{ComponentIdType(1), "level1"};
-  EXPECT_THROW(level1.addComponent(std::unique_ptr<Component>(
-                   new CompositeComponent{ComponentIdType(2), "level2"})),
-               std::invalid_argument)
-      << "Cannot have multiple levels of composite";
-}
-
 TEST(composite_component_test, test_clone){
     CompositeComponent composite{ComponentIdType(1)};
 
@@ -62,46 +54,31 @@ TEST(composite_component_test, test_get_pos){
     EXPECT_EQ(pos[2],2);
 }
 
-TEST(composite_component_test, test_shiftPos) {
+TEST(composite_component_test, test_register_contents) {
+
   using namespace testing;
   MockComponent *child = new MockComponent;
-  EXPECT_CALL(*child, shiftPositionBy(_)).Times(1);
+  EXPECT_CALL(*child, getPos())
+      .Times(AtLeast(1))
+      .WillOnce(Return(Eigen::Vector3d{0, 0, 0}));
 
   CompositeComponent composite{ComponentIdType(1)};
-  composite.addComponent(std::unique_ptr<MockComponent>(child));
+  composite.addComponent(std::unique_ptr<Component>(std::move(child)));
 
-  composite.shiftPositionBy(Eigen::Vector3d{1, 1, 1});
-  EXPECT_TRUE(Mock::VerifyAndClearExpectations(child));
-}
+  // Registers
+  ComponentInfo info;
 
-TEST(composite_component_test, test_rotate) {
-  using namespace testing;
-  MockComponent *child = new MockComponent;
-  EXPECT_CALL(*child, rotate(_, _)).Times(1);
+  EXPECT_CALL(*child, registerContents(_, _)).Times(1);
 
-  CompositeComponent composite{ComponentIdType(1)};
-  composite.addComponent(std::unique_ptr<MockComponent>(child));
+  composite.registerContents(info);
 
-  const Eigen::Vector3d axis{1, 1, 1};
-  const auto theta = M_PI / 2;
-  const Eigen::Vector3d center{1, 1, 1};
+  EXPECT_EQ(info.detectorSize(), 0) << "Composite is not a detector";
+  EXPECT_EQ(info.pathSize(), 0) << "Composite is not a path component";
+  EXPECT_EQ(info.proxies().size(), 1) << "Proxies should grow";
 
-  composite.rotate(axis, theta, center);
-  EXPECT_TRUE(Mock::VerifyAndClearExpectations(child));
-}
+  EXPECT_FALSE(info.proxies()[0].hasParent());
+  EXPECT_FALSE(info.proxies()[0].hasChildren());
 
-TEST(composite_component_test, test_rotate_fast) {
-  using namespace testing;
-  MockComponent *child = new MockComponent;
-  EXPECT_CALL(*child, rotate(_, _)).Times(1);
-
-  CompositeComponent composite{ComponentIdType(1)};
-  composite.addComponent(std::unique_ptr<MockComponent>(child));
-
-  Eigen::Affine3d transform = Eigen::Affine3d::Identity();
-  Eigen::Quaterniond rotation(transform.rotation());
-  // Overload for fast rotations
-  composite.rotate(transform, rotation);
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(child));
 }
 

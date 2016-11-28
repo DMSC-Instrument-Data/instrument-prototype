@@ -19,21 +19,22 @@ add_subdirectory(mappers)
 
 set ( SOURCE_FILES
                    CompositeComponent.cpp
+                   ComponentInfo.cpp
+                   ComponentProxy.cpp
                    DetectorComponent.cpp
-                   InstrumentTree.cpp
-                   MoveCommand.cpp
-                   Node.cpp
+                   FlatTree.cpp
                    NullComponent.cpp
                    ParabolicGuide.cpp
                    PathComponent.cpp
-                   RotateCommand.cpp
+                   ScanTime.cpp
 )
 
 
 set ( INCLUDE_FILES
                    Bool.h
-                   Command.h
                    Component.h
+                   ComponentInfo.h
+                   ComponentProxy.h
                    ComponentVisitor.h
                    CompositeComponent.h
                    cow_ptr.h
@@ -43,14 +44,12 @@ set ( INCLUDE_FILES
                    FixedLengthVector.h
                    IdType.h
                    IndexTranslator.h
-                   InstrumentTree.h
+                   FlatTree.h
                    IntToType.h
                    L1s.h
                    L2s.h
                    MaskFlags.h
                    MonitorFlags.h
-                   MoveCommand.h
-                   Node.h
                    NullComponent.h
                    ParabolicGuide.h
                    Path.h
@@ -59,7 +58,7 @@ set ( INCLUDE_FILES
                    PointPathComponent.h
                    PointSample.h
                    PointSource.h
-                   RotateCommand.h
+                   ScanTime.h
                    SourceSampleDetectorPathFactory.h
                    SpectrumInfo.h
                    Spectrum.h

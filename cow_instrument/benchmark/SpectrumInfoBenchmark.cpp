@@ -1,24 +1,23 @@
 #include "benchmark/benchmark_api.h"
-#include "InstrumentTree.h"
+#include "BenchmarkPolicy.h"
+#include "FlatTree.h"
 #include "SpectrumInfo.h"
 #include "StandardInstrument.h"
 #include "SourceSampleDetectorPathFactory.h"
-#include "Node.h"
 #include <memory.h>
 
 namespace {
 
-class SpectrumInfoFixture : public benchmark::Fixture {
+class SpectrumInfoFixture : public BenchmarkPolicy<SpectrumInfoFixture> {
 
 public:
-  SpectrumInfo<InstrumentTree> m_spectrumInfo;
+  SpectrumInfo<FlatTree> m_spectrumInfo;
 
   SpectrumInfoFixture()
-      : benchmark::Fixture(),
-        m_spectrumInfo(DetectorInfo<InstrumentTree>(
-            std::make_shared<InstrumentTree>(
-                std_instrument::construct_root_node()),
-            SourceSampleDetectorPathFactory<InstrumentTree>{})) {}
+      : BenchmarkPolicy(), m_spectrumInfo(DetectorInfo<FlatTree>(
+                               std::make_shared<FlatTree>(
+                                   std_instrument::construct_root_component()),
+                               SourceSampleDetectorPathFactory<FlatTree>{})) {}
 };
 
 BENCHMARK_F(SpectrumInfoFixture, BM_l2_access)(benchmark::State &state) {

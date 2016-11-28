@@ -4,10 +4,9 @@
 #include <vector>
 #include <memory>
 
-#include "Command.h"
 #include "cow_ptr.h"
 #include "DetectorInfo.h"
-#include "InstrumentTree.h"
+#include "FlatTree.h"
 #include "L2s.h"
 #include "Spectrum.h"
 
@@ -36,7 +35,10 @@ public:
 
   CowPtr<L2s> l2s() const;
 
-  void modify(size_t nodeIndex, Command &command);
+  void moveDetector(size_t spectrumIndex, const Eigen::Vector3d &offset);
+
+  void rotateDetector(size_t spectrumIndex, const Eigen::Vector3d &axis,
+                      const double &theta, const Eigen::Vector3d &center);
 
 private:
   DetectorInfo<InstTree> m_detectorInfo;
@@ -141,8 +143,21 @@ template <typename InstTree> CowPtr<L2s> SpectrumInfo<InstTree>::l2s() const {
 }
 
 template <typename InstTree>
-void SpectrumInfo<InstTree>::modify(size_t nodeIndex, Command &command) {
-  m_detectorInfo.modify(nodeIndex, command);
+void SpectrumInfo<InstTree>::moveDetector(size_t spectrumIndex,
+                                          const Eigen::Vector3d &offset) {
+  for (auto detectorIndex : m_spectra.const_ref()[spectrumIndex].indexes()) {
+    m_detectorInfo.moveDetector(detectorIndex, offset);
+  }
+}
+
+template <typename InstTree>
+void SpectrumInfo<InstTree>::rotateDetector(size_t spectrumIndex,
+                                            const Eigen::Vector3d &axis,
+                                            const double &theta,
+                                            const Eigen::Vector3d &center) {
+  for (auto detectorIndex : m_spectra.const_ref()[spectrumIndex].indexes()) {
+    m_detectorInfo.rotateDetector(detectorIndex, axis, theta, center);
+  }
 }
 
 #endif

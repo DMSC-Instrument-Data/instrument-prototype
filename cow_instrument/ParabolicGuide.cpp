@@ -58,25 +58,6 @@ Eigen::Vector3d ParabolicGuide::getPos() const { return m_position; }
 
 Eigen::Quaterniond ParabolicGuide::getRotation() const { return m_rotation; }
 
-void ParabolicGuide::shiftPositionBy(const Eigen::Vector3d &pos) { m_position = pos; }
-
-void ParabolicGuide::rotate(const Eigen::Vector3d &axis, const double &theta, const Eigen::Vector3d &center)
-{
-  using namespace Eigen;
-  const Affine3d transform =
-      Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
-  m_position = transform * m_position;
-  // Update the absolute rotation of this detector around own center.
-  m_rotation = transform.rotation() * m_rotation;
-}
-
-void ParabolicGuide::rotate(const Eigen::Affine3d &transform,
-                            const Eigen::Quaterniond &rotationPart) {
-  m_position = transform * m_position;
-  // Update the absolute rotation of this detector around own center.
-  m_rotation = rotationPart * m_rotation;
-}
-
 ParabolicGuide *ParabolicGuide::clone() const {
   return new ParabolicGuide(m_componentId, m_a, m_h, m_position);
 }
@@ -90,11 +71,13 @@ bool ParabolicGuide::equals(const Component &other) const {
   return equals;
 }
 
-void ParabolicGuide::registerContents(
-    std::vector<const Detector *> &,
-    std::vector<const PathComponent *> &pathComponents) const {
-  // Register this as a path component. It is not a detector.
-  pathComponents.push_back(this);
+void ParabolicGuide::registerContents(ComponentInfo &info) const {
+  info.registerPathComponent(this);
+}
+
+void ParabolicGuide::registerContents(ComponentInfo &info,
+                                      size_t parentIndex) const {
+  info.registerPathComponent(this, parentIndex);
 }
 
 ComponentIdType ParabolicGuide::componentId() const { return m_componentId; }
@@ -131,5 +114,4 @@ bool ParabolicGuide::operator==(const ParabolicGuide &other) const {
   return m_componentId == other.m_componentId && m_a == other.m_a &&
          m_h == other.m_h && m_position == other.m_position;
 }
-
 

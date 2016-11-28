@@ -31,17 +31,17 @@ include_directories(${GTEST_INCLUDE_DIR} ${GMOCK_INCLUDE_DIR} ${Boost_INCLUDE_DI
 
 set ( TEST_FILES
                  CompositeComponentTest.cpp
+                 ComponentInfoTest.cpp
+                 ComponentProxyTest.cpp
                  DetectorComponentTest.cpp
                  DetectorInfoTest.cpp                 
                  FixedLengthVectorTest.cpp                 
                  IndexTranslatorTest.cpp
-                 InstrumentTreeTest.cpp
-                 MoveCommandTest.cpp
-                 NodeTest.cpp
+                 FlatTreeTest.cpp
                  ParabolicGuideTest.cpp
                  PathComponentTest.cpp
                  PointPathComponentTest.cpp
-                 RotateCommandTest.cpp
+                 ScanTimeTest.cpp
                  SourceSampleDetectorPathFactoryTest.cpp                 
                  SpectrumInfoTest.cpp
                  SpectrumTest.cpp
@@ -52,9 +52,8 @@ set ( TEST_FILES_MAPPERS
                 CompositeComponentMapperTest.cpp
                 ComponentMapperTest.cpp
                 DetectorComponentMapperTest.cpp
-                InstrumentTreeMapperTest.cpp
+                FlatTreeMapperTest.cpp
                 IntToTypeMapperTest.cpp
-                NodeMapperTest.cpp
                 NullComponentMapperTest.cpp
                 ParabolicGuideMapperTest.cpp
                 PointPathComponentMapperTest.cpp

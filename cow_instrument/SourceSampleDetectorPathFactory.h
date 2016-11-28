@@ -27,7 +27,7 @@ Paths *SourceSampleDetectorPathFactory<InstTree>::createL2(
   paths.reserve(instrument.nDetectors());
 
   for (size_t i = 0; i < instrument.nDetectors(); ++i) {
-    paths.emplace_back(Path(1, sampleIndex));
+    paths.emplace_back(1, sampleIndex);
   }
   return new Paths(std::move(paths));
 }
