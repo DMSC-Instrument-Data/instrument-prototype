@@ -24,7 +24,6 @@ endif()
 include_directories(${GBENCH_INCLUDE_DIR})
 
 set ( BENCH_FILES_SRC
-                 BenchmarkPolicy.cpp
                  DetectorInfoConstructionBenchmark.cpp
                  DetectorInfoReadBenchmark.cpp
                  DetectorInfoWriteRotateBenchmark.cpp

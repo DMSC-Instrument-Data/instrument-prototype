@@ -53,7 +53,9 @@ BENCHMARK_F(DetectorInfoWriteRotateFixture,
   this->rotateOnComponent(2, true /*with read metric*/, state);
 }
 
-BENCHMARK_F(BenchmarkPolicy,
+class RotationBenchmark : public BenchmarkPolicy<RotationBenchmark> {};
+
+BENCHMARK_F(RotationBenchmark,
             BM_rotation_one_bank_math)(benchmark::State &state) {
   // Check the rotation math independenly of other implementation details.
 

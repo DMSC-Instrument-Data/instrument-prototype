@@ -4,12 +4,20 @@
 #include <benchmark/benchmark_api.h>
 
 /**
- * Base class to define standard behaviour for performance benchmarks
+ * CRTP For providing a global benchmark execution policy set.
  */
-class BenchmarkPolicy : public benchmark::Fixture {
+template <typename T> class BenchmarkPolicy : public benchmark::Fixture {
 public:
   BenchmarkPolicy();
-  virtual ~BenchmarkPolicy();
 };
+
+template <typename T>
+BenchmarkPolicy<T>::BenchmarkPolicy()
+    : benchmark::Fixture() {
+  // Every benchmark repeated 6 times.
+  Repetitions(6);
+  // Only report the mean and standard deviations
+  ReportAggregatesOnly(true);
+}
 
 #endif

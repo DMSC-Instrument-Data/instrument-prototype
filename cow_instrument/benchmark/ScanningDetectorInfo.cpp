@@ -85,7 +85,8 @@ DetectorInfo<FlatTree> createScanningDetectorInfo() {
   return info;
 }
 
-class DetectorInfoScanningFixture : public BenchmarkPolicy {
+class DetectorInfoScanningFixture
+    : public BenchmarkPolicy<DetectorInfoScanningFixture> {
 private:
   DetectorInfo<FlatTree> m_detectorInfo;
 

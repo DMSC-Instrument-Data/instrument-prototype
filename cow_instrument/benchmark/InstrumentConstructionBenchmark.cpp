@@ -4,7 +4,11 @@
 
 namespace {
 
-BENCHMARK_F(BenchmarkPolicy, BM_instrument_component_tree_construction)(
+class InstrumentConstructionBenchmark
+    : public BenchmarkPolicy<InstrumentConstructionBenchmark> {};
+
+BENCHMARK_F(InstrumentConstructionBenchmark,
+            BM_instrument_component_tree_construction)(
     benchmark::State &state) {
 
   while (state.KeepRunning()) {
@@ -13,7 +17,7 @@ BENCHMARK_F(BenchmarkPolicy, BM_instrument_component_tree_construction)(
   state.SetItemsProcessed(state.iterations() * 1);
 }
 
-BENCHMARK_F(BenchmarkPolicy,
+BENCHMARK_F(InstrumentConstructionBenchmark,
             BM_instrument_tree_copy_construction)(benchmark::State &state) {
   size_t nDetectors = 0;
   while (state.KeepRunning()) {

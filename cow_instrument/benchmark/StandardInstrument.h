@@ -14,7 +14,8 @@ std::shared_ptr<Component> construct_root_component();
 /*
  Create a standard instrument fixture.
  */
-class StandardInstrumentFixture : public BenchmarkPolicy {
+class StandardInstrumentFixture
+    : public BenchmarkPolicy<StandardInstrumentFixture> {
 
 public:
   FlatTree m_instrument;

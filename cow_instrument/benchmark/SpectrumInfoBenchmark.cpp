@@ -8,7 +8,7 @@
 
 namespace {
 
-class SpectrumInfoFixture : public BenchmarkPolicy {
+class SpectrumInfoFixture : public BenchmarkPolicy<SpectrumInfoFixture> {
 
 public:
   SpectrumInfo<FlatTree> m_spectrumInfo;
