@@ -25,8 +25,8 @@ public:
   void rotate(const Eigen::Affine3d &, const Eigen::Quaterniond &){};
   Component *clone() const { return new FakePathComponent{m_position}; }
   bool equals(const Component &other) const { return false; }
-  void registerContents(ComponentInfo &) const {}
-  void registerContents(ComponentInfo &, size_t) const {};
+  void registerContents(SOASource &) const {}
+  void registerContents(SOASource &, size_t) const {};
   ComponentIdType componentId() const { return ComponentIdType{1}; }
   std::string name() const { return ""; }
   bool accept(ComponentVisitor *) const { return false; }

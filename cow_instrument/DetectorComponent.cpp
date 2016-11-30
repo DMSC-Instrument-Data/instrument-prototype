@@ -26,11 +26,11 @@ bool DetectorComponent::equals(const Component &other) const {
   return false;
 }
 
-void DetectorComponent::registerContents(ComponentInfo &info) const {
+void DetectorComponent::registerContents(SOASource &info) const {
   info.registerDetector(this);
 }
 
-void DetectorComponent::registerContents(ComponentInfo &info,
+void DetectorComponent::registerContents(SOASource &info,
                                          size_t parentIndex) const {
   info.registerDetector(this, parentIndex);
 }

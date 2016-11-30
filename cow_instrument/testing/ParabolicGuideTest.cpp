@@ -106,7 +106,7 @@ TEST(parabolic_guide_test, test_register_only_path_components) {
 
   ParabolicGuide guide(ComponentIdType(1), 1.0, 1.0, Eigen::Vector3d{1.0, 1.0, 1.0});
 
-  ComponentInfo info;
+  SOASource info;
   // Perform registration
   guide.registerContents(info);
   EXPECT_EQ(info.detectorSize(), 0)
@@ -179,7 +179,7 @@ TEST(parabolic_guide_test, test_register_contents) {
   ParabolicGuide guide(ComponentIdType(1), 2, 1E-9, {0, 0, 0});
 
   // Registers
-  ComponentInfo info;
+  SOASource info;
 
   guide.registerContents(info);
 

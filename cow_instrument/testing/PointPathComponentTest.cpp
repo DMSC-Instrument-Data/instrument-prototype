@@ -53,7 +53,7 @@ TEST(point_path_component_test, test_register_contents) {
   ToyPointPathComponent component(Eigen::Vector3d{1, 0, 0}, ComponentIdType(1));
 
   // Registers
-  ComponentInfo info;
+  SOASource info;
 
   component.registerContents(info);
 

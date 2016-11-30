@@ -6,7 +6,7 @@
 #include "IdType.h"
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include "ComponentInfo.h"
+#include "SOASource.h"
 
 class Detector;
 class PathComponent;
@@ -16,9 +16,8 @@ public:
   virtual ~Component() {}
   virtual Component *clone() const = 0;
   virtual bool equals(const Component &other) const = 0;
-  virtual void registerContents(ComponentInfo &info) const = 0;
-  virtual void registerContents(ComponentInfo &info,
-                                size_t parentIndex) const = 0;
+  virtual void registerContents(SOASource &info) const = 0;
+  virtual void registerContents(SOASource &info, size_t parentIndex) const = 0;
   virtual ComponentIdType componentId() const = 0;
   virtual std::string name() const = 0;
   virtual bool accept(class ComponentVisitor *visitor) const = 0;

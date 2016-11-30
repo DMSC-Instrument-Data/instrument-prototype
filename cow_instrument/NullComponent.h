@@ -11,8 +11,8 @@ public:
   virtual ~NullComponent();
   NullComponent *clone() const override;
   bool equals(const Component &) const override;
-  void registerContents(ComponentInfo &) const override;
-  virtual void registerContents(ComponentInfo &, size_t) const override;
+  void registerContents(SOASource &) const override;
+  virtual void registerContents(SOASource &, size_t) const override;
 
   ComponentIdType componentId() const override;
   std::string name() const override;

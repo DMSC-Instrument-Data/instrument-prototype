@@ -1,4 +1,3 @@
-#include "ComponentInfo.h"
 #include <gtest/gtest.h>
 #include <memory>
 #include <set>
@@ -6,10 +5,11 @@
 #include "DetectorComponent.h"
 #include "PointSample.h"
 #include "PointSource.h"
+#include "SOASource.h"
 
 namespace {
 
-TEST(component_info_test, test_construction) { ComponentInfo componentInfo; }
+TEST(soa_source_test, test_construction) { SOASource componentInfo; }
 
 std::shared_ptr<CompositeComponent> makeTree() {
   /*
@@ -46,11 +46,11 @@ std::shared_ptr<CompositeComponent> makeTree() {
   return a;
 }
 
-TEST(component_info_test, test_component_proxies) {
+TEST(soa_source_test, test_component_proxies) {
 
   auto comp = makeTree();
 
-  ComponentInfo info;
+  SOASource info;
   comp->registerContents(info);
   auto it = info.begin();
 
@@ -82,9 +82,9 @@ TEST(component_info_test, test_component_proxies) {
   EXPECT_EQ(it->parent(), 0);
 }
 
-TEST(component_info_test, test_equals) {
-  ComponentInfo a;
-  ComponentInfo b;
+TEST(soa_source_test, test_equals) {
+  SOASource a;
+  SOASource b;
 
   EXPECT_EQ(a, b);
   EXPECT_FALSE(a != b);
@@ -98,9 +98,9 @@ TEST(component_info_test, test_equals) {
   EXPECT_FALSE(a != b);
 }
 
-TEST(component_info_test, test_equals_when_component_pointers_are_different) {
-  ComponentInfo a;
-  ComponentInfo b;
+TEST(soa_source_test, test_equals_when_component_pointers_are_different) {
+  SOASource a;
+  SOASource b;
   auto compA = makeTree();
   auto compB = compA->clone();
   compA->registerContents(a);
@@ -110,10 +110,10 @@ TEST(component_info_test, test_equals_when_component_pointers_are_different) {
   EXPECT_FALSE(a != b);
 }
 
-TEST(component_info_test, test_subtree_search) {
+TEST(soa_source_test, test_subtree_search) {
 
   auto comp = makeTree();
-  ComponentInfo info;
+  SOASource info;
   comp->registerContents(info);
 
   // Subtree of A
@@ -140,19 +140,19 @@ TEST(component_info_test, test_subtree_search) {
       << "Should just include itself. Subtree for D incorrect";
 }
 
-TEST(component_info_test, test_rotations) {
+TEST(soa_source_test, test_rotations) {
 
   auto comp = makeTree();
-  ComponentInfo info;
+  SOASource info;
   comp->registerContents(info);
   auto rotations = info.startRotations();
   EXPECT_EQ(rotations.size(), info.componentSize());
 }
 
-TEST(component_info_test, test_positions) {
+TEST(soa_source_test, test_positions) {
 
   auto comp = makeTree();
-  ComponentInfo info;
+  SOASource info;
   comp->registerContents(info);
   auto start = info.begin();
   auto last = --info.end();
@@ -162,9 +162,9 @@ TEST(component_info_test, test_positions) {
   EXPECT_EQ(positions.back(), comp->children()[1]->getPos());
 }
 
-TEST(component_info_test, test_start_entry_exit_points) {
+TEST(soa_source_test, test_start_entry_exit_points) {
   auto comp = makeTree();
-  ComponentInfo info;
+  SOASource info;
   comp->registerContents(info);
   auto pathIndexes = info.pathComponentIndexes();
   auto positions = info.startPositions();
@@ -184,10 +184,10 @@ TEST(component_info_test, test_start_entry_exit_points) {
   }
 }
 
-TEST(component_info_test, test_component_ids) {
+TEST(soa_source_test, test_component_ids) {
 
   auto comp = makeTree();
-  ComponentInfo info;
+  SOASource info;
   comp->registerContents(info);
   auto vecComponentIds = info.componentIds();
   auto componentIds =

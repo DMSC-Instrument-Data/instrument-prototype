@@ -71,11 +71,11 @@ bool ParabolicGuide::equals(const Component &other) const {
   return equals;
 }
 
-void ParabolicGuide::registerContents(ComponentInfo &info) const {
+void ParabolicGuide::registerContents(SOASource &info) const {
   info.registerPathComponent(this);
 }
 
-void ParabolicGuide::registerContents(ComponentInfo &info,
+void ParabolicGuide::registerContents(SOASource &info,
                                       size_t parentIndex) const {
   info.registerPathComponent(this, parentIndex);
 }

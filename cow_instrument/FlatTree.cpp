@@ -15,7 +15,7 @@ namespace {
  * @param detectorStore
  * @param pathStore
  */
-void findKeyComponents(const Component &component, ComponentInfo &info) {
+void findKeyComponents(const Component &component, SOASource &info) {
 
   // Walk through and register all detectors on the store.
   component.registerContents(info);

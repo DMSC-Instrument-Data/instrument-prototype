@@ -1,19 +1,19 @@
 
-#include "ComponentInfo.h"
 #include "CompositeComponent.h"
 #include "Detector.h"
 #include "PathComponent.h"
+#include "SOASource.h"
 #include <string>
 #include <algorithm>
 #include <iterator>
 
-void ComponentInfo::registerDetector(Detector const *const comp) {
+void SOASource::registerDetector(Detector const *const comp) {
 
   const size_t newIndex = coreUpdate(comp);
   m_detectorComponentIndexes.push_back(newIndex);
 }
 
-void ComponentInfo::registerPathComponent(PathComponent const *const comp) {
+void SOASource::registerPathComponent(PathComponent const *const comp) {
 
   const size_t nextComponentIndex = coreUpdate(comp);
   const size_t nextPathIndex = m_pathComponentIndexes.size();
@@ -27,19 +27,19 @@ void ComponentInfo::registerPathComponent(PathComponent const *const comp) {
   }
 }
 
-size_t ComponentInfo::registerComposite(CompositeComponent const *const comp) {
+size_t SOASource::registerComposite(CompositeComponent const *const comp) {
   return coreUpdate(comp);
 }
 
-void ComponentInfo::registerDetector(const Detector *const comp,
-                                     size_t parentIndex) {
+void SOASource::registerDetector(const Detector *const comp,
+                                 size_t parentIndex) {
   const size_t newIndex = coreUpdate(comp, parentIndex);
   m_detectorComponentIndexes.push_back(newIndex);
   m_detectorIds.push_back(comp->detectorId());
 }
 
-void ComponentInfo::registerPathComponent(const PathComponent *const comp,
-                                          size_t parentIndex) {
+void SOASource::registerPathComponent(const PathComponent *const comp,
+                                      size_t parentIndex) {
   const size_t nextComponentIndex = coreUpdate(comp, parentIndex);
   const size_t nextPathIndex = m_pathComponentIndexes.size();
   m_entryPoints.push_back(comp->entryPoint());
@@ -53,53 +53,51 @@ void ComponentInfo::registerPathComponent(const PathComponent *const comp,
   }
 }
 
-size_t ComponentInfo::registerComposite(const CompositeComponent *const comp,
-                                        size_t parentIndex) {
+size_t SOASource::registerComposite(const CompositeComponent *const comp,
+                                    size_t parentIndex) {
   return coreUpdate(comp, parentIndex);
 }
 
-std::vector<ComponentProxy> ComponentInfo::proxies() { return m_proxies; }
+std::vector<ComponentProxy> SOASource::proxies() { return m_proxies; }
 
-const ComponentProxy &ComponentInfo::rootProxy() const { return m_proxies[0]; }
+const ComponentProxy &SOASource::rootProxy() const { return m_proxies[0]; }
 
-size_t ComponentInfo::componentSize() const { return m_proxies.size(); }
+size_t SOASource::componentSize() const { return m_proxies.size(); }
 
-size_t ComponentInfo::detectorSize() const {
+size_t SOASource::detectorSize() const {
   return m_detectorComponentIndexes.size();
 }
 
-size_t ComponentInfo::pathSize() const { return m_pathComponentIndexes.size(); }
+size_t SOASource::pathSize() const { return m_pathComponentIndexes.size(); }
 
-std::vector<size_t> ComponentInfo::pathComponentIndexes() const {
+std::vector<size_t> SOASource::pathComponentIndexes() const {
   return m_pathComponentIndexes;
 }
 
-std::vector<size_t> ComponentInfo::detectorComponentIndexes() const {
+std::vector<size_t> SOASource::detectorComponentIndexes() const {
   return m_detectorComponentIndexes;
 }
 
-size_t ComponentInfo::detIndexToCompIndex(size_t detectorIndex) const {
+size_t SOASource::detIndexToCompIndex(size_t detectorIndex) const {
   return m_detectorComponentIndexes[detectorIndex];
 }
 
-size_t ComponentInfo::pathIndexToCompIndex(size_t pathIndex) const {
+size_t SOASource::pathIndexToCompIndex(size_t pathIndex) const {
   return m_pathComponentIndexes[pathIndex];
 }
 
-std::vector<Eigen::Vector3d> ComponentInfo::startEntryPoints() const {
+std::vector<Eigen::Vector3d> SOASource::startEntryPoints() const {
   return m_entryPoints;
 }
 
-std::vector<Eigen::Vector3d> ComponentInfo::startExitPoints() const {
+std::vector<Eigen::Vector3d> SOASource::startExitPoints() const {
   return m_exitPoints;
 }
 
-std::vector<double> ComponentInfo::pathLengths() const{
-    return m_pathLengths;
-}
+std::vector<double> SOASource::pathLengths() const { return m_pathLengths; }
 
-size_t ComponentInfo::coreUpdate(Component const *const comp,
-                                 size_t previousIndex) {
+size_t SOASource::coreUpdate(Component const *const comp,
+                             size_t previousIndex) {
   size_t newIndex = m_proxies.size();
   m_componentIds.emplace_back(comp->componentId());
   m_proxies.emplace_back(previousIndex, comp->componentId());
@@ -109,7 +107,7 @@ size_t ComponentInfo::coreUpdate(Component const *const comp,
   return newIndex; // Return the last index.
 }
 
-size_t ComponentInfo::coreUpdate(Component const *const comp) {
+size_t SOASource::coreUpdate(Component const *const comp) {
   const size_t newIndex = m_proxies.size();
   m_componentIds.emplace_back(comp->componentId());
   m_proxies.emplace_back(comp->componentId());
@@ -118,45 +116,45 @@ size_t ComponentInfo::coreUpdate(Component const *const comp) {
   return newIndex; // Return the last index.
 }
 
-std::vector<ComponentProxy>::const_iterator ComponentInfo::begin() const {
+std::vector<ComponentProxy>::const_iterator SOASource::begin() const {
   return m_proxies.begin();
 }
-std::vector<ComponentProxy>::const_iterator ComponentInfo::end() const {
+std::vector<ComponentProxy>::const_iterator SOASource::end() const {
   return m_proxies.end();
 }
-std::vector<ComponentProxy>::const_iterator ComponentInfo::cbegin() const {
+std::vector<ComponentProxy>::const_iterator SOASource::cbegin() const {
   return m_proxies.cbegin();
 }
-std::vector<ComponentProxy>::const_iterator ComponentInfo::cend() const {
+std::vector<ComponentProxy>::const_iterator SOASource::cend() const {
   return m_proxies.cend();
 }
 
-bool ComponentInfo::operator==(const ComponentInfo &other) const {
+bool SOASource::operator==(const SOASource &other) const {
   // We only need to compare the proxies.
   return m_proxies == other.m_proxies;
 }
 
-bool ComponentInfo::operator!=(const ComponentInfo &other) const {
+bool SOASource::operator!=(const SOASource &other) const {
   return !operator==(other);
 }
 
-std::vector<Eigen::Vector3d> ComponentInfo::startPositions() const {
+std::vector<Eigen::Vector3d> SOASource::startPositions() const {
   return m_positions;
 }
 
-std::vector<Eigen::Quaterniond> ComponentInfo::startRotations() const {
+std::vector<Eigen::Quaterniond> SOASource::startRotations() const {
   return m_rotations;
 }
 
-std::vector<ComponentIdType> ComponentInfo::componentIds() const {
+std::vector<ComponentIdType> SOASource::componentIds() const {
   return m_componentIds;
 }
 
-std::vector<DetectorIdType> ComponentInfo::detectorIds() const {
+std::vector<DetectorIdType> SOASource::detectorIds() const {
   return m_detectorIds;
 }
 
-std::vector<size_t> ComponentInfo::subTreeIndexes(size_t proxyIndex) const {
+std::vector<size_t> SOASource::subTreeIndexes(size_t proxyIndex) const {
   if (proxyIndex >= componentSize()) {
     throw std::invalid_argument("No subtree for proxy index: " +
                                 std::to_string(proxyIndex));
@@ -172,12 +170,12 @@ std::vector<size_t> ComponentInfo::subTreeIndexes(size_t proxyIndex) const {
   return subtree;
 }
 
-const ComponentProxy &ComponentInfo::proxyAt(size_t index) const {
+const ComponentProxy &SOASource::proxyAt(size_t index) const {
   return m_proxies[index];
 }
 
 void
-ComponentInfo::fillDetectorMap(std::map<DetectorIdType, size_t> &toFill) const {
+SOASource::fillDetectorMap(std::map<DetectorIdType, size_t> &toFill) const {
 
   const size_t nEntries = m_detectorIds.size();
   for (size_t i = 0; i < nEntries; ++i) {
@@ -185,14 +183,14 @@ ComponentInfo::fillDetectorMap(std::map<DetectorIdType, size_t> &toFill) const {
   }
 }
 
-void ComponentInfo::fillComponentMap(
-    std::map<ComponentIdType, size_t> &toFill) const {
+void
+SOASource::fillComponentMap(std::map<ComponentIdType, size_t> &toFill) const {
   const size_t nEntries = m_componentIds.size();
   for (size_t i = 0; i < nEntries; ++i) {
     toFill.insert(std::make_pair(m_componentIds[i], i));
   }
 }
 
-int64_t ComponentInfo::sourcePathIndex() const { return m_sourceIndex; }
+int64_t SOASource::sourcePathIndex() const { return m_sourceIndex; }
 
-int64_t ComponentInfo::samplePathIndex() const { return m_sampleIndex; }
+int64_t SOASource::samplePathIndex() const { return m_sampleIndex; }

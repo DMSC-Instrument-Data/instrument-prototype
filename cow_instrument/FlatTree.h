@@ -6,7 +6,7 @@
 #include <map>
 #include <Eigen/Core>
 #include "IdType.h"
-#include "ComponentInfo.h"
+#include "SOASource.h"
 
 class Detector;
 class PathComponent;
@@ -64,7 +64,7 @@ private:
   /// Path index
   size_t m_sampleIndex;
   /// vector of proxies and relevant pointers
-  ComponentInfo m_componentInfo;
+  SOASource m_componentInfo;
   /// Component root. Stashed. We only need this for serialization at present.
   std::shared_ptr<Component> m_componentRoot;
 };

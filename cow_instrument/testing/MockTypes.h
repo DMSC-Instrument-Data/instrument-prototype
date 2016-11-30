@@ -17,8 +17,8 @@ public:
   MOCK_CONST_METHOD0(getRotation, Eigen::Quaterniond());
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
-  MOCK_CONST_METHOD1(registerContents, void(ComponentInfo &));
-  MOCK_CONST_METHOD2(registerContents, void(ComponentInfo &, size_t));
+  MOCK_CONST_METHOD1(registerContents, void(SOASource &));
+  MOCK_CONST_METHOD2(registerContents, void(SOASource &, size_t));
 
   ~MockComponent() {}
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
@@ -37,10 +37,10 @@ public:
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
 
-  void registerContents(ComponentInfo &info) const {
+  void registerContents(SOASource &info) const {
     info.registerPathComponent(this);
   }
-  void registerContents(ComponentInfo &info, size_t parentIndex) const {
+  void registerContents(SOASource &info, size_t parentIndex) const {
     info.registerPathComponent(this, parentIndex);
   }
 
@@ -63,8 +63,8 @@ public:
   MOCK_CONST_METHOD0(getRotation, Eigen::Quaterniond());
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
-  MOCK_CONST_METHOD1(registerContents, void(ComponentInfo &));
-  MOCK_CONST_METHOD2(registerContents, void(ComponentInfo &, size_t));
+  MOCK_CONST_METHOD1(registerContents, void(SOASource &));
+  MOCK_CONST_METHOD2(registerContents, void(SOASource &, size_t));
   ~MockDetector() {}
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
   MOCK_CONST_METHOD0(name, std::string());

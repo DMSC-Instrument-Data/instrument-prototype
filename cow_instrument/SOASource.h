@@ -1,5 +1,5 @@
-#ifndef COMPONENTINFO_H
-#define COMPONENTINFO_H
+#ifndef SOASource_H
+#define SOASource_H
 
 #include <vector>
 #include <cstddef>
@@ -21,9 +21,9 @@ class CompositeComponent;
  * Methods for registering components (Flattened tree construction) and
  * navigating the subtrees have been provided.
  */
-class ComponentInfo {
+class SOASource {
 public:
-  ComponentInfo() = default;
+  SOASource() = default;
   void registerDetector(Detector const *const comp);
   void registerPathComponent(PathComponent const *const comp);
   size_t registerComposite(CompositeComponent const *const comp);
@@ -52,8 +52,8 @@ public:
   std::vector<ComponentProxy>::const_iterator cbegin() const;
   std::vector<ComponentProxy>::const_iterator cend() const;
 
-  bool operator==(const ComponentInfo &other) const;
-  bool operator!=(const ComponentInfo &other) const;
+  bool operator==(const SOASource &other) const;
+  bool operator!=(const SOASource &other) const;
 
   std::vector<Eigen::Vector3d> startPositions() const;
   std::vector<Eigen::Quaterniond> startRotations() const;
@@ -90,7 +90,7 @@ private:
    */
   std::vector<Eigen::Vector3d> m_entryPoints; // For path components
   std::vector<Eigen::Vector3d> m_exitPoints;  // For path components
-  std::vector<double> m_pathLengths; // For path components
+  std::vector<double> m_pathLengths;          // For path components
   std::vector<size_t> m_pathComponentIndexes;
   std::vector<size_t> m_detectorComponentIndexes;
   std::vector<DetectorIdType> m_detectorIds;
