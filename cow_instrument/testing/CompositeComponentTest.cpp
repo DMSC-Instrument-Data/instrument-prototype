@@ -58,6 +58,9 @@ TEST(composite_component_test, test_register_contents) {
 
   using namespace testing;
   MockComponent *child = new MockComponent;
+  EXPECT_CALL(*child, getPos())
+      .Times(1)
+      .WillOnce(Return(Eigen::Vector3d{0, 0, 0}));
 
   CompositeComponent composite{ComponentIdType(1)};
   composite.addComponent(std::unique_ptr<Component>(std::move(child)));
