@@ -32,6 +32,7 @@ set ( SOURCE_FILES
 set ( INCLUDE_FILES
                    Bool.h
                    Component.h
+                   ComponentInfo.h
                    ComponentProxy.h
                    ComponentVisitor.h
                    CompositeComponent.h

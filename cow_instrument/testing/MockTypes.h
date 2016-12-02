@@ -4,6 +4,7 @@
 #include "Component.h"
 #include "Detector.h"
 #include "DetectorInfo.h"
+#include "ComponentInfo.h"
 #include "FlatTree.h"
 #include "PathComponent.h"
 #include "PathFactory.h"
@@ -183,5 +184,9 @@ public:
 using NiceMockInstrumentTree = testing::NiceMock<MockFlatTree>;
 using DetectorInfoWithMockInstrument = DetectorInfo<MockFlatTree>;
 using DetectorInfoWithNiceMockInstrument = DetectorInfo<NiceMockInstrumentTree>;
+
+using ComponentInfoWithMockInstrument = ComponentInfo<MockFlatTree>;
+using ComponentInfoWithNiceMockInstrument =
+    ComponentInfo<NiceMockInstrumentTree>;
 
 #endif
