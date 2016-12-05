@@ -43,26 +43,16 @@ public:
 
   double l2(size_t detectorIndex) const;
 
-  Eigen::Vector3d position(size_t componentIndex) const;
-
   Eigen::Vector3d positionDetector(size_t detectorIndex) const;
-
-  Eigen::Quaterniond rotation(size_t componentIndex) const;
 
   Eigen::Quaterniond rotationDetector(size_t detectorIndex) const;
 
   double l1(size_t detectorIndex) const;
 
-  size_t size() const;
-
-  size_t componentSize() const;
+  size_t detectorSize() const;
 
   const InstTree &const_instrumentTree() const;
 
-  void move(size_t componentIndex, const Eigen::Vector3d &offset);
-
-  void rotate(size_t componentIndex, const Eigen::Vector3d &axis,
-              const double &theta, const Eigen::Vector3d &center);
 
   void moveDetector(size_t detectorIndex, const Eigen::Vector3d &offset);
 
@@ -72,6 +62,8 @@ public:
   std::vector<Spectrum> makeSpectra() const;
 
   CowPtr<L2s> l2s() const;
+
+  const ComponentInfo<InstTree> &componentInfo() const;
 
 private:
   void init();
@@ -174,8 +166,8 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL1() {
     double l1 = (*m_pathLengths)[path[i]];
     for (i = 1; i < path.size(); ++i) {
 
-      l1 += distance2((*m_startEntryPoints)[path[i]],
-                      (*m_startExitPoints)[path[i - 1]]);
+      l1 += distance((*m_startEntryPoints)[path[i]],
+                     (*m_startExitPoints)[path[i - 1]]);
       l1 += (*m_pathLengths)[path[i]];
     }
 
@@ -200,11 +192,11 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL2() {
 
     // For each detector-l2-path calculate the total neutronic length
     for (i = 1; i < path.size(); ++i) {
-      l2 += distance2((*m_startEntryPoints)[path[i]],
-                      (*m_startExitPoints)[path[i - 1]]);
+      l2 += distance((*m_startEntryPoints)[path[i]],
+                     (*m_startExitPoints)[path[i - 1]]);
       l2 += (*m_pathLengths)[path[i]];
     }
-    l2 += distance2((*m_startExitPoints)[path[i - 1]], detectorPos);
+    l2 += distance((*m_startExitPoints)[path[i - 1]], detectorPos);
 
     (*m_l2)[detectorIndex] = l2;
   }
@@ -235,27 +227,20 @@ double DetectorInfo<InstTree>::l2(size_t detectorIndex) const {
 }
 
 template <typename InstTree>
-Eigen::Vector3d DetectorInfo<InstTree>::position(size_t componentIndex) const {
-  return m_componentInfo.position(componentIndex);
-}
-
-template <typename InstTree>
 Eigen::Vector3d
 DetectorInfo<InstTree>::positionDetector(size_t detectorIndex) const {
 
-  return m_componentInfo.positionDetector(detectorIndex);
-}
-
-template <typename InstTree>
-Eigen::Quaterniond
-DetectorInfo<InstTree>::rotation(size_t componentIndex) const {
-  return m_componentInfo.rotation(componentIndex);
+  return m_componentInfo.position(
+      m_componentInfo.const_instrumentTree().detIndexToCompIndex(
+          detectorIndex));
 }
 
 template <typename InstTree>
 Eigen::Quaterniond
 DetectorInfo<InstTree>::rotationDetector(size_t detectorIndex) const {
-  return m_componentInfo.rotationDetector(detectorIndex);
+  return m_componentInfo.rotation(
+      m_componentInfo.const_instrumentTree().detIndexToCompIndex(
+          detectorIndex));
 }
 
 template <typename InstTree>
@@ -264,42 +249,14 @@ double DetectorInfo<InstTree>::l1(size_t detectorIndex) const {
   return m_l1.const_ref()[detectorIndex];
 }
 
-template <typename InstTree> size_t DetectorInfo<InstTree>::size() const {
-  return m_componentInfo.size();
-}
-
 template <typename InstTree>
-size_t DetectorInfo<InstTree>::componentSize() const {
-  return m_componentInfo.const_instrumentTree().componentSize();
+size_t DetectorInfo<InstTree>::detectorSize() const {
+  return m_nDetectors;
 }
 
 template <typename InstTree>
 const InstTree &DetectorInfo<InstTree>::const_instrumentTree() const {
   return m_componentInfo.const_instrumentTree();
-}
-
-template <typename InstTree>
-void DetectorInfo<InstTree>::move(size_t componentIndex,
-                                  const Eigen::Vector3d &offset) {
-
-  m_componentInfo.move(componentIndex, offset);
-
-  // All other geometry-derived information is now also invalid. Very
-  // important!
-  init();
-}
-
-template <typename InstTree>
-void DetectorInfo<InstTree>::rotate(size_t componentIndex,
-                                    const Eigen::Vector3d &axis,
-                                    const double &theta,
-                                    const Eigen::Vector3d &center) {
-
-  m_componentInfo.rotate(componentIndex, axis, theta, center);
-
-  // All other geometry-derived information is now also invalid. Very
-  // important!
-  init();
 }
 
 template <typename InstTree>
@@ -331,8 +288,8 @@ void DetectorInfo<InstTree>::rotateDetector(size_t detectorIndex,
 template <typename InstTree>
 std::vector<Spectrum> DetectorInfo<InstTree>::makeSpectra() const {
   std::vector<Spectrum> spectra;
-  spectra.reserve(this->size());
-  for (size_t i = 0; i < this->size(); ++i) {
+  spectra.reserve(this->detectorSize());
+  for (size_t i = 0; i < this->detectorSize(); ++i) {
     spectra.push_back(i);
   }
   return spectra;
@@ -340,6 +297,11 @@ std::vector<Spectrum> DetectorInfo<InstTree>::makeSpectra() const {
 
 template <typename InstTree> CowPtr<L2s> DetectorInfo<InstTree>::l2s() const {
   return m_l2;
+}
+
+template <typename InstTree>
+const ComponentInfo<InstTree> &DetectorInfo<InstTree>::componentInfo() const {
+  return m_componentInfo;
 }
 
 #endif

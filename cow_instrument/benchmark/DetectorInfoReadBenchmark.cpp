@@ -8,10 +8,10 @@ using DetectorInfoReadFixture = StandardInstrumentFixture;
 BENCHMARK_F(DetectorInfoReadFixture,
             BM_detectorinfo_component_read_single_position)(
     benchmark::State &state) {
-  const size_t max = m_detectorInfo.componentSize();
+  const size_t max = m_detectorInfo.detectorSize();
   while (state.KeepRunning()) {
     for (size_t i = 1; i < max; ++i) {
-      benchmark::DoNotOptimize(m_detectorInfo.position(i));
+      benchmark::DoNotOptimize(m_detectorInfo.positionDetector(i));
     }
   }
   state.SetItemsProcessed(state.iterations() * max);
@@ -20,10 +20,10 @@ BENCHMARK_F(DetectorInfoReadFixture,
 BENCHMARK_F(DetectorInfoReadFixture,
             BM_detectorinfo_component_read_single_rotation)(
     benchmark::State &state) {
-  const size_t max = m_detectorInfo.componentSize();
+  const size_t max = m_detectorInfo.detectorSize();
   while (state.KeepRunning()) {
     for (size_t i = 1; i < max; ++i) {
-      benchmark::DoNotOptimize(m_detectorInfo.rotation(i));
+      benchmark::DoNotOptimize(m_detectorInfo.rotationDetector(i));
     }
   }
   state.SetItemsProcessed(state.iterations() * max);
@@ -32,7 +32,7 @@ BENCHMARK_F(DetectorInfoReadFixture,
 BENCHMARK_F(DetectorInfoReadFixture,
             BM_detectorinfo_detector_read_single_position)(
     benchmark::State &state) {
-  const size_t max = m_detectorInfo.size(); // ndetectors
+  const size_t max = m_detectorInfo.detectorSize(); // ndetectors
   while (state.KeepRunning()) {
     for (size_t i = 1; i < max; ++i) {
       benchmark::DoNotOptimize(m_detectorInfo.positionDetector(i));
@@ -44,7 +44,7 @@ BENCHMARK_F(DetectorInfoReadFixture,
 BENCHMARK_F(DetectorInfoReadFixture,
             BM_detectorinfo_detector_read_single_rotation)(
     benchmark::State &state) {
-  const size_t max = m_detectorInfo.size(); // ndetectors
+  const size_t max = m_detectorInfo.detectorSize(); // ndetectors
   while (state.KeepRunning()) {
     for (size_t i = 1; i < max; ++i) {
       benchmark::DoNotOptimize(m_detectorInfo.rotationDetector(i));

@@ -28,8 +28,8 @@ set ( BENCH_FILES_SRC
                  DetectorInfoConstructionBenchmark.cpp
                  DetectorInfoReadBenchmark.cpp
                  InstrumentSerializationBenchmark.cpp
-                 DetectorInfoWriteTranslateBenchmark.cpp
-                 DetectorInfoWriteRotateBenchmark.cpp
+                 ComponentInfoWriteTranslateBenchmark.cpp
+                 ComponentInfoWriteRotateBenchmark.cpp
                  SpectrumInfoBenchmark.cpp
                  StandardInstrument.cpp
 )

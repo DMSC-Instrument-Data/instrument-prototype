@@ -3,7 +3,7 @@
 
 namespace {
 
-class DetectorInfoWriteRotateFixture : public StandardInstrumentFixture {
+class ComponentInfoWriteRotateFixture : public StandardInstrumentFixture {
 
 public:
   void rotateOnComponent(size_t componentIndex, bool read,
@@ -12,18 +12,19 @@ public:
     Eigen::Vector3d axis{0, 0, 1};
     auto angle = M_PI / 2;
     Eigen::Vector3d center{0, 0, 0};
+    const auto &componentInfo = m_detectorInfo.componentInfo();
 
     while (state.KeepRunning()) {
       // Then modify that node
-      m_detectorInfo.rotate(componentIndex, axis, angle, center);
+      m_componentInfo.rotate(componentIndex, axis, angle, center);
 
       // If we want to compare reads too.
       if (read) {
         Eigen::Vector3d pos;
         size_t nComponents =
-            m_detectorInfo.const_instrumentTree().componentSize();
+            m_componentInfo.const_instrumentTree().componentSize();
         for (size_t i = 0; i < nComponents; ++i) {
-          benchmark::DoNotOptimize(pos += m_detectorInfo.position(i));
+          benchmark::DoNotOptimize(pos += m_componentInfo.position(i));
         }
       }
     }
@@ -32,22 +33,22 @@ public:
   }
 };
 
-BENCHMARK_F(DetectorInfoWriteRotateFixture,
+BENCHMARK_F(ComponentInfoWriteRotateFixture,
             BM_rotate_root)(benchmark::State &state) {
   this->rotateOnComponent(0, false /*no read metric*/, state);
 }
 
-BENCHMARK_F(DetectorInfoWriteRotateFixture,
+BENCHMARK_F(ComponentInfoWriteRotateFixture,
             BM_rotate_one_trolley)(benchmark::State &state) {
   this->rotateOnComponent(1, false /*no read metric*/, state);
 }
 
-BENCHMARK_F(DetectorInfoWriteRotateFixture,
+BENCHMARK_F(ComponentInfoWriteRotateFixture,
             BM_rotate_one_bank)(benchmark::State &state) {
   this->rotateOnComponent(2, false /*no read metric*/, state);
 }
 
-BENCHMARK_F(DetectorInfoWriteRotateFixture,
+BENCHMARK_F(ComponentInfoWriteRotateFixture,
             BM_rotate_one_bank_with_pos_read)(benchmark::State &state) {
   this->rotateOnComponent(2, true /*with read metric*/, state);
 }
