@@ -24,9 +24,9 @@ void findKeyComponents(const Component &component, SOASource &info) {
 
 void FlatTree::init() {
 
-  findKeyComponents(*m_componentRoot, m_componentInfo);
-  auto sourceIndex = m_componentInfo.sourcePathIndex();
-  auto sampleIndex = m_componentInfo.samplePathIndex();
+  findKeyComponents(*m_componentRoot, m_source);
+  auto sourceIndex = m_source.sourcePathIndex();
+  auto sampleIndex = m_source.samplePathIndex();
   if (sourceIndex < 0) {
     throw std::invalid_argument("Instrument has no marked source");
   }
@@ -43,16 +43,16 @@ FlatTree::FlatTree(std::shared_ptr<Component> componentRoot)
 }
 
 const ComponentProxy &FlatTree::rootProxy() const {
-  return m_componentInfo.rootProxy();
+  return m_source.rootProxy();
 }
 
 void FlatTree::fillDetectorMap(std::map<DetectorIdType, size_t> &toFill) const {
-  m_componentInfo.fillDetectorMap(toFill);
+  m_source.fillDetectorMap(toFill);
 }
 
 void
 FlatTree::fillComponentMap(std::map<ComponentIdType, size_t> &toFill) const {
-  m_componentInfo.fillComponentMap(toFill);
+  m_source.fillComponentMap(toFill);
 }
 
 size_t FlatTree::sampleComponentIndex() const {
@@ -68,64 +68,64 @@ size_t FlatTree::samplePathIndex() const { return m_sampleIndex; }
 size_t FlatTree::sourcePathIndex() const { return m_sourceIndex; }
 
 size_t FlatTree::componentSize() const {
-  return m_componentInfo.componentSize();
+  return m_source.componentSize();
 }
 
 std::vector<size_t> FlatTree::subTreeIndexes(size_t proxyIndex) const {
-  return m_componentInfo.subTreeIndexes(proxyIndex);
+  return m_source.subTreeIndexes(proxyIndex);
 }
 
 std::vector<Eigen::Vector3d> FlatTree::startPositions() const {
   // forwarding
-  return m_componentInfo.startPositions();
+  return m_source.startPositions();
 }
 
 std::vector<Eigen::Quaterniond> FlatTree::startRotations() const {
   // forwarding
-  return m_componentInfo.startRotations();
+  return m_source.startRotations();
 }
 
 std::vector<Eigen::Vector3d> FlatTree::startExitPoints() const {
-  return m_componentInfo.startExitPoints();
+  return m_source.startExitPoints();
 }
 
 std::vector<Eigen::Vector3d> FlatTree::startEntryPoints() const {
-  return m_componentInfo.startEntryPoints();
+  return m_source.startEntryPoints();
 }
 
 std::vector<double> FlatTree::pathLengths() const {
-  return m_componentInfo.pathLengths();
+  return m_source.pathLengths();
 }
 
 size_t FlatTree::detIndexToCompIndex(size_t detectorIndex) const {
-  return m_componentInfo.detIndexToCompIndex(detectorIndex);
+  return m_source.detIndexToCompIndex(detectorIndex);
 }
 
 size_t FlatTree::pathIndexToCompIndex(size_t pathIndex) const {
-  return m_componentInfo.pathIndexToCompIndex(pathIndex);
+  return m_source.pathIndexToCompIndex(pathIndex);
 }
 
 std::shared_ptr<Component> FlatTree::rootComponent() const {
   return m_componentRoot;
 }
 
-size_t FlatTree::nDetectors() const { return m_componentInfo.detectorSize(); }
+size_t FlatTree::nDetectors() const { return m_source.detectorSize(); }
 
-size_t FlatTree::nPathComponents() const { return m_componentInfo.pathSize(); }
+size_t FlatTree::nPathComponents() const { return m_source.pathSize(); }
 
 const ComponentProxy &FlatTree::proxyAt(size_t index) const {
-  return m_componentInfo.proxyAt(index);
+  return m_source.proxyAt(index);
 }
 
 std::vector<ComponentProxy>::const_iterator FlatTree::begin() const {
-  return m_componentInfo.begin();
+  return m_source.begin();
 }
 std::vector<ComponentProxy>::const_iterator FlatTree::end() const {
-  return m_componentInfo.end();
+  return m_source.end();
 }
 std::vector<ComponentProxy>::const_iterator FlatTree::cbegin() const {
-  return m_componentInfo.cbegin();
+  return m_source.cbegin();
 }
 std::vector<ComponentProxy>::const_iterator FlatTree::cend() const {
-  return m_componentInfo.cend();
+  return m_source.cend();
 }

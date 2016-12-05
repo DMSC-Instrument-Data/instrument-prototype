@@ -64,7 +64,7 @@ private:
   /// Path index
   size_t m_sampleIndex;
   /// vector of proxies and relevant pointers
-  SOASource m_componentInfo;
+  SOASource m_source;
   /// Component root. Stashed. We only need this for serialization at present.
   std::shared_ptr<Component> m_componentRoot;
 };
