@@ -17,8 +17,8 @@ TEST(detector_info_test, test_construct) {
   MockFlatTree *pMockInstrumentTree = new testing::NiceMock<MockFlatTree>{};
   EXPECT_CALL(*pMockInstrumentTree, nDetectors())
       .WillRepeatedly(testing::Return(1));
-  EXPECT_CALL(*pMockInstrumentTree, detIndexToCompIndex(_))
-      .WillRepeatedly(Return(0));
+  EXPECT_CALL(*pMockInstrumentTree, detectorComponentIndexes())
+      .WillRepeatedly(testing::Return(std::vector<size_t>(1, 0)));
 
   std::shared_ptr<MockFlatTree> mockInstrumentTree{pMockInstrumentTree};
 
@@ -46,9 +46,8 @@ TEST(detector_info_test, test_construct_with_bad_l2_paths_throws) {
   MockFlatTree *pMockInstrumentTree = new testing::NiceMock<MockFlatTree>{};
   EXPECT_CALL(*pMockInstrumentTree, nDetectors())
       .WillRepeatedly(testing::Return(nDetectors));
-  EXPECT_CALL(*pMockInstrumentTree, detIndexToCompIndex(_))
-      .Times(1)
-      .WillOnce(Return(0));
+  EXPECT_CALL(*pMockInstrumentTree, detectorComponentIndexes())
+      .WillRepeatedly(testing::Return(std::vector<size_t>(1, 0)));
 
   std::shared_ptr<MockFlatTree> mockInstrumentTree{pMockInstrumentTree};
 
@@ -248,6 +247,8 @@ TEST(detector_info_test, test_copy) {
   // Set it up so that it has a 2-detector meta-data size.
   EXPECT_CALL(*pMockInstrumentTree, nDetectors())
       .WillRepeatedly(testing::Return(2));
+  EXPECT_CALL(*pMockInstrumentTree, detectorComponentIndexes())
+      .WillRepeatedly(testing::Return(std::vector<size_t>{1, 2}));
 
   DetectorInfoWithMockInstrument original{
       std::shared_ptr<MockFlatTree>(pMockInstrumentTree),

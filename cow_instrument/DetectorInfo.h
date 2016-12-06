@@ -86,7 +86,8 @@ private:
   CowPtr<std::vector<Eigen::Vector3d>> m_startExitPoints;
   /// All path lengths
   std::shared_ptr<const std::vector<double>> m_pathLengths; // Shouldn't change
-
+  /// Component indexes per detector index
+  std::shared_ptr<const std::vector<size_t>> m_detectorComponentIndexes;
   /// Component info
   ComponentInfo<InstTree> m_componentInfo;
 };
@@ -126,6 +127,8 @@ DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
           instrumentTree->startExitPoints())),
       m_pathLengths(std::make_shared<const std::vector<double>>(
           instrumentTree->pathLengths())),
+      m_detectorComponentIndexes(std::make_shared<const std::vector<size_t>>(
+          instrumentTree->detectorComponentIndexes())),
       m_componentInfo(std::forward<InstSptrType>(instrumentTree)) {
 
   init();
@@ -230,17 +233,13 @@ template <typename InstTree>
 Eigen::Vector3d
 DetectorInfo<InstTree>::positionDetector(size_t detectorIndex) const {
 
-  return m_componentInfo.position(
-      m_componentInfo.const_instrumentTree().detIndexToCompIndex(
-          detectorIndex));
+  return m_componentInfo.position((*m_detectorComponentIndexes)[detectorIndex]);
 }
 
 template <typename InstTree>
 Eigen::Quaterniond
 DetectorInfo<InstTree>::rotationDetector(size_t detectorIndex) const {
-  return m_componentInfo.rotation(
-      m_componentInfo.const_instrumentTree().detIndexToCompIndex(
-          detectorIndex));
+  return m_componentInfo.rotation((*m_detectorComponentIndexes)[detectorIndex]);
 }
 
 template <typename InstTree>
@@ -263,9 +262,7 @@ template <typename InstTree>
 void DetectorInfo<InstTree>::moveDetector(size_t detectorIndex,
                                           const Eigen::Vector3d &offset) {
 
-  moveComponent(
-      m_componentInfo.const_instrumentTree().detIndexToCompIndex(detectorIndex),
-      offset);
+  moveComponent((*m_detectorComponentIndexes)[detectorIndex]);
 
   // Only l2 needs to be recalculated.
   initL2();
@@ -277,9 +274,7 @@ void DetectorInfo<InstTree>::rotateDetector(size_t detectorIndex,
                                             const double &theta,
                                             const Eigen::Vector3d &center) {
 
-  rotateComponent(
-      m_componentInfo.const_instrumentTree().detIndexToCompIndex(detectorIndex),
-      axis, theta, center);
+  rotateComponent((*m_detectorComponentIndexes)[detectorIndex]);
 
   // Only l2 needs to be recalculated.
   initL2();

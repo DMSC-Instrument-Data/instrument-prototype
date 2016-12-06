@@ -88,6 +88,7 @@ public:
   virtual std::vector<Eigen::Vector3d> startEntryPoints() const = 0;
   virtual std::vector<Eigen::Vector3d> startExitPoints() const = 0;
   virtual std::vector<double> pathLengths() const = 0;
+  virtual std::vector<size_t> detectorComponentIndexes() const = 0;
   virtual ~PolymorphicFlatTree() {}
 };
 
@@ -98,6 +99,8 @@ public:
     ON_CALL(m_mockPathComponent, getPos())
         .WillByDefault(testing::Return(Eigen::Vector3d{0, 0, 0}));
     ON_CALL(*this, nDetectors()).WillByDefault(testing::Return(0));
+    ON_CALL(*this, detectorComponentIndexes())
+        .WillByDefault(testing::Return(std::vector<size_t>(0, 0)));
     ON_CALL(*this, samplePathIndex()).WillByDefault(testing::Return(size_t(0)));
     ON_CALL(*this, sourcePathIndex()).WillByDefault(testing::Return(size_t(0)));
     ON_CALL(*this, getDetector(testing::_))
@@ -126,6 +129,8 @@ public:
   MockFlatTree(size_t nDetectors) {
     ON_CALL(m_detector, getPos()).WillByDefault(testing::Return(Eigen::Vector3d{0, 0, 10}));
     ON_CALL(*this, nDetectors()).WillByDefault(testing::Return(nDetectors));
+    ON_CALL(*this, detectorComponentIndexes())
+        .WillByDefault(testing::Return(std::vector<size_t>(nDetectors, 0)));
     ON_CALL(*this, samplePathIndex()).WillByDefault(testing::Return(size_t(0)));
     ON_CALL(*this, sourcePathIndex()).WillByDefault(testing::Return(size_t(0)));
     ON_CALL(*this, getDetector(testing::_))
@@ -165,6 +170,7 @@ public:
   MOCK_CONST_METHOD0(startEntryPoints, std::vector<Eigen::Vector3d>());
   MOCK_CONST_METHOD0(startExitPoints, std::vector<Eigen::Vector3d>());
   MOCK_CONST_METHOD0(pathLengths, std::vector<double>());
+  MOCK_CONST_METHOD0(detectorComponentIndexes, std::vector<size_t>());
 
   virtual ~MockFlatTree() {}
 

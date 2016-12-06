@@ -97,6 +97,10 @@ std::vector<double> FlatTree::pathLengths() const {
   return m_source.pathLengths();
 }
 
+std::vector<size_t> FlatTree::detectorComponentIndexes() const {
+  return m_source.detectorComponentIndexes();
+}
+
 size_t FlatTree::detIndexToCompIndex(size_t detectorIndex) const {
   return m_source.detIndexToCompIndex(detectorIndex);
 }

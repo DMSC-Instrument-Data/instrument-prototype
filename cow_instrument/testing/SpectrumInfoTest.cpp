@@ -72,7 +72,8 @@ TEST(spectrum_info_test, test_l2) {
 
   EXPECT_CALL(*instrument.get(), startPositions())
       .WillOnce(Return(std::vector<Eigen::Vector3d>{{0, 0, 40}}));
-  EXPECT_CALL(*instrument.get(), detIndexToCompIndex(_)).WillOnce(Return(0));
+  EXPECT_CALL(*instrument.get(), detectorComponentIndexes())
+      .WillRepeatedly(testing::Return(std::vector<size_t>(1, 0)));
 
   // Create a DetectorInfo around the Instrument
   DetectorInfoWithMockInstrument detectorInfo{
@@ -105,9 +106,8 @@ TEST(spectrum_info_test, test_l2_mapped) {
 
   EXPECT_CALL(*instrument.get(), startPositions())
       .WillOnce(Return(std::vector<Eigen::Vector3d>{{0, 0, 40}, {0, 0, 30}}));
-  EXPECT_CALL(*instrument.get(), detIndexToCompIndex(_))
-      .WillOnce(Return(0))
-      .WillOnce(Return(1));
+  EXPECT_CALL(*instrument.get(), detectorComponentIndexes())
+      .WillRepeatedly(testing::Return(std::vector<size_t>{0, 1}));
 
   // Create a DetectorInfo around the Instrument
   DetectorInfoWithMockInstrument detectorInfo{

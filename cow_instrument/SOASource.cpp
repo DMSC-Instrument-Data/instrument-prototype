@@ -194,3 +194,4 @@ SOASource::fillComponentMap(std::map<ComponentIdType, size_t> &toFill) const {
 int64_t SOASource::sourcePathIndex() const { return m_sourceIndex; }
 
 int64_t SOASource::samplePathIndex() const { return m_sampleIndex; }
+
