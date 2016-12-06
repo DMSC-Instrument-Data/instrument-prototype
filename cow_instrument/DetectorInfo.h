@@ -260,7 +260,7 @@ template <typename InstTree>
 void DetectorInfo<InstTree>::moveDetector(size_t detectorIndex,
                                           const Eigen::Vector3d &offset) {
 
-  moveComponent((*m_detectorComponentIndexes)[detectorIndex]);
+  m_componentInfo.move((*m_detectorComponentIndexes)[detectorIndex], offset);
 
   // Only l2 needs to be recalculated.
   initL2();
@@ -272,7 +272,7 @@ void DetectorInfo<InstTree>::rotateDetector(size_t detectorIndex,
                                             const double &theta,
                                             const Eigen::Vector3d &center) {
 
-  rotateComponent((*m_detectorComponentIndexes)[detectorIndex]);
+  m_componentInfo.rotate((*m_detectorComponentIndexes)[detectorIndex], axis, theta, center);
 
   // Only l2 needs to be recalculated.
   initL2();
