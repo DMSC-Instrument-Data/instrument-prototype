@@ -1,9 +1,7 @@
 #ifndef INT_TO_TYPE
 #define INT_TO_TYPE
 
-//#include <memory>
-#include <boost/serialization/serialization.hpp>
-
+#include <utility>
 /**
  This allows us to simply create unique types holding a T. I simply enforces
  that concrete types made from IntToType are incompatible.
@@ -15,8 +13,9 @@ template <int I, typename T> class IntToType {
 public:
   using StorageType = T;
   explicit IntToType(const T &val) : value(val) {}
-  explicit IntToType(T &&val) : value(val) {}
+  explicit IntToType(T &&val) : value(std::move(val)) {}
   IntToType(const IntToType<I, T> &other) : value(other.value) {}
+  IntToType(IntToType<I, T> &&other) : value(std::move(other.value)) {}
   IntToType<I, T> &operator=(const IntToType<I, T> &other) {
     value = other.value;
     return *this;

@@ -39,35 +39,8 @@ Eigen::Vector3d CompositeComponent::getPos() const {
   return pos;
 }
 
-void CompositeComponent::shiftPositionBy(const Eigen::Vector3d &delta) {
-  for (size_t i = 0; i < m_children.size(); ++i) {
-    m_children[i]->shiftPositionBy(delta);
-  }
-}
-
 std::vector<std::shared_ptr<Component>> CompositeComponent::children() const {
   return m_children;
-}
-
-void CompositeComponent::rotate(const Eigen::Vector3d &axis,
-                                const double &theta,
-                                const Eigen::Vector3d &center) {
-  using namespace Eigen;
-  Affine3d transform =
-      Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
-  Quaterniond rotationPart(transform.rotation());
-  for (size_t i = 0; i < m_children.size(); ++i) {
-
-    m_children[i]->rotate(transform, rotationPart);
-  }
-}
-
-void CompositeComponent::rotate(const Eigen::Affine3d &transform,
-                                const Eigen::Quaterniond &rotationPart) {
-  for (size_t i = 0; i < m_children.size(); ++i) {
-
-    m_children[i]->rotate(transform, rotationPart);
-  }
 }
 
 CompositeComponent *CompositeComponent::clone() const {
@@ -93,10 +66,6 @@ bool CompositeComponent::equals(const Component &other) const {
 }
 
 void CompositeComponent::addComponent(std::unique_ptr<Component> &&child) {
-  if (dynamic_cast<const CompositeComponent *>(child.get())) {
-    throw std::invalid_argument(
-        "Cannot add a composite component to a composite component");
-  }
   m_children.emplace_back(std::move(child));
 }
 
@@ -109,11 +78,22 @@ const Component &CompositeComponent::getChild(size_t index) const {
   }
 }
 
-void CompositeComponent::registerContents(
-    std::vector<const Detector *> &lookupDetectors,
-    std::vector<const PathComponent *> &lookupPathComponents) const {
+void CompositeComponent::registerContents(SOASource &info) const {
+
+  size_t parentIndex = info.registerComposite(this);
+
   for (auto &child : m_children) {
-    child->registerContents(lookupDetectors, lookupPathComponents);
+    child->registerContents(info, parentIndex);
+  }
+}
+
+void CompositeComponent::registerContents(SOASource &info,
+                                          size_t parentIndex) const {
+
+  size_t newParentIndex = info.registerComposite(this, parentIndex);
+
+  for (auto &child : m_children) {
+    child->registerContents(info, newParentIndex);
   }
 }
 
@@ -128,5 +108,9 @@ bool CompositeComponent::accept(ComponentVisitor *visitor) const {
 }
 
 Eigen::Quaterniond CompositeComponent::getRotation() const {
-  throw std::runtime_error("Not implemented");
+
+  /*
+   I'm not sure that this operation makes sense on a composite?
+   */
+  return Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()};
 }

@@ -106,15 +106,12 @@ TEST(parabolic_guide_test, test_register_only_path_components) {
 
   ParabolicGuide guide(ComponentIdType(1), 1.0, 1.0, Eigen::Vector3d{1.0, 1.0, 1.0});
 
-  std::vector<const Detector *> detectorVec;
-  std::vector<const PathComponent *> pathComponentVec;
-  size_t detectorVecStartSize = detectorVec.size();
-  size_t pathComponentVecSize = pathComponentVec.size();
+  SOASource info;
   // Perform registration
-  guide.registerContents(detectorVec, pathComponentVec);
-  EXPECT_EQ(detectorVec.size(), detectorVecStartSize)
+  guide.registerContents(info);
+  EXPECT_EQ(info.detectorSize(), 0)
       << "Do not register ParabolicGuide as a Detector";
-  EXPECT_EQ(pathComponentVec.size(), pathComponentVecSize + 1)
+  EXPECT_EQ(info.pathSize(), 1)
       << "ParabolicGuide should be registered as a PathComponent";
 }
 
@@ -177,53 +174,23 @@ TEST(parabolic_guide_test, test_not_equals) {
   }
 }
 
-TEST(parabolic_guide_test, test_rotate) {
-  const ComponentIdType id(1);
-  const double a = 1.0;
-  const double h = 1.0;
-  const Eigen::Vector3d position{1.0, 0.0, 0.0};
-  const Eigen::Vector3d axis{0.0, 0.0, 1.0};
-  const Eigen::Vector3d center{0.0, 0.0, 0.0};
-  const double theta = M_PI / 2;
+TEST(parabolic_guide_test, test_register_contents) {
 
-  ParabolicGuide guide(id, a, h, position);
-  // Rotate it 90 degrees around z.
-  guide.rotate(axis, theta, center);
+  ParabolicGuide guide(ComponentIdType(1), 2, 1E-9, {0, 0, 0});
 
-  EXPECT_TRUE(guide.getPos().isApprox(Eigen::Vector3d{0, 1, 0}, 1e-14));
+  // Registers
+  SOASource info;
 
-  Eigen::Vector3d rotatedVector =
-      guide.getRotation().toRotationMatrix() * Eigen::Vector3d{1, 0, 0};
-  EXPECT_TRUE(rotatedVector.isApprox(Eigen::Vector3d{0, 1, 0}, 1e-14))
-      << "Internal guide rotation not updated correctly";
-}
+  guide.registerContents(info);
 
-TEST(parabolic_guide_test, test_rotate_fast) {
-  const ComponentIdType id(1);
-  const double a = 1.0;
-  const double h = 1.0;
-  const Eigen::Vector3d position{1.0, 0.0, 0.0};
+  EXPECT_EQ(info.detectorSize(), 0);
+  EXPECT_EQ(info.pathSize(), 1);
+  EXPECT_EQ(info.pathComponentIndexes().size(), 1);
+  EXPECT_EQ(info.detectorComponentIndexes().size(), 0);
+  EXPECT_EQ(info.proxies().size(), 1) << "Proxies should grow";
 
-  Eigen::Affine3d transform;
-  Eigen::Quaterniond rotationPart;
-  {
-    using namespace Eigen;
-    const Vector3d axis{0.0, 0.0, 1.0};
-    const Vector3d center{0.0, 0.0, 0.0};
-    const double theta = M_PI / 2;
-    // Rotate it 90 degrees around z.
-    transform = Translation3d(center) * AngleAxisd(theta, axis) *
-                Translation3d(-center);
-    rotationPart = transform.rotation();
-  }
-
-  ParabolicGuide guide(id, a, h, position);
-  // Rotate it 90 degrees around z.
-  guide.rotate(transform, rotationPart);
-
-  EXPECT_TRUE(guide.getPos().isApprox(Eigen::Vector3d{0, 1, 0}, 1e-14));
-  Eigen::Vector3d rotatedVector =
-      guide.getRotation().toRotationMatrix() * Eigen::Vector3d{1, 0, 0};
-  EXPECT_TRUE(rotatedVector.isApprox(Eigen::Vector3d{0, 1, 0}, 1e-14))
-      << "Internal guide rotation not updated correctly";
+  EXPECT_FALSE(info.proxies()[0].hasParent());
+  EXPECT_FALSE(info.proxies()[0].hasChildren());
+  EXPECT_EQ(info.pathComponentIndexes()[0], 0)
+      << "Should be pointing to the zeroth index of proxies";
 }

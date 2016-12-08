@@ -4,13 +4,16 @@
 #include "MockTypes.h"
 #include "SourceSampleDetectorPathFactory.h"
 
+namespace {
+
 TEST(spectrum_info_test, test_constructor_lhr) {
   std::vector<Spectrum> spectra{{0}, {1}, {2}};
   size_t nDetectors = 3;
-  auto instrument = std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors);
+  auto instrument =
+      std::make_shared<testing::NiceMock<MockFlatTree>>(nDetectors);
   DetectorInfoWithMockInstrument detectorInfo{
-      instrument, SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
-  SpectrumInfo<MockInstrumentTree> spectrumInfo(spectra, detectorInfo);
+      instrument, SourceSampleDetectorPathFactory<MockFlatTree>{}};
+  SpectrumInfo<MockFlatTree> spectrumInfo(spectra, detectorInfo);
 
   EXPECT_EQ(3, spectrumInfo.size());
   EXPECT_EQ(3, spectrumInfo.nDetectors());
@@ -19,10 +22,10 @@ TEST(spectrum_info_test, test_constructor_lhr) {
 TEST(spectrum_info_test, test_constructor_one_to_one) {
   size_t nDetectors = 3;
   auto instrument =
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors);
+      std::make_shared<testing::NiceMock<MockFlatTree>>(nDetectors);
   DetectorInfoWithMockInstrument detectorInfo{
-      instrument, SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
-  SpectrumInfo<MockInstrumentTree> spectrumInfo(detectorInfo);
+      instrument, SourceSampleDetectorPathFactory<MockFlatTree>{}};
+  SpectrumInfo<MockFlatTree> spectrumInfo(detectorInfo);
 
   EXPECT_EQ(3, spectrumInfo.size());
   EXPECT_EQ(3, spectrumInfo.nDetectors());
@@ -35,9 +38,9 @@ TEST(spectrum_info_test, test_spectra_fetch) {
   std::vector<Spectrum> spectra{{0}, {1, 2}, {3, 4, 5}};
   size_t nDetectors = 6;
   DetectorInfoWithMockInstrument tree{
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors),
-      SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
-  SpectrumInfo<MockInstrumentTree> spectrumInfo(spectra, tree);
+      std::make_shared<testing::NiceMock<MockFlatTree>>(nDetectors),
+      SourceSampleDetectorPathFactory<MockFlatTree>{}};
+  SpectrumInfo<MockFlatTree> spectrumInfo(spectra, tree);
 
   EXPECT_EQ(3, spectrumInfo.size());
   EXPECT_EQ(6, spectrumInfo.nDetectors());
@@ -65,18 +68,21 @@ TEST(spectrum_info_test, test_l2) {
 
   // Create an Instrument around the Detector
   auto instrument =
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors);
-  EXPECT_CALL(*instrument.get(), getDetector(_))
-      .WillRepeatedly(ReturnRef(detector));
+      std::make_shared<testing::NiceMock<MockFlatTree>>(nDetectors);
+
+  EXPECT_CALL(*instrument.get(), startPositions())
+      .WillOnce(Return(std::vector<Eigen::Vector3d>{{0, 0, 40}}));
+  EXPECT_CALL(*instrument.get(), detectorComponentIndexes())
+      .WillRepeatedly(testing::Return(std::vector<size_t>(1, 0)));
 
   // Create a DetectorInfo around the Instrument
   DetectorInfoWithMockInstrument detectorInfo{
-      instrument, SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
+      instrument, SourceSampleDetectorPathFactory<MockFlatTree>{}};
 
   // Create a SpectrumInfo around the DetectorInfo
   // Single detector in single spectra
   std::vector<Spectrum> spectra{{0}};
-  SpectrumInfo<MockInstrumentTree> spectrumInfo(spectra, detectorInfo);
+  SpectrumInfo<MockFlatTree> spectrumInfo(spectra, detectorInfo);
 
   // This is the point of the test. Do we calculate L2 correctly for our single
   // spectra.
@@ -94,58 +100,33 @@ TEST(spectrum_info_test, test_l2_mapped) {
 
   // Create two detectors
   size_t nDetectors = 2;
-  MockDetector detectorA, detectorB;
-  // This is where I place one of the the detectors
-  EXPECT_CALL(detectorA, getPos())
-      .WillRepeatedly(testing::Return(Eigen::Vector3d{0, 0, 40}));
-  // This is where I place the other of the the detectors
-  EXPECT_CALL(detectorB, getPos())
-      .WillRepeatedly(testing::Return(Eigen::Vector3d{0, 0, 30}));
 
   auto instrument =
-      std::make_shared<testing::NiceMock<MockInstrumentTree>>(nDetectors);
-  EXPECT_CALL(*instrument.get(), getDetector(_))
-      .WillOnce(ReturnRef(detectorA))
-      .WillOnce(ReturnRef(detectorB));
+      std::make_shared<testing::NiceMock<MockFlatTree>>(nDetectors);
+
+  EXPECT_CALL(*instrument.get(), startPositions())
+      .WillOnce(Return(std::vector<Eigen::Vector3d>{{0, 0, 40}, {0, 0, 30}}));
+  EXPECT_CALL(*instrument.get(), detectorComponentIndexes())
+      .WillRepeatedly(testing::Return(std::vector<size_t>{0, 1}));
 
   // Create a DetectorInfo around the Instrument
   DetectorInfoWithMockInstrument detectorInfo{
-      instrument, SourceSampleDetectorPathFactory<MockInstrumentTree>{}};
+      instrument, SourceSampleDetectorPathFactory<MockFlatTree>{}};
 
   // Create a SpectrumInfo around the DetectorInfo
   // Two detectors in single spectra
   std::vector<Spectrum> spectra{{0, 1}};
-  SpectrumInfo<MockInstrumentTree> spectrumInfo(spectra, detectorInfo);
+  SpectrumInfo<MockFlatTree> spectrumInfo(spectra, detectorInfo);
 
   // This is the point of the test. Do we calculate L2 correctly for our dual
   // detector
   // spectra.
   EXPECT_EQ(35.0, spectrumInfo.l2(0)) << "(40 + 30)/2 - 0";
-  EXPECT_TRUE(Mock::VerifyAndClearExpectations(&detectorA))
-      << "Mock Detector used incorrectly";
-  EXPECT_TRUE(Mock::VerifyAndClearExpectations(&detectorB))
-      << "Mock Detector used incorrectly";
+  EXPECT_TRUE(Mock::VerifyAndClearExpectations(instrument.get()))
+      << "Mock Instrument used incorrectly";
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(&detectorInfo))
       << "Mock DetectorInfo used incorrectly";
 }
 
-TEST(spectrum_info_test, test_modify) {
-
-  using namespace testing;
-  auto *pMockInstrumentTree = new NiceMockInstrumentTree{};
-
-  // We expect that the modify method of the existing instrument tree gets
-  // called
-  EXPECT_CALL(*pMockInstrumentTree, modifyProxy(testing::_, testing::_))
-      .Times(1);
-
-  SpectrumInfo<MockInstrumentTree> spectrumInfo(DetectorInfoWithMockInstrument{
-      std::shared_ptr<MockInstrumentTree>{pMockInstrumentTree},
-      SourceSampleDetectorPathFactory<MockInstrumentTree>{}});
-
-  MockCommand command;
-  spectrumInfo.modify(0, command);
-
-  // test modify called on instrument.
-  EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree));
 }
+

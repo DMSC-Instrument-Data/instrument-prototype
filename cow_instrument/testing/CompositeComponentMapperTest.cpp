@@ -3,6 +3,7 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <sstream>
 #include "CompositeComponentMapper.h"
+#include "DetectorComponent.h"
 
 TEST(composite_component_mapper_test,
      test_mapper_create_throws_without_composite) {

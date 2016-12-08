@@ -16,15 +16,10 @@ public:
   PointPathComponent(Eigen::Vector3d pos, ComponentIdType id);
   virtual Eigen::Vector3d getPos() const override;
   virtual Eigen::Quaterniond getRotation() const override;
-  virtual void shiftPositionBy(const Eigen::Vector3d &pos) override;
-  virtual void rotate(const Eigen::Vector3d &axis, const double &theta,
-                      const Eigen::Vector3d &center) override;
-  virtual void rotate(const Eigen::Affine3d &transform,
-                      const Eigen::Quaterniond &rotationPart) override;
   virtual bool equals(const Component &other) const override;
-  virtual void registerContents(
-      std::vector<const Detector *> &detectorLookup,
-      std::vector<const PathComponent *> &pathLookup) const override;
+  virtual void registerContents(SOASource &info) const override;
+  virtual void registerContents(SOASource &info,
+                                size_t parentIndex) const override;
   virtual ComponentIdType componentId() const override;
   virtual std::string name() const override;
 
@@ -41,6 +36,7 @@ private:
   Eigen::Vector3d m_pos;
   Eigen::Quaterniond m_rotation;
   ComponentIdType m_componentId;
+  size_t m_pathIndex;
 };
 
 template <typename T>
@@ -54,28 +50,6 @@ template <typename T> Eigen::Vector3d PointPathComponent<T>::getPos() const {
 template <typename T>
 Eigen::Quaterniond PointPathComponent<T>::getRotation() const {
   return m_rotation;
-}
-
-template <typename T>
-void PointPathComponent<T>::shiftPositionBy(const Eigen::Vector3d &pos) {
-  m_pos += pos;
-}
-
-template <typename T>
-void PointPathComponent<T>::rotate(const Eigen::Vector3d& axis, const double& theta, const Eigen::Vector3d& center) {
-    using namespace Eigen;
-    Affine3d A = Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
-    m_pos = A * m_pos;
-    // Update the absolute rotation of this detector around own center.
-    m_rotation = A.rotation() * m_rotation;
-}
-
-template <typename T>
-void PointPathComponent<T>::rotate(const Eigen::Affine3d &transform,
-                                   const Eigen::Quaterniond &rotationPart) {
-  m_pos = transform * m_pos;
-  // Update the absolute rotation of this detector around own center.
-  m_rotation = rotationPart * m_rotation;
 }
 
 template <typename T>
@@ -110,11 +84,14 @@ operator!=(const PointPathComponent<T> &other) const {
 }
 
 template <typename T>
-void PointPathComponent<T>::registerContents(
-    std::vector<const Detector *> &,
-    std::vector<const PathComponent *> &pathLookup) const {
-  // This is not a detector
-  pathLookup.push_back(this);
+void PointPathComponent<T>::registerContents(SOASource &info) const {
+  info.registerPathComponent(this);
+}
+
+template <typename T>
+void PointPathComponent<T>::registerContents(SOASource &info,
+                                             size_t parentIndex) const {
+  info.registerPathComponent(this, parentIndex);
 }
 
 template <typename T>

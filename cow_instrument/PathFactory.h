@@ -3,7 +3,7 @@
 
 #include "Path.h"
 
-class InstrumentTree;
+class FlatTree;
 
 /**
  * FactoryMethod. Makes all flight paths for an InstrumentTree.

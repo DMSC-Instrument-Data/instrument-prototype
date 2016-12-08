@@ -1,13 +1,15 @@
 #ifndef STANDARD_INSTRUMENT_H
 #define STANDARD_INSTRUMENT_H
 
-#include "InstrumentTree.h"
+#include "FlatTree.h"
+#include "ComponentInfo.h"
+#include "DetectorInfo.h"
 #include <vector>
 #include <benchmark/benchmark_api.h>
 
 class Node;
 namespace std_instrument {
-std::vector<Node> construct_root_node();
+std::shared_ptr<Component> construct_root_component();
 }
 
 /*
@@ -16,7 +18,9 @@ std::vector<Node> construct_root_node();
 class StandardInstrumentFixture : public benchmark::Fixture {
 
 public:
-  InstrumentTree m_instrument;
+  FlatTree m_instrument;
+  ComponentInfo<FlatTree> m_componentInfo;
+  DetectorInfo<FlatTree> m_detectorInfo;
 
   StandardInstrumentFixture();
 };

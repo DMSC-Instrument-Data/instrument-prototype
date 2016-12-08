@@ -1,15 +1,16 @@
 #include <gtest/gtest.h>
-#include "InstrumentTree.h"
+#include "FlatTree.h"
+#include "CompositeComponent.h"
 #include "MockTypes.h"
 #include "SourceSampleDetectorPathFactory.h"
-#include "InstrumentTree.h"
-#include "Node.h"
+#include "FlatTree.h"
 #include "DetectorComponent.h"
 #include "PointSample.h"
 #include "PointSource.h"
 #include <Eigen/Core>
+#include <memory>
 
-InstrumentTree
+FlatTree
 make_very_basic_tree(ComponentIdType idForSource = ComponentIdType(0),
                      ComponentIdType idForSample = ComponentIdType(1),
                      ComponentIdType idForDetector1 = ComponentIdType(2),
@@ -17,7 +18,7 @@ make_very_basic_tree(ComponentIdType idForSource = ComponentIdType(0),
 
   /*
 
-        Root Node A
+        Root
         |
  ---------------------------------------------------------
  |                   |               |                   |
@@ -25,32 +26,25 @@ make_very_basic_tree(ComponentIdType idForSource = ComponentIdType(0),
 
   */
 
-  std::vector<Node> nodes;
-  nodes.push_back(Node{});
-  nodes.push_back(
-      Node(0, CowPtr<Component>(new DetectorComponent(
-                  idForDetector1, DetectorIdType(1), Eigen::Vector3d{1, 1, 1}))));
+  auto root = std::make_shared<CompositeComponent>(ComponentIdType(0));
+  root->addComponent(std::unique_ptr<DetectorComponent>(new DetectorComponent(
+      idForDetector1, DetectorIdType(1), Eigen::Vector3d{1, 1, 1})));
 
-  nodes.push_back(
-      Node(0, CowPtr<Component>(new DetectorComponent(
-                  idForDetector2, DetectorIdType(1), Eigen::Vector3d{1, 1, 1}))));
+  root->addComponent(std::unique_ptr<DetectorComponent>(new DetectorComponent(
+      idForDetector2, DetectorIdType(1), Eigen::Vector3d{1, 1, 1})));
 
-  nodes.push_back(
-      Node(0, CowPtr<Component>(new PointSource(Eigen::Vector3d{0, 0, 0}, idForSource))));
-  nodes.push_back(
-      Node(0, CowPtr<Component>(new PointSample(Eigen::Vector3d{0, 0, 10}, idForSample))));
+  root->addComponent(std::unique_ptr<PointSource>(
+      new PointSource(Eigen::Vector3d{0, 0, 0}, idForSource)));
+  root->addComponent(std::unique_ptr<PointSample>(
+      new PointSample(Eigen::Vector3d{0, 0, 10}, idForSample)));
 
-  nodes[0].addChild(1);
-  nodes[0].addChild(2);
-  nodes[0].addChild(3);
-  nodes[0].addChild(4);
-  return InstrumentTree(std::move(nodes));
+  return FlatTree(root);
 }
 
 TEST(source_sample_detector_path_factory_test, test_l1_paths) {
 
   auto instrument = make_very_basic_tree();
-  SourceSampleDetectorPathFactory<InstrumentTree> pathFactory{};
+  SourceSampleDetectorPathFactory<FlatTree> pathFactory{};
   auto *paths = pathFactory.createL1(instrument);
   EXPECT_EQ(paths->size(), instrument.nDetectors())
       << "Wrong number of L1 paths";
@@ -62,7 +56,7 @@ TEST(source_sample_detector_path_factory_test, test_l1_paths) {
 TEST(source_sample_detector_path_factory_test, test_l2_paths) {
 
   auto instrument = make_very_basic_tree();
-  SourceSampleDetectorPathFactory<InstrumentTree> pathFactory{};
+  SourceSampleDetectorPathFactory<FlatTree> pathFactory{};
   auto *paths = pathFactory.createL2(instrument);
   EXPECT_EQ(paths->size(), instrument.nDetectors())
       << "Wrong number of L2 paths";
