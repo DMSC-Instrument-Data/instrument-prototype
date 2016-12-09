@@ -38,10 +38,10 @@ set ( TEST_FILES
                  FixedLengthVectorTest.cpp                 
                  IndexTranslatorTest.cpp
                  FlatTreeTest.cpp
+                 LinkedTreeParserTest.cpp
                  ParabolicGuideTest.cpp
                  PathComponentTest.cpp
                  PointPathComponentTest.cpp
-                 SOASourceTest.cpp
                  SourceSampleDetectorPathFactoryTest.cpp                 
                  SpectrumInfoTest.cpp
                  SpectrumTest.cpp

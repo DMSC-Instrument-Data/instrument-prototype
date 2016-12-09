@@ -1,17 +1,51 @@
-#include "FlatTree.h"
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "MockTypes.h"
-#include "DetectorComponent.h"
 #include "CompositeComponent.h"
+#include "DetectorComponent.h"
+#include "LinkedTreeParser.h"
 #include "ParabolicGuide.h"
-#include "NullComponent.h"
 #include "PointSource.h"
 #include "PointSample.h"
 
 using namespace testing;
 
 namespace {
+
+std::shared_ptr<CompositeComponent> make_tree() {
+  /*
+
+    we start like this. A-B-C-D are components
+
+        A
+        |
+ ------------------
+ |                |
+ B                D
+ |
+ C
+
+
+
+  */
+
+  // Create B
+  auto b = std::unique_ptr<CompositeComponent>(
+      new CompositeComponent(ComponentIdType(2)));
+  // Add C to B
+  b->addComponent(std::unique_ptr<PointSample>(
+      new PointSample(Eigen::Vector3d{0, 0, 0}, ComponentIdType(3))));
+
+  // Add B to A
+  auto a = std::make_shared<CompositeComponent>(ComponentIdType(1));
+  a->addComponent(std::move(b));
+
+  // Add D to A
+  a->addComponent(std::unique_ptr<PointSource>(
+      new PointSource(Eigen::Vector3d{-1, 0, 0}, ComponentIdType(4))));
+
+  return a;
+}
 
 FlatTree make_simple_tree(DetectorIdType detector1Id,
                           DetectorIdType detector2Id) {
@@ -269,6 +303,40 @@ TEST(instrument_tree_test, test_subtree_search) {
   // Subtree of E
   indexes = instrument.subTreeIndexes(4);
   EXPECT_EQ(indexes, (std::vector<size_t>{4})) << "Subtree for E incorrect";
+}
+
+TEST(instrument_tree_test, test_positions) {
+
+  auto comp = make_tree();
+  FlatTree tree(comp);
+  auto positions = tree.startPositions();
+  EXPECT_EQ(positions.size(), tree.componentSize());
+  EXPECT_EQ(positions.front(), comp->getPos());
+  EXPECT_EQ(positions.back(), comp->children()[1]->getPos());
+}
+
+TEST(instrument_tree_test, test_equals) {
+  auto comp = make_tree();
+  FlatTree a(comp);
+  FlatTree b(comp);
+
+  EXPECT_EQ(a, b);
+  EXPECT_FALSE(a != b);
+
+  EXPECT_EQ(a, b);
+  EXPECT_FALSE(a != b);
+}
+
+TEST(instrument_tree_test, test_equals_when_component_pointers_are_different) {
+
+  std::shared_ptr<Component> compA = make_tree();
+  std::shared_ptr<Component> compB(compA->clone());
+
+  FlatTree a(compA);
+  FlatTree b(compB);
+
+  EXPECT_EQ(a, b);
+  EXPECT_FALSE(a != b);
 }
 
 TEST(instrument_tree_test, test_subtree_unreachable_throws) {

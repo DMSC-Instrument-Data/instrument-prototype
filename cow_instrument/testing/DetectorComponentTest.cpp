@@ -77,7 +77,7 @@ TEST(detector_component_test, test_register_contents) {
                              Eigen::Vector3d{1, 0, 0} /*Detector position*/);
 
   // Registers
-  SOASource info;
+  LinkedTreeParser info;
 
   detector.registerContents(info);
 

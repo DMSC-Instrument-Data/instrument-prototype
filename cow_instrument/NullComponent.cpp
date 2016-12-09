@@ -11,11 +11,11 @@ bool NullComponent::equals(const Component& other) const{
     return dynamic_cast<const NullComponent*>(&other) != nullptr;
 }
 
-void NullComponent::registerContents(SOASource &) const {
+void NullComponent::registerContents(LinkedTreeParser &) const {
   // Do nothing.
 }
 
-void NullComponent::registerContents(SOASource &, size_t) const {
+void NullComponent::registerContents(LinkedTreeParser &, size_t) const {
   // Do nothing.
 }
 

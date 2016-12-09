@@ -15,8 +15,8 @@ public:
   virtual Eigen::Quaterniond getRotation() const override;
   virtual ParabolicGuide *clone() const override;
   virtual bool equals(const Component &other) const override;
-  virtual void registerContents(SOASource &info) const;
-  virtual void registerContents(SOASource &info,
+  virtual void registerContents(LinkedTreeParser &info) const;
+  virtual void registerContents(LinkedTreeParser &info,
                                 size_t parentIndex) const override;
   ComponentIdType componentId() const;
   std::string name() const;

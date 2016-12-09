@@ -22,10 +22,10 @@ set ( SOURCE_FILES
                    ComponentProxy.cpp
                    DetectorComponent.cpp
                    FlatTree.cpp
+                   LinkedTreeParser.cpp
                    NullComponent.cpp
                    ParabolicGuide.cpp
                    PathComponent.cpp
-                   SOASource.cpp
 )
 
 
@@ -47,6 +47,7 @@ set ( INCLUDE_FILES
                    IntToType.h
                    L1s.h
                    L2s.h
+                   LinkedTreeParser.h
                    MaskFlags.h
                    MonitorFlags.h
                    NullComponent.h
@@ -57,7 +58,6 @@ set ( INCLUDE_FILES
                    PointPathComponent.h
                    PointSample.h
                    PointSource.h
-                   SOASource.h
                    SourceSampleDetectorPathFactory.h
                    SpectrumInfo.h
                    Spectrum.h

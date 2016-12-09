@@ -1,5 +1,5 @@
-#ifndef SOASource_H
-#define SOASource_H
+#ifndef LinkedTreeParser_H
+#define LinkedTreeParser_H
 
 #include <vector>
 #include <cstddef>
@@ -14,16 +14,12 @@ class PathComponent;
 class CompositeComponent;
 
 /**
- * Collection of ComponentProxies. Which are the flattened tree representation
- * of the InstrumentTree. Other key information also stored here in the
- *flatterned floor.
- *
- * Methods for registering components (Flattened tree construction) and
- * navigating the subtrees have been provided.
+ * Converts a component tree doubly linked-list representation of an instrument
+ * into a series of arrays and a flattened component-proxy representation.
  */
-class SOASource {
+class LinkedTreeParser {
 public:
-  SOASource() = default;
+  LinkedTreeParser() = default;
   void registerDetector(Detector const *const comp);
   void registerPathComponent(PathComponent const *const comp);
   size_t registerComposite(CompositeComponent const *const comp);
@@ -34,33 +30,18 @@ public:
                            size_t parentIndex);
 
   std::vector<ComponentProxy> proxies();
-  const ComponentProxy &proxyAt(size_t index) const;
-  const ComponentProxy &rootProxy() const;
   size_t componentSize() const;
   size_t detectorSize() const;
   size_t pathSize() const;
-  std::vector<size_t> subTreeIndexes(size_t proxyIndex) const;
   std::vector<size_t> pathComponentIndexes() const;
   std::vector<size_t> detectorComponentIndexes() const;
-  size_t detIndexToCompIndex(size_t detectorIndex) const;
-  size_t pathIndexToCompIndex(size_t pathIndex) const;
   std::vector<Eigen::Vector3d> startEntryPoints() const;
   std::vector<Eigen::Vector3d> startExitPoints() const;
   std::vector<double> pathLengths() const;
-  std::vector<ComponentProxy>::const_iterator begin() const;
-  std::vector<ComponentProxy>::const_iterator end() const;
-  std::vector<ComponentProxy>::const_iterator cbegin() const;
-  std::vector<ComponentProxy>::const_iterator cend() const;
-
-  bool operator==(const SOASource &other) const;
-  bool operator!=(const SOASource &other) const;
-
   std::vector<Eigen::Vector3d> startPositions() const;
   std::vector<Eigen::Quaterniond> startRotations() const;
   std::vector<ComponentIdType> componentIds() const;
   std::vector<DetectorIdType> detectorIds() const;
-  void fillDetectorMap(std::map<DetectorIdType, size_t> &toFill) const;
-  void fillComponentMap(std::map<ComponentIdType, size_t> &toFill) const;
   int64_t sourcePathIndex() const;
   int64_t samplePathIndex() const;
 

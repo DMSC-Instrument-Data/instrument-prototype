@@ -21,8 +21,8 @@ public:
   bool equals(const Component &other) const override;
   DetectorIdType detectorId() const override;
   ComponentIdType componentId() const override;
-  virtual void registerContents(SOASource &info) const override;
-  virtual void registerContents(SOASource &info,
+  virtual void registerContents(LinkedTreeParser &info) const override;
+  virtual void registerContents(LinkedTreeParser &info,
                                 size_t parentIndex) const override;
   std::string name() const override;
   virtual bool accept(ComponentVisitor *visitor) const override;

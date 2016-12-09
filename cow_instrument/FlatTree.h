@@ -5,9 +5,11 @@
 #include <vector>
 #include <map>
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 #include "IdType.h"
-#include "SOASource.h"
 
+class Component;
+class ComponentProxy;
 class Detector;
 class PathComponent;
 class PointSource;
@@ -57,6 +59,9 @@ public:
   // Needed for serialization.
   std::shared_ptr<Component> rootComponent() const;
 
+  bool operator==(const FlatTree &other) const;
+  bool operator!=(const FlatTree &other) const;
+
 private:
   void init();
 
@@ -64,9 +69,28 @@ private:
   size_t m_sourceIndex;
   /// Path index
   size_t m_sampleIndex;
-  /// vector of proxies and relevant pointers
-  SOASource m_source;
-  /// Component root. Stashed. We only need this for serialization at present.
+
+  /*
+   These collections have the same size as the number of components. They are
+   component
+   type independent
+   */
+  std::vector<ComponentProxy> m_proxies;
+  std::vector<Eigen::Vector3d> m_positions;
+  std::vector<Eigen::Quaterniond> m_rotations;
+  std::vector<ComponentIdType> m_componentIds;
+
+  /*
+    These collections are conditionally updated depending upon component type.
+    The vector
+    of indexes allows us to go from say detector_index -> component_index.
+   */
+  std::vector<Eigen::Vector3d> m_entryPoints; // For path components
+  std::vector<Eigen::Vector3d> m_exitPoints;  // For path components
+  std::vector<double> m_pathLengths;          // For path components
+  std::vector<size_t> m_pathComponentIndexes;
+  std::vector<size_t> m_detectorComponentIndexes;
+  std::vector<DetectorIdType> m_detectorIds;
   std::shared_ptr<Component> m_componentRoot;
 };
 

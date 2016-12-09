@@ -78,7 +78,7 @@ const Component &CompositeComponent::getChild(size_t index) const {
   }
 }
 
-void CompositeComponent::registerContents(SOASource &info) const {
+void CompositeComponent::registerContents(LinkedTreeParser &info) const {
 
   size_t parentIndex = info.registerComposite(this);
 
@@ -87,7 +87,7 @@ void CompositeComponent::registerContents(SOASource &info) const {
   }
 }
 
-void CompositeComponent::registerContents(SOASource &info,
+void CompositeComponent::registerContents(LinkedTreeParser &info,
                                           size_t parentIndex) const {
 
   size_t newParentIndex = info.registerComposite(this, parentIndex);

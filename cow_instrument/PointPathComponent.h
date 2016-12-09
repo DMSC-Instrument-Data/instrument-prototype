@@ -17,8 +17,8 @@ public:
   virtual Eigen::Vector3d getPos() const override;
   virtual Eigen::Quaterniond getRotation() const override;
   virtual bool equals(const Component &other) const override;
-  virtual void registerContents(SOASource &info) const override;
-  virtual void registerContents(SOASource &info,
+  virtual void registerContents(LinkedTreeParser &info) const override;
+  virtual void registerContents(LinkedTreeParser &info,
                                 size_t parentIndex) const override;
   virtual ComponentIdType componentId() const override;
   virtual std::string name() const override;
@@ -84,12 +84,12 @@ operator!=(const PointPathComponent<T> &other) const {
 }
 
 template <typename T>
-void PointPathComponent<T>::registerContents(SOASource &info) const {
+void PointPathComponent<T>::registerContents(LinkedTreeParser &info) const {
   info.registerPathComponent(this);
 }
 
 template <typename T>
-void PointPathComponent<T>::registerContents(SOASource &info,
+void PointPathComponent<T>::registerContents(LinkedTreeParser &info,
                                              size_t parentIndex) const {
   info.registerPathComponent(this, parentIndex);
 }

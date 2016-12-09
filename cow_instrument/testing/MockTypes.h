@@ -18,8 +18,8 @@ public:
   MOCK_CONST_METHOD0(getRotation, Eigen::Quaterniond());
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
-  MOCK_CONST_METHOD1(registerContents, void(SOASource &));
-  MOCK_CONST_METHOD2(registerContents, void(SOASource &, size_t));
+  MOCK_CONST_METHOD1(registerContents, void(LinkedTreeParser &));
+  MOCK_CONST_METHOD2(registerContents, void(LinkedTreeParser &, size_t));
 
   ~MockComponent() {}
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
@@ -38,10 +38,10 @@ public:
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
 
-  void registerContents(SOASource &info) const {
+  void registerContents(LinkedTreeParser &info) const {
     info.registerPathComponent(this);
   }
-  void registerContents(SOASource &info, size_t parentIndex) const {
+  void registerContents(LinkedTreeParser &info, size_t parentIndex) const {
     info.registerPathComponent(this, parentIndex);
   }
 
@@ -64,8 +64,8 @@ public:
   MOCK_CONST_METHOD0(getRotation, Eigen::Quaterniond());
   MOCK_CONST_METHOD0(clone, Component *());
   MOCK_CONST_METHOD1(equals, bool(const Component &));
-  MOCK_CONST_METHOD1(registerContents, void(SOASource &));
-  MOCK_CONST_METHOD2(registerContents, void(SOASource &, size_t));
+  MOCK_CONST_METHOD1(registerContents, void(LinkedTreeParser &));
+  MOCK_CONST_METHOD2(registerContents, void(LinkedTreeParser &, size_t));
   ~MockDetector() {}
   MOCK_CONST_METHOD0(componentId, ComponentIdType());
   MOCK_CONST_METHOD0(name, std::string());
