@@ -186,6 +186,34 @@ TEST(instrument_tree_test, test_both_constructors) {
   EXPECT_EQ(treeA, treeB) << "Proxies not the same. Something badly wrong.";
 }
 
+// Add characterisation test
+TEST(instrument_tree_test, test_fetching_root_component_failure) {
+
+  auto source = make_component_tree();
+
+  LinkedTreeParser intermediate;
+  source->registerContents(intermediate);
+  auto proxies = intermediate.proxies();
+  auto positions = intermediate.startPositions();
+  auto rotations = intermediate.startRotations();
+  auto componentIds = intermediate.componentIds();
+  auto entryPoints = intermediate.startEntryPoints();
+  auto exitPoints = intermediate.startExitPoints();
+  auto pathLengths = intermediate.pathLengths();
+  auto pathComponentIndexes = intermediate.pathComponentIndexes();
+  auto detectorComponentIndexes = intermediate.detectorComponentIndexes();
+  auto detectorIds = intermediate.detectorIds();
+
+  FlatTree tree(std::move(proxies), std::move(positions), std::move(rotations),
+                std::move(componentIds), std::move(entryPoints),
+                std::move(exitPoints), std::move(pathLengths),
+                std::move(pathComponentIndexes),
+                std::move(detectorComponentIndexes), std::move(detectorIds),
+                intermediate.sourcePathIndex(), intermediate.samplePathIndex());
+
+  EXPECT_TRUE(!tree.rootComponent()) << "We never set this";
+}
+
 TEST(instrument_tree_test, test_find_source_sample) {
   /*
    * One source, one sample, one detector
