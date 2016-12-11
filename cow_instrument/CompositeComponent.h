@@ -23,7 +23,8 @@ public:
   size_t size() const {return m_children.size();}
   const Component& getChild(size_t index) const;
   void registerContents(LinkedTreeParser &info) const override;
-  void registerContents(LinkedTreeParser &info, size_t parentIndex) const override;
+  void registerContents(LinkedTreeParser &info,
+                        size_t parentIndex) const override;
   ComponentIdType componentId() const override;
   std::string name() const override;
   virtual bool accept(class ComponentVisitor *visitor) const override;

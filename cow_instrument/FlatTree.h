@@ -21,6 +21,19 @@ class PointSample;
 class FlatTree {
 public:
   FlatTree(std::shared_ptr<Component> componentRoot);
+  /// A construction mechnanism that bypasses the old tree linked-list
+  /// constructional approach
+  FlatTree(std::vector<ComponentProxy> &&proxies,
+           std::vector<Eigen::Vector3d> &&positions,
+           std::vector<Eigen::Quaterniond> &&rotations,
+           std::vector<ComponentIdType> &&componentIds,
+           std::vector<Eigen::Vector3d> &&entryPoints,
+           std::vector<Eigen::Vector3d> &&exitPoints,
+           std::vector<double> &&pathLengths,
+           std::vector<size_t> &&pathComponentIndexes,
+           std::vector<size_t> &&detectorComponentIndexes,
+           std::vector<DetectorIdType> &&detectorIds, size_t sourceIndex,
+           size_t sampleIndex);
 
   const ComponentProxy &rootProxy() const;
 
@@ -63,7 +76,6 @@ public:
   bool operator!=(const FlatTree &other) const;
 
 private:
-  void init();
 
   /// Path index
   size_t m_sourceIndex;

@@ -26,7 +26,8 @@ void findKeyComponents(const Component &component, LinkedTreeParser &info) {
 }
 }
 
-void FlatTree::init() {
+FlatTree::FlatTree(std::shared_ptr<Component> componentRoot)
+    : m_componentRoot(componentRoot) {
 
   LinkedTreeParser treeParser;
   findKeyComponents(*m_componentRoot, treeParser);
@@ -52,9 +53,51 @@ void FlatTree::init() {
   m_detectorIds = treeParser.detectorIds();
 }
 
-FlatTree::FlatTree(std::shared_ptr<Component> componentRoot)
-    : m_componentRoot(componentRoot) {
-  init();
+/**
+ * @brief FlatTree::FlatTree
+ *
+ * Prototype new constructor that bypasses the need to do anything with the
+ *Component virtual
+ * hierachy at all.
+ *
+ * Complexity of this constructor suggests that a constructional helper is
+ *missing.
+ *
+ * @param proxies
+ * @param positions
+ * @param rotations
+ * @param componentIds
+ * @param entryPoints
+ * @param exitPoints
+ * @param pathLengths
+ * @param pathComponentIndexes
+ * @param detectorComponentIndexes
+ * @param detectorIds
+ * @param sourceIndex
+ * @param sampleIndex
+ */
+FlatTree::FlatTree(std::vector<ComponentProxy> &&proxies,
+                   std::vector<Eigen::Vector3d> &&positions,
+                   std::vector<Eigen::Quaterniond> &&rotations,
+                   std::vector<ComponentIdType> &&componentIds,
+                   std::vector<Eigen::Vector3d> &&entryPoints,
+                   std::vector<Eigen::Vector3d> &&exitPoints,
+                   std::vector<double> &&pathLengths,
+                   std::vector<size_t> &&pathComponentIndexes,
+                   std::vector<size_t> &&detectorComponentIndexes,
+                   std::vector<DetectorIdType> &&detectorIds,
+                   size_t sourceIndex, size_t sampleIndex)
+    : m_proxies(std::move(proxies)), m_positions(std::move(positions)),
+      m_rotations(std::move(rotations)),
+      m_componentIds(std::move(componentIds)),
+      m_entryPoints(std::move(entryPoints)),
+      m_exitPoints(std::move(exitPoints)),
+      m_pathLengths(std::move(pathLengths)),
+      m_pathComponentIndexes(std::move(pathComponentIndexes)),
+      m_detectorComponentIndexes(std::move(detectorComponentIndexes)),
+      m_detectorIds(std::move(detectorIds)), m_sourceIndex(sourceIndex),
+      m_sampleIndex(sampleIndex) {
+  // Note that m_rootComponent is not set because we don't have one.
 }
 
 const ComponentProxy &FlatTree::rootProxy() const { return m_proxies[0]; }

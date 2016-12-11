@@ -27,19 +27,20 @@ void LinkedTreeParser::registerPathComponent(PathComponent const *const comp) {
   }
 }
 
-size_t LinkedTreeParser::registerComposite(CompositeComponent const *const comp) {
+size_t
+LinkedTreeParser::registerComposite(CompositeComponent const *const comp) {
   return coreUpdate(comp);
 }
 
 void LinkedTreeParser::registerDetector(const Detector *const comp,
-                                 size_t parentIndex) {
+                                        size_t parentIndex) {
   const size_t newIndex = coreUpdate(comp, parentIndex);
   m_detectorComponentIndexes.push_back(newIndex);
   m_detectorIds.push_back(comp->detectorId());
 }
 
 void LinkedTreeParser::registerPathComponent(const PathComponent *const comp,
-                                      size_t parentIndex) {
+                                             size_t parentIndex) {
   const size_t nextComponentIndex = coreUpdate(comp, parentIndex);
   const size_t nextPathIndex = m_pathComponentIndexes.size();
   m_entryPoints.push_back(comp->entryPoint());
@@ -54,7 +55,7 @@ void LinkedTreeParser::registerPathComponent(const PathComponent *const comp,
 }
 
 size_t LinkedTreeParser::registerComposite(const CompositeComponent *const comp,
-                                    size_t parentIndex) {
+                                           size_t parentIndex) {
   return coreUpdate(comp, parentIndex);
 }
 
@@ -66,7 +67,9 @@ size_t LinkedTreeParser::detectorSize() const {
   return m_detectorComponentIndexes.size();
 }
 
-size_t LinkedTreeParser::pathSize() const { return m_pathComponentIndexes.size(); }
+size_t LinkedTreeParser::pathSize() const {
+  return m_pathComponentIndexes.size();
+}
 
 std::vector<size_t> LinkedTreeParser::pathComponentIndexes() const {
   return m_pathComponentIndexes;
@@ -84,10 +87,12 @@ std::vector<Eigen::Vector3d> LinkedTreeParser::startExitPoints() const {
   return m_exitPoints;
 }
 
-std::vector<double> LinkedTreeParser::pathLengths() const { return m_pathLengths; }
+std::vector<double> LinkedTreeParser::pathLengths() const {
+  return m_pathLengths;
+}
 
 size_t LinkedTreeParser::coreUpdate(Component const *const comp,
-                             size_t previousIndex) {
+                                    size_t previousIndex) {
   size_t newIndex = m_proxies.size();
   m_componentIds.emplace_back(comp->componentId());
   m_proxies.emplace_back(previousIndex, comp->componentId());
@@ -125,4 +130,3 @@ std::vector<DetectorIdType> LinkedTreeParser::detectorIds() const {
 int64_t LinkedTreeParser::sourcePathIndex() const { return m_sourceIndex; }
 
 int64_t LinkedTreeParser::samplePathIndex() const { return m_sampleIndex; }
-

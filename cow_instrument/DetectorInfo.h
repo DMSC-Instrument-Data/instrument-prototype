@@ -53,7 +53,6 @@ public:
 
   const InstTree &const_instrumentTree() const;
 
-
   void moveDetector(size_t detectorIndex, const Eigen::Vector3d &offset);
 
   void rotateDetector(size_t detectorIndex, const Eigen::Vector3d &axis,
