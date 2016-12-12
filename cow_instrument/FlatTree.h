@@ -5,9 +5,11 @@
 #include <vector>
 #include <map>
 #include <Eigen/Core>
+#include <Eigen/Geometry>
 #include "IdType.h"
-#include "SOASource.h"
 
+class Component;
+class ComponentProxy;
 class Detector;
 class PathComponent;
 class PointSource;
@@ -19,6 +21,19 @@ class PointSample;
 class FlatTree {
 public:
   FlatTree(std::shared_ptr<Component> componentRoot);
+  /// A construction mechnanism that bypasses the old tree linked-list
+  /// constructional approach
+  FlatTree(std::vector<ComponentProxy> &&proxies,
+           std::vector<Eigen::Vector3d> &&positions,
+           std::vector<Eigen::Quaterniond> &&rotations,
+           std::vector<ComponentIdType> &&componentIds,
+           std::vector<Eigen::Vector3d> &&entryPoints,
+           std::vector<Eigen::Vector3d> &&exitPoints,
+           std::vector<double> &&pathLengths,
+           std::vector<size_t> &&pathComponentIndexes,
+           std::vector<size_t> &&detectorComponentIndexes,
+           std::vector<DetectorIdType> &&detectorIds, size_t sourceIndex,
+           size_t sampleIndex);
 
   const ComponentProxy &rootProxy() const;
 
@@ -57,16 +72,37 @@ public:
   // Needed for serialization.
   std::shared_ptr<Component> rootComponent() const;
 
+  bool operator==(const FlatTree &other) const;
+  bool operator!=(const FlatTree &other) const;
+
 private:
-  void init();
 
   /// Path index
   size_t m_sourceIndex;
   /// Path index
   size_t m_sampleIndex;
-  /// vector of proxies and relevant pointers
-  SOASource m_source;
-  /// Component root. Stashed. We only need this for serialization at present.
+
+  /*
+   These collections have the same size as the number of components. They are
+   component
+   type independent
+   */
+  std::vector<ComponentProxy> m_proxies;
+  std::vector<Eigen::Vector3d> m_positions;
+  std::vector<Eigen::Quaterniond> m_rotations;
+  std::vector<ComponentIdType> m_componentIds;
+
+  /*
+    These collections are conditionally updated depending upon component type.
+    The vector
+    of indexes allows us to go from say detector_index -> component_index.
+   */
+  std::vector<Eigen::Vector3d> m_entryPoints; // For path components
+  std::vector<Eigen::Vector3d> m_exitPoints;  // For path components
+  std::vector<double> m_pathLengths;          // For path components
+  std::vector<size_t> m_pathComponentIndexes;
+  std::vector<size_t> m_detectorComponentIndexes;
+  std::vector<DetectorIdType> m_detectorIds;
   std::shared_ptr<Component> m_componentRoot;
 };
 

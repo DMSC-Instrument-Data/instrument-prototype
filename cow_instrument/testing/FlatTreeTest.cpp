@@ -1,17 +1,51 @@
-#include "FlatTree.h"
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "MockTypes.h"
-#include "DetectorComponent.h"
 #include "CompositeComponent.h"
+#include "DetectorComponent.h"
+#include "LinkedTreeParser.h"
 #include "ParabolicGuide.h"
-#include "NullComponent.h"
 #include "PointSource.h"
 #include "PointSample.h"
 
 using namespace testing;
 
 namespace {
+
+std::shared_ptr<CompositeComponent> make_component_tree() {
+  /*
+
+    we start like this. A-B-C-D are components
+
+        A
+        |
+ ------------------
+ |                |
+ B                D
+ |
+ C
+
+
+
+  */
+
+  // Create B
+  auto b = std::unique_ptr<CompositeComponent>(
+      new CompositeComponent(ComponentIdType(2)));
+  // Add C to B
+  b->addComponent(std::unique_ptr<PointSample>(
+      new PointSample(Eigen::Vector3d{0, 0, 0}, ComponentIdType(3))));
+
+  // Add B to A
+  auto a = std::make_shared<CompositeComponent>(ComponentIdType(1));
+  a->addComponent(std::move(b));
+
+  // Add D to A
+  a->addComponent(std::unique_ptr<PointSource>(
+      new PointSource(Eigen::Vector3d{-1, 0, 0}, ComponentIdType(4))));
+
+  return a;
+}
 
 FlatTree make_simple_tree(DetectorIdType detector1Id,
                           DetectorIdType detector2Id) {
@@ -111,6 +145,73 @@ TEST(instrument_tree_test, test_cannot_construct_without_source) {
   EXPECT_CALL(*sample_ptr, isSample()).WillRepeatedly(Return(true));
   EXPECT_THROW(FlatTree{sample}, std::invalid_argument)
       << "Should throw, there is not source";
+}
+
+TEST(instrument_tree_test, test_both_constructors) {
+
+  auto source = make_component_tree();
+
+  FlatTree treeA(source);
+
+  LinkedTreeParser intermediate;
+  source->registerContents(intermediate);
+  auto proxies = intermediate.proxies();
+  auto positions = intermediate.startPositions();
+  auto rotations = intermediate.startRotations();
+  auto componentIds = intermediate.componentIds();
+  auto entryPoints = intermediate.startEntryPoints();
+  auto exitPoints = intermediate.startExitPoints();
+  auto pathLengths = intermediate.pathLengths();
+  auto pathComponentIndexes = intermediate.pathComponentIndexes();
+  auto detectorComponentIndexes = intermediate.detectorComponentIndexes();
+  auto detectorIds = intermediate.detectorIds();
+
+  FlatTree treeB(
+      std::move(proxies), std::move(positions), std::move(rotations),
+      std::move(componentIds), std::move(entryPoints), std::move(exitPoints),
+      std::move(pathLengths), std::move(pathComponentIndexes),
+      std::move(detectorComponentIndexes), std::move(detectorIds),
+      intermediate.sourcePathIndex(), intermediate.samplePathIndex());
+
+  EXPECT_EQ(treeA.startPositions(), treeB.startPositions())
+      << "Unequal positions size";
+  EXPECT_EQ(treeA.componentSize(), treeB.componentSize())
+      << "Unequal component size";
+  EXPECT_EQ(treeA.startEntryPoints(), treeB.startEntryPoints())
+      << "Unequal entry points";
+  EXPECT_EQ(treeA.startExitPoints(), treeB.startExitPoints())
+      << "Unequal exit points";
+  EXPECT_EQ(treeA.pathLengths(), treeB.pathLengths()) << "Unequal path lengths";
+
+  EXPECT_EQ(treeA, treeB) << "Proxies not the same. Something badly wrong.";
+}
+
+// Add characterisation test
+TEST(instrument_tree_test, test_fetching_root_component_failure) {
+
+  auto source = make_component_tree();
+
+  LinkedTreeParser intermediate;
+  source->registerContents(intermediate);
+  auto proxies = intermediate.proxies();
+  auto positions = intermediate.startPositions();
+  auto rotations = intermediate.startRotations();
+  auto componentIds = intermediate.componentIds();
+  auto entryPoints = intermediate.startEntryPoints();
+  auto exitPoints = intermediate.startExitPoints();
+  auto pathLengths = intermediate.pathLengths();
+  auto pathComponentIndexes = intermediate.pathComponentIndexes();
+  auto detectorComponentIndexes = intermediate.detectorComponentIndexes();
+  auto detectorIds = intermediate.detectorIds();
+
+  FlatTree tree(std::move(proxies), std::move(positions), std::move(rotations),
+                std::move(componentIds), std::move(entryPoints),
+                std::move(exitPoints), std::move(pathLengths),
+                std::move(pathComponentIndexes),
+                std::move(detectorComponentIndexes), std::move(detectorIds),
+                intermediate.sourcePathIndex(), intermediate.samplePathIndex());
+
+  EXPECT_TRUE(!tree.rootComponent()) << "We never set this";
 }
 
 TEST(instrument_tree_test, test_find_source_sample) {
@@ -269,6 +370,40 @@ TEST(instrument_tree_test, test_subtree_search) {
   // Subtree of E
   indexes = instrument.subTreeIndexes(4);
   EXPECT_EQ(indexes, (std::vector<size_t>{4})) << "Subtree for E incorrect";
+}
+
+TEST(instrument_tree_test, test_positions) {
+
+  auto comp = make_component_tree();
+  FlatTree tree(comp);
+  auto positions = tree.startPositions();
+  EXPECT_EQ(positions.size(), tree.componentSize());
+  EXPECT_EQ(positions.front(), comp->getPos());
+  EXPECT_EQ(positions.back(), comp->children()[1]->getPos());
+}
+
+TEST(instrument_tree_test, test_equals) {
+  auto comp = make_component_tree();
+  FlatTree a(comp);
+  FlatTree b(comp);
+
+  EXPECT_EQ(a, b);
+  EXPECT_FALSE(a != b);
+
+  EXPECT_EQ(a, b);
+  EXPECT_FALSE(a != b);
+}
+
+TEST(instrument_tree_test, test_equals_when_component_pointers_are_different) {
+
+  std::shared_ptr<Component> compA = make_component_tree();
+  std::shared_ptr<Component> compB(compA->clone());
+
+  FlatTree a(compA);
+  FlatTree b(compB);
+
+  EXPECT_EQ(a, b);
+  EXPECT_FALSE(a != b);
 }
 
 TEST(instrument_tree_test, test_subtree_unreachable_throws) {

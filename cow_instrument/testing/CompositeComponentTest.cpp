@@ -66,7 +66,7 @@ TEST(composite_component_test, test_register_contents) {
   composite.addComponent(std::unique_ptr<Component>(std::move(child)));
 
   // Registers
-  SOASource info;
+  LinkedTreeParser info;
 
   EXPECT_CALL(*child, registerContents(_, _)).Times(1);
 
