@@ -1,6 +1,7 @@
 #include "StandardInstrument.h"
 #include "FlatTree.h"
 #include "FlatTreeMapper.h"
+#include "StandardBenchmark.h"
 #include <benchmark/benchmark_api.h>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>

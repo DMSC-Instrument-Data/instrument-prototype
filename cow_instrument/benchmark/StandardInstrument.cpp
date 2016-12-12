@@ -83,7 +83,7 @@ std::shared_ptr<Component> construct_root_component() {
 }
 
 StandardInstrumentFixture::StandardInstrumentFixture()
-    : benchmark::Fixture(),
+    : StandardBenchmark<StandardInstrumentFixture>(),
       m_instrument(std_instrument::construct_root_component()),
       m_componentInfo(std::make_shared<FlatTree>(
           std_instrument::construct_root_component())),

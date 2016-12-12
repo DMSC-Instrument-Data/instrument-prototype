@@ -4,6 +4,7 @@
 #include "FlatTree.h"
 #include "ComponentInfo.h"
 #include "DetectorInfo.h"
+#include "StandardBenchmark.h"
 #include <vector>
 #include <benchmark/benchmark_api.h>
 
@@ -15,7 +16,8 @@ std::shared_ptr<Component> construct_root_component();
 /*
  Create a standard instrument fixture.
  */
-class StandardInstrumentFixture : public benchmark::Fixture {
+class StandardInstrumentFixture
+    : public StandardBenchmark<StandardInstrumentFixture> {
 
 public:
   FlatTree m_instrument;
