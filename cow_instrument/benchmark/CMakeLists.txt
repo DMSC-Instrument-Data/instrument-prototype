@@ -35,6 +35,7 @@ set ( BENCH_FILES_SRC
 )
 
 set ( BENCH_FILES_H
+                 StandardBenchmark.h
                  StandardInstrument.h
 )
 
