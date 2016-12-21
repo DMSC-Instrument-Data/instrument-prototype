@@ -7,6 +7,7 @@
 #include "ParabolicGuide.h"
 #include "PointSource.h"
 #include "PointSample.h"
+#include "FlatTree.h"
 
 using namespace testing;
 

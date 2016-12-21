@@ -65,6 +65,7 @@ public:
   std::vector<Eigen::Vector3d> startEntryPoints() const;
   std::vector<double> pathLengths() const;
   std::vector<size_t> detectorComponentIndexes() const;
+  std::vector<size_t> pathComponentIndexes() const;
 
   size_t detIndexToCompIndex(size_t detectorIndex) const;
   size_t pathIndexToCompIndex(size_t pathIndex) const;

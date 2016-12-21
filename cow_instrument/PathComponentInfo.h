@@ -1,0 +1,202 @@
+#ifndef PATHCOMPONENTINFO_H
+#define PATHCOMPONENTINFO_H
+
+#include <vector>
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+#include "cow_ptr.h"
+
+/**
+ * PathComponentInfo type. Provides meta-data an behaviour for working with a
+ * FlatTree at the PathComponent level
+ * at the component level.
+ */
+template <typename InstTree> class PathComponentInfo {
+
+public:
+  template <typename InstSptrType>
+  explicit PathComponentInfo(InstSptrType &&instrumentTree);
+
+  Eigen::Vector3d position(size_t pathComponentIndex) const;
+
+  Eigen::Vector3d entryPoint(size_t pathComponentIndex) const;
+
+  Eigen::Vector3d exitPoint(size_t pathComponentIndex) const;
+
+  Eigen::Quaterniond rotation(size_t pathComponentIndex) const;
+
+  const InstTree &const_instrumentTree() const;
+
+  void movePathComponent(size_t pathComponentIndex,
+                         const Eigen::Vector3d &offset);
+
+  void movePathComponents(const std::vector<size_t> &pathComponentIndexes,
+                          const Eigen::Vector3d &offset);
+
+  void rotatePathComponent(size_t pathComponentIndex,
+                           const Eigen::Vector3d &axis, const double &theta,
+                           const Eigen::Vector3d &center);
+
+  void rotatePathComponents(const std::vector<size_t> &pathComponentIndexs,
+                            const Eigen::Vector3d &axis, const double &theta,
+                            const Eigen::Vector3d &center);
+
+private:
+  const size_t m_nPathComponents;
+  /// All path component entry points.
+  CowPtr<std::vector<Eigen::Vector3d>> m_startEntryPoints;
+  /// All path component exit points
+  CowPtr<std::vector<Eigen::Vector3d>> m_startExitPoints;
+  /// Locally (detector) indexed positions
+  CowPtr<std::vector<Eigen::Vector3d>> m_positions;
+  /// Locally (detector) indexed rotations
+  CowPtr<std::vector<Eigen::Quaterniond>> m_rotations;
+  /// Path component indexes
+  std::shared_ptr<const std::vector<size_t>> m_pathComponentIndexes;
+  /// Shared instrument
+  std::shared_ptr<InstTree> m_instrumentTree;
+};
+
+namespace {
+
+template <typename U>
+void pathComponentRangeCheck(size_t pathComponentIndex, const U &container) {
+  if (pathComponentIndex >= container.size()) {
+    std::stringstream buffer;
+    buffer << "PathComponent at index " << pathComponentIndex
+           << " is out of range";
+    throw std::out_of_range(buffer.str());
+  }
+}
+}
+template <typename InstTree>
+template <typename InstSptrType>
+PathComponentInfo<InstTree>::PathComponentInfo(InstSptrType &&instrumentTree)
+
+    : m_nPathComponents(instrumentTree->nPathComponents()),
+      m_startEntryPoints(
+          std::make_shared<std::vector<Eigen::Vector3d>>(m_nPathComponents)),
+      m_startExitPoints(
+          std::make_shared<std::vector<Eigen::Vector3d>>(m_nPathComponents)),
+      m_positions(
+          std::make_shared<std::vector<Eigen::Vector3d>>(m_nPathComponents)),
+      m_rotations(
+          std::make_shared<std::vector<Eigen::Quaterniond>>(m_nPathComponents)),
+      m_pathComponentIndexes(std::make_shared<const std::vector<size_t>>(
+          instrumentTree->pathComponentIndexes())),
+      m_instrumentTree(std::forward<InstSptrType>(instrumentTree)) {
+  // TODO. Do this without copying everything!
+  std::vector<Eigen::Vector3d> allComponentPositions =
+      m_instrumentTree->startPositions();
+  std::vector<Eigen::Quaterniond> allComponentRotations =
+      m_instrumentTree->startRotations();
+  std::vector<Eigen::Vector3d> allComponentEntryPoints =
+      m_instrumentTree->startEntryPoints();
+  std::vector<Eigen::Vector3d> allComponentExitPoints =
+      m_instrumentTree->startExitPoints();
+
+  size_t i = 0;
+  for (auto &compIndex : (*m_pathComponentIndexes)) {
+    (*m_positions)[i] = allComponentPositions[compIndex];
+    (*m_rotations)[i] = allComponentRotations[compIndex];
+    (*m_startEntryPoints)[i] = allComponentEntryPoints[compIndex];
+    (*m_startExitPoints)[i] = allComponentExitPoints[compIndex];
+    ++i;
+  }
+}
+
+template <typename InstTree>
+Eigen::Vector3d
+PathComponentInfo<InstTree>::position(size_t pathComponentIndex) const {
+  pathComponentRangeCheck(pathComponentIndex, *m_positions);
+  return (*m_positions)[pathComponentIndex];
+}
+
+template <typename InstTree>
+Eigen::Vector3d
+PathComponentInfo<InstTree>::entryPoint(size_t pathComponentIndex) const {
+  pathComponentRangeCheck(pathComponentIndex, *m_startEntryPoints);
+  return (*m_startEntryPoints)[pathComponentIndex];
+}
+
+template <typename InstTree>
+Eigen::Vector3d
+PathComponentInfo<InstTree>::exitPoint(size_t pathComponentIndex) const {
+  pathComponentRangeCheck(pathComponentIndex, *m_startExitPoints);
+  return (*m_startExitPoints)[pathComponentIndex];
+}
+
+template <typename InstTree>
+Eigen::Quaterniond
+PathComponentInfo<InstTree>::rotation(size_t pathComponentIndex) const {
+  pathComponentRangeCheck(pathComponentIndex, *m_rotations);
+  return (*m_rotations)[pathComponentIndex];
+}
+
+template <typename InstTree>
+const InstTree &PathComponentInfo<InstTree>::const_instrumentTree() const {
+  return *m_instrumentTree;
+}
+
+template <typename InstTree>
+void
+PathComponentInfo<InstTree>::movePathComponent(size_t detectorIndex,
+                                               const Eigen::Vector3d &offset) {
+
+  (*m_positions)[detectorIndex] += offset;
+
+  // Would need to update detectorInfo?
+}
+
+template <typename InstTree>
+void PathComponentInfo<InstTree>::movePathComponents(
+    const std::vector<size_t> &pathComponentIndexes,
+    const Eigen::Vector3d &offset) {
+
+  for (auto &pathComponentIndex : pathComponentIndexes) {
+    (*m_positions)[pathComponentIndex] += offset;
+  }
+
+  // Would need to update detectorInfo?
+}
+
+template <typename InstTree>
+void PathComponentInfo<InstTree>::rotatePathComponent(
+    size_t pathComponentIndex, const Eigen::Vector3d &axis, const double &theta,
+    const Eigen::Vector3d &center) {
+
+  using namespace Eigen;
+  const auto transform =
+      Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
+  const auto rotation = transform.rotation();
+
+  (*m_positions)[pathComponentIndex] =
+      transform * (*m_positions)[pathComponentIndex];
+  (*m_rotations)[pathComponentIndex] =
+      rotation * (*m_rotations)[pathComponentIndex];
+
+  // Would need to update detectorInfo?
+}
+
+template <typename InstTree>
+void PathComponentInfo<InstTree>::rotatePathComponents(
+    const std::vector<size_t> &pathComponentIndexes,
+    const Eigen::Vector3d &axis, const double &theta,
+    const Eigen::Vector3d &center) {
+
+  using namespace Eigen;
+  const auto transform =
+      Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
+  const auto rotation = transform.rotation();
+  for (auto &pathComponentIndex : pathComponentIndexes) {
+
+    (*m_positions)[pathComponentIndex] =
+        transform * (*m_positions)[pathComponentIndex];
+    (*m_rotations)[pathComponentIndex] =
+        rotation * (*m_rotations)[pathComponentIndex];
+  }
+
+  // Would need to update detectorInfo?
+}
+
+#endif

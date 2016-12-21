@@ -12,13 +12,11 @@
 #include "cow_ptr.h"
 #include "DetectorInfo.h"
 
-#include "IdType.h"
-
 /**
  * ComponentInfo type. Provides meta-data an behaviour for working with a
- * FlatTree
- * at the component level. Meta-data is provided per component. Add detectors
- * are components.
+ * FlatTree at the component level. Wraps DetectorInfo and PatchComponentInfo
+ * and therefore
+ * gives a Component only view of the data and associated operations.
  */
 template <typename InstTree> class ComponentInfo {
 public:

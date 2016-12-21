@@ -1,5 +1,4 @@
 #include "DetectorInfo.h"
-#include "FlatTree.h"
 #include "MockTypes.h"
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>

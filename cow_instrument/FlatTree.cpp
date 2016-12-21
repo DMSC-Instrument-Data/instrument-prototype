@@ -170,6 +170,10 @@ std::vector<size_t> FlatTree::detectorComponentIndexes() const {
   return m_detectorComponentIndexes;
 }
 
+std::vector<size_t> FlatTree::pathComponentIndexes() const {
+  return m_pathComponentIndexes;
+}
+
 size_t FlatTree::detIndexToCompIndex(size_t detectorIndex) const {
   return m_detectorComponentIndexes[detectorIndex];
 }

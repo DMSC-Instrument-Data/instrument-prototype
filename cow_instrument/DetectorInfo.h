@@ -312,8 +312,8 @@ void DetectorInfo<InstTree>::rotateDetector(size_t detectorIndex,
       Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
   const auto rotation = transform.rotation();
 
-  (*m_positions)[detectorIndex] = transform * (*m_positions)[index];
-  (*m_rotations)[detectorIndex] = rotation * (*m_rotations)[index];
+  (*m_positions)[detectorIndex] = transform * (*m_positions)[detectorIndex];
+  (*m_rotations)[detectorIndex] = rotation * (*m_rotations)[detectorIndex];
 
   // Only l2 needs to be recalculated.
   initL2();
@@ -330,8 +330,8 @@ void DetectorInfo<InstTree>::rotateDetectors(
   const auto rotation = transform.rotation();
   for (auto &detIndex : detectorIndexes) {
 
-    (*m_positions)[detIndex] = transform * (*m_positions)[index];
-    (*m_rotations)[detIndex] = rotation * (*m_rotations)[index];
+    (*m_positions)[detIndex] = transform * (*m_positions)[detIndex];
+    (*m_rotations)[detIndex] = rotation * (*m_rotations)[detIndex];
   }
   // Only l2 needs to be recalculated.
   initL2();
