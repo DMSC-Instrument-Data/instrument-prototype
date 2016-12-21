@@ -10,7 +10,6 @@
 
 #include "ComponentProxy.h"
 #include "cow_ptr.h"
-#include "ComponentInfo.h"
 #include "Detector.h"
 #include "IdType.h"
 #include "L1s.h"
@@ -55,8 +54,15 @@ public:
 
   void moveDetector(size_t detectorIndex, const Eigen::Vector3d &offset);
 
+  void moveDetectors(const std::vector<size_t> &detectorIndexes,
+                     const Eigen::Vector3d &offset);
+
   void rotateDetector(size_t detectorIndex, const Eigen::Vector3d &axis,
                       const double &theta, const Eigen::Vector3d &center);
+
+  void rotateDetectors(const std::vector<size_t> &detectorIndexes,
+                       const Eigen::Vector3d &axis, const double &theta,
+                       const Eigen::Vector3d &center);
 
   std::vector<Spectrum> makeSpectra() const;
 
@@ -284,6 +290,18 @@ void DetectorInfo<InstTree>::moveDetector(size_t detectorIndex,
 }
 
 template <typename InstTree>
+void DetectorInfo<InstTree>::moveDetectors(
+    const std::vector<size_t> &detectorIndexes, const Eigen::Vector3d &offset) {
+
+  for (auto &detIndex : detectorIndexes) {
+    (*m_positions)[detIndex] += offset;
+  }
+
+  // Only l2 needs to be recalculated.
+  initL2();
+}
+
+template <typename InstTree>
 void DetectorInfo<InstTree>::rotateDetector(size_t detectorIndex,
                                             const Eigen::Vector3d &axis,
                                             const double &theta,
@@ -297,6 +315,24 @@ void DetectorInfo<InstTree>::rotateDetector(size_t detectorIndex,
   (*m_positions)[detectorIndex] = transform * (*m_positions)[index];
   (*m_rotations)[detectorIndex] = rotation * (*m_rotations)[index];
 
+  // Only l2 needs to be recalculated.
+  initL2();
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::rotateDetectors(
+    const std::vector<size_t> &detectorIndexes, const Eigen::Vector3d &axis,
+    const double &theta, const Eigen::Vector3d &center) {
+
+  using namespace Eigen;
+  const auto transform =
+      Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
+  const auto rotation = transform.rotation();
+  for (auto &detIndex : detectorIndexes) {
+
+    (*m_positions)[detIndex] = transform * (*m_positions)[index];
+    (*m_rotations)[detIndex] = rotation * (*m_rotations)[index];
+  }
   // Only l2 needs to be recalculated.
   initL2();
 }

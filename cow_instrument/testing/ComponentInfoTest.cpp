@@ -219,4 +219,19 @@ TEST(component_info_test, test_multiple_rotation_arbitrary_center) {
   EXPECT_TRUE(rotatedVector.isApprox(Eigen::Vector3d{0, 0, 1}, 1e-14))
       << "Internal component rotation not updated correctly";
 }
+
+TEST(component_info_test, test_detector_info_constructor) {
+  using namespace testing;
+
+  MockPathFactory mockPathFactory;
+  EXPECT_CALL(mockPathFactory, createL1(testing::_))
+      .WillOnce(testing::Return(new Paths(0, Path{0})));
+  EXPECT_CALL(mockPathFactory, createL2(testing::_))
+      .WillOnce(testing::Return(new Paths(0, Path{0})));
+
+  auto detectorInfo = std::make_shared<DetectorInfo<NiceMockInstrumentTree>>(
+      std::make_shared<NiceMockInstrumentTree>(), mockPathFactory);
+
+  ComponentInfo<NiceMockInstrumentTree> compInfo{detectorInfo};
+}
 }
