@@ -71,7 +71,7 @@ TEST(spectrum_info_test, test_l2) {
       std::make_shared<testing::NiceMock<MockFlatTree>>(nDetectors);
 
   EXPECT_CALL(*instrument.get(), startPositions())
-      .WillOnce(Return(std::vector<Eigen::Vector3d>{{0, 0, 40}}));
+      .WillRepeatedly(Return(std::vector<Eigen::Vector3d>{{0, 0, 40}}));
   EXPECT_CALL(*instrument.get(), detectorComponentIndexes())
       .WillRepeatedly(testing::Return(std::vector<size_t>(1, 0)));
 
@@ -105,7 +105,8 @@ TEST(spectrum_info_test, test_l2_mapped) {
       std::make_shared<testing::NiceMock<MockFlatTree>>(nDetectors);
 
   EXPECT_CALL(*instrument.get(), startPositions())
-      .WillOnce(Return(std::vector<Eigen::Vector3d>{{0, 0, 40}, {0, 0, 30}}));
+      .WillRepeatedly(
+          Return(std::vector<Eigen::Vector3d>{{0, 0, 40}, {0, 0, 30}}));
   EXPECT_CALL(*instrument.get(), detectorComponentIndexes())
       .WillRepeatedly(testing::Return(std::vector<size_t>{0, 1}));
 

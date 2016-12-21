@@ -62,8 +62,6 @@ public:
 
   CowPtr<L2s> l2s() const;
 
-  const ComponentInfo<InstTree> &componentInfo() const;
-
 private:
   void init();
   void initL2();
@@ -88,7 +86,11 @@ private:
   /// Component indexes per detector index
   std::shared_ptr<const std::vector<size_t>> m_detectorComponentIndexes;
   /// Component info
-  ComponentInfo<InstTree> m_componentInfo;
+  std::shared_ptr<InstTree> m_instrumentTree;
+  /// Locally (detector) indexed positions
+  std::shared_ptr<std::vector<Eigen::Vector3d>> m_positions;
+  /// Locally (detector) indexed rotations
+  std::shared_ptr<std::vector<Eigen::Quaterniond>> m_rotations;
 };
 
 namespace {
@@ -126,7 +128,10 @@ DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
           instrumentTree->pathLengths())),
       m_detectorComponentIndexes(std::make_shared<const std::vector<size_t>>(
           instrumentTree->detectorComponentIndexes())),
-      m_componentInfo(std::forward<InstSptrType>(instrumentTree)) {
+      m_instrumentTree(std::forward<InstSptrType>(instrumentTree)),
+      m_positions(std::make_shared<std::vector<Eigen::Vector3d>>(m_nDetectors)),
+      m_rotations(
+          std::make_shared<std::vector<Eigen::Quaterniond>>(m_nDetectors)) {
 
   init();
 }
@@ -138,6 +143,19 @@ void DetectorInfo<InstTree>::setMasked(size_t detectorIndex) {
 }
 
 template <typename InstTree> void DetectorInfo<InstTree>::init() {
+
+  std::vector<Eigen::Vector3d> allComponentPositions =
+      m_instrumentTree->startPositions();
+  std::vector<Eigen::Quaterniond> allComponentRotations =
+      m_instrumentTree->startRotations();
+
+  size_t i = 0;
+  for (auto &compIndex : (*m_detectorComponentIndexes)) {
+    (*m_positions)[i] = allComponentPositions[compIndex];
+    (*m_rotations)[i] = allComponentRotations[compIndex];
+    ++i;
+  }
+
   initL1();
   initL2();
 }
@@ -181,7 +199,7 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL2() {
   for (size_t detectorIndex = 0; detectorIndex < m_nDetectors;
        ++detectorIndex) {
 
-    auto detectorPos = positionDetector(detectorIndex);
+    auto detectorPos = (*m_positions)[detectorIndex];
     size_t i = 0;
     const Path &path = (*m_l2Paths)[detectorIndex];
     if (path.size() < 1) {
@@ -230,13 +248,13 @@ template <typename InstTree>
 Eigen::Vector3d
 DetectorInfo<InstTree>::positionDetector(size_t detectorIndex) const {
 
-  return m_componentInfo.position((*m_detectorComponentIndexes)[detectorIndex]);
+  return (*m_positions)[detectorIndex];
 }
 
 template <typename InstTree>
 Eigen::Quaterniond
 DetectorInfo<InstTree>::rotationDetector(size_t detectorIndex) const {
-  return m_componentInfo.rotation((*m_detectorComponentIndexes)[detectorIndex]);
+  return (*m_rotations)[detectorIndex];
 }
 
 template <typename InstTree>
@@ -252,14 +270,14 @@ size_t DetectorInfo<InstTree>::detectorSize() const {
 
 template <typename InstTree>
 const InstTree &DetectorInfo<InstTree>::const_instrumentTree() const {
-  return m_componentInfo.const_instrumentTree();
+  return *m_instrumentTree;
 }
 
 template <typename InstTree>
 void DetectorInfo<InstTree>::moveDetector(size_t detectorIndex,
                                           const Eigen::Vector3d &offset) {
 
-  m_componentInfo.move((*m_detectorComponentIndexes)[detectorIndex], offset);
+  (*m_positions)[detectorIndex] += offset;
 
   // Only l2 needs to be recalculated.
   initL2();
@@ -271,7 +289,13 @@ void DetectorInfo<InstTree>::rotateDetector(size_t detectorIndex,
                                             const double &theta,
                                             const Eigen::Vector3d &center) {
 
-  m_componentInfo.rotate((*m_detectorComponentIndexes)[detectorIndex], axis, theta, center);
+  using namespace Eigen;
+  const auto transform =
+      Translation3d(center) * AngleAxisd(theta, axis) * Translation3d(-center);
+  const auto rotation = transform.rotation();
+
+  (*m_positions)[detectorIndex] = transform * (*m_positions)[index];
+  (*m_rotations)[detectorIndex] = rotation * (*m_rotations)[index];
 
   // Only l2 needs to be recalculated.
   initL2();
@@ -291,9 +315,5 @@ template <typename InstTree> CowPtr<L2s> DetectorInfo<InstTree>::l2s() const {
   return m_l2;
 }
 
-template <typename InstTree>
-const ComponentInfo<InstTree> &DetectorInfo<InstTree>::componentInfo() const {
-  return m_componentInfo;
-}
 
 #endif
