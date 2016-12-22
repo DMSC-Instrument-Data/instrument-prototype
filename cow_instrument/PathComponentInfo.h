@@ -41,12 +41,16 @@ public:
                             const Eigen::Vector3d &axis, const double &theta,
                             const Eigen::Vector3d &center);
 
+  bool operator==(const PathComponentInfo<InstTree>& other) const;
+
+  bool operator!=(const PathComponentInfo<InstTree> &other) const;
+
 private:
   const size_t m_nPathComponents;
   /// All path component entry points.
-  CowPtr<std::vector<Eigen::Vector3d>> m_startEntryPoints;
+  CowPtr<std::vector<Eigen::Vector3d>> m_entryPoints;
   /// All path component exit points
-  CowPtr<std::vector<Eigen::Vector3d>> m_startExitPoints;
+  CowPtr<std::vector<Eigen::Vector3d>> m_exitPoints;
   /// Locally (detector) indexed positions
   CowPtr<std::vector<Eigen::Vector3d>> m_positions;
   /// Locally (detector) indexed rotations
@@ -74,9 +78,9 @@ template <typename InstSptrType>
 PathComponentInfo<InstTree>::PathComponentInfo(InstSptrType &&instrumentTree)
 
     : m_nPathComponents(instrumentTree->nPathComponents()),
-      m_startEntryPoints(
+      m_entryPoints(
           std::make_shared<std::vector<Eigen::Vector3d>>(m_nPathComponents)),
-      m_startExitPoints(
+      m_exitPoints(
           std::make_shared<std::vector<Eigen::Vector3d>>(m_nPathComponents)),
       m_positions(
           std::make_shared<std::vector<Eigen::Vector3d>>(m_nPathComponents)),
@@ -85,6 +89,7 @@ PathComponentInfo<InstTree>::PathComponentInfo(InstSptrType &&instrumentTree)
       m_pathComponentIndexes(std::make_shared<const std::vector<size_t>>(
           instrumentTree->pathComponentIndexes())),
       m_instrumentTree(std::forward<InstSptrType>(instrumentTree)) {
+
   // TODO. Do this without copying everything!
   std::vector<Eigen::Vector3d> allComponentPositions =
       m_instrumentTree->startPositions();
@@ -99,8 +104,8 @@ PathComponentInfo<InstTree>::PathComponentInfo(InstSptrType &&instrumentTree)
   for (auto &compIndex : (*m_pathComponentIndexes)) {
     (*m_positions)[i] = allComponentPositions[compIndex];
     (*m_rotations)[i] = allComponentRotations[compIndex];
-    (*m_startEntryPoints)[i] = allComponentEntryPoints[compIndex];
-    (*m_startExitPoints)[i] = allComponentExitPoints[compIndex];
+    (*m_entryPoints)[i] = allComponentEntryPoints[compIndex];
+    (*m_exitPoints)[i] = allComponentExitPoints[compIndex];
     ++i;
   }
 }
@@ -115,15 +120,15 @@ PathComponentInfo<InstTree>::position(size_t pathComponentIndex) const {
 template <typename InstTree>
 Eigen::Vector3d
 PathComponentInfo<InstTree>::entryPoint(size_t pathComponentIndex) const {
-  pathComponentRangeCheck(pathComponentIndex, *m_startEntryPoints);
-  return (*m_startEntryPoints)[pathComponentIndex];
+  pathComponentRangeCheck(pathComponentIndex, *m_entryPoints);
+  return (*m_entryPoints)[pathComponentIndex];
 }
 
 template <typename InstTree>
 Eigen::Vector3d
 PathComponentInfo<InstTree>::exitPoint(size_t pathComponentIndex) const {
-  pathComponentRangeCheck(pathComponentIndex, *m_startExitPoints);
-  return (*m_startExitPoints)[pathComponentIndex];
+  pathComponentRangeCheck(pathComponentIndex, *m_exitPoints);
+  return (*m_exitPoints)[pathComponentIndex];
 }
 
 template <typename InstTree>
@@ -140,10 +145,12 @@ const InstTree &PathComponentInfo<InstTree>::const_instrumentTree() const {
 
 template <typename InstTree>
 void
-PathComponentInfo<InstTree>::movePathComponent(size_t detectorIndex,
+PathComponentInfo<InstTree>::movePathComponent(size_t pathComponentIndex,
                                                const Eigen::Vector3d &offset) {
 
-  (*m_positions)[detectorIndex] += offset;
+  (*m_positions)[pathComponentIndex] += offset;
+  (*m_entryPoints)[pathComponentIndex] += offset;
+  (*m_exitPoints)[pathComponentIndex] += offset;
 
   // Would need to update detectorInfo?
 }
@@ -155,6 +162,8 @@ void PathComponentInfo<InstTree>::movePathComponents(
 
   for (auto &pathComponentIndex : pathComponentIndexes) {
     (*m_positions)[pathComponentIndex] += offset;
+    (*m_entryPoints)[pathComponentIndex] += offset;
+    (*m_exitPoints)[pathComponentIndex] += offset;
   }
 
   // Would need to update detectorInfo?
@@ -172,6 +181,10 @@ void PathComponentInfo<InstTree>::rotatePathComponent(
 
   (*m_positions)[pathComponentIndex] =
       transform * (*m_positions)[pathComponentIndex];
+  (*m_entryPoints)[pathComponentIndex] =
+      transform * (*m_entryPoints)[pathComponentIndex];
+  (*m_exitPoints)[pathComponentIndex] =
+      transform * (*m_exitPoints)[pathComponentIndex];
   (*m_rotations)[pathComponentIndex] =
       rotation * (*m_rotations)[pathComponentIndex];
 
@@ -192,11 +205,30 @@ void PathComponentInfo<InstTree>::rotatePathComponents(
 
     (*m_positions)[pathComponentIndex] =
         transform * (*m_positions)[pathComponentIndex];
+    (*m_entryPoints)[pathComponentIndex] =
+        transform * (*m_entryPoints)[pathComponentIndex];
+    (*m_exitPoints)[pathComponentIndex] =
+        transform * (*m_exitPoints)[pathComponentIndex];
     (*m_rotations)[pathComponentIndex] =
         rotation * (*m_rotations)[pathComponentIndex];
   }
 
   // Would need to update detectorInfo?
+}
+
+template <typename InstTree>
+bool PathComponentInfo<InstTree>::operator==(const PathComponentInfo<InstTree>& other) const{
+
+    // We only need to compare instruments
+    return this->const_instrumentTree() == other.const_instrumentTree();
+
+}
+
+template <typename InstTree>
+bool PathComponentInfo<InstTree>::operator!=(const PathComponentInfo<InstTree>& other) const{
+
+    return !this->operator==(other);
+
 }
 
 #endif
