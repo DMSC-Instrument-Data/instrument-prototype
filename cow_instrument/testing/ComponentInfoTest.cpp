@@ -19,7 +19,8 @@ TEST(component_info_test, test_construct) {
 
   std::shared_ptr<MockFlatTree> mockInstrumentTree{pMockInstrumentTree};
 
-  ComponentInfoWithMockInstrument{mockInstrumentTree};
+  ComponentInfoWithMockInstrument{
+      std::make_shared<DetectorInfo<MockFlatTree>>(mockInstrumentTree)};
 
   EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree))
       << "InstrumentTree used incorrectly";
@@ -29,19 +30,21 @@ TEST(component_info_test, test_move) {
 
   using namespace testing;
 
-  auto *instrumentTree = new NiceMockInstrumentTree{};
+  auto *instrumentTree = new testing::NiceMock<MockFlatTree>{};
   // configure what the subTreIndexes call will do. i.e. point to the first
   // component_id
   EXPECT_CALL(*instrumentTree, subTreeIndexes(_))
       .WillOnce(Return(std::vector<size_t>{0}));
 
-  ComponentInfoWithMockInstrument ComponentInfo{
-      std::shared_ptr<MockFlatTree>(instrumentTree)};
+  std::shared_ptr<NiceMockInstrumentTree> mockInstrumentTree(instrumentTree);
+  auto componentInfo = ComponentInfoWithNiceMockInstrument{
+      std::make_shared<DetectorInfo<NiceMockInstrumentTree>>(
+          mockInstrumentTree)};
 
-  auto before = ComponentInfo.position(0);
+  auto before = componentInfo.positionOfPathComponent(0);
   auto offset = Eigen::Vector3d{1, 0, 0};
-  ComponentInfo.move(0, offset);
-  auto after = ComponentInfo.position(0);
+  componentInfo.move(0, offset);
+  auto after = componentInfo.positionOfPathComponent(0);
 
   EXPECT_EQ(after, before + offset);
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(instrumentTree));
@@ -55,34 +58,37 @@ TEST(component_info_test, test_single_rotation_around_component_origin) {
   // configure what the subTreIndexes call will do. i.e. point to the first
   // component_id
   EXPECT_CALL(*instrumentTree, subTreeIndexes(_))
-      .WillOnce(Return(std::vector<size_t>{0}));
+      .WillRepeatedly(Return(std::vector<size_t>{0}));
   EXPECT_CALL(*instrumentTree, startPositions())
-      .WillOnce(Return(std::vector<Eigen::Vector3d>{Eigen::Vector3d{0, 0, 0}}));
+      .WillRepeatedly(
+          Return(std::vector<Eigen::Vector3d>{Eigen::Vector3d{0, 0, 0}}));
   EXPECT_CALL(*instrumentTree, startRotations())
-      .WillOnce(Return(std::vector<Eigen::Quaterniond>{
+      .WillRepeatedly(Return(std::vector<Eigen::Quaterniond>{
           Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()}}));
 
-  ComponentInfoWithMockInstrument ComponentInfo{
-      std::shared_ptr<MockFlatTree>(instrumentTree)};
+  std::shared_ptr<NiceMockInstrumentTree> mockInstrumentTree(instrumentTree);
+  auto componentInfo = ComponentInfoWithNiceMockInstrument{
+      std::make_shared<DetectorInfo<NiceMockInstrumentTree>>(
+          mockInstrumentTree)};
 
   const size_t sampleComponentIndex = 0;
 
   const Eigen::Vector3d rotationAxis{0, 0, 1};
   const double rotationAngle = M_PI / 2;
-  const Eigen::Vector3d rotationCenter{ComponentInfo.position(
+  const Eigen::Vector3d rotationCenter{componentInfo.positionOfPathComponent(
       sampleComponentIndex)}; // rotate around component center
 
-  ComponentInfo.rotate(sampleComponentIndex, rotationAxis, rotationAngle,
+  componentInfo.rotate(sampleComponentIndex, rotationAxis, rotationAngle,
                        rotationCenter);
 
-  auto after = ComponentInfo.rotation(sampleComponentIndex);
+  auto after = componentInfo.rotationOfPathComponent(sampleComponentIndex);
   auto rotMatrix = after.toRotationMatrix();
   // Check that some vector I define gets rotated as I would expect
   Eigen::Vector3d rotatedVector = rotMatrix * Eigen::Vector3d{1, 0, 0};
   EXPECT_TRUE(rotatedVector.isApprox(Eigen::Vector3d{0, 1, 0}, 1e-14))
       << "Internal rotation not updated correctly";
 
-  EXPECT_TRUE(ComponentInfo.position(sampleComponentIndex)
+  EXPECT_TRUE(componentInfo.positionOfPathComponent(sampleComponentIndex)
                   .isApprox(Eigen::Vector3d{0, 0, 0}, 1e-14))
       << "Position should be unchanged as rotation was around its own center";
 
@@ -103,24 +109,27 @@ TEST(component_info_test, test_multiple_rotation_around_component_origin) {
   EXPECT_CALL(*instrumentTree, subTreeIndexes(_))
       .WillRepeatedly(Return(std::vector<size_t>{0}));
   EXPECT_CALL(*instrumentTree, startPositions())
-      .WillOnce(Return(std::vector<Eigen::Vector3d>{rotationCenter}));
+      .WillRepeatedly(Return(std::vector<Eigen::Vector3d>{rotationCenter}));
   EXPECT_CALL(*instrumentTree, startRotations())
-      .WillOnce(Return(std::vector<Eigen::Quaterniond>{
+      .WillRepeatedly(Return(std::vector<Eigen::Quaterniond>{
           Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()}}));
 
-  ComponentInfoWithMockInstrument ComponentInfo{
-      std::shared_ptr<MockFlatTree>(instrumentTree)};
+  std::shared_ptr<NiceMockInstrumentTree> mockInstrumentTree(instrumentTree);
+  auto componentInfo = ComponentInfoWithNiceMockInstrument{
+      std::make_shared<DetectorInfo<NiceMockInstrumentTree>>(
+          mockInstrumentTree)};
 
   const size_t sampleComponentIndex = 0;
 
   // Rotate sample once by 45 degrees
-  ComponentInfo.rotate(sampleComponentIndex, rotationAxis, rotationAngle,
+  componentInfo.rotate(sampleComponentIndex, rotationAxis, rotationAngle,
                        rotationCenter);
   // Rotate sample again by 45 degrees
-  ComponentInfo.rotate(sampleComponentIndex, rotationAxis, rotationAngle,
+  componentInfo.rotate(sampleComponentIndex, rotationAxis, rotationAngle,
                        rotationCenter);
 
-  auto samplePosition = ComponentInfo.position(sampleComponentIndex);
+  auto samplePosition =
+      componentInfo.positionOfPathComponent(sampleComponentIndex);
 
   // Check that the position has not changed
   EXPECT_TRUE(samplePosition.isApprox(rotationCenter, 1e-14))
@@ -129,7 +138,8 @@ TEST(component_info_test, test_multiple_rotation_around_component_origin) {
   // Check that the internal rotation gets updated. i.e component is rotated
   // around its own centre.
   Eigen::Matrix3d rotMatrix =
-      ComponentInfo.rotation(sampleComponentIndex).toRotationMatrix();
+      componentInfo.rotationOfPathComponent(sampleComponentIndex)
+          .toRotationMatrix();
   // Check that some vector I define gets rotated as I would expect
   Eigen::Vector3d rotatedVector = rotMatrix * Eigen::Vector3d{1, 0, 0};
   EXPECT_TRUE(rotatedVector.isApprox(Eigen::Vector3d{0, 1, 0}, 1e-14))
@@ -151,24 +161,27 @@ TEST(component_info_test, test_single_rotation_around_arbitrary_center) {
   EXPECT_CALL(*instrumentTree, subTreeIndexes(_))
       .WillRepeatedly(Return(std::vector<size_t>{0}));
   EXPECT_CALL(*instrumentTree, startPositions())
-      .WillOnce(Return(std::vector<Eigen::Vector3d>{componentCenter}));
+      .WillRepeatedly(Return(std::vector<Eigen::Vector3d>{componentCenter}));
   EXPECT_CALL(*instrumentTree, startRotations())
-      .WillOnce(Return(std::vector<Eigen::Quaterniond>{
+      .WillRepeatedly(Return(std::vector<Eigen::Quaterniond>{
           Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()}}));
 
-  ComponentInfoWithMockInstrument ComponentInfo{
-      std::shared_ptr<MockFlatTree>(instrumentTree)};
+  std::shared_ptr<NiceMockInstrumentTree> mockInstrumentTree(instrumentTree);
+  auto componentInfo = ComponentInfoWithNiceMockInstrument{
+      std::make_shared<DetectorInfo<NiceMockInstrumentTree>>(
+          mockInstrumentTree)};
   const size_t sampleComponentIndex = 0;
 
-  ComponentInfo.rotate(sampleComponentIndex, rotationAxis, rotationAngle,
+  componentInfo.rotate(sampleComponentIndex, rotationAxis, rotationAngle,
                        rotationCenter);
   // Check that the position has the rotation applied.
-  EXPECT_TRUE(ComponentInfo.position(sampleComponentIndex)
+  EXPECT_TRUE(componentInfo.positionOfPathComponent(sampleComponentIndex)
                   .isApprox(Eigen::Vector3d(0, 1, 0), 1e-14));
 
   // Check that the internal rotation gets updated
   Eigen::Matrix3d rotMatrix =
-      ComponentInfo.rotation(sampleComponentIndex).toRotationMatrix();
+      componentInfo.rotationOfPathComponent(sampleComponentIndex)
+          .toRotationMatrix();
   // Check that some vector I define gets rotated as I would expect
   Eigen::Vector3d rotatedVector = rotMatrix * Eigen::Vector3d{1, 0, 0};
   EXPECT_TRUE(rotatedVector.isApprox(Eigen::Vector3d{0, 1, 0}, 1e-14))
@@ -190,48 +203,37 @@ TEST(component_info_test, test_multiple_rotation_arbitrary_center) {
   EXPECT_CALL(*instrumentTree, subTreeIndexes(_))
       .WillRepeatedly(Return(std::vector<size_t>{0}));
   EXPECT_CALL(*instrumentTree, startPositions())
-      .WillOnce(Return(std::vector<Eigen::Vector3d>{componentCenter}));
+      .WillRepeatedly(Return(std::vector<Eigen::Vector3d>{componentCenter}));
   EXPECT_CALL(*instrumentTree, startRotations())
-      .WillOnce(Return(std::vector<Eigen::Quaterniond>{
+      .WillRepeatedly(Return(std::vector<Eigen::Quaterniond>{
           Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()}}));
 
-  ComponentInfoWithMockInstrument ComponentInfo{
-      std::shared_ptr<MockFlatTree>(instrumentTree)};
+  std::shared_ptr<NiceMockInstrumentTree> mockInstrumentTree(instrumentTree);
+  auto componentInfo = ComponentInfoWithNiceMockInstrument{
+      std::make_shared<DetectorInfo<NiceMockInstrumentTree>>(
+          mockInstrumentTree)};
   const size_t sampleComponentIndex = 0;
 
   // Rotate once by 90 degrees around z should put detector at 0,1,0
-  ComponentInfo.rotate(sampleComponentIndex, rotationAxisZ, rotationAngle,
+  componentInfo.rotate(sampleComponentIndex, rotationAxisZ, rotationAngle,
                        rotationCenter);
   // Rotate again by 90 degrees around x should put detector at 0,0,1
-  ComponentInfo.rotate(sampleComponentIndex, rotationAxisX, rotationAngle,
+  componentInfo.rotate(sampleComponentIndex, rotationAxisX, rotationAngle,
                        rotationCenter);
 
   // Check that the position has the rotations applied.
-  EXPECT_TRUE(ComponentInfo.position(sampleComponentIndex)
+  EXPECT_TRUE(componentInfo.positionOfPathComponent(sampleComponentIndex)
                   .isApprox(Eigen::Vector3d(0, 0, 1), 1e-14));
 
   // Check that the internal rotation gets updated. i.e component is rotated
   // around its own centre.
   Eigen::Matrix3d rotMatrix =
-      ComponentInfo.rotation(sampleComponentIndex).toRotationMatrix();
+      componentInfo.rotationOfPathComponent(sampleComponentIndex)
+          .toRotationMatrix();
   // Check that some vector I define gets rotated as I would expect
   Eigen::Vector3d rotatedVector = rotMatrix * Eigen::Vector3d{1, 0, 0};
   EXPECT_TRUE(rotatedVector.isApprox(Eigen::Vector3d{0, 0, 1}, 1e-14))
       << "Internal component rotation not updated correctly";
 }
 
-TEST(component_info_test, test_detector_info_constructor) {
-  using namespace testing;
-
-  MockPathFactory mockPathFactory;
-  EXPECT_CALL(mockPathFactory, createL1(testing::_))
-      .WillOnce(testing::Return(new Paths(0, Path{0})));
-  EXPECT_CALL(mockPathFactory, createL2(testing::_))
-      .WillOnce(testing::Return(new Paths(0, Path{0})));
-
-  auto detectorInfo = std::make_shared<DetectorInfo<NiceMockInstrumentTree>>(
-      std::make_shared<NiceMockInstrumentTree>(), mockPathFactory);
-
-  ComponentInfo<NiceMockInstrumentTree> compInfo{detectorInfo};
-}
 }

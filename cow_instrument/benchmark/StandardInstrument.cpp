@@ -85,8 +85,10 @@ std::shared_ptr<Component> construct_root_component() {
 StandardInstrumentFixture::StandardInstrumentFixture()
     : StandardBenchmark<StandardInstrumentFixture>(),
       m_instrument(std_instrument::construct_root_component()),
-      m_componentInfo(std::make_shared<FlatTree>(
-          std_instrument::construct_root_component())),
+      m_componentInfo(std::make_shared<DetectorInfo<FlatTree>>(
+          std::make_shared<FlatTree>(
+              std_instrument::construct_root_component()),
+          SourceSampleDetectorPathFactory<FlatTree>{})),
       m_detectorInfo(std::make_shared<FlatTree>(
                          std_instrument::construct_root_component()),
                      SourceSampleDetectorPathFactory<FlatTree>{}) {}

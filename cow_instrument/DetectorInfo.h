@@ -21,6 +21,7 @@
 #include "PathComponentInfo.h"
 #include "PathFactory.h"
 #include "Spectrum.h"
+#include "SourceSampleDetectorPathFactory.h"
 
 /**
  * DetectorInfo type. Provides Meta-data context to an InstrumentTree
@@ -32,6 +33,10 @@ public:
   template <typename InstSptrType, typename PathFactoryType>
   explicit DetectorInfo(InstSptrType &&instrumentTree,
                         PathFactoryType &&pathFactory);
+
+  explicit DetectorInfo(std::shared_ptr<InstTree> &instrumentTree);
+
+  explicit DetectorInfo(std::shared_ptr<InstTree> &&instrumentTree);
 
   void setMasked(size_t detectorIndex);
 
@@ -65,7 +70,16 @@ public:
                        const Eigen::Vector3d &axis, const double &theta,
                        const Eigen::Vector3d &center);
 
+  void rotatePathComponents(const std::vector<size_t> &pathComponentIndexes,
+                            const Eigen::Vector3d &axis, const double &theta,
+                            const Eigen::Vector3d &center);
+
+  void movePathComponents(const std::vector<size_t> &pathComponentIndexes,
+                          const Eigen::Vector3d &offset);
+
   std::vector<Spectrum> makeSpectra() const;
+
+  const PathComponentInfo<InstTree> &pathComponentInfo() const;
 
   CowPtr<L2s> l2s() const;
 
@@ -129,6 +143,52 @@ DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
       m_detectorComponentIndexes(std::make_shared<const std::vector<size_t>>(
           instrumentTree->detectorComponentIndexes())),
       m_instrumentTree(std::forward<InstSptrType>(instrumentTree)),
+      m_positions(std::make_shared<std::vector<Eigen::Vector3d>>(m_nDetectors)),
+      m_rotations(
+          std::make_shared<std::vector<Eigen::Quaterniond>>(m_nDetectors)),
+      m_pathComponentInfo(
+          std::make_shared<PathComponentInfo<InstTree>>(m_instrumentTree)) {
+
+  init();
+}
+
+template <typename InstTree>
+DetectorInfo<InstTree>::DetectorInfo(std::shared_ptr<InstTree> &instrumentTree)
+    : m_l2Paths(SourceSampleDetectorPathFactory<InstTree>{}.createL2(
+          *instrumentTree)),
+      m_l1Paths(SourceSampleDetectorPathFactory<InstTree>{}.createL1(
+          *instrumentTree)),
+      m_nDetectors(instrumentTree->nDetectors()),
+      m_l1(std::make_shared<L1s>(m_nDetectors)),
+      m_l2(std::make_shared<L2s>(m_nDetectors)),
+      m_isMasked(std::make_shared<MaskFlags>(m_nDetectors, Bool(false))),
+      m_isMonitor(std::make_shared<MonitorFlags>(m_nDetectors, Bool(false))),
+      m_detectorComponentIndexes(std::make_shared<const std::vector<size_t>>(
+          instrumentTree->detectorComponentIndexes())),
+      m_instrumentTree(instrumentTree),
+      m_positions(std::make_shared<std::vector<Eigen::Vector3d>>(m_nDetectors)),
+      m_rotations(
+          std::make_shared<std::vector<Eigen::Quaterniond>>(m_nDetectors)),
+      m_pathComponentInfo(
+          std::make_shared<PathComponentInfo<InstTree>>(m_instrumentTree)) {
+
+  init();
+}
+
+template <typename InstTree>
+DetectorInfo<InstTree>::DetectorInfo(std::shared_ptr<InstTree> &&instrumentTree)
+    : m_l2Paths(SourceSampleDetectorPathFactory<InstTree>{}.createL2(
+          *instrumentTree)),
+      m_l1Paths(SourceSampleDetectorPathFactory<InstTree>{}.createL1(
+          *instrumentTree)),
+      m_nDetectors(instrumentTree->nDetectors()),
+      m_l1(std::make_shared<L1s>(m_nDetectors)),
+      m_l2(std::make_shared<L2s>(m_nDetectors)),
+      m_isMasked(std::make_shared<MaskFlags>(m_nDetectors, Bool(false))),
+      m_isMonitor(std::make_shared<MonitorFlags>(m_nDetectors, Bool(false))),
+      m_detectorComponentIndexes(std::make_shared<const std::vector<size_t>>(
+          instrumentTree->detectorComponentIndexes())),
+      m_instrumentTree(std::forward<std::shared_ptr<InstTree>>(instrumentTree)),
       m_positions(std::make_shared<std::vector<Eigen::Vector3d>>(m_nDetectors)),
       m_rotations(
           std::make_shared<std::vector<Eigen::Quaterniond>>(m_nDetectors)),
@@ -299,8 +359,8 @@ void DetectorInfo<InstTree>::moveDetector(size_t detectorIndex,
 
   (*m_positions)[detectorIndex] += offset;
 
-  // Only l2 needs to be recalculated.
-  initL2();
+  // TODO should be L2 only
+  init();
 }
 
 template <typename InstTree>
@@ -311,8 +371,8 @@ void DetectorInfo<InstTree>::moveDetectors(
     (*m_positions)[detIndex] += offset;
   }
 
-  // Only l2 needs to be recalculated.
-  initL2();
+  // Only l2 needs to be recalculated. TODO.
+  init();
 }
 
 template <typename InstTree>
@@ -329,8 +389,8 @@ void DetectorInfo<InstTree>::rotateDetector(size_t detectorIndex,
   (*m_positions)[detectorIndex] = transform * (*m_positions)[detectorIndex];
   (*m_rotations)[detectorIndex] = rotation * (*m_rotations)[detectorIndex];
 
-  // Only l2 needs to be recalculated.
-  initL2();
+  // Only l2 needs to be recalculated. TODO.
+  init();
 }
 
 template <typename InstTree>
@@ -347,8 +407,32 @@ void DetectorInfo<InstTree>::rotateDetectors(
     (*m_positions)[detIndex] = transform * (*m_positions)[detIndex];
     (*m_rotations)[detIndex] = rotation * (*m_rotations)[detIndex];
   }
-  // Only l2 needs to be recalculated.
-  initL2();
+  // Only l2 needs to be recalculated. TODO.
+  init();
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::rotatePathComponents(
+    const std::vector<size_t> &pathComponentIndexes,
+    const Eigen::Vector3d &axis, const double &theta,
+    const Eigen::Vector3d &center) {
+
+  m_pathComponentInfo->rotatePathComponents(pathComponentIndexes, axis, theta,
+                                            center);
+
+  // Only l2 needs to be recalculated. TODO.
+  init();
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::movePathComponents(
+    const std::vector<size_t> &pathComponentIndexes,
+    const Eigen::Vector3d &offset) {
+
+  m_pathComponentInfo->movePathComponents(pathComponentIndexes, offset);
+
+  // Only l2 needs to be recalculated. TODO.
+  init();
 }
 
 template <typename InstTree>
@@ -365,5 +449,10 @@ template <typename InstTree> CowPtr<L2s> DetectorInfo<InstTree>::l2s() const {
   return m_l2;
 }
 
+template <typename InstTree>
+const PathComponentInfo<InstTree> &
+DetectorInfo<InstTree>::pathComponentInfo() const {
+  return *m_pathComponentInfo;
+}
 
 #endif
