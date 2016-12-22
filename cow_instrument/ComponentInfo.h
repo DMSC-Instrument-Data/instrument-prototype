@@ -59,9 +59,12 @@ private:
   /// All rotations indexed by component index. Owned by ComponentInfo.
   CowPtr<std::vector<Eigen::Quaterniond>> m_rotations;
   // TODO shapes and parameters would also be stored here
-  std::vector<int64_t> m_componentToDetector;
+  /// Inverted map to get detector indexes from component indexes
+  std::vector<int64_t> m_componentToDetectorIndex;
+  /// Inverted map to get path component indexes indexes from component indexes
+  std::vector<int64_t> m_componentToPathIndex;
 
-  void makeInvertedMap();
+  void makeInvertedMaps();
 };
 
 template <typename InstTree>
@@ -96,9 +99,10 @@ ComponentInfo<InstTree>::ComponentInfo(
           m_instrumentTree2.startPositions())),
       m_rotations(std::make_shared<std::vector<Eigen::Quaterniond>>(
           m_instrumentTree2.startRotations())),
-      m_componentToDetector(m_instrumentTree2.componentSize(), -1) {
+      m_componentToDetectorIndex(m_instrumentTree2.componentSize(), -1),
+      m_componentToPathIndex(m_instrumentTree2.componentSize(), -1) {
 
-  makeInvertedMap();
+  makeInvertedMaps();
 }
 
 template <typename InstTree>
@@ -110,16 +114,21 @@ ComponentInfo<InstTree>::ComponentInfo(
           m_instrumentTree2.startPositions())),
       m_rotations(std::make_shared<std::vector<Eigen::Quaterniond>>(
           m_instrumentTree2.startRotations())),
-      m_componentToDetector(m_instrumentTree2.componentSize(), -1) {
-  makeInvertedMap();
+      m_componentToDetectorIndex(m_instrumentTree2.componentSize(), -1),
+      m_componentToPathIndex(m_instrumentTree2.componentSize(), -1) {
+  makeInvertedMaps();
 }
 
-template <typename InstTree> void ComponentInfo<InstTree>::makeInvertedMap() {
+template <typename InstTree> void ComponentInfo<InstTree>::makeInvertedMaps() {
 
   // Invert the map.
   auto detToComponent = m_instrumentTree2.detectorComponentIndexes();
+  auto pathToComponent = m_instrumentTree2.pathComponentIndexes();
   for (size_t i = 0; i < detToComponent.size(); ++i) {
-    m_componentToDetector[detToComponent[i]] = i;
+    m_componentToDetectorIndex[detToComponent[i]] = i;
+  }
+  for (size_t i = 0; i < pathToComponent.size(); ++i) {
+    m_componentToPathIndex[pathToComponent[i]] = i;
   }
 }
 
@@ -160,20 +169,29 @@ template <typename InstTree>
 void ComponentInfo<InstTree>::move2(size_t componentIndex,
                                     const Eigen::Vector3d &offset) {
 
-  const std::vector<size_t> indexes =
+  // All "connected" component indexes
+  const std::vector<size_t> componentIndexes =
       m_instrumentTree->subTreeIndexes(componentIndex);
 
   std::vector<size_t>
-      detectorsToMove; // we would have an equivalent for path components.
-  for (auto &compIndex : indexes) {
-    auto detIndex = m_componentToDetector[compIndex];
+      detectorsToMove; // Cache of detector indexes which will be moved.
+  std::vector<size_t> pathComponentsToMove; // Cache of path component indexes
+                                            // which will be moved
+  for (auto &compIndex : componentIndexes) {
+    auto detIndex = m_componentToDetectorIndex[compIndex];
     if (detIndex >= 0) {
       detectorsToMove.push_back(detIndex);
     }
-    // TODO m_entry and m_exit points should also be translated here!
+
+    auto pathIndex = m_componentToPathIndex[compIndex];
+    if (pathIndex >= 0) {
+      pathComponentsToMove.push_back(pathIndex);
+    }
   }
 
-  m_detectorInfo->moveDetectors(detectorsToMove, componentIndex, offset);
+  m_detectorInfo->moveDetectors(detectorsToMove, offset);
+  m_detectorInfo->pathComponentInfo().movePathComponents(pathComponentsToMove,
+                                                         offset);
 }
 
 template <typename InstTree>
@@ -182,18 +200,29 @@ void ComponentInfo<InstTree>::rotate2(size_t componentIndex,
                                       const double &theta,
                                       const Eigen::Vector3d &center) {
 
-  const std::vector<size_t> indexes =
+  // All "connected" component indexes
+  const std::vector<size_t> componentIndexes =
       m_instrumentTree->subTreeIndexes(componentIndex);
 
-  std::vector<size_t> detectorsToRotate;
-  for (auto &compIndex : indexes) {
-    auto detIndex = m_componentToDetector[compIndex];
+  std::vector<size_t>
+      detectorsToRotate; // Cache of detector indexes which will be rotated.
+  std::vector<size_t> pathComponentsToRotate; // Cache of path component indexes
+                                              // which will be rotated
+  for (auto &compIndex : componentIndexes) {
+    auto detIndex = m_componentToDetectorIndex[compIndex];
     if (detIndex >= 0) {
       detectorsToRotate.push_back(detIndex);
     }
-    // TODO m_entry and m_exit points should also be translated here!
-  }
+
+    auto pathIndex = m_componentToPathIndex[compIndex];
+    if (pathIndex >= 0) {
+      pathComponentsToRotate.push_back(pathIndex);
+    }
+    }
+
   m_detectorInfo->rotateDetectors(detectorsToRotate, axis, theta, center);
+  m_detectorInfo->pathComponentInfo().rotatePathComponents(
+      pathComponentsToRotate, axis, theta, center);
 }
 
 template <typename InstTree>
