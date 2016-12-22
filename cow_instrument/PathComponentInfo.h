@@ -14,8 +14,10 @@
 template <typename InstTree> class PathComponentInfo {
 
 public:
-  template <typename InstSptrType>
-  explicit PathComponentInfo(InstSptrType &&instrumentTree);
+  // template <typename InstSptrType>
+  // explicit PathComponentInfo(InstSptrType &&instrumentTree);
+
+  explicit PathComponentInfo(std::shared_ptr<InstTree> &instrumentTree);
 
   Eigen::Vector3d position(size_t pathComponentIndex) const;
 
@@ -24,6 +26,12 @@ public:
   Eigen::Vector3d exitPoint(size_t pathComponentIndex) const;
 
   Eigen::Quaterniond rotation(size_t pathComponentIndex) const;
+
+  const std::vector<Eigen::Vector3d> &const_entryPoints() const;
+
+  const std::vector<Eigen::Vector3d> &const_exitPoints() const;
+
+  const std::vector<double> &const_pathLengths() const;
 
   const InstTree &const_instrumentTree() const;
 
@@ -41,7 +49,7 @@ public:
                             const Eigen::Vector3d &axis, const double &theta,
                             const Eigen::Vector3d &center);
 
-  bool operator==(const PathComponentInfo<InstTree>& other) const;
+  bool operator==(const PathComponentInfo<InstTree> &other) const;
 
   bool operator!=(const PathComponentInfo<InstTree> &other) const;
 
@@ -51,6 +59,8 @@ private:
   CowPtr<std::vector<Eigen::Vector3d>> m_entryPoints;
   /// All path component exit points
   CowPtr<std::vector<Eigen::Vector3d>> m_exitPoints;
+  /// All path component entry points.
+  std::shared_ptr<const std::vector<double>> m_pathLengths;
   /// Locally (detector) indexed positions
   CowPtr<std::vector<Eigen::Vector3d>> m_positions;
   /// Locally (detector) indexed rotations
@@ -73,39 +83,36 @@ void pathComponentRangeCheck(size_t pathComponentIndex, const U &container) {
   }
 }
 }
+
 template <typename InstTree>
-template <typename InstSptrType>
-PathComponentInfo<InstTree>::PathComponentInfo(InstSptrType &&instrumentTree)
+PathComponentInfo<InstTree>::PathComponentInfo(
+    std::shared_ptr<InstTree> &instrumentTree)
 
     : m_nPathComponents(instrumentTree->nPathComponents()),
-      m_entryPoints(
-          std::make_shared<std::vector<Eigen::Vector3d>>(m_nPathComponents)),
-      m_exitPoints(
-          std::make_shared<std::vector<Eigen::Vector3d>>(m_nPathComponents)),
+      m_entryPoints(std::make_shared<std::vector<Eigen::Vector3d>>(
+          instrumentTree->startEntryPoints())),
+      m_exitPoints(std::make_shared<std::vector<Eigen::Vector3d>>(
+          instrumentTree->startExitPoints())),
       m_positions(
           std::make_shared<std::vector<Eigen::Vector3d>>(m_nPathComponents)),
+      m_pathLengths(
+          std::make_shared<std::vector<double>>(instrumentTree->pathLengths())),
       m_rotations(
           std::make_shared<std::vector<Eigen::Quaterniond>>(m_nPathComponents)),
       m_pathComponentIndexes(std::make_shared<const std::vector<size_t>>(
           instrumentTree->pathComponentIndexes())),
-      m_instrumentTree(std::forward<InstSptrType>(instrumentTree)) {
+      m_instrumentTree(instrumentTree) {
 
   // TODO. Do this without copying everything!
   std::vector<Eigen::Vector3d> allComponentPositions =
       m_instrumentTree->startPositions();
   std::vector<Eigen::Quaterniond> allComponentRotations =
       m_instrumentTree->startRotations();
-  std::vector<Eigen::Vector3d> allComponentEntryPoints =
-      m_instrumentTree->startEntryPoints();
-  std::vector<Eigen::Vector3d> allComponentExitPoints =
-      m_instrumentTree->startExitPoints();
 
   size_t i = 0;
   for (auto &compIndex : (*m_pathComponentIndexes)) {
     (*m_positions)[i] = allComponentPositions[compIndex];
     (*m_rotations)[i] = allComponentRotations[compIndex];
-    (*m_entryPoints)[i] = allComponentEntryPoints[compIndex];
-    (*m_exitPoints)[i] = allComponentExitPoints[compIndex];
     ++i;
   }
 }
@@ -136,6 +143,24 @@ Eigen::Quaterniond
 PathComponentInfo<InstTree>::rotation(size_t pathComponentIndex) const {
   pathComponentRangeCheck(pathComponentIndex, *m_rotations);
   return (*m_rotations)[pathComponentIndex];
+}
+
+template <typename InstTree>
+const std::vector<Eigen::Vector3d> &
+PathComponentInfo<InstTree>::const_entryPoints() const {
+  return (*m_entryPoints);
+}
+
+template <typename InstTree>
+const std::vector<Eigen::Vector3d> &
+PathComponentInfo<InstTree>::const_exitPoints() const {
+  return (*m_exitPoints);
+}
+
+template <typename InstTree>
+const std::vector<double> &
+PathComponentInfo<InstTree>::const_pathLengths() const {
+  return (*m_pathLengths);
 }
 
 template <typename InstTree>
@@ -217,18 +242,18 @@ void PathComponentInfo<InstTree>::rotatePathComponents(
 }
 
 template <typename InstTree>
-bool PathComponentInfo<InstTree>::operator==(const PathComponentInfo<InstTree>& other) const{
+bool PathComponentInfo<InstTree>::
+operator==(const PathComponentInfo<InstTree> &other) const {
 
-    // We only need to compare instruments
-    return this->const_instrumentTree() == other.const_instrumentTree();
-
+  // We only need to compare instruments
+  return this->const_instrumentTree() == other.const_instrumentTree();
 }
 
 template <typename InstTree>
-bool PathComponentInfo<InstTree>::operator!=(const PathComponentInfo<InstTree>& other) const{
+bool PathComponentInfo<InstTree>::
+operator!=(const PathComponentInfo<InstTree> &other) const {
 
-    return !this->operator==(other);
-
+  return !this->operator==(other);
 }
 
 #endif

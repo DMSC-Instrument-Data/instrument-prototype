@@ -18,6 +18,7 @@
 #include "MonitorFlags.h"
 #include "Path.h"
 #include "PathComponent.h"
+#include "PathComponentInfo.h"
 #include "PathFactory.h"
 #include "Spectrum.h"
 
@@ -70,8 +71,12 @@ public:
 
 private:
   void init();
-  void initL2();
-  void initL1();
+  void initL2(const std::vector<Eigen::Vector3d> &entryPoints,
+              const std::vector<Eigen::Vector3d> &exitPoints,
+              const std::vector<double> &pathLengths);
+  void initL1(const std::vector<Eigen::Vector3d> &entryPoints,
+              const std::vector<Eigen::Vector3d> &exitPoints,
+              const std::vector<double> &pathLengths);
 
   //------------------- Metadata -------------
   const size_t m_nDetectors;
@@ -83,13 +88,6 @@ private:
   CowPtr<L2s> m_l2;
   CowPtr<const Paths> m_l2Paths;
   CowPtr<const Paths> m_l1Paths;
-  /// All path component entry points.
-  CowPtr<std::vector<Eigen::Vector3d>> m_startEntryPoints;
-  /// All path component exit points
-  CowPtr<std::vector<Eigen::Vector3d>> m_startExitPoints;
-  /// All path lengths
-  std::shared_ptr<const std::vector<double>> m_pathLengths; // Shouldn't change
-  /// Component indexes per detector index
   std::shared_ptr<const std::vector<size_t>> m_detectorComponentIndexes;
   /// Component info
   std::shared_ptr<InstTree> m_instrumentTree;
@@ -97,6 +95,8 @@ private:
   std::shared_ptr<std::vector<Eigen::Vector3d>> m_positions;
   /// Locally (detector) indexed rotations
   std::shared_ptr<std::vector<Eigen::Quaterniond>> m_rotations;
+  /// Path component information
+  CowPtr<PathComponentInfo<InstTree>> m_pathComponentInfo;
 };
 
 namespace {
@@ -126,18 +126,14 @@ DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
       m_l2(std::make_shared<L2s>(m_nDetectors)),
       m_isMasked(std::make_shared<MaskFlags>(m_nDetectors, Bool(false))),
       m_isMonitor(std::make_shared<MonitorFlags>(m_nDetectors, Bool(false))),
-      m_startEntryPoints(std::make_shared<std::vector<Eigen::Vector3d>>(
-          instrumentTree->startEntryPoints())),
-      m_startExitPoints(std::make_shared<std::vector<Eigen::Vector3d>>(
-          instrumentTree->startExitPoints())),
-      m_pathLengths(std::make_shared<const std::vector<double>>(
-          instrumentTree->pathLengths())),
       m_detectorComponentIndexes(std::make_shared<const std::vector<size_t>>(
           instrumentTree->detectorComponentIndexes())),
       m_instrumentTree(std::forward<InstSptrType>(instrumentTree)),
       m_positions(std::make_shared<std::vector<Eigen::Vector3d>>(m_nDetectors)),
       m_rotations(
-          std::make_shared<std::vector<Eigen::Quaterniond>>(m_nDetectors)) {
+          std::make_shared<std::vector<Eigen::Quaterniond>>(m_nDetectors)),
+      m_pathComponentInfo(
+          std::make_shared<PathComponentInfo<InstTree>>(m_instrumentTree)) {
 
   init();
 }
@@ -150,6 +146,7 @@ void DetectorInfo<InstTree>::setMasked(size_t detectorIndex) {
 
 template <typename InstTree> void DetectorInfo<InstTree>::init() {
 
+  // TODO. Refactor this so that a copy is not required!
   std::vector<Eigen::Vector3d> allComponentPositions =
       m_instrumentTree->startPositions();
   std::vector<Eigen::Quaterniond> allComponentRotations =
@@ -162,11 +159,26 @@ template <typename InstTree> void DetectorInfo<InstTree>::init() {
     ++i;
   }
 
-  initL1();
-  initL2();
+  /* Be warned that DetectorInfo is going to be internally indexing the
+     following by path
+     component index not detector index.
+  */
+  const std::vector<Eigen::Vector3d> &entryPoints =
+      m_pathComponentInfo->const_entryPoints();
+  const std::vector<Eigen::Vector3d> &exitPoints =
+      m_pathComponentInfo->const_exitPoints();
+  const std::vector<double> &pathLengths =
+      m_pathComponentInfo->const_pathLengths();
+
+  initL1(entryPoints, exitPoints, pathLengths);
+  initL2(entryPoints, exitPoints, pathLengths);
 }
 
-template <typename InstTree> void DetectorInfo<InstTree>::initL1() {
+template <typename InstTree>
+void
+DetectorInfo<InstTree>::initL1(const std::vector<Eigen::Vector3d> &entryPoints,
+                               const std::vector<Eigen::Vector3d> &exitPoints,
+                               const std::vector<double> &pathLengths) {
 
   /*
    * Caution for future extension of this: We must not double count the
@@ -187,19 +199,22 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL1() {
                              "components (sample + source).");
     }
 
-    double l1 = (*m_pathLengths)[path[i]];
+    double l1 = pathLengths[path[i]];
     for (i = 1; i < path.size(); ++i) {
 
-      l1 += distance((*m_startEntryPoints)[path[i]],
-                     (*m_startExitPoints)[path[i - 1]]);
-      l1 += (*m_pathLengths)[path[i]];
+      l1 += distance(entryPoints[path[i]], exitPoints[path[i - 1]]);
+      l1 += pathLengths[path[i]];
     }
 
     (*m_l1)[detectorIndex] = l1;
   }
 }
 
-template <typename InstTree> void DetectorInfo<InstTree>::initL2() {
+template <typename InstTree>
+void
+DetectorInfo<InstTree>::initL2(const std::vector<Eigen::Vector3d> &entryPoints,
+                               const std::vector<Eigen::Vector3d> &exitPoints,
+                               const std::vector<double> &pathLengths) {
 
   // Loop over all detector indexes. We will have a path for each.
   for (size_t detectorIndex = 0; detectorIndex < m_nDetectors;
@@ -212,15 +227,14 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL2() {
       throw std::logic_error("Cannot have a L2 specified with less than 1 path "
                              "components (sample).");
     }
-    double l2 = (*m_pathLengths)[path[i]];
+    double l2 = pathLengths[path[i]];
 
     // For each detector-l2-path calculate the total neutronic length
     for (i = 1; i < path.size(); ++i) {
-      l2 += distance((*m_startEntryPoints)[path[i]],
-                     (*m_startExitPoints)[path[i - 1]]);
-      l2 += (*m_pathLengths)[path[i]];
+      l2 += distance(entryPoints[path[i]], exitPoints[path[i - 1]]);
+      l2 += pathLengths[path[i]];
     }
-    l2 += distance((*m_startExitPoints)[path[i - 1]], detectorPos);
+    l2 += distance(exitPoints[path[i - 1]], detectorPos);
 
     (*m_l2)[detectorIndex] = l2;
   }

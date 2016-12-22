@@ -128,7 +128,7 @@ public:
     ON_CALL(*this, detectorComponentIndexes())
         .WillByDefault(testing::Return(std::vector<size_t>(nDetectors, 0)));
 
-    std::vector<size_t> pathComponentIndexesData(nDetectors + 1);
+    std::vector<size_t> pathComponentIndexesData(1);
     std::iota(pathComponentIndexesData.begin(), pathComponentIndexesData.end(),
               nDetectors);
     ON_CALL(*this, pathComponentIndexes())
