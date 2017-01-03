@@ -14,8 +14,6 @@
 template <typename InstTree> class PathComponentInfo {
 
 public:
-  // template <typename InstSptrType>
-  // explicit PathComponentInfo(InstSptrType &&instrumentTree);
 
   explicit PathComponentInfo(std::shared_ptr<InstTree> &instrumentTree);
 

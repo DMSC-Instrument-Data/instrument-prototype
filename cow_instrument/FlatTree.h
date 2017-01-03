@@ -56,8 +56,11 @@ public:
   std::vector<ComponentProxy>::const_iterator cend() const;
 
   size_t componentSize() const;
-  /// Enable use to determine all sub-components.
+  /// Enable use to determine all sub-components proxy indexes.
   std::vector<size_t> subTreeIndexes(size_t proxyIndex) const;
+  /// Enable use to determine sub-component proxy indexes only down to the next
+  /// level.
+  std::vector<size_t> nextLevelIndexes(size_t proxyIndex) const;
 
   std::vector<Eigen::Vector3d> startPositions() const;
   std::vector<Eigen::Quaterniond> startRotations() const;

@@ -26,8 +26,7 @@ public:
         for (size_t i = 0; i < nComponents; ++i) {
           // throw std::runtime_error("This benchmark doesn't make sense any
           // more");
-          benchmark::DoNotOptimize(pos +=
-                                   m_componentInfo.positionOfPathComponent(i));
+          benchmark::DoNotOptimize(pos += m_componentInfo.position(i));
         }
       }
     }

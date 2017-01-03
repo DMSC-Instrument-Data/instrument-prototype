@@ -24,13 +24,9 @@ public:
       std::shared_ptr<DetectorInfo<InstTree>> &&detectorInfo);
   explicit ComponentInfo(std::shared_ptr<DetectorInfo<InstTree>> &detectorInfo);
 
-  Eigen::Vector3d positionOfDetector(size_t componentIndex) const;
+  Eigen::Vector3d position(size_t componentIndex) const;
 
-  Eigen::Vector3d positionOfPathComponent(size_t componentIndex) const;
-
-  Eigen::Quaterniond rotationOfDetector(size_t componentIndex) const;
-
-  Eigen::Quaterniond rotationOfPathComponent(size_t componentIndex) const;
+  Eigen::Quaterniond rotation(size_t componentIndex) const;
 
   size_t size() const;
 
@@ -89,73 +85,57 @@ template <typename InstTree> void ComponentInfo<InstTree>::makeInvertedMaps() {
   }
 }
 
-/**
- * Preferred mechanism would be to go through DetectorInfo.
- */
-template <typename InstTree>
-Eigen::Vector3d
-ComponentInfo<InstTree>::positionOfDetector(size_t componentIndex) const {
 
-  auto detIndex = m_componentToDetectorIndex[componentIndex];
-  if (detIndex >= 0) {
-    return m_detectorInfo->positionDetector(detIndex);
+template <typename InstTree>
+Eigen::Vector3d ComponentInfo<InstTree>::position(size_t componentIndex) const {
+
+  const std::vector<size_t> componentIndexes =
+      m_instrumentTree.nextLevelIndexes(componentIndex);
+  const auto nextLevelSize = componentIndexes.size();
+  if (nextLevelSize > 0) {
+    // We are dealing with a composite
+    auto pos = Eigen::Vector3d{0, 0, 0};
+    for (auto &index : componentIndexes) {
+      pos += this->position(index);
+    }
+    pos /= nextLevelSize;
+    return pos;
   } else {
-    throw std::invalid_argument(
-        "No detector with corresponding component index " +
-        std::to_string(componentIndex));
+    // Is either a path component or a detector
+    auto detIndex = m_componentToDetectorIndex[componentIndex];
+    if (detIndex >= 0) {
+      return m_detectorInfo->position(detIndex);
+    } else {
+      auto pathIndex = m_componentToPathIndex[componentIndex];
+
+      return m_detectorInfo->pathComponentInfo().position(pathIndex);
+    }
   }
 }
 
-/**
- * Preferred mechanism would be to go through DetectorInfo.
- */
-template <typename InstTree>
-Eigen::Vector3d
-ComponentInfo<InstTree>::positionOfPathComponent(size_t componentIndex) const {
-
-  auto pathIndex = m_componentToPathIndex[componentIndex];
-  if (pathIndex >= 0) {
-    return m_detectorInfo->pathComponentInfo().position(pathIndex);
-  } else {
-    throw std::invalid_argument(
-        "No path component with corresponding component index " +
-        std::to_string(componentIndex));
-  }
-}
-
-/**
- * Preferred mechanism would be to go through DetectorInfo.
- */
 template <typename InstTree>
 Eigen::Quaterniond
-ComponentInfo<InstTree>::rotationOfDetector(size_t componentIndex) const {
-
-  auto detIndex = m_componentToPathIndex[componentIndex];
-  if (detIndex >= 0) {
-    return m_detectorInfo->rotationDetector(detIndex);
+ComponentInfo<InstTree>::rotation(size_t componentIndex) const {
+  const std::vector<size_t> componentIndexes =
+      m_instrumentTree.nextLevelIndexes(componentIndex);
+  const auto nextLevelSize = componentIndexes.size();
+  if (nextLevelSize > 0) {
+    // We are dealing with a composite
+    throw std::runtime_error("Rotations for composites not implemented");
   } else {
-    throw std::invalid_argument(
-        "No detector with corresponding component index " +
-        std::to_string(componentIndex));
+    // Is either a path component or a detector
+    auto detIndex = m_componentToDetectorIndex[componentIndex];
+    if (detIndex >= 0) {
+      return m_detectorInfo->rotation(detIndex);
+    } else {
+      auto pathIndex = m_componentToPathIndex[componentIndex];
+
+      return m_detectorInfo->pathComponentInfo().rotation(pathIndex);
+    }
   }
 }
 
-/**
- * Preferred mechanism would be to go through DetectorInfo.
- */
-template <typename InstTree>
-Eigen::Quaterniond
-ComponentInfo<InstTree>::rotationOfPathComponent(size_t componentIndex) const {
 
-  auto pathIndex = m_componentToPathIndex[componentIndex];
-  if (pathIndex >= 0) {
-    return m_detectorInfo->pathComponentInfo().rotation(pathIndex);
-  } else {
-    throw std::invalid_argument(
-        "No path component with corresponding component index " +
-        std::to_string(componentIndex));
-  }
-}
 
 template <typename InstTree>
 size_t ComponentInfo<InstTree>::componentSize() const {
@@ -223,12 +203,11 @@ void ComponentInfo<InstTree>::rotate(size_t componentIndex,
     }
 
     // Anything else in the subtree is ignored. Correctly.
-    }
+  }
 
   m_detectorInfo->rotateDetectors(detectorsToRotate, axis, theta, center);
   m_detectorInfo->rotatePathComponents(pathComponentsToRotate, axis, theta,
                                        center);
 }
-
 
 #endif

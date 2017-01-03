@@ -23,9 +23,8 @@ public:
   virtual std::string name() const = 0;
   virtual bool accept(class ComponentVisitor *visitor) const = 0;
 
-  virtual Eigen::Vector3d getPos() const = 0; // TODO. Remove to avoid mistakes
-  virtual Eigen::Quaterniond
-  getRotation() const = 0; // TODO. Remove to avoid mistakes
+  virtual Eigen::Vector3d getPos() const = 0;
+  virtual Eigen::Quaterniond getRotation() const = 0;
 };
 
 #endif

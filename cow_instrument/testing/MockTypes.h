@@ -82,6 +82,7 @@ public:
   virtual std::vector<Eigen::Vector3d> startPositions() const = 0;
   virtual std::vector<Eigen::Quaterniond> startRotations() const = 0;
   virtual std::vector<size_t> subTreeIndexes(size_t proxyIndex) const = 0;
+  virtual std::vector<size_t> nextLevelIndexes(size_t proxyIndex) const = 0;
   virtual size_t detIndexToCompIndex(size_t detectorIndex) const = 0;
   virtual size_t pathIndexToCompIndex(size_t pathIndex) const = 0;
   virtual std::vector<Eigen::Vector3d> startEntryPoints() const = 0;
@@ -157,13 +158,13 @@ public:
   }
   MOCK_CONST_METHOD0(nDetectors, size_t());
   MOCK_CONST_METHOD0(nPathComponents, size_t());
-  MOCK_CONST_METHOD1(getDetector, const Detector &(size_t));
   MOCK_CONST_METHOD0(samplePathIndex, size_t());
   MOCK_CONST_METHOD0(sourcePathIndex, size_t());
   MOCK_CONST_METHOD0(componentSize, size_t());
   MOCK_CONST_METHOD0(startPositions, std::vector<Eigen::Vector3d>());
   MOCK_CONST_METHOD0(startRotations, std::vector<Eigen::Quaterniond>());
   MOCK_CONST_METHOD1(subTreeIndexes, std::vector<size_t>(size_t));
+  MOCK_CONST_METHOD1(nextLevelIndexes, std::vector<size_t>(size_t));
   MOCK_CONST_METHOD1(detIndexToCompIndex, size_t(size_t));
   MOCK_CONST_METHOD1(pathIndexToCompIndex, size_t(size_t));
   MOCK_CONST_METHOD0(startEntryPoints, std::vector<Eigen::Vector3d>());

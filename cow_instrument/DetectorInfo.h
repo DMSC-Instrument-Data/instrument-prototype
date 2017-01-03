@@ -48,9 +48,9 @@ public:
 
   double l2(size_t detectorIndex) const;
 
-  Eigen::Vector3d positionDetector(size_t detectorIndex) const;
+  Eigen::Vector3d position(size_t detectorIndex) const;
 
-  Eigen::Quaterniond rotationDetector(size_t detectorIndex) const;
+  Eigen::Quaterniond rotation(size_t detectorIndex) const;
 
   double l1(size_t detectorIndex) const;
 
@@ -325,15 +325,14 @@ double DetectorInfo<InstTree>::l2(size_t detectorIndex) const {
 }
 
 template <typename InstTree>
-Eigen::Vector3d
-DetectorInfo<InstTree>::positionDetector(size_t detectorIndex) const {
+Eigen::Vector3d DetectorInfo<InstTree>::position(size_t detectorIndex) const {
 
   return (*m_positions)[detectorIndex];
 }
 
 template <typename InstTree>
 Eigen::Quaterniond
-DetectorInfo<InstTree>::rotationDetector(size_t detectorIndex) const {
+DetectorInfo<InstTree>::rotation(size_t detectorIndex) const {
   return (*m_rotations)[detectorIndex];
 }
 

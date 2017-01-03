@@ -138,14 +138,25 @@ std::vector<size_t> FlatTree::subTreeIndexes(size_t proxyIndex) const {
                                 std::to_string(proxyIndex));
   }
 
+  // Note that the query proxy index is also returned
   std::vector<size_t> subtree = {proxyIndex};
   for (size_t index = 0; index < subtree.size(); ++index) {
-    auto &currentProxy = m_proxies[subtree[index]];
+    const auto &currentProxy = m_proxies[subtree[index]];
     const auto &currentChildren = currentProxy.children();
     std::copy(currentChildren.begin(), currentChildren.end(),
               std::back_inserter(subtree));
   }
   return subtree;
+}
+
+std::vector<size_t> FlatTree::nextLevelIndexes(size_t proxyIndex) const {
+  if (proxyIndex >= componentSize()) {
+    throw std::invalid_argument("No subtree for proxy index: " +
+                                std::to_string(proxyIndex));
+  }
+
+  const auto &currentProxy = m_proxies[proxyIndex];
+  return currentProxy.children();
 }
 
 std::vector<Eigen::Vector3d> FlatTree::startPositions() const {
