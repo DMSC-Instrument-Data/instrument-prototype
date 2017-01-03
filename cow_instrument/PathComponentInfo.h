@@ -175,7 +175,6 @@ PathComponentInfo<InstTree>::movePathComponent(size_t pathComponentIndex,
   (*m_entryPoints)[pathComponentIndex] += offset;
   (*m_exitPoints)[pathComponentIndex] += offset;
 
-  // Would need to update detectorInfo?
 }
 
 template <typename InstTree>
@@ -189,7 +188,6 @@ void PathComponentInfo<InstTree>::movePathComponents(
     (*m_exitPoints)[pathComponentIndex] += offset;
   }
 
-  // Would need to update detectorInfo?
 }
 
 template <typename InstTree>
@@ -211,7 +209,6 @@ void PathComponentInfo<InstTree>::rotatePathComponent(
   (*m_rotations)[pathComponentIndex] =
       rotation * (*m_rotations)[pathComponentIndex];
 
-  // Would need to update detectorInfo?
 }
 
 template <typename InstTree>

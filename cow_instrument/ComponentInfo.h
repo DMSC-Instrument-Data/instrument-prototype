@@ -194,6 +194,9 @@ void ComponentInfo<InstTree>::rotate(size_t componentIndex,
       detectorsToRotate; // Cache of detector indexes which will be rotated.
   std::vector<size_t> pathComponentsToRotate; // Cache of path component indexes
                                               // which will be rotated
+
+  detectorsToRotate.reserve(componentIndexes.size());
+  pathComponentsToRotate.reserve(componentIndexes.size());
   for (auto &compIndex : componentIndexes) {
     auto detIndex = m_componentToDetectorIndex[compIndex];
     if (detIndex >= 0) {
