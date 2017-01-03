@@ -24,8 +24,6 @@ public:
         size_t nComponents =
             m_componentInfo.const_instrumentTree().componentSize();
         for (size_t i = 0; i < nComponents; ++i) {
-          // throw std::runtime_error("This benchmark doesn't make sense any
-          // more");
           benchmark::DoNotOptimize(pos += m_componentInfo.position(i));
         }
       }

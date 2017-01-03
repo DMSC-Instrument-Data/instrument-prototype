@@ -159,6 +159,9 @@ void ComponentInfo<InstTree>::move(size_t componentIndex,
       detectorsToMove; // Cache of detector indexes which will be moved.
   std::vector<size_t> pathComponentsToMove; // Cache of path component indexes
                                             // which will be moved
+
+  detectorsToMove.reserve(componentIndexes.size());
+  pathComponentsToMove.reserve(componentIndexes.size());
   for (auto &compIndex : componentIndexes) {
     auto detIndex = m_componentToDetectorIndex[compIndex];
     if (detIndex >= 0) {
