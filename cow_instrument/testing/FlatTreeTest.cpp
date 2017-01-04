@@ -164,6 +164,7 @@ TEST(instrument_tree_test, test_both_constructors) {
   auto exitPoints = intermediate.startExitPoints();
   auto pathLengths = intermediate.pathLengths();
   auto pathComponentIndexes = intermediate.pathComponentIndexes();
+  auto branchNodeComponentIndexes = intermediate.branchNodeComponentIndexes();
   auto detectorComponentIndexes = intermediate.detectorComponentIndexes();
   auto detectorIds = intermediate.detectorIds();
 
@@ -171,7 +172,8 @@ TEST(instrument_tree_test, test_both_constructors) {
       std::move(proxies), std::move(positions), std::move(rotations),
       std::move(componentIds), std::move(entryPoints), std::move(exitPoints),
       std::move(pathLengths), std::move(pathComponentIndexes),
-      std::move(detectorComponentIndexes), std::move(detectorIds),
+      std::move(detectorComponentIndexes),
+      std::move(branchNodeComponentIndexes), std::move(detectorIds),
       intermediate.sourcePathIndex(), intermediate.samplePathIndex());
 
   EXPECT_EQ(treeA.startPositions(), treeB.startPositions())
@@ -203,13 +205,15 @@ TEST(instrument_tree_test, test_fetching_root_component_failure) {
   auto pathLengths = intermediate.pathLengths();
   auto pathComponentIndexes = intermediate.pathComponentIndexes();
   auto detectorComponentIndexes = intermediate.detectorComponentIndexes();
+  auto branchNodeComponentIndexes = intermediate.branchNodeComponentIndexes();
   auto detectorIds = intermediate.detectorIds();
 
   FlatTree tree(std::move(proxies), std::move(positions), std::move(rotations),
                 std::move(componentIds), std::move(entryPoints),
                 std::move(exitPoints), std::move(pathLengths),
                 std::move(pathComponentIndexes),
-                std::move(detectorComponentIndexes), std::move(detectorIds),
+                std::move(detectorComponentIndexes),
+                std::move(branchNodeComponentIndexes), std::move(detectorIds),
                 intermediate.sourcePathIndex(), intermediate.samplePathIndex());
 
   EXPECT_TRUE(!tree.rootComponent()) << "We never set this";

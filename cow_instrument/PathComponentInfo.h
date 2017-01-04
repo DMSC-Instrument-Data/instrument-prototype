@@ -59,9 +59,9 @@ private:
   CowPtr<std::vector<Eigen::Vector3d>> m_exitPoints;
   /// All path component entry points.
   std::shared_ptr<const std::vector<double>> m_pathLengths;
-  /// Locally (detector) indexed positions
+  /// Locally (path component) indexed positions
   CowPtr<std::vector<Eigen::Vector3d>> m_positions;
-  /// Locally (detector) indexed rotations
+  /// Locally (path component) indexed rotations
   CowPtr<std::vector<Eigen::Quaterniond>> m_rotations;
   /// Path component indexes
   std::shared_ptr<const std::vector<size_t>> m_pathComponentIndexes;

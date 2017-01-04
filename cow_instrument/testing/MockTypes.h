@@ -76,6 +76,7 @@ template <typename T> class PolymorphicFlatTree {
 public:
   virtual size_t nDetectors() const = 0;
   virtual size_t nPathComponents() const = 0;
+  virtual size_t nBranchNodeComponents() const = 0;
   virtual size_t samplePathIndex() const = 0;
   virtual size_t sourcePathIndex() const = 0;
   virtual size_t componentSize() const = 0;
@@ -90,6 +91,7 @@ public:
   virtual std::vector<double> pathLengths() const = 0;
   virtual std::vector<size_t> detectorComponentIndexes() const = 0;
   virtual std::vector<size_t> pathComponentIndexes() const = 0;
+  virtual std::vector<size_t> branchNodeComponentIndexes() const = 0;
   virtual ~PolymorphicFlatTree() {}
 };
 
@@ -158,6 +160,7 @@ public:
   }
   MOCK_CONST_METHOD0(nDetectors, size_t());
   MOCK_CONST_METHOD0(nPathComponents, size_t());
+  MOCK_CONST_METHOD0(nBranchNodeComponents, size_t());
   MOCK_CONST_METHOD0(samplePathIndex, size_t());
   MOCK_CONST_METHOD0(sourcePathIndex, size_t());
   MOCK_CONST_METHOD0(componentSize, size_t());
@@ -172,6 +175,7 @@ public:
   MOCK_CONST_METHOD0(pathLengths, std::vector<double>());
   MOCK_CONST_METHOD0(detectorComponentIndexes, std::vector<size_t>());
   MOCK_CONST_METHOD0(pathComponentIndexes, std::vector<size_t>());
+  MOCK_CONST_METHOD0(branchNodeComponentIndexes, std::vector<size_t>());
 
   virtual ~MockFlatTree() {}
 };

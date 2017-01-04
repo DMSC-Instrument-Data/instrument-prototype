@@ -32,6 +32,7 @@ public:
            std::vector<double> &&pathLengths,
            std::vector<size_t> &&pathComponentIndexes,
            std::vector<size_t> &&detectorComponentIndexes,
+           std::vector<size_t> &&branchNodeComponentIndexes,
            std::vector<DetectorIdType> &&detectorIds, size_t sourceIndex,
            size_t sampleIndex);
 
@@ -42,6 +43,7 @@ public:
 
   size_t nDetectors() const;
   size_t nPathComponents() const;
+  size_t nBranchNodeComponents() const;
 
   const ComponentProxy &proxyAt(size_t index) const;
 
@@ -69,6 +71,7 @@ public:
   std::vector<double> pathLengths() const;
   std::vector<size_t> detectorComponentIndexes() const;
   std::vector<size_t> pathComponentIndexes() const;
+  std::vector<size_t> branchNodeComponentIndexes() const;
 
   size_t detIndexToCompIndex(size_t detectorIndex) const;
   size_t pathIndexToCompIndex(size_t pathIndex) const;
@@ -106,6 +109,7 @@ private:
   std::vector<double> m_pathLengths;          // For path components
   std::vector<size_t> m_pathComponentIndexes;
   std::vector<size_t> m_detectorComponentIndexes;
+  std::vector<size_t> m_branchNodeComponentIndexes;
   std::vector<DetectorIdType> m_detectorIds;
   std::shared_ptr<Component> m_componentRoot;
 };
