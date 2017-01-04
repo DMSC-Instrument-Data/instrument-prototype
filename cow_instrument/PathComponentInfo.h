@@ -16,6 +16,7 @@ template <typename InstTree> class PathComponentInfo {
 public:
 
   explicit PathComponentInfo(std::shared_ptr<InstTree> &instrumentTree);
+  explicit PathComponentInfo(std::shared_ptr<InstTree> &&instrumentTree);
 
   Eigen::Vector3d position(size_t pathComponentIndex) const;
 
@@ -52,6 +53,8 @@ public:
   bool operator!=(const PathComponentInfo<InstTree> &other) const;
 
 private:
+  /// initalization
+  void init();
   const size_t m_nPathComponents;
   /// All path component entry points.
   CowPtr<std::vector<Eigen::Vector3d>> m_entryPoints;
@@ -65,7 +68,7 @@ private:
   CowPtr<std::vector<Eigen::Quaterniond>> m_rotations;
   /// Path component indexes
   std::shared_ptr<const std::vector<size_t>> m_pathComponentIndexes;
-  /// Shared instrument
+  /// Shared instrument. This is the "owner"
   std::shared_ptr<InstTree> m_instrumentTree;
 };
 
@@ -101,6 +104,32 @@ PathComponentInfo<InstTree>::PathComponentInfo(
           instrumentTree->pathComponentIndexes())),
       m_instrumentTree(instrumentTree) {
 
+  init();
+}
+
+template <typename InstTree>
+PathComponentInfo<InstTree>::PathComponentInfo(
+    std::shared_ptr<InstTree> &&instrumentTree)
+
+    : m_nPathComponents(instrumentTree->nPathComponents()),
+      m_entryPoints(std::make_shared<std::vector<Eigen::Vector3d>>(
+          instrumentTree->startEntryPoints())),
+      m_exitPoints(std::make_shared<std::vector<Eigen::Vector3d>>(
+          instrumentTree->startExitPoints())),
+      m_positions(
+          std::make_shared<std::vector<Eigen::Vector3d>>(m_nPathComponents)),
+      m_pathLengths(
+          std::make_shared<std::vector<double>>(instrumentTree->pathLengths())),
+      m_rotations(
+          std::make_shared<std::vector<Eigen::Quaterniond>>(m_nPathComponents)),
+      m_pathComponentIndexes(std::make_shared<const std::vector<size_t>>(
+          instrumentTree->pathComponentIndexes())),
+      m_instrumentTree(std::move(instrumentTree)) {
+
+  init();
+}
+
+template <typename InstTree> void PathComponentInfo<InstTree>::init() {
   // TODO. Do this without copying everything!
   std::vector<Eigen::Vector3d> allComponentPositions =
       m_instrumentTree->startPositions();

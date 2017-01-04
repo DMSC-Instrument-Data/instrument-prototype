@@ -9,11 +9,10 @@ namespace {
 TEST(spectrum_info_test, test_constructor_lhr) {
   std::vector<Spectrum> spectra{{0}, {1}, {2}};
   size_t nDetectors = 3;
-  auto instrument =
-      std::make_shared<testing::NiceMock<MockFlatTree>>(nDetectors);
-  DetectorInfoWithMockInstrument detectorInfo{
-      instrument, SourceSampleDetectorPathFactory<MockFlatTree>{}};
-  SpectrumInfo<MockFlatTree> spectrumInfo(spectra, detectorInfo);
+  auto instrument = std::make_shared<NiceMockInstrumentTree>(nDetectors);
+  DetectorInfoWithNiceMockInstrument detectorInfo{
+      instrument, SourceSampleDetectorPathFactory<NiceMockInstrumentTree>{}};
+  SpectrumInfo<NiceMockInstrumentTree> spectrumInfo(spectra, detectorInfo);
 
   EXPECT_EQ(3, spectrumInfo.size());
   EXPECT_EQ(3, spectrumInfo.nDetectors());
