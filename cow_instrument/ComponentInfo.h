@@ -141,34 +141,30 @@ Eigen::Vector3d ComponentInfo<InstTree>::position(size_t componentIndex) const {
   auto detIndex = m_componentToDetectorIndex[componentIndex];
   if (detIndex >= 0) {
     return m_detectorInfo->position(detIndex);
-  } else {
-
-    auto pathIndex = m_componentToPathIndex[componentIndex];
-    if (pathIndex >= 0) {
-      return m_detectorInfo->pathComponentInfo().position(pathIndex);
-    } else {
-      auto branchNodeIndex = m_componentToBranchNodeIndex[componentIndex];
-      return (*m_positions)[branchNodeIndex];
-    }
   }
+
+  auto pathIndex = m_componentToPathIndex[componentIndex];
+  if (pathIndex >= 0) {
+    return m_detectorInfo->pathComponentInfo().position(pathIndex);
+  }
+  auto branchNodeIndex = m_componentToBranchNodeIndex[componentIndex];
+  return (*m_positions)[branchNodeIndex];
 }
 
 template <typename InstTree>
 Eigen::Quaterniond
 ComponentInfo<InstTree>::rotation(size_t componentIndex) const {
-    auto detIndex = m_componentToDetectorIndex[componentIndex];
-    if (detIndex >= 0) {
-      return m_detectorInfo->rotation(detIndex);
-    } else {
+  auto detIndex = m_componentToDetectorIndex[componentIndex];
+  if (detIndex >= 0) {
+    return m_detectorInfo->rotation(detIndex);
+  }
 
-      auto pathIndex = m_componentToPathIndex[componentIndex];
-      if (pathIndex >= 0) {
-        return m_detectorInfo->pathComponentInfo().rotation(pathIndex);
-      } else {
-        auto branchNodeIndex = m_componentToBranchNodeIndex[componentIndex];
-        return (*m_rotations)[branchNodeIndex];
-      }
-    }
+  auto pathIndex = m_componentToPathIndex[componentIndex];
+  if (pathIndex >= 0) {
+    return m_detectorInfo->pathComponentInfo().rotation(pathIndex);
+  }
+  auto branchNodeIndex = m_componentToBranchNodeIndex[componentIndex];
+  return (*m_rotations)[branchNodeIndex];
 }
 
 template <typename InstTree>
