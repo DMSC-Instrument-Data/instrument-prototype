@@ -55,7 +55,7 @@ TEST(component_info_test, test_construct) {
   std::shared_ptr<MockFlatTree> mockInstrumentTree{pMockInstrumentTree};
 
   ComponentInfoWithMockInstrument{
-      std::make_shared<DetectorInfo<MockFlatTree>>(mockInstrumentTree)};
+      DetectorInfo<MockFlatTree>(mockInstrumentTree)};
 
   EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree))
       << "InstrumentTree used incorrectly";
@@ -72,8 +72,7 @@ TEST(component_info_test, test_move) {
       .WillOnce(Return(std::vector<size_t>{0}));
 
   std::shared_ptr<NiceMockInstrumentTree> mockInstrumentTree(instrumentTree);
-  auto componentInfo = ComponentInfoWithNiceMockInstrument{
-      std::make_shared<DetectorInfo<NiceMockInstrumentTree>>(
+  auto componentInfo = ComponentInfoWithNiceMockInstrument{DetectorInfo<NiceMockInstrumentTree>(
           mockInstrumentTree)};
 
   auto before = componentInfo.position(0);
@@ -103,7 +102,7 @@ TEST(component_info_test, test_single_rotation_around_component_origin) {
 
   std::shared_ptr<NiceMockInstrumentTree> mockInstrumentTree(instrumentTree);
   auto componentInfo = ComponentInfoWithNiceMockInstrument{
-      std::make_shared<DetectorInfo<NiceMockInstrumentTree>>(
+      DetectorInfo<NiceMockInstrumentTree>(
           mockInstrumentTree)};
 
   const size_t sampleComponentIndex = 0;
@@ -151,7 +150,7 @@ TEST(component_info_test, test_multiple_rotation_around_component_origin) {
 
   std::shared_ptr<NiceMockInstrumentTree> mockInstrumentTree(instrumentTree);
   auto componentInfo = ComponentInfoWithNiceMockInstrument{
-      std::make_shared<DetectorInfo<NiceMockInstrumentTree>>(
+      DetectorInfo<NiceMockInstrumentTree>(
           mockInstrumentTree)};
 
   const size_t sampleComponentIndex = 0;
@@ -201,7 +200,7 @@ TEST(component_info_test, test_single_rotation_around_arbitrary_center) {
 
   std::shared_ptr<NiceMockInstrumentTree> mockInstrumentTree(instrumentTree);
   auto componentInfo = ComponentInfoWithNiceMockInstrument{
-      std::make_shared<DetectorInfo<NiceMockInstrumentTree>>(
+      DetectorInfo<NiceMockInstrumentTree>(
           mockInstrumentTree)};
   const size_t sampleComponentIndex = 0;
 
@@ -242,7 +241,7 @@ TEST(component_info_test, test_multiple_rotation_arbitrary_center) {
 
   std::shared_ptr<NiceMockInstrumentTree> mockInstrumentTree(instrumentTree);
   auto componentInfo = ComponentInfoWithNiceMockInstrument{
-      std::make_shared<DetectorInfo<NiceMockInstrumentTree>>(
+      DetectorInfo<NiceMockInstrumentTree>(
           mockInstrumentTree)};
   const size_t sampleComponentIndex = 0;
 
@@ -269,8 +268,7 @@ TEST(component_info_test, test_multiple_rotation_arbitrary_center) {
 
 TEST(component_info_test, test_position) {
 
-  auto detectorInfo =
-      std::make_shared<DetectorInfo<FlatTree>>(makeInstrumentTree());
+  auto detectorInfo = DetectorInfo<FlatTree>(makeInstrumentTree());
 
   ComponentInfo<FlatTree> componentInfo(detectorInfo);
 
