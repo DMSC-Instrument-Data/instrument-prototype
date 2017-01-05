@@ -29,7 +29,9 @@ void LinkedTreeParser::registerPathComponent(PathComponent const *const comp) {
 
 size_t
 LinkedTreeParser::registerComposite(CompositeComponent const *const comp) {
-  return coreUpdate(comp);
+  const size_t nextComponentIndex = coreUpdate(comp);
+  m_branchNodeComponentIndexes.push_back(nextComponentIndex);
+  return nextComponentIndex;
 }
 
 void LinkedTreeParser::registerDetector(const Detector *const comp,
@@ -56,7 +58,9 @@ void LinkedTreeParser::registerPathComponent(const PathComponent *const comp,
 
 size_t LinkedTreeParser::registerComposite(const CompositeComponent *const comp,
                                            size_t parentIndex) {
-  return coreUpdate(comp, parentIndex);
+  const size_t nextComponentIndex = coreUpdate(comp, parentIndex);
+  m_branchNodeComponentIndexes.push_back(nextComponentIndex);
+  return nextComponentIndex;
 }
 
 std::vector<ComponentProxy> LinkedTreeParser::proxies() { return m_proxies; }
@@ -77,6 +81,10 @@ std::vector<size_t> LinkedTreeParser::pathComponentIndexes() const {
 
 std::vector<size_t> LinkedTreeParser::detectorComponentIndexes() const {
   return m_detectorComponentIndexes;
+}
+
+std::vector<size_t> LinkedTreeParser::branchNodeComponentIndexes() const {
+  return m_branchNodeComponentIndexes;
 }
 
 std::vector<Eigen::Vector3d> LinkedTreeParser::startEntryPoints() const {

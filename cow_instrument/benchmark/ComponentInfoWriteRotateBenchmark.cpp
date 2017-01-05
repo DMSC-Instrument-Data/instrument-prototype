@@ -1,6 +1,7 @@
 #include "StandardInstrument.h"
 #include <benchmark/benchmark_api.h>
 
+#include <stdexcept>
 namespace {
 
 class ComponentInfoWriteRotateFixture : public StandardInstrumentFixture {
@@ -12,7 +13,6 @@ public:
     Eigen::Vector3d axis{0, 0, 1};
     auto angle = M_PI / 2;
     Eigen::Vector3d center{0, 0, 0};
-    const auto &componentInfo = m_detectorInfo.componentInfo();
 
     while (state.KeepRunning()) {
       // Then modify that node

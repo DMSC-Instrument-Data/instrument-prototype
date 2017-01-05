@@ -41,6 +41,7 @@ set ( TEST_FILES
                  LinkedTreeParserTest.cpp
                  ParabolicGuideTest.cpp
                  PathComponentTest.cpp
+                 PathComponentInfoTest.cpp
                  PointPathComponentTest.cpp
                  SourceSampleDetectorPathFactoryTest.cpp                 
                  SpectrumInfoTest.cpp

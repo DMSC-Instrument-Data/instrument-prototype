@@ -7,6 +7,7 @@
 #include "ParabolicGuide.h"
 #include "PointSource.h"
 #include "PointSample.h"
+#include "FlatTree.h"
 
 using namespace testing;
 
@@ -163,6 +164,7 @@ TEST(instrument_tree_test, test_both_constructors) {
   auto exitPoints = intermediate.startExitPoints();
   auto pathLengths = intermediate.pathLengths();
   auto pathComponentIndexes = intermediate.pathComponentIndexes();
+  auto branchNodeComponentIndexes = intermediate.branchNodeComponentIndexes();
   auto detectorComponentIndexes = intermediate.detectorComponentIndexes();
   auto detectorIds = intermediate.detectorIds();
 
@@ -170,7 +172,8 @@ TEST(instrument_tree_test, test_both_constructors) {
       std::move(proxies), std::move(positions), std::move(rotations),
       std::move(componentIds), std::move(entryPoints), std::move(exitPoints),
       std::move(pathLengths), std::move(pathComponentIndexes),
-      std::move(detectorComponentIndexes), std::move(detectorIds),
+      std::move(detectorComponentIndexes),
+      std::move(branchNodeComponentIndexes), std::move(detectorIds),
       intermediate.sourcePathIndex(), intermediate.samplePathIndex());
 
   EXPECT_EQ(treeA.startPositions(), treeB.startPositions())
@@ -202,13 +205,15 @@ TEST(instrument_tree_test, test_fetching_root_component_failure) {
   auto pathLengths = intermediate.pathLengths();
   auto pathComponentIndexes = intermediate.pathComponentIndexes();
   auto detectorComponentIndexes = intermediate.detectorComponentIndexes();
+  auto branchNodeComponentIndexes = intermediate.branchNodeComponentIndexes();
   auto detectorIds = intermediate.detectorIds();
 
   FlatTree tree(std::move(proxies), std::move(positions), std::move(rotations),
                 std::move(componentIds), std::move(entryPoints),
                 std::move(exitPoints), std::move(pathLengths),
                 std::move(pathComponentIndexes),
-                std::move(detectorComponentIndexes), std::move(detectorIds),
+                std::move(detectorComponentIndexes),
+                std::move(branchNodeComponentIndexes), std::move(detectorIds),
                 intermediate.sourcePathIndex(), intermediate.samplePathIndex());
 
   EXPECT_TRUE(!tree.rootComponent()) << "We never set this";
@@ -279,7 +284,7 @@ TEST(instrument_tree_test,
 FlatTree makeInstrumentTree() {
   /*
 
-    we start like this. A-B-C-D-E are components within a single node.
+    we start like this. A-B-C-D-E are components
 
         A
         |
@@ -351,7 +356,8 @@ TEST(instrument_tree_test, test_subtree_search) {
   // Subtree of A
   auto indexes = instrument.subTreeIndexes(0);
   EXPECT_EQ(indexes, (std::vector<size_t>{0, 1, 2, 3, 4}))
-      << "Subtree for A. should include everything";
+      << "Subtree for A. should include everything including original query "
+         "proxy index";
 
   // Subtree of B
   indexes = instrument.subTreeIndexes(1);
@@ -370,6 +376,36 @@ TEST(instrument_tree_test, test_subtree_search) {
   // Subtree of E
   indexes = instrument.subTreeIndexes(4);
   EXPECT_EQ(indexes, (std::vector<size_t>{4})) << "Subtree for E incorrect";
+}
+
+TEST(instrument_tree_test, test_next_level_search) {
+  FlatTree instrument = makeInstrumentTree();
+
+  // Subtree of A
+  auto indexes = instrument.nextLevelIndexes(0);
+  EXPECT_EQ(indexes, (std::vector<size_t>{1, 2, 3}))
+      << "Next level for A wrong. should include only indexes for the next "
+         "level";
+
+  // Subtree of B
+  indexes = instrument.nextLevelIndexes(1);
+  EXPECT_EQ(indexes, (std::vector<size_t>()))
+      << "Next level for B wrong. Expected to be empty - no subtree";
+
+  // Subtree of C
+  indexes = instrument.nextLevelIndexes(2);
+  EXPECT_EQ(indexes, (std::vector<size_t>()))
+      << "Should be empty - no next level. Subtree for C incorrect";
+
+  // Subtree of D
+  indexes = instrument.nextLevelIndexes(3);
+  EXPECT_EQ(indexes, (std::vector<size_t>{4}))
+      << "Indexes for D incorrect - no next level";
+
+  // Subtree of E
+  indexes = instrument.nextLevelIndexes(4);
+  EXPECT_EQ(indexes, (std::vector<size_t>()))
+      << "Indexes for E incorrect. Should be empty - no next level";
 }
 
 TEST(instrument_tree_test, test_positions) {
@@ -411,6 +447,14 @@ TEST(instrument_tree_test, test_subtree_unreachable_throws) {
   FlatTree instrument = makeInstrumentTree();
 
   EXPECT_THROW(instrument.subTreeIndexes(instrument.componentSize()),
+               std::invalid_argument);
+}
+
+TEST(instrument_tree_test, test_nextlevel_unreachable_throws) {
+
+  FlatTree instrument = makeInstrumentTree();
+
+  EXPECT_THROW(instrument.nextLevelIndexes(instrument.componentSize()),
                std::invalid_argument);
 }
 }

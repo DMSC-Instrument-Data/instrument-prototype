@@ -11,7 +11,7 @@ BENCHMARK_F(DetectorInfoReadFixture,
   const size_t max = m_detectorInfo.detectorSize();
   while (state.KeepRunning()) {
     for (size_t i = 1; i < max; ++i) {
-      benchmark::DoNotOptimize(m_detectorInfo.positionDetector(i));
+      benchmark::DoNotOptimize(m_detectorInfo.position(i));
     }
   }
   state.SetItemsProcessed(state.iterations() * max);
@@ -23,7 +23,7 @@ BENCHMARK_F(DetectorInfoReadFixture,
   const size_t max = m_detectorInfo.detectorSize();
   while (state.KeepRunning()) {
     for (size_t i = 1; i < max; ++i) {
-      benchmark::DoNotOptimize(m_detectorInfo.rotationDetector(i));
+      benchmark::DoNotOptimize(m_detectorInfo.rotation(i));
     }
   }
   state.SetItemsProcessed(state.iterations() * max);
@@ -35,7 +35,7 @@ BENCHMARK_F(DetectorInfoReadFixture,
   const size_t max = m_detectorInfo.detectorSize(); // ndetectors
   while (state.KeepRunning()) {
     for (size_t i = 1; i < max; ++i) {
-      benchmark::DoNotOptimize(m_detectorInfo.positionDetector(i));
+      benchmark::DoNotOptimize(m_detectorInfo.position(i));
     }
   }
   state.SetItemsProcessed(state.iterations() * max);
@@ -47,7 +47,7 @@ BENCHMARK_F(DetectorInfoReadFixture,
   const size_t max = m_detectorInfo.detectorSize(); // ndetectors
   while (state.KeepRunning()) {
     for (size_t i = 1; i < max; ++i) {
-      benchmark::DoNotOptimize(m_detectorInfo.rotationDetector(i));
+      benchmark::DoNotOptimize(m_detectorInfo.rotation(i));
     }
   }
   state.SetItemsProcessed(state.iterations() * max);

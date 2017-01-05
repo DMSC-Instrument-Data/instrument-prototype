@@ -50,6 +50,7 @@ FlatTree::FlatTree(std::shared_ptr<Component> componentRoot)
   m_pathLengths = treeParser.pathLengths();
   m_pathComponentIndexes = treeParser.pathComponentIndexes();
   m_detectorComponentIndexes = treeParser.detectorComponentIndexes();
+  m_branchNodeComponentIndexes = treeParser.branchNodeComponentIndexes();
   m_detectorIds = treeParser.detectorIds();
 }
 
@@ -72,6 +73,7 @@ FlatTree::FlatTree(std::shared_ptr<Component> componentRoot)
  * @param pathLengths
  * @param pathComponentIndexes
  * @param detectorComponentIndexes
+ * @param branchNodeComponentIndexes
  * @param detectorIds
  * @param sourceIndex
  * @param sampleIndex
@@ -85,6 +87,7 @@ FlatTree::FlatTree(std::vector<ComponentProxy> &&proxies,
                    std::vector<double> &&pathLengths,
                    std::vector<size_t> &&pathComponentIndexes,
                    std::vector<size_t> &&detectorComponentIndexes,
+                   std::vector<size_t> &&branchNodeComponentIndexes,
                    std::vector<DetectorIdType> &&detectorIds,
                    size_t sourceIndex, size_t sampleIndex)
     : m_proxies(std::move(proxies)), m_positions(std::move(positions)),
@@ -95,9 +98,13 @@ FlatTree::FlatTree(std::vector<ComponentProxy> &&proxies,
       m_pathLengths(std::move(pathLengths)),
       m_pathComponentIndexes(std::move(pathComponentIndexes)),
       m_detectorComponentIndexes(std::move(detectorComponentIndexes)),
+      m_branchNodeComponentIndexes(std::move(branchNodeComponentIndexes)),
       m_detectorIds(std::move(detectorIds)), m_sourceIndex(sourceIndex),
       m_sampleIndex(sampleIndex) {
-  // Note that m_rootComponent is not set because we don't have one.
+  /* Note that m_rootComponent is not set because we don't have one.
+     This will currently stop serialization working from this construction mode.
+     However,
+     serialization is due an update anyway */
 }
 
 const ComponentProxy &FlatTree::rootProxy() const { return m_proxies[0]; }
@@ -138,14 +145,25 @@ std::vector<size_t> FlatTree::subTreeIndexes(size_t proxyIndex) const {
                                 std::to_string(proxyIndex));
   }
 
+  // Note that the query proxy index is also returned
   std::vector<size_t> subtree = {proxyIndex};
   for (size_t index = 0; index < subtree.size(); ++index) {
-    auto &currentProxy = m_proxies[subtree[index]];
+    const auto &currentProxy = m_proxies[subtree[index]];
     const auto &currentChildren = currentProxy.children();
     std::copy(currentChildren.begin(), currentChildren.end(),
               std::back_inserter(subtree));
   }
   return subtree;
+}
+
+std::vector<size_t> FlatTree::nextLevelIndexes(size_t proxyIndex) const {
+  if (proxyIndex >= componentSize()) {
+    throw std::invalid_argument("No subtree for proxy index: " +
+                                std::to_string(proxyIndex));
+  }
+
+  const auto &currentProxy = m_proxies[proxyIndex];
+  return currentProxy.children();
 }
 
 std::vector<Eigen::Vector3d> FlatTree::startPositions() const {
@@ -168,6 +186,14 @@ std::vector<double> FlatTree::pathLengths() const { return m_pathLengths; }
 
 std::vector<size_t> FlatTree::detectorComponentIndexes() const {
   return m_detectorComponentIndexes;
+}
+
+std::vector<size_t> FlatTree::pathComponentIndexes() const {
+  return m_pathComponentIndexes;
+}
+
+std::vector<size_t> FlatTree::branchNodeComponentIndexes() const {
+  return m_branchNodeComponentIndexes;
 }
 
 size_t FlatTree::detIndexToCompIndex(size_t detectorIndex) const {
@@ -214,4 +240,8 @@ bool FlatTree::operator==(const FlatTree &other) const {
 
 bool FlatTree::operator!=(const FlatTree &other) const {
   return !operator==(other);
+}
+
+size_t FlatTree::nBranchNodeComponents() const {
+  return componentSize() - nDetectors() - nPathComponents();
 }

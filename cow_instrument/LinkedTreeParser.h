@@ -35,6 +35,7 @@ public:
   size_t pathSize() const;
   std::vector<size_t> pathComponentIndexes() const;
   std::vector<size_t> detectorComponentIndexes() const;
+  std::vector<size_t> branchNodeComponentIndexes() const;
   std::vector<Eigen::Vector3d> startEntryPoints() const;
   std::vector<Eigen::Vector3d> startExitPoints() const;
   std::vector<double> pathLengths() const;
@@ -74,6 +75,7 @@ private:
   std::vector<double> m_pathLengths;          // For path components
   std::vector<size_t> m_pathComponentIndexes;
   std::vector<size_t> m_detectorComponentIndexes;
+  std::vector<size_t> m_branchNodeComponentIndexes;
   std::vector<DetectorIdType> m_detectorIds;
 };
 

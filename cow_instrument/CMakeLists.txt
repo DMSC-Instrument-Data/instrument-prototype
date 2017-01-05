@@ -54,6 +54,7 @@ set ( INCLUDE_FILES
                    ParabolicGuide.h
                    Path.h
                    PathComponent.h
+                   PathComponentInfo.h
                    PathFactory.h
                    PointPathComponent.h
                    PointSample.h
