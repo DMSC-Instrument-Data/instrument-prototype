@@ -20,6 +20,7 @@
 #include "PathComponent.h"
 #include "PathComponentInfo.h"
 #include "PathFactory.h"
+#include "ScanTime.h"
 #include "Spectrum.h"
 #include "SourceSampleDetectorPathFactory.h"
 
@@ -32,11 +33,19 @@ template <typename InstTree> class DetectorInfo {
 public:
   template <typename InstSptrType, typename PathFactoryType>
   explicit DetectorInfo(InstSptrType &&instrumentTree,
-                        PathFactoryType &&pathFactory);
+                        PathFactoryType &&pathFactory, ScanTime scanTime = ScanTime{});
 
-  explicit DetectorInfo(std::shared_ptr<InstTree> &instrumentTree);
+  explicit DetectorInfo(std::shared_ptr<InstTree> &instrumentTree, ScanTime scanTime = ScanTime{});
 
-  explicit DetectorInfo(std::shared_ptr<InstTree> &&instrumentTree);
+  explicit DetectorInfo(std::shared_ptr<InstTree> &&instrumentTree, ScanTime scanTime = ScanTime{});
+
+  template <typename InstSptrType, typename TimeIndexesType,
+            typename ScanTimesType, typename PositionsType,
+            typename RotationsType>
+  explicit DetectorInfo(InstSptrType &&instrumentTree,
+                        TimeIndexesType &&timeIndexes,
+                        ScanTimesType &&scanTimes, PositionsType &&positions,
+                        RotationsType &&rotations);
 
   void setMasked(size_t detectorIndex);
 
@@ -50,7 +59,11 @@ public:
 
   Eigen::Vector3d position(size_t detectorIndex) const;
 
+  Eigen::Vector3d position(size_t detectorIndex, size_t timeIndex) const;
+
   Eigen::Quaterniond rotation(size_t detectorIndex) const;
+
+  Eigen::Quaterniond rotation(size_t detectorIndex, size_t timeIndex) const;
 
   double l1(size_t detectorIndex) const;
 
@@ -59,6 +72,9 @@ public:
   const InstTree &const_instrumentTree() const;
 
   void moveDetector(size_t detectorIndex, const Eigen::Vector3d &offset);
+
+  void moveDetector(size_t detectorIndex, size_t timeIndex,
+                    const Eigen::Vector3d &offset);
 
   void moveDetectors(const std::vector<size_t> &detectorIndexes,
                      const Eigen::Vector3d &offset);
@@ -83,28 +99,34 @@ public:
 
   CowPtr<L2s> l2s() const;
 
+  bool isScanning() const;
+
 private:
   void init();
   void initL2();
   void initL1();
 
-  //------------------- Metadata -------------
   const size_t m_nDetectors;
   CowPtr<MaskFlags> m_isMasked;
   CowPtr<MonitorFlags> m_isMonitor;
 
-  //------------------- DerivedInfo -------------
   CowPtr<L1s> m_l1;
   CowPtr<L2s> m_l2;
   CowPtr<const Paths> m_l2Paths;
   CowPtr<const Paths> m_l1Paths;
   std::shared_ptr<const std::vector<size_t>> m_detectorComponentIndexes;
   /// Locally (detector) indexed positions
-  std::shared_ptr<std::vector<Eigen::Vector3d>> m_positions;
+  CowPtr<std::vector<Eigen::Vector3d>> m_positions;
   /// Locally (detector) indexed rotations
-  std::shared_ptr<std::vector<Eigen::Quaterniond>> m_rotations;
+  CowPtr<std::vector<Eigen::Quaterniond>> m_rotations;
+  /// Linear index map (detector indexed)
+  std::shared_ptr<const std::vector<std::vector<size_t>>> m_linearIndexMap;
+  /// Scan durations
+  std::shared_ptr<const ScanTimes> m_durations;
   /// Path component information
   PathComponentInfo<InstTree> m_pathComponentInfo;
+  /// Is scanning
+  const bool m_isScanning = false;
 };
 
 namespace {
@@ -121,12 +143,25 @@ void detectorRangeCheck(size_t detectorIndex, const U &container) {
 double distance(const Eigen::Vector3d &a, const Eigen::Vector3d &b) {
   return (a - b).norm();
 }
+
+template <typename InstSptrType>
+std::shared_ptr<std::vector<std::vector<size_t>>>
+makeDefaultIndexes(InstSptrType &instrumentTree) {
+  size_t size = instrumentTree->nDetectors();
+  auto indexes = std::make_shared<std::vector<std::vector<size_t>>>(size);
+  for (size_t i = 0; i < size; ++i) {
+    // Always one time index per detector. Just need the detector index.
+    (*indexes)[i] = std::vector<size_t>(1, i);
+  }
+  return indexes;
+}
 }
 
 template <typename InstTree>
 template <typename InstSptrType, typename PathFactoryType>
 DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
-                                     PathFactoryType &&pathFactory)
+                                     PathFactoryType &&pathFactory,
+                                     ScanTime scanTime)
     : m_l2Paths(pathFactory.createL2(*instrumentTree)),
       m_l1Paths(pathFactory.createL1(*instrumentTree)),
       m_nDetectors(instrumentTree->nDetectors()),
@@ -139,13 +174,16 @@ DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
       m_positions(std::make_shared<std::vector<Eigen::Vector3d>>(m_nDetectors)),
       m_rotations(
           std::make_shared<std::vector<Eigen::Quaterniond>>(m_nDetectors)),
+      m_linearIndexMap(makeDefaultIndexes(instrumentTree)),
+      m_durations(std::make_shared<const ScanTimes>(1, scanTime)),
       m_pathComponentInfo(std::forward<InstSptrType>(instrumentTree)) {
 
   init();
 }
 
 template <typename InstTree>
-DetectorInfo<InstTree>::DetectorInfo(std::shared_ptr<InstTree> &instrumentTree)
+DetectorInfo<InstTree>::DetectorInfo(std::shared_ptr<InstTree> &instrumentTree,
+                                     ScanTime scanTime)
     : m_l2Paths(SourceSampleDetectorPathFactory<InstTree>{}.createL2(
           *instrumentTree)),
       m_l1Paths(SourceSampleDetectorPathFactory<InstTree>{}.createL1(
@@ -160,13 +198,16 @@ DetectorInfo<InstTree>::DetectorInfo(std::shared_ptr<InstTree> &instrumentTree)
       m_positions(std::make_shared<std::vector<Eigen::Vector3d>>(m_nDetectors)),
       m_rotations(
           std::make_shared<std::vector<Eigen::Quaterniond>>(m_nDetectors)),
+      m_linearIndexMap(makeDefaultIndexes(instrumentTree)),
+      m_durations(std::make_shared<const ScanTimes>(1, scanTime)),
       m_pathComponentInfo(instrumentTree) {
 
   init();
 }
 
 template <typename InstTree>
-DetectorInfo<InstTree>::DetectorInfo(std::shared_ptr<InstTree> &&instrumentTree)
+DetectorInfo<InstTree>::DetectorInfo(std::shared_ptr<InstTree> &&instrumentTree,
+                                     ScanTime scanTime)
     : m_l2Paths(SourceSampleDetectorPathFactory<InstTree>{}.createL2(
           *instrumentTree)),
       m_l1Paths(SourceSampleDetectorPathFactory<InstTree>{}.createL1(
@@ -181,10 +222,66 @@ DetectorInfo<InstTree>::DetectorInfo(std::shared_ptr<InstTree> &&instrumentTree)
       m_positions(std::make_shared<std::vector<Eigen::Vector3d>>(m_nDetectors)),
       m_rotations(
           std::make_shared<std::vector<Eigen::Quaterniond>>(m_nDetectors)),
+      m_linearIndexMap(makeDefaultIndexes(instrumentTree)),
+      m_durations(std::make_shared<const ScanTimes>(1, scanTime)),
       m_pathComponentInfo(
           std::forward<std::shared_ptr<InstTree>>(instrumentTree)) {
 
   init();
+}
+
+template <typename InstTree>
+template <typename InstSptrType, typename TimeIndexesType,
+          typename ScanTimesType, typename PositionsType,
+          typename RotationsType>
+DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
+                                     TimeIndexesType &&timeIndexes,
+                                     ScanTimesType &&scanTimes,
+                                     PositionsType &&positions,
+                                     RotationsType &&rotations)
+    : m_l2Paths(SourceSampleDetectorPathFactory<InstTree>{}.createL2(
+          *instrumentTree)),
+      m_l1Paths(SourceSampleDetectorPathFactory<InstTree>{}.createL1(
+          *instrumentTree)),
+      m_nDetectors(instrumentTree->nDetectors()),
+      m_l1(std::make_shared<L1s>(m_nDetectors)),
+      m_l2(std::make_shared<L2s>(m_nDetectors * scanTimes.size())),
+      m_isMasked(std::make_shared<MaskFlags>(m_nDetectors, Bool(false))),
+      m_isMonitor(std::make_shared<MonitorFlags>(m_nDetectors, Bool(false))),
+      m_detectorComponentIndexes(std::make_shared<const std::vector<size_t>>(
+          instrumentTree->detectorComponentIndexes())),
+      m_positions(std::make_shared<std::vector<Eigen::Vector3d>>(
+          std::forward<PositionsType>(positions))),
+      m_rotations(std::make_shared<std::vector<Eigen::Quaterniond>>(
+          std::forward<RotationsType>(rotations))),
+      m_linearIndexMap(std::make_shared<std::vector<std::vector<size_t>>>(
+          std::forward<TimeIndexesType>(timeIndexes))),
+      m_durations(
+          std::make_shared<ScanTimes>(std::forward<ScanTimesType>(scanTimes))),
+      m_pathComponentInfo(
+          std::forward<std::shared_ptr<InstTree>>(instrumentTree)),
+      m_isScanning(true) {
+  size_t indexEntryCount = 0;
+  for (auto &positionTimes : *m_linearIndexMap) {
+    // Count up the time indexes for each component
+    indexEntryCount += positionTimes.size();
+  }
+  if (indexEntryCount != m_positions->size()) {
+    throw std::invalid_argument("The number of component/time indexes does not "
+                                "match the number of positions for scanning "
+                                "construction");
+  }
+  if (indexEntryCount != m_rotations->size()) {
+    throw std::invalid_argument("The number of component/time indexes does not "
+                                "match the number of rotations for scanning "
+                                "construction");
+  }
+  if ((m_positions->size() / m_linearIndexMap->size()) != m_durations->size()) {
+    throw std::invalid_argument("Wrong number of scans");
+  }
+
+  initL1();
+  initL2();
 }
 
 template <typename InstTree>
@@ -315,9 +412,22 @@ Eigen::Vector3d DetectorInfo<InstTree>::position(size_t detectorIndex) const {
 }
 
 template <typename InstTree>
+Eigen::Vector3d DetectorInfo<InstTree>::position(size_t detectorIndex,
+                                                 size_t timeIndex) const {
+
+  return (*m_positions)[(*m_linearIndexMap)[detectorIndex][timeIndex]];
+}
+
+template <typename InstTree>
 Eigen::Quaterniond
 DetectorInfo<InstTree>::rotation(size_t detectorIndex) const {
   return (*m_rotations)[detectorIndex];
+}
+
+template <typename InstTree>
+Eigen::Quaterniond DetectorInfo<InstTree>::rotation(size_t detectorIndex,
+                                                    size_t timeIndex) const {
+  return (*m_rotations)[(*m_linearIndexMap)[detectorIndex][timeIndex]];
 }
 
 template <typename InstTree>
@@ -341,6 +451,16 @@ void DetectorInfo<InstTree>::moveDetector(size_t detectorIndex,
                                           const Eigen::Vector3d &offset) {
 
   (*m_positions)[detectorIndex] += offset;
+
+  initL2();
+}
+
+template <typename InstTree>
+void DetectorInfo<InstTree>::moveDetector(size_t detectorIndex,
+                                          size_t timeIndex,
+                                          const Eigen::Vector3d &offset) {
+
+  (*m_positions)[(*m_linearIndexMap)[detectorIndex][timeIndex]] += offset;
 
   initL2();
 }
@@ -433,6 +553,10 @@ template <typename InstTree>
 const PathComponentInfo<InstTree> &
 DetectorInfo<InstTree>::pathComponentInfo() const {
   return m_pathComponentInfo;
+}
+
+template <typename InstTree> bool DetectorInfo<InstTree>::isScanning() const {
+  return m_isScanning;
 }
 
 #endif

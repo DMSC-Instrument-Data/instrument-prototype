@@ -1,4 +1,9 @@
+#include "CompositeComponent.h"
+#include "PointSample.h"
+#include "PointSource.h"
+#include "DetectorComponent.h"
 #include "DetectorInfo.h"
+#include "FlatTree.h"
 #include "MockTypes.h"
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
@@ -270,4 +275,173 @@ TEST(detector_info_test, test_copy) {
   EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree));
 }
 
+std::shared_ptr<FlatTree> makeInstrumentTree() {
+  /*
+
+        A
+        |
+ -----------------
+ |      |    |   |
+ B      C    D   E
+                 |
+                 F
+
+
+  */
+
+  auto a = std::make_shared<CompositeComponent>(ComponentIdType(1));
+
+  // Add single detector (B)
+  a->addComponent(std::unique_ptr<DetectorComponent>(new DetectorComponent(
+      ComponentIdType(2), DetectorIdType(1), Eigen::Vector3d{1, 1, 1})));
+
+  // Add single detector (C)
+  a->addComponent(std::unique_ptr<DetectorComponent>(new DetectorComponent(
+      ComponentIdType(2), DetectorIdType(1), Eigen::Vector3d{1, 1, 1})));
+
+  // Add point source (D)
+  a->addComponent(std::unique_ptr<PointSource>(
+      new PointSource(Eigen::Vector3d{-1, 0, 0}, ComponentIdType(3))));
+
+  // Add arbitrary composite (E)
+  auto d = std::unique_ptr<CompositeComponent>(
+      new CompositeComponent(ComponentIdType(4)));
+
+  // Add point sample (F)
+  d->addComponent(std::unique_ptr<PointSample>(
+      new PointSample(Eigen::Vector3d{0.1, 0, 0}, ComponentIdType(5))));
+
+  a->addComponent(std::move(d));
+
+  return std::make_shared<FlatTree>(a);
+}
+
+TEST(detector_info_test,
+     test_scanning_construction_throws_with_wrong_positions_size) {
+
+  auto scanTimes = ScanTimes{ScanTime(0, 10), ScanTime(10, 20)}; // 2 scan times
+
+  auto timeIndexes = std::vector<std::vector<size_t>>{{0, 2}, {1, 3}};
+
+  auto rotations = std::vector<Eigen::Quaterniond>(
+      4, Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()});
+
+  // Too many positions!
+  auto positions = std::vector<Eigen::Vector3d>(5); // Should have 4 positions
+  // EXPECT_THROW(DetectorInfo<FlatTree>(makeInstrumentTree(), timeIndexes,
+  // scanTimes, positions, rotations), std::invalid_argument) << "Should throw.
+  // Too many positions";
+
+  // Too many positions!
+  positions = std::vector<Eigen::Vector3d>(3); // Should have 4 positions
+  // EXPECT_THROW(DetectorInfo<FlatTree>(makeInstrumentTree(), timeIndexes,
+  // scanTimes, positions, rotations), std::invalid_argument) << "Should throw.
+  // Too few positions";
+}
+
+TEST(detector_info_test,
+     test_scanning_construction_throws_with_wrong_scan_number) {
+
+  auto rotations = std::vector<Eigen::Quaterniond>(
+      4, Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()});
+
+  auto positions = std::vector<Eigen::Vector3d>(4);
+
+  auto timeIndexes = std::vector<std::vector<size_t>>{
+      {0, 2}, {1, 3, 4}}; // Should only provide 4 time indexes
+
+  auto scanTimes =
+      ScanTimes{ScanTime(0, 10)}; // Only 1 scan time. This is wrong.
+
+  EXPECT_THROW(DetectorInfo<FlatTree>(makeInstrumentTree(), timeIndexes,
+                                      scanTimes, positions, rotations),
+               std::invalid_argument)
+      << "Should throw. Not enough scan times.";
+}
+
+TEST(detector_info_test,
+     test_scanning_construction_throws_with_wrong_rotations_size) {
+
+  auto scanTimes = ScanTimes{ScanTime(0, 10), ScanTime(10, 20)}; // 2 scan times
+
+  auto timeIndexes = std::vector<std::vector<size_t>>{{0, 2}, {1, 3}};
+
+  auto positions = std::vector<Eigen::Vector3d>(4);
+
+  // Too many rotations
+  auto rotations = std::vector<Eigen::Quaterniond>(
+      5,
+      Eigen::Quaterniond{
+          Eigen::Affine3d::Identity().rotation()}); // Should have 4 rotations
+  EXPECT_THROW(DetectorInfo<FlatTree>(makeInstrumentTree(), timeIndexes,
+                                      scanTimes, positions, rotations),
+               std::invalid_argument)
+      << "Should throw. Too many rotations";
+
+  // Too few rotations
+  rotations = std::vector<Eigen::Quaterniond>(
+      3,
+      Eigen::Quaterniond{
+          Eigen::Affine3d::Identity().rotation()}); // Should have 4 rotations
+  EXPECT_THROW(DetectorInfo<FlatTree>(makeInstrumentTree(), timeIndexes,
+                                      scanTimes, positions, rotations),
+               std::invalid_argument)
+      << "Should throw. Too few rotations";
+}
+
+TEST(detector_info_test, test_scanning_positions) {
+
+  auto scanTimes = ScanTimes{ScanTime(0, 10), ScanTime(10, 20)}; // 2 scan times
+
+  auto timeIndexes = std::vector<std::vector<size_t>>{{0, 2}, {1, 3}};
+
+  auto positions = std::vector<Eigen::Vector3d>(4);
+  positions[0] = Eigen::Vector3d{1, 0, 0};    // Detector B time 0
+  positions[1] = Eigen::Vector3d{1, 2, 0};    // Detector C time 0
+  positions[2] = Eigen::Vector3d{1.01, 0, 0}; // Detector B time 1
+  positions[3] = Eigen::Vector3d{1.01, 2, 0}; // Detector C time 1
+
+  auto rotations = std::vector<Eigen::Quaterniond>(
+      4, Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()});
+
+  DetectorInfo<FlatTree> detectorInfo(makeInstrumentTree(), timeIndexes,
+                                      scanTimes, positions, rotations);
+
+  EXPECT_EQ(positions[0],
+            detectorInfo.position(0 /*detector index*/, 0 /*time index*/));
+  EXPECT_EQ(positions[2],
+            detectorInfo.position(0 /*detector index*/, 1 /*time index*/));
+  EXPECT_EQ(positions[1],
+            detectorInfo.position(1 /*detector index*/, 0 /*time index*/));
+  EXPECT_EQ(positions[3],
+            detectorInfo.position(1 /*detector index*/, 1 /*time index*/));
+}
+
+TEST(detector_info_test, test_move_scan_position) {
+
+  auto scanTimes = ScanTimes{ScanTime(0, 10), ScanTime(10, 20)}; // 2 scan times
+
+  auto timeIndexes = std::vector<std::vector<size_t>>{{0, 2}, {1, 3}};
+
+  auto positions = std::vector<Eigen::Vector3d>(4);
+  positions[0] = Eigen::Vector3d{1, 0, 0};    // Detector B time 0
+  positions[1] = Eigen::Vector3d{1, 2, 0};    // Detector C time 0
+  positions[2] = Eigen::Vector3d{1.01, 0, 0}; // Detector B time 1
+  positions[3] = Eigen::Vector3d{1.01, 2, 0}; // Detector C time 1
+
+  auto rotations = std::vector<Eigen::Quaterniond>(
+      4, Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()});
+
+  DetectorInfo<FlatTree> detectorInfo(makeInstrumentTree(), timeIndexes,
+                                      scanTimes, positions, rotations);
+
+  // We are going to move just Detector C time 1 by some offset.
+  Eigen::Vector3d offset{-1, 0, 0};
+  Eigen::Vector3d expected = positions[3] + offset;
+  detectorInfo.moveDetector(1, 1, offset);
+
+  // Check that detector position at this time scan was moved correctly
+  Eigen::Vector3d actual = detectorInfo.position(1, 1);
+  EXPECT_EQ(actual, expected);
+}
 }

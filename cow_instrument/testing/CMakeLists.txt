@@ -43,6 +43,7 @@ set ( TEST_FILES
                  PathComponentTest.cpp
                  PathComponentInfoTest.cpp
                  PointPathComponentTest.cpp
+                 ScanTimeTest.cpp
                  SourceSampleDetectorPathFactoryTest.cpp                 
                  SpectrumInfoTest.cpp
                  SpectrumTest.cpp
