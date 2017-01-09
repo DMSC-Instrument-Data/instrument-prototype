@@ -417,6 +417,35 @@ TEST(detector_info_test, test_scanning_positions) {
             detectorInfo.position(1 /*detector index*/, 1 /*time index*/));
 }
 
+TEST(detector_info_test, test_scanning_l2) {
+
+  auto scanTimes = ScanTimes{ScanTime(0, 10), ScanTime(10, 20)}; // 2 scan times
+
+  auto timeIndexes = std::vector<std::vector<size_t>>{{0, 2}, {1, 3}};
+
+  auto positions = std::vector<Eigen::Vector3d>(4);
+  positions[0] = Eigen::Vector3d{1, 0, 0}; // Detector B time 0
+  positions[1] = Eigen::Vector3d{2, 0, 0}; // Detector C time 0
+  positions[2] = Eigen::Vector3d{3, 0, 0}; // Detector B time 1
+  positions[3] = Eigen::Vector3d{4, 0, 0}; // Detector C time 1
+
+  auto rotations = std::vector<Eigen::Quaterniond>(
+      4, Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()});
+
+  // Source at -1, 0, 0
+  // Sample at 0.1, 0, 0
+  auto instTree = makeInstrumentTree();
+
+  DetectorInfo<FlatTree> detectorInfo(instTree, timeIndexes, scanTimes,
+                                      positions, rotations);
+
+  EXPECT_EQ(0.9, detectorInfo.l2(0, 0)) << "Detector 0 t0 l2 incorrect";
+  EXPECT_EQ(2.9, detectorInfo.l2(0, 1)) << "Detector 0 t1 l2 incorrect";
+
+  EXPECT_EQ(1.9, detectorInfo.l2(1, 0)) << "Detector 1 t0 l2 incorrect";
+  EXPECT_EQ(3.9, detectorInfo.l2(1, 1)) << "Detector 1 t1 l2 incorrect";
+}
+
 TEST(detector_info_test, test_move_scan_position) {
 
   auto scanTimes = ScanTimes{ScanTime(0, 10), ScanTime(10, 20)}; // 2 scan times

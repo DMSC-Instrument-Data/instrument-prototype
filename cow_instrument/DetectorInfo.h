@@ -33,11 +33,14 @@ template <typename InstTree> class DetectorInfo {
 public:
   template <typename InstSptrType, typename PathFactoryType>
   explicit DetectorInfo(InstSptrType &&instrumentTree,
-                        PathFactoryType &&pathFactory, ScanTime scanTime = ScanTime{});
+                        PathFactoryType &&pathFactory,
+                        ScanTime scanTime = ScanTime{});
 
-  explicit DetectorInfo(std::shared_ptr<InstTree> &instrumentTree, ScanTime scanTime = ScanTime{});
+  explicit DetectorInfo(std::shared_ptr<InstTree> &instrumentTree,
+                        ScanTime scanTime = ScanTime{});
 
-  explicit DetectorInfo(std::shared_ptr<InstTree> &&instrumentTree, ScanTime scanTime = ScanTime{});
+  explicit DetectorInfo(std::shared_ptr<InstTree> &&instrumentTree,
+                        ScanTime scanTime = ScanTime{});
 
   template <typename InstSptrType, typename TimeIndexesType,
             typename ScanTimesType, typename PositionsType,
@@ -56,6 +59,8 @@ public:
   bool isMonitor(size_t detectorIndex) const;
 
   double l2(size_t detectorIndex) const;
+
+  double l2(size_t detectorIndex, size_t timeIndex) const;
 
   Eigen::Vector3d position(size_t detectorIndex) const;
 
@@ -357,27 +362,34 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL2() {
   const std::vector<double> &pathLengths =
       m_pathComponentInfo.const_pathLengths();
 
+  const size_t scanCount = m_durations->size();
+
   // Loop over all detector indexes. We will have a path for each.
   for (size_t detectorIndex = 0; detectorIndex < m_nDetectors;
        ++detectorIndex) {
 
-    auto detectorPos = (*m_positions)[detectorIndex];
-    size_t i = 0;
-    const Path &path = (*m_l2Paths)[detectorIndex];
-    if (path.size() < 1) {
-      throw std::logic_error("Cannot have a L2 specified with less than 1 path "
-                             "components (sample).");
-    }
-    double l2 = pathLengths[path[i]];
+    for (size_t timeIndex = 0; timeIndex < scanCount; ++timeIndex) {
 
-    // For each detector-l2-path calculate the total neutronic length
-    for (i = 1; i < path.size(); ++i) {
-      l2 += distance(entryPoints[path[i]], exitPoints[path[i - 1]]);
-      l2 += pathLengths[path[i]];
-    }
-    l2 += distance(exitPoints[path[i - 1]], detectorPos);
+      auto detectorPos =
+          (*m_positions)[(*m_linearIndexMap)[detectorIndex][timeIndex]];
+      size_t i = 0;
+      const Path &path = (*m_l2Paths)[detectorIndex];
+      if (path.size() < 1) {
+        throw std::logic_error(
+            "Cannot have a L2 specified with less than 1 path "
+            "components (sample).");
+      }
+      double l2 = pathLengths[path[i]];
 
-    (*m_l2)[detectorIndex] = l2;
+      // For each detector-l2-path calculate the total neutronic length
+      for (i = 1; i < path.size(); ++i) {
+        l2 += distance(entryPoints[path[i]], exitPoints[path[i - 1]]);
+        l2 += pathLengths[path[i]];
+      }
+      l2 += distance(exitPoints[path[i - 1]], detectorPos);
+
+      (*m_l2)[(*m_linearIndexMap)[detectorIndex][timeIndex]] = l2;
+    }
   }
 }
 
@@ -403,6 +415,13 @@ template <typename InstTree>
 double DetectorInfo<InstTree>::l2(size_t detectorIndex) const {
   detectorRangeCheck(detectorIndex, m_l2.const_ref());
   return m_l2.const_ref()[detectorIndex];
+}
+
+template <typename InstTree>
+double DetectorInfo<InstTree>::l2(size_t detectorIndex,
+                                  size_t timeIndex) const {
+  detectorRangeCheck(detectorIndex, m_l2.const_ref());
+  return m_l2.const_ref()[(*m_linearIndexMap)[detectorIndex][timeIndex]];
 }
 
 template <typename InstTree>
