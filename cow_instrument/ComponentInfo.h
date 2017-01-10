@@ -103,6 +103,12 @@ ComponentInfo<InstTree>::ComponentInfo(const DetectorInfo<InstTree> &&detectorIn
 
 
 template <typename InstrTree> void ComponentInfo<InstrTree>::init() {
+
+  if (m_detectorInfo.isScanning()) {
+    // This could be added, but we dont support it yet.
+    throw std::runtime_error("ComponentInfo does not support scanning yet");
+  }
+
   // TODO. Do this without copying everything!
   std::vector<Eigen::Vector3d> allComponentPositions =
       m_instrumentTree.startPositions();
