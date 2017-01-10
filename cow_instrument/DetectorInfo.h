@@ -106,6 +106,8 @@ public:
 
   bool isScanning() const;
 
+  size_t scanCount() const;
+
 private:
   void init();
   void initL2();
@@ -274,7 +276,10 @@ DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
   if (indexEntryCount != m_positions->size()) {
     throw std::invalid_argument("The number of component/time indexes does not "
                                 "match the number of positions for scanning "
-                                "construction");
+                                "construction. Index entry count = " +
+                                std::to_string(indexEntryCount) +
+                                ", rotation count = " +
+                                std::to_string(m_rotations->size()));
   }
   if (indexEntryCount != m_rotations->size()) {
     throw std::invalid_argument("The number of component/time indexes does not "
@@ -576,6 +581,9 @@ DetectorInfo<InstTree>::pathComponentInfo() const {
 
 template <typename InstTree> bool DetectorInfo<InstTree>::isScanning() const {
   return m_isScanning;
+}
+template <typename InstTree> size_t DetectorInfo<InstTree>::scanCount() const {
+  return m_durations->size();
 }
 
 #endif
