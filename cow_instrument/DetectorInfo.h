@@ -252,7 +252,7 @@ DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
           *instrumentTree)),
       m_nDetectors(instrumentTree->nDetectors()),
       m_l1(std::make_shared<L1s>(m_nDetectors)),
-      m_l2(std::make_shared<L2s>(m_nDetectors * scanTimes.size())),
+      m_l2(std::make_shared<L2s>(positions.size())),
       m_isMasked(std::make_shared<MaskFlags>(m_nDetectors, Bool(false))),
       m_isMonitor(std::make_shared<MonitorFlags>(m_nDetectors, Bool(false))),
       m_detectorComponentIndexes(std::make_shared<const std::vector<size_t>>(
@@ -268,26 +268,9 @@ DetectorInfo<InstTree>::DetectorInfo(InstSptrType &&instrumentTree,
       m_pathComponentInfo(
           std::forward<std::shared_ptr<InstTree>>(instrumentTree)),
       m_isScanning(true) {
-  size_t indexEntryCount = 0;
-  for (auto &positionTimes : *m_linearIndexMap) {
-    // Count up the time indexes for each component
-    indexEntryCount += positionTimes.size();
-  }
-  if (indexEntryCount != m_positions->size()) {
-    throw std::invalid_argument("The number of component/time indexes does not "
-                                "match the number of positions for scanning "
-                                "construction. Index entry count = " +
-                                std::to_string(indexEntryCount) +
-                                ", rotation count = " +
-                                std::to_string(m_rotations->size()));
-  }
-  if (indexEntryCount != m_rotations->size()) {
-    throw std::invalid_argument("The number of component/time indexes does not "
-                                "match the number of rotations for scanning "
-                                "construction");
-  }
-  if ((m_positions->size() / m_linearIndexMap->size()) != m_durations->size()) {
-    throw std::invalid_argument("Wrong number of scans");
+
+  if (m_positions->size() != m_rotations->size()) {
+    throw std::invalid_argument("The numbers of rotations and positions should match");
   }
 
   initL1();
@@ -375,8 +358,9 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL2() {
 
     for (size_t timeIndex = 0; timeIndex < scanCount; ++timeIndex) {
 
+      const size_t linearIndex = (*m_linearIndexMap)[detectorIndex][timeIndex];
       auto detectorPos =
-          (*m_positions)[(*m_linearIndexMap)[detectorIndex][timeIndex]];
+          (*m_positions)[linearIndex];
       size_t i = 0;
       const Path &path = (*m_l2Paths)[detectorIndex];
       if (path.size() < 1) {
@@ -393,7 +377,8 @@ template <typename InstTree> void DetectorInfo<InstTree>::initL2() {
       }
       l2 += distance(exitPoints[path[i - 1]], detectorPos);
 
-      (*m_l2)[(*m_linearIndexMap)[detectorIndex][timeIndex]] = l2;
+      // TODO. We may end up assigning the same value to the same index in some scanning modes. That will need optimizing out.
+      (*m_l2)[linearIndex] = l2;
     }
   }
 }
@@ -562,8 +547,9 @@ void DetectorInfo<InstTree>::movePathComponents(
 template <typename InstTree>
 std::vector<Spectrum> DetectorInfo<InstTree>::makeSpectra() const {
   std::vector<Spectrum> spectra;
-  spectra.reserve(this->detectorSize());
-  for (size_t i = 0; i < this->detectorSize(); ++i) {
+  const size_t spectraSize = m_positions->size();
+  spectra.reserve(spectraSize);
+  for (size_t i = 0; i < spectraSize; ++i) {
     spectra.push_back(i);
   }
   return spectra;

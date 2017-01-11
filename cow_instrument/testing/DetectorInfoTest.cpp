@@ -316,51 +316,9 @@ std::shared_ptr<FlatTree> makeInstrumentTree() {
   return std::make_shared<FlatTree>(a);
 }
 
-TEST(detector_info_test,
-     test_scanning_construction_throws_with_wrong_positions_size) {
-
-  auto scanTimes = ScanTimes{ScanTime(0, 10), ScanTime(10, 20)}; // 2 scan times
-
-  auto timeIndexes = std::vector<std::vector<size_t>>{{0, 2}, {1, 3}};
-
-  auto rotations = std::vector<Eigen::Quaterniond>(
-      4, Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()});
-
-  // Too many positions!
-  auto positions = std::vector<Eigen::Vector3d>(5); // Should have 4 positions
-  // EXPECT_THROW(DetectorInfo<FlatTree>(makeInstrumentTree(), timeIndexes,
-  // scanTimes, positions, rotations), std::invalid_argument) << "Should throw.
-  // Too many positions";
-
-  // Too many positions!
-  positions = std::vector<Eigen::Vector3d>(3); // Should have 4 positions
-  // EXPECT_THROW(DetectorInfo<FlatTree>(makeInstrumentTree(), timeIndexes,
-  // scanTimes, positions, rotations), std::invalid_argument) << "Should throw.
-  // Too few positions";
-}
 
 TEST(detector_info_test,
-     test_scanning_construction_throws_with_wrong_scan_number) {
-
-  auto rotations = std::vector<Eigen::Quaterniond>(
-      4, Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()});
-
-  auto positions = std::vector<Eigen::Vector3d>(4);
-
-  auto timeIndexes = std::vector<std::vector<size_t>>{
-      {0, 2}, {1, 3, 4}}; // Should only provide 4 time indexes
-
-  auto scanTimes =
-      ScanTimes{ScanTime(0, 10)}; // Only 1 scan time. This is wrong.
-
-  EXPECT_THROW(DetectorInfo<FlatTree>(makeInstrumentTree(), timeIndexes,
-                                      scanTimes, positions, rotations),
-               std::invalid_argument)
-      << "Should throw. Not enough scan times.";
-}
-
-TEST(detector_info_test,
-     test_scanning_construction_throws_with_wrong_rotations_size) {
+     test_scanning_construction_throws_with_when_rotation_size_and_position_size_not_same) {
 
   auto scanTimes = ScanTimes{ScanTime(0, 10), ScanTime(10, 20)}; // 2 scan times
 
@@ -386,7 +344,7 @@ TEST(detector_info_test,
   EXPECT_THROW(DetectorInfo<FlatTree>(makeInstrumentTree(), timeIndexes,
                                       scanTimes, positions, rotations),
                std::invalid_argument)
-      << "Should throw. Too few rotations";
+      << "Should throw. Postions and rotations do not match in size";
 }
 
 TEST(detector_info_test, test_scanning_positions) {
@@ -421,16 +379,15 @@ TEST(detector_info_test, test_scanning_l2) {
 
   auto scanTimes = ScanTimes{ScanTime(0, 10), ScanTime(10, 20)}; // 2 scan times
 
-  auto timeIndexes = std::vector<std::vector<size_t>>{{0, 2}, {1, 3}};
+  auto timeIndexes = std::vector<std::vector<size_t>>{{0, 1}, {2, 2}};
 
-  auto positions = std::vector<Eigen::Vector3d>(4);
+  auto positions = std::vector<Eigen::Vector3d>(3);
   positions[0] = Eigen::Vector3d{1, 0, 0}; // Detector B time 0
-  positions[1] = Eigen::Vector3d{2, 0, 0}; // Detector C time 0
-  positions[2] = Eigen::Vector3d{3, 0, 0}; // Detector B time 1
-  positions[3] = Eigen::Vector3d{4, 0, 0}; // Detector C time 1
+  positions[1] = Eigen::Vector3d{2, 0, 0}; // Detector B time 1
+  positions[2] = Eigen::Vector3d{3, 0, 0}; // Detector C time 0 abd time 1 (not scanning)
 
   auto rotations = std::vector<Eigen::Quaterniond>(
-      4, Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()});
+      3, Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()});
 
   // Source at -1, 0, 0
   // Sample at 0.1, 0, 0
@@ -440,10 +397,10 @@ TEST(detector_info_test, test_scanning_l2) {
                                       positions, rotations);
 
   EXPECT_EQ(0.9, detectorInfo.l2(0, 0)) << "Detector 0 t0 l2 incorrect";
-  EXPECT_EQ(2.9, detectorInfo.l2(0, 1)) << "Detector 0 t1 l2 incorrect";
+  EXPECT_EQ(1.9, detectorInfo.l2(0, 1)) << "Detector 0 t1 l2 incorrect";
 
-  EXPECT_EQ(1.9, detectorInfo.l2(1, 0)) << "Detector 1 t0 l2 incorrect";
-  EXPECT_EQ(3.9, detectorInfo.l2(1, 1)) << "Detector 1 t1 l2 incorrect";
+  EXPECT_EQ(2.9, detectorInfo.l2(1, 0)) << "Detector 1 t0 l2 incorrect";
+  EXPECT_EQ(2.9, detectorInfo.l2(1, 1)) << "Detector 1 t1 l2 incorrect";
 }
 
 TEST(detector_info_test, test_move_scan_position) {
