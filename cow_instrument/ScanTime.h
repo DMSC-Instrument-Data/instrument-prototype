@@ -20,8 +20,6 @@ public:
 private:
   /// Start time
   std::time_t m_start;
-  /// End time
-  std::time_t m_end;
   /// Duration in seconds.
   uint32_t m_duration;
 };
