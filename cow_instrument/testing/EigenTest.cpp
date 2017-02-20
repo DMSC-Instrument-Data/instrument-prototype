@@ -9,7 +9,7 @@ TEST(eigen_test, rotate_point1) {
   Eigen::Quaterniond quat{Eigen::AngleAxisd(theta, Eigen::Vector3d::UnitY())};
 
   auto b = quat.toRotationMatrix() * a;
-  EXPECT_TRUE(b.isApprox(Eigen::Vector3d{0, 0, -1}, 1e-14))
+  EXPECT_TRUE(b.isApprox(Eigen::Vector3d{0, 0, -1}, 1e-12))
       << "Rotated 90 degrees around Y";
 }
 
@@ -23,7 +23,7 @@ TEST(eigen_test, rotate_point2) {
   // q.a.q^-1
 
   auto bq = quat * a * quat.inverse();
-  EXPECT_TRUE(bq.vec().isApprox(Eigen::Vector3d{0, 0, -1}, 1e-14))
+  EXPECT_TRUE(bq.vec().isApprox(Eigen::Vector3d{0, 0, -1}, 1e-12))
       << "Rotated 90 degrees around Y";
 }
 
@@ -38,7 +38,7 @@ TEST(eigen_test, rotate_compound) {
   // (q.r).a.(q.r)^-1
 
   auto bq = q * r * a * (q * r).inverse();
-  EXPECT_TRUE(bq.vec().isApprox(Eigen::Vector3d{-1, 0, 0}, 1e-14))
+  EXPECT_TRUE(bq.vec().isApprox(Eigen::Vector3d{-1, 0, 0}, 1e-12))
       << "Rotated 90 degrees around Y. Twice";
 }
 
@@ -57,7 +57,7 @@ TEST(eigen_test, rotate_relative_from_absolute_correct) {
   // diff_q should be a rotation M_PI - M_PI/2 = M_PI/2
 
   auto bq = diff_q * a * diff_q.inverse(); // Apply the rotation to a point
-  EXPECT_TRUE(bq.vec().isApprox(Eigen::Vector3d{0, 0, -1}, 1e-14))
+  EXPECT_TRUE(bq.vec().isApprox(Eigen::Vector3d{0, 0, -1}, 1e-12))
       << "Diff is a rotation yielding 90 degrees around Y";
 }
 
