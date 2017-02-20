@@ -9,7 +9,7 @@ TEST(eigen_test, rotate_point1) {
   Eigen::Quaterniond quat{Eigen::AngleAxisd(theta, Eigen::Vector3d::UnitY())};
 
   auto b = quat.toRotationMatrix() * a;
-  EXPECT_TRUE(b.isApprox(Eigen::Vector3d{0, 0, -1}, 1e-12))
+  EXPECT_TRUE(b.isApprox(Eigen::Vector3d{0, 1, 0}, 1e-12))
       << "Rotated 90 degrees around Y";
 }
 
