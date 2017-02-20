@@ -19,7 +19,7 @@ public:
   VectorOfComponentMapper itemMapper;
   SingleItemMapper<std::string> nameMapper;
 
-  CompositeComponent *create();
+  CompositeComponent *create() override;
 
   void store(const CompositeComponent &source);
 

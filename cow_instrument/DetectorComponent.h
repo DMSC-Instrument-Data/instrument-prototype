@@ -15,7 +15,7 @@ public:
   DetectorComponent &operator=(const DetectorComponent &) = default;
 
   Eigen::Vector3d getPos() const override;
-  Eigen::Quaterniond getRotation() const;
+  Eigen::Quaterniond getRotation() const override;
   virtual ~DetectorComponent();
   DetectorComponent *clone() const override;
   bool equals(const Component &other) const override;

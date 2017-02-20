@@ -1,5 +1,5 @@
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
-find_package ( Boost 1.54.0 COMPONENTS mpi serialization REQUIRED )
+find_package ( Boost 1.54.0 COMPONENTS serialization REQUIRED )
 
 find_package(Eigen3 3.1.2 REQUIRED)
 
@@ -8,8 +8,6 @@ if(${Boost_VERSION} LESS 105700)
     message(STATUS "Add serialization overloads. Boost version ${Boost_VERSION}")
     add_definitions(-DLEGACY_BOOST_SERIALIZATION)
 endif()
-
-find_package(MPI REQUIRED)
 
 add_subdirectory(testing)
 

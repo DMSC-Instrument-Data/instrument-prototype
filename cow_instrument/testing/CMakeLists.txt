@@ -35,6 +35,7 @@ set ( TEST_FILES
                  ComponentProxyTest.cpp
                  DetectorComponentTest.cpp
                  DetectorInfoTest.cpp                 
+                 EigenTest.cpp
                  FixedLengthVectorTest.cpp                 
                  IndexTranslatorTest.cpp
                  FlatTreeTest.cpp
@@ -46,8 +47,8 @@ set ( TEST_FILES
                  SourceSampleDetectorPathFactoryTest.cpp                 
                  SpectrumInfoTest.cpp
                  SpectrumTest.cpp
-                 #MPITest.cpp
 )
+
 
 set ( TEST_FILES_MAPPERS
                 CompositeComponentMapperTest.cpp
@@ -63,12 +64,9 @@ set ( TEST_FILES_MAPPERS
                 V3DMapperTest.cpp
 )
 
-set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}" ${MPI_CXX_COMPILE_FLAGS} )
-set ( CMAKE_CXX_LINK_FLAGS ${CMAKE_CXX_LINK_FLAGS} ${MPI_LINK_FLAGS} )
+add_executable(cow_instrument_test runner.cpp MockTypes.h ${TEST_FILES} ${TEST_FILES_MAPPERS} )
 
-add_executable(cow_instrument_test runner.cpp MockTypes.h ${TEST_FILES} ${TEST_FILES_MAPPERS})
-
-target_link_libraries(cow_instrument_test LINK_PRIVATE cow_instrument ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} ${GMOCK_LIBRARY} ${GMOCK_MAIN_LIBRARY} ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} ${MPI_CXX_LIBRARIES})
+target_link_libraries(cow_instrument_test LINK_PRIVATE cow_instrument ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} ${GMOCK_LIBRARY} ${GMOCK_MAIN_LIBRARY} ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES})
 
 add_test(cow_instrument_test cow_instrument_test)
 
