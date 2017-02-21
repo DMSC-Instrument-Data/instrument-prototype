@@ -3,83 +3,20 @@
 This prototype attempts to do the following
 * Eliminate the need for a `ParameterMap` for write operations to an instrument
 * Provide read-operations that do not need to walk the `Component` hierachy
-* Make it cheap and easy to copy an `Instrument` 
+* Make it cheap and easy to copy what would traditionally be classed as an `Instrument`  
+* Demonstrate complex/neutronic beam paths
+* Demonstrate step scanning of detectors
+* Demonstrate serialization and de-serialization
 
 ##Design##
 
-This prototype introduces a `Node` that provides immutable access only to a `Component`. `Nodes` are linked together to form the tree that we think of as the `Instrument`.  `Nodes` are very small, and cheap to manufacture. Any modification to an `Instrument` results in a new `Instrument` (completely new set of `Nodes`), but crutially `Components`, which are held by nodes are copy-on-write. The end result is that new `Instruments` should be cheap to manufacture, because different `Nodes` will largely share the same acutal `Component` representations. 
+The design is centered around a structure of arrays approach to improve cache locality. As far as possible information can be read directly without the need for lazy calculation. The design uses various "Info" layers which can be indexed and enumerated over quickly to provide different views on the beamline. For example a `DetectorInfo` provides a simple detector centric view of the beamline. The instrument tree is represented in a flat vector format, which eliminates the need for pointer dereferncing and complex/expensive runtime hierachies.
 
 ###Modifications###
 
-All `Components` are effectively immutable behind `Nodes`. `Nodes` take `Commands` to allow the underlying `Component` representations to be modified. When a modification is made, the entire node tree is always shallow copied (see definition below) first. The `Command` is then executed on the relevant `Component`s of the new copy. 
-
-Unlike the v1 Mantid Instrument, we make reads cheap at the expense of the writes/modifications. We store absolute values at the `Component` level, and that means that any modifications need to cascade down the tree. For this reason all `Commands` are both executed on the target `Component` and all child `Node`s too.
-
-After each modification a pointer to the root `Node` of the new tree is returned. The root `Node` is entirely equivalent to the `Instrument`
-
-###Shallow Copy###
-
-When `Nodes` are copied, the COW pointer to the `Component` is copied, but a new `Component` is not generated. Only when mutable access to a `Component` is made is the `Component` copied too. 
-
-###The Node Type###
-
-For the actual class declaration see [here](Node.h) 
-
-```cpp
-class Node {
-public:
-  /* Method for making instrument modifications. 
-  Instrument is mainly a wrapper around the root node of the new tree now.
-  Note that this method is const.
-  */
-  Instrument_uptr modify(Command& command) const;
-  /* Only const access to the Component is allowed externally.
-     Ensures immutability of any components.
-  */
-  const Component & const_ref() const;
-private:
-  Node_sptr m_parent;
-  std::vector<Node_sptr> m_children;
-  COWPtr<Component> m_component;
-};
-```
-
-###The Command Type###
-
-For the actual class declaration see [here](Command.h) 
-```cpp
-class Command {
-public:
-  /* 
-    Do something to a component
-  */
-  void execute(Component& command) const;
-};
-```
-
-###The InstrumentTree###
-
-This is merely a wrapper around the root node. It may provide some other convenience functions.
-
-```cpp
-class InstrumentTree {
-public:
-
-    InstrumentTree(std::shared_ptr<const Node> root);
-
-    std::unique_ptr<NodeIterator> iterator() const;
-
-    std::shared_ptr<const Node> root() const;
+Writes are more expensive since absolute values are taken for positions and rotations, and offsets need to be applied to sub-levels of the tree. Since writes are an infrequent operation, this is the correct comprimise to make. Vectors homed in copy on write pointers are used to give high degrees of sharing across copies.
 
 
-private:
-    
-    // TODO. Detector map.
-
-    std::shared_ptr<const Node> m_root;
-
-};
-```
 
 
 
