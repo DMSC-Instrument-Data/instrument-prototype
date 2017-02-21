@@ -18,7 +18,7 @@ public:
   PointPathComponentMapper(const Mapee &source) { store(source); }
   PointPathComponentMapper() = default;
 
-  Mapee *create() {
+  Mapee *create() override {
     if (componentIdMapper.initalized() && posMapper.initialized()) {
       return new Mapee(posMapper.create(), componentIdMapper.create());
     } else {

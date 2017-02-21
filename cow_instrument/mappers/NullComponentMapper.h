@@ -16,7 +16,7 @@ public:
   virtual bool visit(PointSource const *const component) override;
   virtual bool visit(CompositeComponent const *const component) override;
   virtual bool visit(NullComponent const *const component) override;
-  virtual Component *create();
+  virtual Component *create() override;
   virtual ~NullComponentMapper() {}
 
   template <class Archive>
