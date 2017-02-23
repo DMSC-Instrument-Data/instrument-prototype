@@ -32,6 +32,7 @@ set ( BENCH_FILES_SRC
                  ComponentInfoWriteRotateBenchmark.cpp
                  DetectorInfoWriteTranslateBenchmark.cpp
                  DetectorInfoWriteRotateBenchmark.cpp
+                 ScanningDetectorInfo.cpp
                  SpectrumInfoBenchmark.cpp
                  StandardInstrument.cpp
 )

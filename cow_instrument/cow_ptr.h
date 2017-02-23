@@ -2,6 +2,7 @@
 #define COWPTR_H
 
 #include <memory>
+#include <utility>
 #include <type_traits>
 
 template <class T> class CowPtr {
@@ -36,7 +37,7 @@ private:
 public:
   void copy();
   CowPtr(T *t);
-  CowPtr(const RefPtr &refptr);
+  template <typename RefPtrType> CowPtr(RefPtrType &&refptr);
   const T &operator*() const;
   T &operator*();
   const T *operator->() const;
@@ -57,7 +58,10 @@ template <typename T> void CowPtr<T>::copy() {
 
 template <typename T> CowPtr<T>::CowPtr(T *t) : m_sp(t) {}
 
-template <typename T> CowPtr<T>::CowPtr(const RefPtr &refptr) : m_sp(refptr) {}
+template <typename T>
+template <typename RefPtrType>
+CowPtr<T>::CowPtr(RefPtrType &&refptr)
+    : m_sp(std::forward<RefPtrType>(refptr)) {}
 
 template <typename T> const T &CowPtr<T>::operator*() const { return *m_sp; }
 
