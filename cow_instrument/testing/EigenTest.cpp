@@ -2,18 +2,7 @@
 #include "Eigen/Geometry"
 #include <cmath>
 
-TEST(eigen_test, rotate_point1) {
-
-  Eigen::Vector3d a{1, 0, 0};
-  double theta = M_PI / 2;
-  Eigen::Quaterniond quat{Eigen::AngleAxisd(theta, Eigen::Vector3d::UnitY())};
-
-  auto b = quat.toRotationMatrix() * a;
-  EXPECT_TRUE(b.isApprox(Eigen::Vector3d{0, 0, -1}, 1e-12))
-      << "Rotated 90 degrees around Y";
-}
-
-TEST(eigen_test, rotate_point2) {
+TEST(eigen_test, rotate_point) {
 
   Eigen::Quaterniond a{0, 1, 0, 0}; // Point, x = 1, y = 0, z = 0
   double theta = M_PI / 2;
