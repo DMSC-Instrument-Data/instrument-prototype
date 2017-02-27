@@ -29,6 +29,7 @@ set ( SOURCE_FILES
 
 
 set ( INCLUDE_FILES
+                   AssemblyInfo.h
                    Bool.h
                    Component.h
                    ComponentInfo.h

@@ -9,7 +9,7 @@
 #include <cmath>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-
+#include "AssemblyInfo.h"
 #include "ComponentProxy.h"
 #include "cow_ptr.h"
 #include "DetectorInfo.h"
@@ -47,6 +47,8 @@ private:
   void makeInvertedMaps();
   /// Detector info
   DetectorInfo<InstTree> m_detectorInfo;
+  /// Assembly info (branched nodes)
+  AssemblyInfo<InstTree> m_assemblyInfo;
   /// Instrument tree
   const InstTree &m_instrumentTree;
   /// Inverted map to get detector indexes from component indexes
@@ -55,27 +57,17 @@ private:
   std::vector<int64_t> m_componentToPathIndex;
   /// Inverted map to get branch node indexes from component indexes
   std::vector<int64_t> m_componentToBranchNodeIndex;
-  /// Locally (branch node) indexed positions
-  CowPtr<std::vector<Eigen::Vector3d>> m_positions;
-  /// Locally (branch node) indexed rotations
-  CowPtr<std::vector<Eigen::Quaterniond>> m_rotations;
-  /// branch node component indexes
-  std::shared_ptr<const std::vector<size_t>> m_branchNodeComponentIndexes;
 };
 
 template <typename InstTree>
-ComponentInfo<InstTree>::ComponentInfo(const DetectorInfo<InstTree> &detectorInfo)
+ComponentInfo<InstTree>::ComponentInfo(
+    const DetectorInfo<InstTree> &detectorInfo)
     : m_detectorInfo(detectorInfo),
+      m_assemblyInfo(detectorInfo.const_instrumentTree()),
       m_instrumentTree(m_detectorInfo.const_instrumentTree()),
       m_componentToDetectorIndex(m_instrumentTree.componentSize(), -1),
       m_componentToPathIndex(m_instrumentTree.componentSize(), -1),
-      m_componentToBranchNodeIndex(m_instrumentTree.componentSize(), -1),
-      m_positions(std::make_shared<std::vector<Eigen::Vector3d>>(
-          m_instrumentTree.nBranchNodeComponents())),
-      m_rotations(std::make_shared<std::vector<Eigen::Quaterniond>>(
-          m_instrumentTree.nBranchNodeComponents())),
-      m_branchNodeComponentIndexes(std::make_shared<std::vector<size_t>>(
-          m_instrumentTree.branchNodeComponentIndexes()))
+      m_componentToBranchNodeIndex(m_instrumentTree.componentSize(), -1)
 
 {
 
@@ -83,18 +75,14 @@ ComponentInfo<InstTree>::ComponentInfo(const DetectorInfo<InstTree> &detectorInf
 }
 
 template <typename InstTree>
-ComponentInfo<InstTree>::ComponentInfo(const DetectorInfo<InstTree> &&detectorInfo)
+ComponentInfo<InstTree>::ComponentInfo(
+    const DetectorInfo<InstTree> &&detectorInfo)
     : m_detectorInfo(std::move(detectorInfo)),
+      m_assemblyInfo(m_detectorInfo.const_instrumentTree()),
       m_instrumentTree(m_detectorInfo.const_instrumentTree()),
       m_componentToDetectorIndex(m_instrumentTree.componentSize(), -1),
       m_componentToPathIndex(m_instrumentTree.componentSize(), -1),
-      m_componentToBranchNodeIndex(m_instrumentTree.componentSize(), -1),
-      m_positions(std::make_shared<std::vector<Eigen::Vector3d>>(
-          m_instrumentTree.nBranchNodeComponents())),
-      m_rotations(std::make_shared<std::vector<Eigen::Quaterniond>>(
-          m_instrumentTree.nBranchNodeComponents())),
-      m_branchNodeComponentIndexes(std::make_shared<std::vector<size_t>>(
-          m_instrumentTree.branchNodeComponentIndexes()))
+      m_componentToBranchNodeIndex(m_instrumentTree.componentSize(), -1)
 
 {
 
@@ -103,24 +91,6 @@ ComponentInfo<InstTree>::ComponentInfo(const DetectorInfo<InstTree> &&detectorIn
 
 
 template <typename InstrTree> void ComponentInfo<InstrTree>::init() {
-
-  if (m_detectorInfo.isScanning()) {
-    // This could be added, but we dont support it yet.
-    throw std::runtime_error("ComponentInfo does not support scanning yet");
-  }
-
-  // TODO. Do this without copying everything!
-  std::vector<Eigen::Vector3d> allComponentPositions =
-      m_instrumentTree.startPositions();
-  std::vector<Eigen::Quaterniond> allComponentRotations =
-      m_instrumentTree.startRotations();
-
-  size_t i = 0;
-  for (auto &compIndex : (*m_branchNodeComponentIndexes)) {
-    (*m_positions)[i] = allComponentPositions[compIndex];
-    (*m_rotations)[i] = allComponentRotations[compIndex];
-    ++i;
-  }
   makeInvertedMaps();
 }
 
@@ -153,8 +123,8 @@ Eigen::Vector3d ComponentInfo<InstTree>::position(size_t componentIndex) const {
   if (pathIndex >= 0) {
     return m_detectorInfo.pathComponentInfo().position(pathIndex);
   }
-  auto branchNodeIndex = m_componentToBranchNodeIndex[componentIndex];
-  return (*m_positions)[branchNodeIndex];
+  auto assemblyIndex = m_componentToBranchNodeIndex[componentIndex];
+  return m_assemblyInfo.position(assemblyIndex);
 }
 
 template <typename InstTree>
@@ -169,8 +139,8 @@ ComponentInfo<InstTree>::rotation(size_t componentIndex) const {
   if (pathIndex >= 0) {
     return m_detectorInfo.pathComponentInfo().rotation(pathIndex);
   }
-  auto branchNodeIndex = m_componentToBranchNodeIndex[componentIndex];
-  return (*m_rotations)[branchNodeIndex];
+  auto assemblyIndex = m_componentToBranchNodeIndex[componentIndex];
+  return m_assemblyInfo.rotation(assemblyIndex);
 }
 
 template <typename InstTree>
@@ -195,9 +165,12 @@ void ComponentInfo<InstTree>::move(size_t componentIndex,
       detectorsToMove; // Cache of detector indexes which will be moved.
   std::vector<size_t> pathComponentsToMove; // Cache of path component indexes
                                             // which will be moved
+  std::vector<size_t> assemblyComponentsToMove; // Cache of assembly component
+                                                // indexes which will be moved.
 
   detectorsToMove.reserve(componentIndexes.size());
   pathComponentsToMove.reserve(componentIndexes.size());
+  assemblyComponentsToMove.reserve(componentIndexes.size());
   for (auto &compIndex : componentIndexes) {
     auto detIndex = m_componentToDetectorIndex[compIndex];
     if (detIndex >= 0) {
@@ -209,12 +182,17 @@ void ComponentInfo<InstTree>::move(size_t componentIndex,
       pathComponentsToMove.push_back(pathIndex);
     }
 
-    auto branchNodeIndex = m_componentToBranchNodeIndex[compIndex];
-    if (branchNodeIndex >= 0) {
-      (*m_positions)[branchNodeIndex] += offset;
+    auto assemblyIndex = m_componentToBranchNodeIndex[compIndex];
+    if (assemblyIndex >= 0) {
+      /*
+       * Note that sub-components of the assembly are handled at the
+       * component-index level (see FlatTree::subTree).
+       */
+      assemblyComponentsToMove.push_back(assemblyIndex);
     }
   }
 
+  m_assemblyInfo.moveAssemblyComponents(assemblyComponentsToMove, offset);
   m_detectorInfo.moveDetectors(detectorsToMove, offset);
   m_detectorInfo.movePathComponents(pathComponentsToMove, offset);
 }
@@ -233,9 +211,11 @@ void ComponentInfo<InstTree>::rotate(size_t componentIndex,
       detectorsToRotate; // Cache of detector indexes which will be rotated.
   std::vector<size_t> pathComponentsToRotate; // Cache of path component indexes
                                               // which will be rotated
-
+  std::vector<size_t>
+      assemblyComponentsToRotate; // Cache of assembly indexes to rotate
   detectorsToRotate.reserve(componentIndexes.size());
   pathComponentsToRotate.reserve(componentIndexes.size());
+  assemblyComponentsToRotate.reserve(componentIndexes.size());
   for (auto &compIndex : componentIndexes) {
     auto detIndex = m_componentToDetectorIndex[compIndex];
     if (detIndex >= 0) {
@@ -247,20 +227,14 @@ void ComponentInfo<InstTree>::rotate(size_t componentIndex,
       pathComponentsToRotate.push_back(pathIndex);
     }
 
-    auto branchNodeIndex = m_componentToBranchNodeIndex[compIndex];
-    if (branchNodeIndex >= 0) {
-      using namespace Eigen;
-      const auto transform = Translation3d(center) * AngleAxisd(theta, axis) *
-                             Translation3d(-center);
-      const auto rotation = transform.rotation();
-
-      (*m_positions)[branchNodeIndex] =
-          transform * (*m_positions)[branchNodeIndex];
-      (*m_rotations)[branchNodeIndex] =
-          rotation * (*m_rotations)[branchNodeIndex];
+    auto assemblyIndex = m_componentToBranchNodeIndex[compIndex];
+    if (assemblyIndex >= 0) {
+      assemblyComponentsToRotate.push_back(assemblyIndex);
     }
   }
 
+  m_assemblyInfo.rotateAssemblyComponents(assemblyComponentsToRotate, axis,
+                                          theta, center);
   m_detectorInfo.rotateDetectors(detectorsToRotate, axis, theta, center);
   m_detectorInfo.rotatePathComponents(pathComponentsToRotate, axis, theta,
                                        center);
