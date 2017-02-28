@@ -21,9 +21,9 @@
  */
 template <typename InstTree> class ComponentInfo {
 public:
-  explicit ComponentInfo(const std::shared_ptr<InstTree> &instTree,
+  explicit ComponentInfo(const std::shared_ptr<const InstTree> &instTree,
                          ScanTime scanTime = ScanTime{});
-  explicit ComponentInfo(const std::shared_ptr<InstTree> &&instTree,
+  explicit ComponentInfo(const std::shared_ptr<const InstTree> &&instTree,
                          ScanTime scanTime = ScanTime{});
 
   template <typename InstSptrType, typename TimeIndexesType,
@@ -50,7 +50,7 @@ public:
               const double &theta, const Eigen::Vector3d &center);
 
 private:
-  std::shared_ptr<InstTree> m_instrumentTree;
+  std::shared_ptr<const InstTree> m_instrumentTree;
 
   /// Locally (component) indexed positions
   CowPtr<std::vector<Eigen::Vector3d>> m_positions;
@@ -80,7 +80,7 @@ makeDefaultComponentIndexes(InstSptrType &instrumentTree) {
 
 template <typename InstTree>
 ComponentInfo<InstTree>::ComponentInfo(
-    const std::shared_ptr<InstTree> &&instrumentTree, ScanTime scanTime)
+    const std::shared_ptr<const InstTree> &&instrumentTree, ScanTime scanTime)
     : m_instrumentTree(std::move(instrumentTree)),
       m_positions(std::make_shared<std::vector<Eigen::Vector3d>>(
           m_instrumentTree->startPositions())),
@@ -91,7 +91,7 @@ ComponentInfo<InstTree>::ComponentInfo(
 
 template <typename InstTree>
 ComponentInfo<InstTree>::ComponentInfo(
-    const std::shared_ptr<InstTree> &instrumentTree, ScanTime scanTime)
+    const std::shared_ptr<const InstTree> &instrumentTree, ScanTime scanTime)
     : m_instrumentTree(instrumentTree),
       m_positions(std::make_shared<std::vector<Eigen::Vector3d>>(
           m_instrumentTree->startPositions())),
