@@ -52,10 +52,11 @@ TEST(assembly_info_test, test_positions) {
       std::make_shared<ComponentInfo<FlatTree>>(instrumentTree);
   AssemblyInfo<FlatTree> assemblyInfo{componentInfo};
 
-  EXPECT_TRUE(assemblyInfo.position(0).isApprox(componentInfo->position(0))) << "Assembly 0 is same as Component 0";
-  EXPECT_TRUE(assemblyInfo.position(1).isApprox(componentInfo->position(3))) << "Assembly 1 is same as Component 3";
+  EXPECT_TRUE(assemblyInfo.position(0).isApprox(componentInfo->position(0)))
+      << "Assembly 0 is same as Component 0";
+  EXPECT_TRUE(assemblyInfo.position(1).isApprox(componentInfo->position(3)))
+      << "Assembly 1 is same as Component 3";
 }
-
 
 TEST(assembly_info_test, test_rotations) {
   auto instrumentTree = makeInstrumentTree();
@@ -63,22 +64,26 @@ TEST(assembly_info_test, test_rotations) {
       std::make_shared<ComponentInfo<FlatTree>>(instrumentTree);
   AssemblyInfo<FlatTree> assemblyInfo{componentInfo};
 
-  EXPECT_TRUE(assemblyInfo.rotation(0).isApprox(componentInfo->rotation(0))) << "Assembly 0 is same as Component 0";
-  EXPECT_TRUE(assemblyInfo.rotation(1).isApprox(componentInfo->rotation(3))) << "Assembly 1 is same as Component 3";
+  EXPECT_TRUE(assemblyInfo.rotation(0).isApprox(componentInfo->rotation(0)))
+      << "Assembly 0 is same as Component 0";
+  EXPECT_TRUE(assemblyInfo.rotation(1).isApprox(componentInfo->rotation(3)))
+      << "Assembly 1 is same as Component 3";
 }
-TEST(assembly_info_test, test_move){
+TEST(assembly_info_test, test_move) {
 
-    auto instrumentTree = makeInstrumentTree();
-    auto componentInfo =
-        std::make_shared<ComponentInfo<FlatTree>>(instrumentTree);
-    AssemblyInfo<FlatTree> assemblyInfo{componentInfo};
+  auto instrumentTree = makeInstrumentTree();
+  auto componentInfo =
+      std::make_shared<ComponentInfo<FlatTree>>(instrumentTree);
+  AssemblyInfo<FlatTree> assemblyInfo{componentInfo};
 
-    auto currentRootPos = assemblyInfo.position(0); // root position
-    auto currentLeafPos = componentInfo->position(1);
-    Eigen::Vector3d delta{1, 0, 0};
-    assemblyInfo.moveAssemblyComponent(0, delta);
+  auto currentRootPos = assemblyInfo.position(0); // root position
+  auto currentLeafPos = componentInfo->position(1);
+  Eigen::Vector3d delta{1, 0, 0};
+  assemblyInfo.moveAssemblyComponent(0, delta);
 
-    EXPECT_TRUE(assemblyInfo.position(0).isApprox(currentRootPos + delta)) << "Test root moved";
-    EXPECT_TRUE(componentInfo->position(1).isApprox(currentLeafPos + delta)) << "Test leaf moved. Changes should be progated down.";
+  EXPECT_TRUE(assemblyInfo.position(0).isApprox(currentRootPos + delta))
+      << "Test root moved";
+  EXPECT_TRUE(componentInfo->position(1).isApprox(currentLeafPos + delta))
+      << "Test leaf moved. Changes should be progated down.";
 }
 }

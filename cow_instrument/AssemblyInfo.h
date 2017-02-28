@@ -11,8 +11,7 @@
 template <typename InstTree> class AssemblyInfo {
 public:
   AssemblyInfo();
-  explicit AssemblyInfo(
-      std::shared_ptr<ComponentInfo<InstTree>> componentInfo);
+  explicit AssemblyInfo(std::shared_ptr<ComponentInfo<InstTree>> componentInfo);
   Eigen::Quaterniond rotation(size_t assemblyIndex) const;
   Eigen::Vector3d position(size_t assemblyIndex) const;
   void moveAssemblyComponent(const size_t assemblyIndex,
@@ -37,13 +36,15 @@ AssemblyInfo<InstTree>::AssemblyInfo(
 
 template <typename InstTree>
 Eigen::Vector3d AssemblyInfo<InstTree>::position(size_t assemblyIndex) const {
-  return m_componentInfo->position((*m_assemblyComponentIndexes)[assemblyIndex]);
+  return m_componentInfo->position(
+      (*m_assemblyComponentIndexes)[assemblyIndex]);
 }
 
 template <typename InstTree>
 Eigen::Quaterniond
 AssemblyInfo<InstTree>::rotation(size_t assemblyIndex) const {
-  return m_componentInfo->rotation((*m_assemblyComponentIndexes)[assemblyIndex]);
+  return m_componentInfo->rotation(
+      (*m_assemblyComponentIndexes)[assemblyIndex]);
 }
 
 template <typename InstTree>
