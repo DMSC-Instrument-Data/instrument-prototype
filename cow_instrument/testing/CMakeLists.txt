@@ -30,6 +30,7 @@ endif()
 include_directories(${GTEST_INCLUDE_DIR} ${GMOCK_INCLUDE_DIR} ${Boost_INCLUDE_DIRS} ${MPI_CXX_INCLUDE_PATH})
 
 set ( TEST_FILES
+                 AssemblyInfoTest.cpp
                  CompositeComponentTest.cpp
                  ComponentInfoTest.cpp
                  ComponentProxyTest.cpp
