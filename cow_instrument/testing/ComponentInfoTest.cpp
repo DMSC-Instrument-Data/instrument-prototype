@@ -44,37 +44,15 @@ std::shared_ptr<FlatTree> makeInstrumentTree() {
 
   return std::make_shared<FlatTree>(a);
 }
-/*
-TEST(component_info_test, test_construct) {
-
-  using namespace testing;
-  MockFlatTree *pMockInstrumentTree = new testing::NiceMock<MockFlatTree>{};
-  EXPECT_CALL(*pMockInstrumentTree, nDetectors())
-      .WillRepeatedly(testing::Return(1));
-
-  std::shared_ptr<MockFlatTree> mockInstrumentTree{pMockInstrumentTree};
-
-  ComponentInfoWithMockInstrument{
-      DetectorInfo<MockFlatTree>(mockInstrumentTree)};
-
-  EXPECT_TRUE(testing::Mock::VerifyAndClear(pMockInstrumentTree))
-      << "InstrumentTree used incorrectly";
-}
 
 TEST(component_info_test, test_move) {
 
   using namespace testing;
 
   auto *instrumentTree = new testing::NiceMock<MockFlatTree>{};
-  // configure what the subTreIndexes call will do. i.e. point to the first
-  // component_id
-  EXPECT_CALL(*instrumentTree, subTreeIndexes(_))
-      .WillOnce(Return(std::vector<size_t>{0}));
 
   std::shared_ptr<NiceMockInstrumentTree> mockInstrumentTree(instrumentTree);
-  auto componentInfo =
-ComponentInfoWithNiceMockInstrument{DetectorInfo<NiceMockInstrumentTree>(
-          mockInstrumentTree)};
+  auto componentInfo = ComponentInfoWithNiceMockInstrument{mockInstrumentTree};
 
   auto before = componentInfo.position(0);
   auto offset = Eigen::Vector3d{1, 0, 0};
@@ -84,7 +62,6 @@ ComponentInfoWithNiceMockInstrument{DetectorInfo<NiceMockInstrumentTree>(
   EXPECT_EQ(after, before + offset);
   EXPECT_TRUE(Mock::VerifyAndClearExpectations(instrumentTree));
 }
-
 TEST(component_info_test, test_single_rotation_around_component_origin) {
 
   using namespace testing;
@@ -102,9 +79,7 @@ TEST(component_info_test, test_single_rotation_around_component_origin) {
           Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()}}));
 
   std::shared_ptr<NiceMockInstrumentTree> mockInstrumentTree(instrumentTree);
-  auto componentInfo = ComponentInfoWithNiceMockInstrument{
-      DetectorInfo<NiceMockInstrumentTree>(
-          mockInstrumentTree)};
+  auto componentInfo = ComponentInfoWithNiceMockInstrument{mockInstrumentTree};
 
   const size_t sampleComponentIndex = 0;
 
@@ -150,9 +125,7 @@ TEST(component_info_test, test_multiple_rotation_around_component_origin) {
           Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()}}));
 
   std::shared_ptr<NiceMockInstrumentTree> mockInstrumentTree(instrumentTree);
-  auto componentInfo = ComponentInfoWithNiceMockInstrument{
-      DetectorInfo<NiceMockInstrumentTree>(
-          mockInstrumentTree)};
+  auto componentInfo = ComponentInfoWithNiceMockInstrument{mockInstrumentTree};
 
   const size_t sampleComponentIndex = 0;
 
@@ -200,9 +173,7 @@ TEST(component_info_test, test_single_rotation_around_arbitrary_center) {
           Eigen::Quaterniond{Eigen::Affine3d::Identity().rotation()}}));
 
   std::shared_ptr<NiceMockInstrumentTree> mockInstrumentTree(instrumentTree);
-  auto componentInfo = ComponentInfoWithNiceMockInstrument{
-      DetectorInfo<NiceMockInstrumentTree>(
-          mockInstrumentTree)};
+  auto componentInfo = ComponentInfoWithNiceMockInstrument{mockInstrumentTree};
   const size_t sampleComponentIndex = 0;
 
   componentInfo.rotate(sampleComponentIndex, rotationAxis, rotationAngle,
@@ -219,8 +190,6 @@ TEST(component_info_test, test_single_rotation_around_arbitrary_center) {
   EXPECT_TRUE(rotatedVector.isApprox(Eigen::Vector3d{0, 1, 0}, 1e-14))
       << "Internal component rotation not updated correctly";
 }
-*/
-
 TEST(component_info_test, test_multiple_rotation_arbitrary_center) {
 
   using namespace testing;
