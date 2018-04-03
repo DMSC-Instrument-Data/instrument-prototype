@@ -6,7 +6,7 @@
 #include "DetectorInfo.h"
 #include "StandardBenchmark.h"
 #include <vector>
-#include <benchmark/benchmark_api.h>
+#include <benchmark/benchmark.h>
 
 class Node;
 namespace std_instrument {

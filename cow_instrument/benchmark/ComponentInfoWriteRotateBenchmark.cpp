@@ -1,5 +1,5 @@
 #include "StandardInstrument.h"
-#include <benchmark/benchmark_api.h>
+#include <benchmark/benchmark.h>
 
 #include <stdexcept>
 namespace {

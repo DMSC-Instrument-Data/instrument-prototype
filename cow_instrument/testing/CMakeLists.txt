@@ -65,7 +65,7 @@ set ( TEST_FILES_MAPPERS
                 V3DMapperTest.cpp
 )
 
-add_executable(cow_instrument_test runner.cpp MockTypes.h ${TEST_FILES} ${TEST_FILES_MAPPERS} )
+add_executable(cow_instrument_test runner.cpp MockTypes.h ${TEST_FILES} )
 
 target_link_libraries(cow_instrument_test LINK_PRIVATE cow_instrument ${GTEST_LIBRARY} ${GTEST_MAIN_LIBRARY} ${GMOCK_LIBRARY} ${GMOCK_MAIN_LIBRARY} ${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES})
 

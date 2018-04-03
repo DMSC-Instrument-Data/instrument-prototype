@@ -1,4 +1,4 @@
-#include "benchmark/benchmark_api.h"
+#include "benchmark/benchmark.h"
 #include "FlatTree.h"
 #include "SpectrumInfo.h"
 #include "StandardBenchmark.h"

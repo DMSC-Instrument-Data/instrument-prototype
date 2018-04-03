@@ -12,8 +12,8 @@ CompositeComponentMapper::CompositeComponentMapper(
 
 CompositeComponent *CompositeComponentMapper::create() {
   // Check that everything required has been specified.
-  if (componentIdMapper.initalized() && itemMapper.initialized() &&
-      nameMapper.initialized()) {
+//  if (componentIdMapper.initalized() && itemMapper.initialized() &&
+//      nameMapper.initialized()) {
 
     auto component =
         new CompositeComponent(componentIdMapper.create(), nameMapper.create());
@@ -23,11 +23,11 @@ CompositeComponent *CompositeComponentMapper::create() {
           std::move(std::unique_ptr<Component>(item.create())));
     }
     return component;
-  } else {
-    throw std::invalid_argument("Cannot be deserialized. Not all mandatory "
-                                "construction fields have been provided for "
-                                "CompositeComponent");
-  }
+ // } else {
+ //   throw std::invalid_argument("Cannot be deserialized. Not all mandatory "
+ //                               "construction fields have been provided for "
+ //                               "CompositeComponent");
+ // }
 }
 
 void CompositeComponentMapper::store(const CompositeComponent &source) {

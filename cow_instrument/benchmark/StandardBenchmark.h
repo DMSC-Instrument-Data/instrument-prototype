@@ -1,7 +1,7 @@
 #ifndef STANDARDBENCHMARK_H
 #define STANDARDBENCHMARK_H
 
-#include <benchmark/benchmark_api.h>
+#include <benchmark/benchmark.h>
 
 /**
  * CRTP For providing a global benchmark execution policy set.

@@ -1,6 +1,6 @@
 #include "StandardInstrument.h"
 #include "DetectorInfo.h"
-#include <benchmark/benchmark_api.h>
+#include <benchmark/benchmark.h>
 
 namespace {
 

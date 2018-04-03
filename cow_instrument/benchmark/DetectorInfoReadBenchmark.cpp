@@ -1,5 +1,5 @@
 #include "StandardInstrument.h"
-#include <benchmark/benchmark_api.h>
+#include <benchmark/benchmark.h>
 
 namespace {
 
@@ -31,4 +31,4 @@ BENCHMARK_F(DetectorInfoReadFixture,
 
 } // namespace
 
-BENCHMARK_MAIN()
+BENCHMARK_MAIN();

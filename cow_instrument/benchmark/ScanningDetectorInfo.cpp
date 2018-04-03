@@ -7,7 +7,7 @@
 #include "SourceSampleDetectorPathFactory.h"
 #include "FlatTree.h"
 #include "ScanTime.h"
-#include <benchmark/benchmark_api.h>
+#include <benchmark/benchmark.h>
 #include <iostream>
 
 namespace {
