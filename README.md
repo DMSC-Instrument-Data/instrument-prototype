@@ -34,7 +34,7 @@ $ cmake --build
 ```
 $ git clone https://github.com/google/benchmark.git
 $ cd benchmark
-$ cmake .
+$ cmake -DBENCHMARK_ENABLE_GTEST_TESTS=OFF .
 $ cmake --build
 ```
 
