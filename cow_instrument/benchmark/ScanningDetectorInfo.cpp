@@ -18,7 +18,8 @@ std::unique_ptr<Component> make_tube(size_t nPixels, std::string name,
   std::unique_ptr<CompositeComponent> tube(
       new CompositeComponent(ComponentIdType(0), name));
 
-  for (size_t i = 0; i < nPixels; ++i) {
+
+  for (int i = 0; i < nPixels; ++i) {
     tube->addComponent(std::unique_ptr<DetectorComponent>(
         new DetectorComponent(componentId++, detectorId++, Eigen::Vector3d{})));
   }
